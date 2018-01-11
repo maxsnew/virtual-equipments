@@ -1,0 +1,73 @@
+* Universal Properties in Generalized Multicategories
+
+While it is widely recognized that there are deep connections between
+logic, type theory and category theory, we believe that existing
+practice of categorical logic applied to type theory takes advantage
+of only a fraction of what category theory has to offer.
+
+Even the basic standard dogma of "negative simply typed lambda
+calculus" corresponds to "cartesian closed categories" is overly
+complex.
+
+Specifically, the most basic flaw in the correspondence is that while
+categories axiomatize a basic notion of map from one object to
+another, cartesian type theory axiomatizes a notion of map of many
+arguments.
+
+Why should this basic conceptual mismatch be handled at the boundary
+between syntax and semantics?
+
+We, following and embracing the work of many others in the field (cite
+some stuff about operads, multicats) instead believe that type
+theories have natural models not in *categories*, but instead in
+*multi-categories* (also known as operads).
+
+The conceptual shift from categories to (cartesian) multi-categories
+makes the initiality theorem for stlc and cartesian closed
+multicategories almost a triviality, just as any basic theorem should
+be!
+
+Then the more interesting relationship between cartesian
+multicategories and cartesian categories can take place wholly on the
+semantic side (or syntactic, if one prefers) without muddling the
+simplicity of the relationship between syntax and semantics.
+
+However in shifting from categories to multi-categories, we also shift
+from an intensely developed field of mathematics to its less
+well-developed cousin, and furthermore, each new flavor of type theory
+(cartesian, relevant, linear, dependent) demands a new flavor of
+multi-category.
+
+Fortunately, recent categorical work (Crutwell-Shulman, some prev
+stuff) makes developing these new flavors of multi-category much
+simpler by giving us a notion of "generalized multicategory", which is
+a generalization of multicategories, but also of enriched and internal
+categories.
+
+In this paper we seek to develop some "type theoretic" concepts at the
+level of generality of generalized multi-categories.
+
+Specifically, we develop a notion of "right universal property" that
+corresponds to right-representable profunctors in classical
+categories, but generalizes to also capture closed multicategories and
+therefore the function type in both cartesian and substructural type
+theories.
+
+Further, we use this notion to provide an abstract notion of
+"multicategory with specified right universals" that cleanly captures
+the technical notion of "category of models" for a vast group of type
+theories.
+
+* Right Universal Property in a Generalized Multicategory
+
+As our notion of generalized multicategory, we pick Crutwell-Shulman's
+"normalized T-monoid for a monad T on a virtual equipment V".
+
+Then a (parameterized) right universal property is a right module of
+this monad.
+
+
+
+However I want to go one step further and define a *generic* right
+universal property to be a functor from nKmod(T,V) to Rmod(T,V)
+
