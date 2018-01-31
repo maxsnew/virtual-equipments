@@ -1,0 +1,205 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{tikz-cd}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\begin{document}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newcommand{\pto}{\nrightarrow}
+\newcommand{\pfrom}{\nleftarrow}
+\newcommand{\vcat}{\mathcal}
+\newcommand{\cat}{\mathbb}
+
+\title{Universal Properties in Generalized Multicategories}
+\author{Max S. New}
+
+\maketitle
+
+In this paper, we seek to develop some theory of right and left
+universal properties at the abstract level of generalized
+multicategories.
+%
+Our goal is to ease the development of new type theories with sound
+and complete categorical semantics based on Martin-Lof's notion of
+judgmental structure.
+%
+In effect we are abstracting the Curry-Howard-Lambek correspondence as
+follows:
+
+\begin{tabular}{|c|c|}
+  \hline
+  Syntax/Type Theory & Semantics/Category Theory\\ \hline \hline
+  Judgmental Structure & Generalized Multicategory\\ \hline
+  Negative Type & Representable Generic Right Universal Property\\ \hline
+  Positive Type & Representable Generic Left Universal Property\\ \hline  
+\end{tabular}
+
+In the process we will provide definitions and theorems that should
+free the working semanticist from proving some tedious theorems and
+provide guidance for the development of new type theories.
+%
+In particular, our notions of generic right and left-universal
+property lead to a transparent definition of the category of models in
+which the type theory presents the initial model.
+% TODO: actually see if we *can* prove the following LOL
+Further, we provide a quite abstract ``presentation parsimony''
+theorem that shows that type theories presenting functorial
+constructions can \emph{derive} the functoriality from the
+introduction and elimination rules.
+
+\section{Horizontal Profunctors and Representability}
+
+In ordinary category theory there is no need for a separate notion of
+right- and left-universal property since categories satisfy perfect
+duality: the opposite of a category is a category and so a
+left-universal property is defined as a right-universal property in
+the opposite category.
+%
+However multicategories are assymetric by default, the source is given
+by a context and the target by a single object, so the opposite of a
+multicategory is not a multicategory but a poycategory.
+%
+It is conceivable that the more general framework of polycategories
+will restore this duality, but for now we will work with the
+asymmetric notion, which will help to develop intuition in the worst
+case.
+
+Despite the lack of perfect duality, we can abstract over some of the
+commonalities between right and left universal properties.
+%
+Right universal properties are right modules and left universal
+properties are left modules, but rather than being modules between
+categories or between multicategories, the modules will have one side
+be a category and the other a multicategory.
+%
+This structure is generally modelled by a horizontal profunctor
+between the virtual equipments of categories and multicategories.
+
+\begin{definition}[Horizontal Profunctor]
+  Given virtual double categories $\vcat{V},\vcat{U}$, a
+  \emph{horizontal profunctor} $H : \vcat V \pfrom \vcat U$ is for
+  each $v \in \vcat V, u \in \vcat U$ a set $H(v,u)$ of ``horizontal
+  heteromorphisms'' from $u$ to $v$, so written $v \pfrom u$.
+  Additionally a notion of ``hetero-2-cell'' with shapes:
+
+  \begin{tikzcd}
+v_n \arrow[dd, "f"] & \cdots \arrow[l, "R_n"] & v_0 \arrow[l, "R_1"] & u_0 \arrow[l, "h"] & \cdots \arrow[l, "Q_1"] & u_m \arrow[l, "Q_m"] \arrow[dd, "g"] \\
+ &  &  &  &  &  \\
+v' &  &  &  &  & u' \arrow[lllll, "h'"]
+  \end{tikzcd}
+
+  that can be composed with other hetero-2-cells and 2-cells in $\vcat
+  V, \vcat U$ in the evident way, satisfying the evident unitality and
+  associativity laws.
+\end{definition}
+
+We draw diagrams for horizontal profunctors the same way we draw them
+for virtual double categories, this is justified by the following
+definition, in which they are just diagrams in a virtual double category:
+
+\begin{definition}[Cograph of a Horizontal Profunctor]
+  For any horizontal profunctor $H : \vcat V \pfrom \vcat U$ we
+  construct the cograph $V +_{H} U$ to have as objects $V_0 + U_0$,
+  vertical arrows only within $V,U$ and horizontal morphisms defined
+  as:
+  \begin{align*}
+    (V +_{H} U)(v,v') &= V(v,v')\\
+    (V +_{H} U)(u,u') &= U(u,u')\\
+    (V +_{H} U)(v,u) &= H(v,u)\\
+    (V +_{H} U)(u,v) &= \emptyset
+  \end{align*}
+  With 2-cells inherited from $V,U,H$.
+\end{definition}
+
+I'm not sure if it's possible to define a virtual equipment of virtual
+double categories, double functors and \emph{horizontal} profunctors,
+but we will need at least the following very simple kind of 2-cell in
+this imagined equipment of the following shape:
+
+\begin{tikzcd}
+ & W \arrow[ldd, "F_V"] \arrow[rdd, "F_U"] &  \\
+ & F &  \\
+V &  & U \arrow[ll, "H"]
+\end{tikzcd}
+
+\begin{definition}[Parameterized Element of a Profunctor]
+  Let $\vcat {V,U}$ be virtual double categories, $\cat W$ be a
+  category and let $H \vcat V \pfrom \vcat U$ be a profunctor.
+
+  Then a $\cat W$-parameterized element of $H$ consists of
+  \begin{enumerate}
+  \item Functors $F_U : \cat W \to (\vcat U)_v$ and $F_{\vcat V} :
+    \cat W \to (\vcat V)_v$.
+  \item For each $w \in W$, a heteromorphism $F(w) : F_{\vcat V} w
+    \pfrom F_{\vcat W} w$
+  \item For each $f : w \to w'$, a 2-cell
+    \begin{tikzcd}
+F_{V} w \arrow[dd, "F_{V} f"] &  & F_{U} w \arrow[ll, "Fw"] \arrow[dd, "F_{U}f"] \\
+ & Ff &  \\
+F_{V} w' &  & F_{U} w' \arrow[ll, "Fw'"]
+    \end{tikzcd}
+    such that the assignment is functorial (preserve identity,
+    composition).
+  \end{enumerate}
+\end{definition}
+
+Now we can define a general notion of representability in a
+profunctor.
+%
+Representability is a formulation of a (parameterized) type having a
+universal property: the horizontal morphism is the universal property
+and the 2-cell means ``maps into/out of this object look like the
+universal property''.
+%
+In a virtual double category representability is a relationship
+between horizontal and vertical morphisms with the same boundary, but
+our horizontal profunctor doesn't give us a notion of vertical
+morphism.
+%
+It might be possible to develop a more general definition of
+profunctor, but instead for now we will limit to the following case:
+
+\begin{definition}{Representable Heteromorphism}
+  Let $H : \vcat V \pfrom \vcat U$ be a horizontal profunctor and
+  $\bar H : \vcat U \to \vcat V$ be a functor with a $(\vcat U)_v$
+  parameterized element of $H$:
+  \[
+  \begin{tikzcd}
+ & U_v \arrow[ldd, "\bar H"'] \arrow[rdd, "id"] &  \\
+ & \bar H &  \\
+V &  & U \arrow[ll, "H"]
+\end{tikzcd}
+  \]
+
+  Then a representation of a heteromorphism $h : u \pfrom v$ consists
+  of a vertical arrow $\bar h : v \to \bar H u$ and a 2-cell
+  \[
+  \begin{tikzcd}
+u \arrow[dd, "id"] &  & v \arrow[dd, "\bar h"] \arrow[ll, "h"] \\
+ & \bar h &  \\
+u &  & \bar H u \arrow[ll, "\bar H u"]
+  \end{tikzcd}
+  \]
+  that is cartesian in $\vcat V +_{H} \vcat U$.
+\end{definition}
+
+Below, we think of all heteromorphisms as expressing
+\emph{specifications} for vertical morphisms in this way, which is why
+it is thought of as a ``property'' that an object may or may not have.
+
+\section{Concrete and Generic Right Universal Properties}
+
+
+
+\section{Left Universal Properties}
+
+
+\end{document}
+
+%% Local Variables:
+%% compile-command: "pdflatex upgm.tex"
+%% End:
