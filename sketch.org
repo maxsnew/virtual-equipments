@@ -58,6 +58,16 @@ Further, we use this notion to provide an abstract notion of
 the technical notion of "category of models" for a vast group of type
 theories.
 
+* Representable Heteromorphisms
+
+To start, we develop some of the common theory between right/negative
+and left/positive universal properties.
+
+Both are instances of what we could call "horizontal virtual
+profunctors" which give a notion of "horizontal heteromorphism"
+between two virtual double categories and 2-cell with a horizontal
+heteromorphism as target and appearing in the source.
+
 * Right Universal Property in a Generalized Multicategory
 
 We use definitions, terminology from Crutwell-Shulman.
