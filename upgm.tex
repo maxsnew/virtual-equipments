@@ -13,6 +13,8 @@
 \newcommand{\pfrom}{\nleftarrow}
 \newcommand{\vcat}{\mathcal}
 \newcommand{\cat}{\mathbb}
+\newcommand{\vtkmnd}{\mathbb{K}\text{Mod}(\vcat{V},T)}
+\newcommand{\rmod}{\text{RMod}}
 
 \title{Universal Properties in Generalized Multicategories}
 \author{Max S. New}
@@ -193,6 +195,129 @@ it is thought of as a ``property'' that an object may or may not have.
 
 \section{Concrete and Generic Right Universal Properties}
 
+A right universal property is a specification for a parameterized
+object by defining what maps \emph{into} the object look like.
+%
+These are simpler to formalize for generalized multicategories because
+we have less interaction with the context as given by the monad $T$.
+%
+If our generalized multicategories are defined as kleisli monoids in
+$\vcat V$ with monad $T$, then a right universal property on a
+``multicategory'' $\vcat M \in \vtkmnd$ will be parameterized by a
+``category'' $\cat C \in \vcat V$ and is defined as an element of the
+following profunctor:
+
+\begin{definition}{Profunctor of Right Modules}
+  The profunctor of category-parameterized right modules on
+  multicategories $\rmod : \vtkmnd \pfrom \vcat V$ has as elements
+  $\vcat M \pfrom \cat C$ \emph{right modules} which consist of
+  \begin{enumerate}
+  \item A profunctor $Q : T \vcat M \pfrom \cat C$ in $\vcat V$.
+  \item An action
+    \[
+\begin{tikzcd}
+T^2M_0 \arrow[dd, "\mu"] & T M_0 \arrow[l, "T(M_1)"] & C \arrow[dd, "id"] \arrow[l, "Q"] \\
+ & Qcut &  \\
+TM_0 &  & C \arrow[ll, "Q"]
+\end{tikzcd}
+\]
+  \item That is associative:
+    \[
+    \begin{tikzcd}
+T^3M_0 \arrow[dd, "\mu"] &  & T^2M_0 \arrow[dd, "\mu"] \arrow[ll, "T^2(M_1)"] & T M_0 \arrow[l, "T(M_1)"] & C \arrow[dd, "id"] \arrow[l, "Q"] &  & T^3M_0 \arrow[dd, "\mu"] & T^2M_0 \arrow[l] & TM_0 \arrow[l] \arrow[dd, "id"] & C \arrow[l, "Q"] \arrow[dd, "id"] \\
+ & \mu &  & Qcut &  &  &  & T(M_1) &  &  \\
+T^2M_0 \arrow[dd, "\mu"] &  & TM_0 \arrow[ll, "T(M_1)"] &  & C \arrow[ll, "Q"] \arrow[dd, "id"] & = & T^2M_0 \arrow[dd, "\mu"] &  & TM_0 \arrow[ll, "T(M_1)"] & C \arrow[l, "Q"] \arrow[dd, "id"] \\
+ &  & Qcut &  &  &  &  &  & Qcut &  \\
+TM_0 &  &  &  & C \arrow[llll, "Q"] &  & TM_0 &  &  & C \arrow[lll, "Q"]
+\end{tikzcd}
+    \]
+  \item And unital:
+    \[\begin{tikzcd}
+ & TM_0 \arrow[ld, "T\eta"] \arrow[d, "id"] &  & C \arrow[ll, "Q"] \arrow[d, "id"] &  &  &  \\
+T^2M_0 \arrow[dd, "\mu"] & TM_0 \arrow[l, "M_1"] &  & C \arrow[ll, "Q"] \arrow[dd, "id"] & = & TM_0 \arrow[d, "id"] & C \arrow[d, "id"] \arrow[l, "Q"] \\
+ &  & Qcut &  &  & TM_0 & C \arrow[l, "Q"] \\
+TM_0 &  &  & C \arrow[lll, "Q"] &  &  & 
+    \end{tikzcd}\]
+  \end{enumerate}
+
+  And a 2-cell with shape 
+  \[\begin{tikzcd}
+{\vcat M}_n \arrow[dd, "f"] & \cdots \arrow[l, "R_n"] & {\vcat M}_0 \arrow[l, "R_1"] & {\cat C}_0 \arrow[l, "Q"] & \cdots \arrow[l, "P_1"] &  {\cat C}_m \arrow[l, "P_m"] \arrow[dd, "g"] \\
+ &  &  &  &  &  \\
+{\vcat M}' &  &  &  &  & {\cat C}' \arrow[lllll, "Q'"]
+  \end{tikzcd}\]
+  is given by a 2-cell in $\vcat V$ with shape:
+  \[\begin{tikzcd}
+T^{n+1}\vcat{M}_n \arrow[d, "\mu^n"] & \cdots \arrow[l, "T^nR_n"] & T\vcat{M}_0 \arrow[l, "TR_1"] & \cat C_0 \arrow[l, "Q"] & \cdots \arrow[l, "P_1"] & \cat C_m \arrow[l, "P_m"] \arrow[dd, "g"] \\
+T\vcat{M}_n \arrow[d, "Tf"] &  &  &  &  &  \\
+T\vcat{M}' &  &  &  &  & \cat C' \arrow[lllll, "Q'"]
+\end{tikzcd}
+  \]
+
+  with composition defined in the obvious way and unitality and
+  associativity properties of 2-cells following from the unitality and
+  associativity properties of the actions.
+\end{definition}
+
+\subsection{Examples}
+
+The most basic is the identity module which is given by $M_1 : TM_0
+\pfrom M_0$ itself. We will use this for representability next.
+
+If $\vcat V$ is cartesian or even virtually cartesian, we can define
+the \emph{product} property as $\Delta^{*}(M_1\times M_1) : TM_0
+\pfrom M_0\times M_0$ and the \emph{cartesian unit} as $!^*(Id_{1}) :
+TM_0 \pfrom 1$.
+
+We will need some technology from the next section to define a general
+notion of \emph{closed} multicategory, but we can define the property
+of $A \to B$ concretely in many different multicategories.
+
+\subsection{Representability}
+
+As noted above, the hom of a generalized multicategory can be seen as
+a module $M_1 : T M_0 \pfrom M_0$ and we can make this into a
+parameterized element of $\rmod$ of shape:
+  \[
+  \begin{tikzcd}
+ & \vtkmnd_v \arrow[ldd,"id"] \arrow[rdd, "-_{0}"] &  \\
+ & -_1 &  \\
+\vtkmnd &  & \vcat V \arrow[ll, "\rmod"]
+\end{tikzcd}
+  \]
+and then we can define a representable negative universal property as
+just a representable right module with respect to $-_1$.
+
+In more detail a representation of $Q : \vcat M \pfrom \cat C$ is a
+2-cell:
+  \[
+  \begin{tikzcd}
+TM_0 \arrow[dd, "id"] &  & C \arrow[dd, "G_Q"] \arrow[ll, "Q"] \\
+ & I_Q &  \\
+TM_0 &  & M_1 \arrow[ll, "M_1"]
+  \end{tikzcd}
+  \]
+that is cartesian in the appropriate sense.
+%
+Returning to type-theoretic intuition, this square is the
+\emph{introduction rule}: above the line we have the ``formal''
+product or functin etc, and below the line we have the
+``internalized'' notion.
+%
+The associativity rule gives the definition of substitution for the
+introductin rule.
+%
+We can define an ``elimination'' rule using the cartesian property of
+$I_Q$, except \emph{we can't we need a notion of vertical morphism from cat to multicat(!)}:
+
+\[\begin{tikzcd}
+C \arrow[d, "F"] &  & C \arrow[ll, "\to_C"] \arrow[dd, "id"] &  & C \arrow[dd, "F"] &  & C \arrow[dd, "F"] \arrow[ll, "=_C"] \\
+M_0 \arrow[d, "\eta"] & \epsilon &  &  &  & F &  \\
+T(M_0) \arrow[dd, "id", two heads, tail] &  & C \arrow[ll, "|-^P"] \arrow[dd, "F"] & = & M_0 \arrow[dd, "\eta"] &  & M_0 \arrow[dd, "id"] \arrow[ll, "=_{M_0}"] \\
+ & \iota &  &  &  & Var &  \\
+T(M_0) &  & M_0 \arrow[ll, "\vdash"'] &  & T(M_0) &  & M_0 \arrow[ll, "|-"]
+\end{tikzcd}
+\]
 
 
 \section{Left Universal Properties}
