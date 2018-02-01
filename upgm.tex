@@ -15,6 +15,7 @@
 \newcommand{\cat}{\mathbb}
 \newcommand{\vtkmnd}{\mathbb{K}\text{Mod}(\vcat{V},T)}
 \newcommand{\rmod}{\text{RMod}}
+\newcommand{\lmod}{\text{LMod}}
 
 \title{Universal Properties in Generalized Multicategories}
 \author{Max S. New}
@@ -212,7 +213,7 @@ following profunctor:
   multicategories $\rmod : \vtkmnd \pfrom \vcat V$ has as elements
   $\vcat M \pfrom \cat C$ \emph{right modules} which consist of
   \begin{enumerate}
-  \item A profunctor $Q : T \vcat M \pfrom \cat C$ in $\vcat V$.
+  \item A profunctor $Q : T \vcat M_0 \pfrom \cat C$ in $\vcat V$.
   \item An action
     \[
 \begin{tikzcd}
@@ -321,6 +322,91 @@ T(M_0) &  & M_0 \arrow[ll, "\vdash"'] &  & T(M_0) &  & M_0 \arrow[ll, "|-"]
 
 
 \section{Left Universal Properties}
+
+For left-universal properties, consider sums as an illustrative
+example.
+%
+In a category $\cat C$, a sum/coproduct $A + B$ is defined by the property that
+\[ \cat C(A + B, C) \equiv \cat C(A,C) \times \cat C(B,C) \]
+%
+However, a sum in a multicategory $\vcat C$ should \emph{not} just be
+a sum in the underlying category (unlike for right universal
+properties).
+%
+Instead it is what's called a \emph{distributive} coproduct, which can
+be defined manually by some laws relating compositions of the
+coproduct with the monoidal structure.
+%
+We want to find an abstract setting that captures these distributivity
+properties, which already have a type-theoretic explanation: the
+equivalence happens ``in an arbitrary context'':
+\[ \vcat C(\Gamma,A + B; C) \equiv \vcat C(\Gamma, A; C) \times C(\Gamma,B;C)\]
+this can be defined using fibrations but we will try a different,
+hopefully more direct tactic.
+
+We define left universal properties as saying that maps out of a
+context with the object are given by a certain module. For this to
+make sense we need a concept of ``context with an object missing'',
+and after McBride and Combinatorialists we will call this the
+``derivative'' of the context. Since the shape of contexts is given by
+a monad, we would like a concept that applies to an arbitrary monad,
+not just polynomial functors. I haven't nailed it down but it looks
+like we need the following at least.
+
+The microcoms principle is here inescapable and so we need an extra
+condition of $\vcat V$ being a \emph{monoidal} virtual double
+category, which we will here weaken to a \emph{virtually monoidal}
+double category which might be called a ``virtual multi-double
+category'' or something like that.
+
+\begin{definition}[Derivative of a Monad]
+  Let $T$ be a monad on a virtually monoidal virtual equipment $\vcat
+  V$. A \emph{derivative} of $T$ is an endofunctor $dT : \vcat V \to
+  \vcat V$ such that/with
+  \begin{enumerate}
+  \item $dT$ is a vertical monoid in $\vcat V$, i.e. there are natural
+    monoidal product $m_A : dT(A),dT(A) \to dT(A)$ and unit $e_A :
+    \cdot \to dT(A)$.
+  \item $dT$ is a left-module of $T$, i.e. there is a vertical action
+    $d\mu : dT \circ T \Rightarrow dT$ that interacts with $\mu,\eta$
+    in the obvious way.
+  \item A ``plugging in'' morphism $dT,Id \Rightarrow T$, i.e., $l :
+    dT(A),A \to TA$.
+  \item $\lambda l : dT \to (Id \to T)$ is a monoid homomorphism
+    where $(Id \to T)$ uses kleisli composition
+  \item The two ways of plugging $dT(T A), A \to T A$ are equal:
+    \[\begin{tikzcd}
+ & dT(TA),A \arrow[ld, "{dT(\eta),id}"'] \arrow[rd, "{id,\eta}"] &  \\
+dT(A),A \arrow[rdd, "l_A"] &  & dT(TA),TA \arrow[d, "l_{TA}"] \\
+ &  & T^2A \arrow[ld, "\mu"] \\
+ & TA & 
+    \end{tikzcd}\]
+  \item Possibly other laws...
+  \end{enumerate}
+\end{definition}
+What other conditions we have no clue unfortunately. For instance all
+of the above are satisfied by the trivial functor $dT(A) = 1$
+
+Given a derivative $dT$ of $T$, we define the profunctor of
+\emph{left} modules as follows:
+
+\begin{definition}[Profunctor of Left Modules]
+  The profunctor of category-parameterized left modules on
+  multicategories $\lmod : \vcat V \pfrom \vtkmnd$ has as elements
+  $\cat C \pfrom \vcat M$ \emph{left modules} which consist of
+  \begin{enumerate}
+  \item A profunctor $P : dT(\vcat M_0) \otimes \cat C \pfrom \vcat M_0$ in $\vcat V$
+  \item An action \[\begin{tikzcd}
+dT(TM_0) \times (dT(M_0) \times C) \arrow[dd, "l"] &  & dT(M_0) \times C \arrow[ll, "dT(M_1) \times P"] &  & M_0 \arrow[dd, "id"] \arrow[ll, "P"] \\
+ &  & Pcut &  &  \\
+dT(M_0) \times C &  &  &  & M_0 \arrow[llll, "P"]
+  \end{tikzcd}\]
+  \item That is associative
+  \item Unital
+  \item 2-cells are defined as...
+  \end{enumerate}
+\end{definition}
+
 
 
 \end{document}
