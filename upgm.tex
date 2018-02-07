@@ -298,14 +298,16 @@ TM_0 \arrow[dd, "id"] &  & C \arrow[dd, "G_Q"] \arrow[ll, "Q"] \\
 TM_0 &  & M_1 \arrow[ll, "M_1"]
   \end{tikzcd}
   \]
-that is cartesian in the appropriate sense.
+that is cartesian in the appropriate sense and a module
+\emph{homomorphism} in that the introduction rule turns $Q$-cuts into
+$M$-cuts.
 %
 Returning to type-theoretic intuition, this square is the
 \emph{introduction rule}: above the line we have the ``formal''
 product or functin etc, and below the line we have the
 ``internalized'' notion.
 %
-The associativity rule gives the definition of substitution for the
+The homomorphism property gives the definition of substitution for the
 introductin rule.
 %
 We can define an ``elimination'' rule using the cartesian property of
@@ -341,8 +343,8 @@ We want to find an abstract setting that captures these distributivity
 properties, which already have a type-theoretic explanation: the
 equivalence happens ``in an arbitrary context'':
 \[ \vcat C(\Gamma,A + B; C) \equiv \vcat C(\Gamma, A; C) \times C(\Gamma,B;C)\]
-this can be defined using fibrations but we will try a different,
-hopefully more direct tactic.
+the usual approach is to use fibrations, and our approach is similar,
+but more general and we hope more conceptually direct.
 
 We define left universal properties as saying that maps out of a
 context with the object are given by a certain module. For this to
