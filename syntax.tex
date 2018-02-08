@@ -1,0 +1,143 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{tikz-cd}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{mathpartir}
+
+\begin{document}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newcommand{\pto}{\nrightarrow}
+\newcommand{\pfrom}{\nleftarrow}
+\newcommand{\vcat}{\mathcal}
+\newcommand{\cat}{\mathbb}
+\newcommand{\vtkmnd}{\mathbb{K}\text{Mod} (\vcat{V},T)}
+\newcommand{\rmod}{\text{RMod}}
+\newcommand{\lmod}{\text{LMod}}
+
+\newcommand{\sort}{\,\text{sort}}
+\newcommand{\ctx}{\,\text{context}}
+\newcommand{\pipe}{\,|\,}
+
+\title{An Syntax for Virtual Equipments}
+\author{Max S. New}
+
+\maketitle
+
+\begin{figure}
+  \begin{mathpar}
+    \cat C \sort\\
+    \inferrule*[right=Object/Type-formation]
+    {\cat C \sort \and \cat D \sort}
+    {\alpha : \cat C \vdash A : \cat D}\\
+
+    \inferrule*[right=Relation/Judgment/Profunctor-formation]
+    {\cat C \sort \and \cat D \sort}
+    {\alpha^{o}:\cat C; \beta : \cat D \pipe R}
+
+    \inferrule*[right=Context-formation]
+    {\cat C \sort \and \cat D \sort}
+    {\alpha^{o}:\cat C ; \beta:\cat D\sort \pipe \Phi \ctx}
+
+    \inferrule*[right=Element/Term/Arrow-formation]
+    {\alpha^o:\cat C; \beta : \cat D \pipe \Phi\and
+      \alpha^o:\cat C; \beta : \cat D \pipe R}
+    {\alpha^{o}:\cat C;\beta : \cat D \pipe \Phi \vdash t : R}
+
+    \inferrule*[right=Substitution-formation]
+    {\alpha : \cat C \vdash A : \cat C'\\
+      \beta : \cat D \vdash B : \cat D'\\
+      \alpha^o : \cat C; \beta : \cat D \pipe \Phi\\
+      \alpha'^o : \cat C'; \beta' : \cat D' \pipe \Psi}
+    {A;B \pipe \Phi\vdash \vec t : \Psi}
+  \end{mathpar}
+  \caption{Formation Rules of Judgment Theory}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule*[right=]
+    {~}
+    {\alpha : \cat C \vdash \alpha : \cat C}
+
+    \inferrule*[right=*]
+    {\alpha : \cat C \vdash B : \cat D\and
+    \beta : \cat D \vdash A : \cat E}
+    {\alpha : \cat C \vdash A[B/\beta] : \cat E}\\
+
+    \inferrule*[right=Restriction*]
+    {\alpha^o : \cat C;\beta : \cat D \pipe R\and
+      \alpha' : \cat C' \vdash A : \cat C\and
+      \beta' : \cat D' \vdash B : \cat D'}
+    {\alpha'^o : \cat C';\beta':\cat D' \pipe R[A/\alpha,B/\beta]}\\
+
+    \inferrule
+    {~}
+    {\alpha^o : \cat C ; \alpha : \cat C \pipe \cdot}
+
+    \inferrule
+    {\alpha^o : \cat C; \beta : \cat D \pipe \Phi\and
+      \beta^o : \cat D; \gamma : \cat E\pipe R}
+    {\alpha^o : \cat C : \gamma : \cat E \pipe \Phi, \phi : R}
+
+    \inferrule*[right=*]
+    {\alpha^o : \cat C; \beta : \cat D \pipe \Phi\and
+    \beta^o : \cat D; \gamma : \cat E \pipe \Psi}
+    {\alpha^o : \cat C; \gamma : \cat E \pipe \Phi, \Psi}\\
+
+    \inferrule*[right=]
+    {\Phi \vdash t : R[A/\alpha,B/\beta]}
+    {A;B \pipe \Phi \vdash t/\phi : (\phi : R)}
+
+    \inferrule*[right=]
+    {A;B \pipe \Psi \vdash \vec t : \Phi \and
+      B;C \pipe \Psi' \vdash s : R[B/\beta, C/\gamma]}
+    {A;C \pipe \Psi,\Psi' \vdash \vec t, s/\phi : (\Phi, \phi : R)}
+
+    \inferrule*[right=*]
+    {A;B \pipe \Psi \vdash \vec t : \Phi \and
+    B;C \pipe \Psi' \vdash \vec s : \Phi'}
+    {A;C \pipe \Psi,\Psi' \vdash \vec t, \vec s : \Phi,\Phi'}
+    \\
+
+    \inferrule*[right=]
+    {~}
+    {\alpha^o;\beta\pipe \phi : R \vdash \phi : R}
+    
+    \inferrule*[right=*]
+    {A;B \pipe \Psi \vdash \Phi\and
+      \alpha'^o : \cat C'; \beta' : \cat D' \pipe \Phi \vdash t : R
+    }
+    {\alpha^o:\cat C; \beta : \cat D \pipe \Psi \vdash t[\vec s] : R[A/\alpha',B/\beta']}
+  \end{mathpar}
+  \caption{Basic Rules of Judgment Theory, starred rules are
+    admissible, non-starred are primitive}
+\end{figure}
+\begin{figure}
+  \begin{mathpar}
+    \begin{array}{rcl}
+      A[\alpha/\alpha] &=& A\\
+      A[B/\beta][C/\gamma] & = & A[B[C/\gamma]/\beta]\\\\
+      
+      R[\alpha/\alpha,\beta/\beta] &=& R\\
+      R[\alpha'.A/\alpha,\beta'.B/\beta][A'/\alpha',B'/\beta'] & = &
+      R[A[A'/\alpha']/\alpha,B[B'/\beta']/\beta]\\\\
+      \Phi,\cdot &=& \Phi\\
+      \cdot,\Phi &=& \Phi\\
+      (\Phi,\Psi),\Theta &=& \Phi,(\Psi,\Theta)\\\\
+      (\vec t,\vec s),\vec u &=& \vec t, (\vec s, \vec u)\\\\
+      t[\phi_1/\phi_1,\ldots\phi_n/\phi_n] &=& t\\
+      t[\Psi_1.s_1/\phi_1,\ldots,\Psi_n.s_n/\phi_n][\vec u_1/\Psi_1,\ldots,\vec u_n/\Psi_n] &=& t[s_1[\vec u_1/\Psi_1]/\phi_1,\ldots,s_n[\vec u_n/\Psi_n]/\phi_n]\\
+    \end{array}
+  \end{mathpar}  
+  \caption{Algebraic Properties of Basic Rules}
+\end{figure}
+
+\end{document}
+
+%% Local Variables:
+%% compile-command: "pdflatex syntax.tex"
+%% End:
