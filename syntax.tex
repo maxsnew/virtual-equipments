@@ -18,14 +18,73 @@
 \newcommand{\rmod}{\text{RMod}}
 \newcommand{\lmod}{\text{LMod}}
 
+\newcommand{\id}{\text{id}}
+\newcommand{\when}{\text{when}\,}
 \newcommand{\sort}{\,\text{sort}}
 \newcommand{\ctx}{\,\text{context}}
 \newcommand{\pipe}{\,|\,}
 
-\title{An Syntax for Virtual Equipments}
+\title{Judgment Theory: An Syntax for Virtual Equipments}
 \author{Max S. New}
 
 \maketitle
+
+In what follows we present an internal language for virtual equipments
+(TODO: cite Crutwell-Shulman, Leinster, Hermida)
+%
+Despite sounding slightly obscure, virtual equipments are quite useful
+as ``a good place to do category theory'', that is a virtual equipment
+has enough structure to define internal notions of category,
+multicategory and polycategory.
+%
+From a type-theoretic angle and a sprinkle of Curry-Howard-Lambek
+ideology, we can also see a virtual equipment as a ``good place to
+study type theories'' and so we call the type theory ``judgment
+theory''.
+
+The following figures present the basic formation, primitive and
+admissible and equality rules of a type theory we call judgment
+theory, an internal language for virtual equipments.
+%
+Note that contra Crutwell-Shulman, we define a virtual equipment to be
+a virtual double category with all restrictions, whereas they
+additionally require the category to have all \emph{units}.
+%
+Judgment theory has 4 central concepts, which we will refer to
+sometimes using type theoretic and at other times category-theoretic
+terminology.
+%
+In type theoretic terminology, judgment theory has \emph{sorts} $\cat
+C, \cat D, \cat E$, and \emph{types} $A,B,C$ which have a given sort
+and are also \emph{parameterized} by an object of some other sort, and
+so can also be thought of as \emph{functions} with input and output
+sorts.
+%
+Next there are \emph{judgments} $P,Q,R,S$ which are parameterized by
+two variables.
+%
+In $\alpha^o:\cat C;\beta : \cat D \pipe R$, we say $R$ depends on
+$\alpha$ \emph{contravariantly} and in $\beta$ \emph{covariantly}.
+%
+Finally, we have \emph{terms} $s,t,u$ that are elements of some
+judgment $R$ but are also parameterized by elements of some other
+judgments which are given by a \emph{context} $\Phi$, which is a
+``compatible string'' of judgments where the covariant variable of one
+judgment is the same as the contravariant variable of the next.
+%
+Since these terms are parameterized by other terms, we can see these
+as \emph{inference rules} for the judgments.
+
+At other times we will want to think of these using set-theoretic
+terminology, in which case we have sets $\cat C,\cat D, \cat E$,
+functions/elements $A,B,C$, \emph{spans} $R,\ldots$ and morphisms of
+spans $s,t,u$.
+%
+Finally when we develop multicategory theory we will use
+category-theoretic terminology, in which the structure is most
+familiar and we have categories, objects/functors,
+\emph{profunctors}/bimodules and 2-cells/homomorphisms of bimodules.
+
 
 \begin{figure}
   \begin{mathpar}
@@ -108,7 +167,7 @@
     {\alpha^o;\beta\pipe \phi : R \vdash \phi : R}
     
     \inferrule*[right=*]
-    {A;B \pipe \Psi \vdash \Phi\and
+    {A;B \pipe \Psi \vdash \vec s : \Phi\and
       \alpha'^o : \cat C'; \beta' : \cat D' \pipe \Phi \vdash t : R
     }
     {\alpha^o:\cat C; \beta : \cat D \pipe \Psi \vdash t[\vec s] : R[A/\alpha',B/\beta']}
@@ -135,6 +194,33 @@
   \end{mathpar}  
   \caption{Algebraic Properties of Basic Rules}
 \end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule*[right=Hom-Formation]
+    {\beta : \cat D \vdash A : \cat C\and
+    \gamma : \cat E \vdash A' : \cat C}
+    {\beta^o : \cat D;\gamma : \cat E \pipe A \to_{\cat C} A'}
+
+    \inferrule*[right=Hom-Introduction]
+    {~}
+    {\alpha^o : \cat C, \alpha : \cat C | \cdot \vdash \id_{\alpha} : \alpha \to_{\cat C} \alpha}
+
+    \inferrule*[right=Hom-Left (Sequent Style)]
+    {\alpha^o,\beta|\Phi,\phi : R[\delta/\delta_1], \psi : S[\delta/\delta_2],\Psi \vdash Q }
+    {\alpha^o,\beta|\Phi,\phi : R, \chi : \delta_1 \to \delta_2, \psi : S,\Psi \vdash Q}
+    
+    \inferrule*[right=Hom-Elim]
+    {\beta_1^o;\beta_2\pipe\Psi \vdash f : \beta_1 \to_{C} \beta_2\and
+      \alpha^o;\beta\pipe \Phi\and
+      \beta^o;\gamma\pipe \Phi'\and
+      \Phi,\Phi' \vdash g : R}
+    {\Phi[\cdot;\beta_1/\beta],\Psi,\Phi'[\beta_2/\beta;\cdot]\vdash \when f = \id_{\beta}.~ g[\beta_1/\beta;\beta_2/\beta] : R[\beta_1/\beta;\beta_2/\beta]}
+  \end{mathpar}
+  \caption{Hom Sets}
+\end{figure}
+
+
 
 \end{document}
 
