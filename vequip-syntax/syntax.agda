@@ -76,42 +76,50 @@ module VE1 (Σ-type : Type-type) where
             -> (J : Judg C' D')
             -> Term Φ (restrict A B J)
             -> Subst Φ A B (cons J end)
-        cons : ∀ {C C' D D' E E'}
+        cons : ∀ {C C' D D' E' F F'}
             -> (Φ : Ctx C D)
-            -> (Φ' : Ctx D E)
+            -> (Φ' : Ctx D F)
             -> (A : Type C C')
             -> (B : Type D D')
-            -> (B' : Type E E')
+            -> (B' : Type F F')
             -> (J : Judg C' D')
-            -> (Ψ : Ctx D' E')
+            -> (K : Judg D' E')
+            -> (Ψ : Ctx E' F')
             -> Term Φ (restrict A B J)
-            -> Subst Φ' B B' Ψ
-            -> Subst (append Φ Φ') A B' (cons J Ψ)
+            -> Subst Φ' B B' (cons K Ψ)
+            -> Subst (append Φ Φ') A B' (cons J (cons K Ψ))
 
-      -- subst-term  : ∀ {C C' D D'}{A : Type C C'}{B : Type D D'}{Φ Ψ R}
-      --             -> Term Φ R
-      --             -> Subst Ψ A B Φ
-      --             -> Term Ψ (restrict A B R)
-      -- comp-subst : ∀ {C C' C'' D D' D''}{A : Type C' C''}{A' : Type C C'}{B : Type D' D''}{B' : Type D D'}{Ψ Φ Θ}
-      --            -> Subst Ψ A B Φ
-      --            -> Subst Θ A' B' Ψ
-      --            -> Subst Θ (subst-type A A') (subst-type B B') Φ
-      -- subst-term (var R) (end Φ A B .R t) = t
-      -- subst-term (var R) (cons Φ Φ' A B B' .R .end t ())
-      -- subst-term {Ψ = Ψ}(fun-app t ψ) φ = subst (λ S -> Term Ψ S) (restrict-assoc _ _ _ _ _) (fun-app t (comp-subst ψ φ)) -- {!fun-app t (comp-subst ψ φ)!}
-      -- comp-subst {Θ = Θ} (end Φ A B J t) ψ =
-      --   end _ _ _ _ (subst (λ J₁ → Term Θ J₁) (sym (restrict-assoc A _ B _ J)) (subst-term t ψ))
-      -- comp-subst (cons Φ Φ' A B B' J Ψ t φ) ψ = {!!}
+      subst-term  : ∀ {C C' D D'}{A : Type C C'}{B : Type D D'}{Φ Ψ R}
+                  -> Term Φ R
+                  -> Subst Ψ A B Φ
+                  -> Term Ψ (restrict A B R)
+      comp-subst : ∀ {C C' C'' D D' D''}{A : Type C' C''}{A' : Type C C'}{B : Type D' D''}{B' : Type D D'}{Ψ Φ Θ}
+                 -> Subst Ψ A B Φ
+                 -> Subst Θ A' B' Ψ
+                 -> Subst Θ (subst-type A A') (subst-type B B') Φ
+      subst-term (var R) (end Φ A B .R t) = t
+      subst-term {Ψ = Ψ}(fun-app t ψ) φ = subst (λ S -> Term Ψ S) (restrict-assoc _ _ _ _ _) (fun-app t (comp-subst ψ φ)) -- {!fun-app t (comp-subst ψ φ)!}
+      comp-subst {Θ = Θ} (end Φ A B J t) φ =
+        end _ _ _ _ (subst (λ J₁ → Term Θ J₁) (sym (restrict-assoc A _ B _ J)) (subst-term t φ))
+      -- | want a (Θ -> (J, K, Ψ)) and have φ : (Θ -> (Φ, Φ')) and a t : (Φ -> J) and a ψ : (Φ' -> (K, Ψ))
+      comp-subst (cons end Φ' A B B' J K Ψ t ψ) φ = {!subst (λ Θ -> Subst Θ (subst-type A A') (subst-type B' )) !}
+      comp-subst (cons (cons L end) Φ' A B B' J K Ψ t ψ) φ = {!!}
+      comp-subst (cons (cons L (cons x₁ Φ)) Φ' A B B' J K Ψ t ψ) φ = {!!}
 
-      record Split-Subst {C C' D D' E'}(F : Type C C')(H : Type D D')(Θ : Ctx C D)(Φ1 : Ctx C' E')(Φ2 : Ctx E' D') : Set where
-        field
-          E  : Sort
-          G  : Type E E'
-          Θ1 : Ctx C E
-          Θ2 : Ctx E D
-          φ  : Subst Θ1 F G Φ1
-          φ' : Subst Θ2 G H Φ2
+      -- record Split-Subst {C C' D D' E'}(F : Type C C')(H : Type D D')(Θ : Ctx C D)(Φ1 : Ctx C' E')(Φ2 : Ctx E' D') : Set where
+      --   field
+      --     E  : Sort
+      --     G  : Type E E'
+      --     Θ1 : Ctx C E
+      --     Θ2 : Ctx E D
+      --     φ  : Subst Θ1 F G Φ1
+      --     φ' : Subst Θ2 G H Φ2
 
-      -- | PLAN: induction on Φ1
-      split-subst : ∀ {C C' D D' E'}{F : Type C C'}{H : Type D D'}{Ψ}{Φ1 Φ2} -> Subst Ψ F H (append {midSort = E'} Φ1 Φ2) -> Split-Subst F H Ψ Φ1 Φ2
-      split-subst φφ = {!!}
+      -- -- | PLAN: induction on Φ1
+      -- split-subst : ∀ {C C' D D' E'}{F : Type C C'}{H : Type D D'}{Ψ}{Φ1 Φ2}
+      --             -> Subst Ψ F H (append {midSort = E'} Φ1 Φ2)
+      --             -> Split-Subst F H Ψ Φ1 Φ2
+      -- split-subst {Ψ = .Φ} {end} {.(cons J end)} (end Φ A B J x₁) = {!!} -- record { E = ? ; G = ? ; Θ1 = end ; Θ2 = Ψ ; φ = ? ; φ' = ? }
+      -- split-subst {Ψ = .(append Φ Φ')} {end} {.(cons J Ψ)} (cons Φ Φ' A B B' J Ψ x₁ φφ) = {!!} -- record { E = ? ; G = ? ; Θ1 = end ; Θ2 = Ψ ; φ = ? ; φ' = ? }
+      -- split-subst {Φ1 = cons x₁ Φ1} φφ = {!!}
+
