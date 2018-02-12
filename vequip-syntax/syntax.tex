@@ -216,6 +216,12 @@ familiar and we have categories, objects/functors,
       \beta^o;\gamma\pipe \Phi'\and
       \Phi,\Phi' \vdash g : R}
     {\Phi[\cdot;\beta_1/\beta],\Psi,\Phi'[\beta_2/\beta;\cdot]\vdash \when f = \id_{\beta}.~ g : R[\beta_1/\beta;\beta_2/\beta]}
+
+    \when \id_{\alpha} = \id_{\beta}.~ g \equiv g[\alpha/\beta]
+
+    \inferrule*[right=Hom-$\eta$]
+    {...}
+    {\beta_1^o : \cat C;\beta_2:\cat C\pipe \Phi \vdash f \equiv \when f = \id_{\alpha} .~ \id_{\alpha} : \beta_1 \to_{\cat C} \beta_2}
   \end{mathpar}
   \caption{Hom Sets}
 \end{figure}
@@ -281,13 +287,32 @@ read exactly as the classical definitions.
   on those category structures is given by
   \begin{enumerate}
   \item A function $\Phi \vdash F_1 : \alpha \to_{R} \beta$
-  \item Internal Associativity: $\Phi = \Phi_0,\phi : \gamma \to_{S}
-    \delta,\psi : \delta \to_{T} \epsilon,\Phi_1$ where $\gamma : \cat
-    E$ and $\delta : \cat F$, $\epsilon : \cat G$, an equality
-    \[ \Phi_0,\phi : \gamma\to_{S} \delta_0, \theta : \delta_0 \to_{\cat F} \delta_1,\psi : \delta\to_T \epsilon \vdash F_1[\theta \circ_{\cat F S} \phi/\phi] = F_1[\psi \circ_{T \cat F}\theta /\psi] \]
-  \item External Associativity:...
+  \item Internal Naturality: For any decomposition $\Phi = \Phi_0,\phi
+    : \gamma \to_{S} \delta,\psi : \delta \to_{T} \epsilon,\Phi_1$
+    where $\gamma : \cat E$ and $\delta : \cat F$, $\epsilon : \cat
+    G$, an equality
+    \[ \Phi_0,\phi : \gamma\to_{S} \delta_0, \theta : \delta_0 \to_{\cat F} \delta_1,\psi : \delta_1\to_T \epsilon, \Phi_1 \vdash F_1[\theta \circ_{\cat F S} \phi/\phi] = F_1[\psi \circ_{T \cat F}\theta /\psi] \]
+  \item Left naturality: If $\Phi = \phi : \alpha \to_{s} \gamma,\Phi'$
+    then \[ F_1 \circ_{R\cat C} \psi = F_1[\phi \circ_{S\cat C} \psi]\]
+  \item Right naturality: If $\Phi = \Phi', \phi : \gamma \to_{S}
+    \beta$, then
+    \[ \phi \circ_{\cat D R} F_1 = F_1[\psi \circ \phi/\psi]\]
   \end{enumerate}
 \end{definition}
+
+
+Next we show that internal categories provide us with our first
+\emph{model} of judgment type theory by interpreting sorts as
+categories, functions as functors, spans as profunctors and 2-cells as
+natural transformations.
+%
+Furthermore, this model can be seen as an \emph{implementation} of
+Hom-sets, we translate Judgment type theory with hom sets into
+categories internal to judgmental type theory \emph{without} hom sets:
+the home sets come from the category structure.
+
+The interpretation of hom-formation and -introduction is obvious, but
+elim is more interesting...
 
 \end{document}
 
