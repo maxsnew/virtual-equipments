@@ -1,5 +1,6 @@
 module Syntax (Σ-sort : Set) where
 
+open import Data.Product
 open import Relation.Binary.PropositionalEquality
 
 -- A sort C,D,E identifies a set/cat/type theory
@@ -50,7 +51,7 @@ module VE1 (Σ-type : Type-type) where
       end  : ∀ {C} -> Ctx C C
       cons : ∀ {C D E} -> Judg C D -> Ctx D E -> Ctx C E
 
-    append : ∀ {C D E} -> Ctx C D -> Ctx D E -> Ctx C E
+    append : ∀ {C midSort E} -> Ctx C midSort -> Ctx midSort E -> Ctx C E
     append end Ψ = Ψ
     append (cons R Φ) Ψ = cons R (append Φ Ψ)
 
@@ -87,15 +88,30 @@ module VE1 (Σ-type : Type-type) where
             -> Subst Φ' B B' Ψ
             -> Subst (append Φ Φ') A B' (cons J Ψ)
 
-      subst-term  : ∀ {C C' D D'}{A : Type C C'}{B : Type D D'}{Φ Ψ R}
-                  -> Term Φ R
-                  -> Subst Ψ A B Φ
-                  -> Term Ψ (restrict A B R)
-      comp-subst : ∀ {C C' C'' D D' D''}{A : Type C' C''}{A' : Type C C'}{B : Type D' D''}{B' : Type D D'}{Ψ Φ Θ}
-                 -> Subst Ψ A B Φ
-                 -> Subst Θ A' B' Ψ
-                 -> Subst Θ (subst-type A A') (subst-type B B') Φ
-      subst-term (var R) (end Φ A B .R t) = t
-      subst-term (var R) (cons Φ Φ' A B B' .R .end t ())
-      subst-term {Ψ = Ψ}(fun-app t ψ) φ = subst (λ S -> Term Ψ S) (restrict-assoc _ _ _ _ _) (fun-app t (comp-subst ψ φ)) -- {!fun-app t (comp-subst ψ φ)!}
-      comp-subst φ ψ = {!!}
+      -- subst-term  : ∀ {C C' D D'}{A : Type C C'}{B : Type D D'}{Φ Ψ R}
+      --             -> Term Φ R
+      --             -> Subst Ψ A B Φ
+      --             -> Term Ψ (restrict A B R)
+      -- comp-subst : ∀ {C C' C'' D D' D''}{A : Type C' C''}{A' : Type C C'}{B : Type D' D''}{B' : Type D D'}{Ψ Φ Θ}
+      --            -> Subst Ψ A B Φ
+      --            -> Subst Θ A' B' Ψ
+      --            -> Subst Θ (subst-type A A') (subst-type B B') Φ
+      -- subst-term (var R) (end Φ A B .R t) = t
+      -- subst-term (var R) (cons Φ Φ' A B B' .R .end t ())
+      -- subst-term {Ψ = Ψ}(fun-app t ψ) φ = subst (λ S -> Term Ψ S) (restrict-assoc _ _ _ _ _) (fun-app t (comp-subst ψ φ)) -- {!fun-app t (comp-subst ψ φ)!}
+      -- comp-subst {Θ = Θ} (end Φ A B J t) ψ =
+      --   end _ _ _ _ (subst (λ J₁ → Term Θ J₁) (sym (restrict-assoc A _ B _ J)) (subst-term t ψ))
+      -- comp-subst (cons Φ Φ' A B B' J Ψ t φ) ψ = {!!}
+
+      record Split-Subst {C C' D D' E'}(F : Type C C')(H : Type D D')(Θ : Ctx C D)(Φ1 : Ctx C' E')(Φ2 : Ctx E' D') : Set where
+        field
+          E  : Sort
+          G  : Type E E'
+          Θ1 : Ctx C E
+          Θ2 : Ctx E D
+          φ  : Subst Θ1 F G Φ1
+          φ' : Subst Θ2 G H Φ2
+
+      -- | PLAN: induction on Φ1
+      split-subst : ∀ {C C' D D' E'}{F : Type C C'}{H : Type D D'}{Ψ}{Φ1 Φ2} -> Subst Ψ F H (append {midSort = E'} Φ1 Φ2) -> Split-Subst F H Ψ Φ1 Φ2
+      split-subst φφ = {!!}
