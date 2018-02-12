@@ -1,1 +1,4 @@
 *.agdai
+*.aux
+*.log
+/vequip-syntax/syntax.pdf

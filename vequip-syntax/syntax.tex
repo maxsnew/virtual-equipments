@@ -206,21 +206,88 @@ familiar and we have categories, objects/functors,
     {~}
     {\alpha^o : \cat C, \alpha : \cat C | \cdot \vdash \id_{\alpha} : \alpha \to_{\cat C} \alpha}
 
-    \inferrule*[right=Hom-Left (Sequent Style)]
-    {\alpha^o,\beta|\Phi,\phi : R[\delta/\delta_1], \psi : S[\delta/\delta_2],\Psi \vdash Q }
-    {\alpha^o,\beta|\Phi,\phi : R, \chi : \delta_1 \to \delta_2, \psi : S,\Psi \vdash Q}
+    %% \inferrule*[right=Hom-Left (Sequent Style)]
+    %% {\alpha^o,\beta|\Phi,\phi : R[\delta/\delta_1], \psi : S[\delta/\delta_2],\Psi \vdash Q }
+    %% {\alpha^o,\beta|\Phi,\phi : R, \chi : \delta_1 \to \delta_2, \psi : S,\Psi \vdash Q}
     
     \inferrule*[right=Hom-Elim]
     {\beta_1^o;\beta_2\pipe\Psi \vdash f : \beta_1 \to_{C} \beta_2\and
       \alpha^o;\beta\pipe \Phi\and
       \beta^o;\gamma\pipe \Phi'\and
       \Phi,\Phi' \vdash g : R}
-    {\Phi[\cdot;\beta_1/\beta],\Psi,\Phi'[\beta_2/\beta;\cdot]\vdash \when f = \id_{\beta}.~ g[\beta_1/\beta;\beta_2/\beta] : R[\beta_1/\beta;\beta_2/\beta]}
+    {\Phi[\cdot;\beta_1/\beta],\Psi,\Phi'[\beta_2/\beta;\cdot]\vdash \when f = \id_{\beta}.~ g : R[\beta_1/\beta;\beta_2/\beta]}
   \end{mathpar}
   \caption{Hom Sets}
 \end{figure}
 
+\section{Internal Categories}
 
+Next, we introduce the notion of category internal to our syntactic
+virtual equipment and the \emph{monoids and modules} translation that
+shows that, with the inclusion of hom sets, our syntax is already
+suitable for doing syntactic category theory.
+
+The benefits of our syntax become clear when we define internal
+categories, functors, profunctors and transformations: the definitions
+read exactly as the classical definitions.
+\begin{definition}[Internal Category]
+  An \emph{(internal) category} consists of
+  \begin{enumerate}
+  \item A sort $\cat C_0$
+  \item A span $\alpha^o:C_0;\alpha' : C_0 \pipe \alpha^o \to_{\cat C} \alpha'$
+  \item Identity arrows $\alpha^o : C_0; \alpha : C_0 \pipe \cdot
+    \vdash \id_{\alpha} : \alpha \to_{\cat C} \alpha$.
+  \item Composition $\alpha_0^o:C_0;\alpha_2:C_0\pipe \phi_0 :
+    \alpha_0 \to \alpha_1, \phi_1 : \alpha_1 \to \alpha_2 \vdash
+    \phi_1 \circ \phi_0 : \alpha_0 \to \alpha_2$
+  \item Satisfying Unitality:
+    \[ \id_{\alpha} \circ \phi = \phi = \phi \circ \id_{\alpha'}\]
+  \item And Associativity:
+    \[ (\phi \circ \psi) \circ \theta = \phi \circ (\psi \circ \theta) \]
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}[Internal Functor]
+  A functor $F$ between internal categories $\cat C$ and $\cat D$ consists of
+  \begin{enumerate}
+  \item a function on objects $\alpha : \cat C_0 \vdash F_0 : \cat D_0$
+  \item a function on arrows $\alpha_0^o : \cat C_0; \alpha_1 : \cat C_0\pipe \phi:\alpha_0 \to_{\cat C} \alpha_1 \vdash F_1(\phi) : F_0(\alpha_0) \to_{\cat D} F_0(\alpha_1)$
+  \item that preserves identity:
+    \[ F_1(\id_{\alpha}) = \id_{F_0(\alpha)}\]
+  \item and composition:
+    \[ F_1(\psi \circ \phi) = F_1(\psi) \circ F_1(\phi) \]
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}[Internal Profunctor]
+  A profunctor $R$ between internal categories $\cat C$ and $\cat D$
+  consists of
+  \begin{enumerate}
+  \item A span $\alpha^o : \cat C_0\pipe \beta : \cat D_0 \pipe \alpha \to_{R} \beta$
+  \item $C$-composition: $\alpha_0^o:\cat C_0;\beta : \cat D_0\pipe \phi : \alpha_0 \to_{C} \alpha_1, \psi : \alpha_1 \to_{R} \beta \vdash \psi \circ_{R\cat C} \phi : \alpha_0 \to_{R} \beta$
+  \item $D$-composition: $\alpha^o:\cat C_0;\beta_1 : \cat D_0\pipe \psi : \alpha \to_{R} \beta, \theta : \beta_0 \to_{\cat D} \beta_1 \vdash \theta \circ_{\cat DR} \psi : \alpha \to_{R} \beta_1$
+  \item Satisfying $\cat C$ associativity: $\psi \circ_{R\cat C} (\phi_1 \circ_{\cat C} \phi_0) = (\psi \circ_{R\cat C} \phi_1) \circ_{R\cat C} \phi_0$
+  \item Satisfying $\cat C$ unitality: $\psi \circ_{R\cat C} \id_{\alpha} = \psi$
+  \item Satisfying $\cat D$ associativity: $(\theta_1 \circ_{\cat D} \theta_0) \circ_{\cat DR} \psi = \theta_1 \circ_{\cat D R} (\theta_0 \circ_{\cat DR} \psi)$
+  \item Satisfying $\cat D$ unitality: $\id_{\beta} \circ_{\cat D R} \psi = \psi$
+  \item Satisfying mixed associativity: $(\theta \circ_{\cat D R} \psi) \circ_{R \cat C} \phi = \theta \circ_{\cat D R} (\psi \circ_{R \cat C} \phi)$
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}[Natural Transformation]
+  A transformation $F : \Phi \vdash : R$ where each of the sorts in
+  $\alpha^o: \cat C;\beta : \cat D \pipe \Phi$ has a given category
+  structure and each of the spans in $\Phi$ has a profunctor structure
+  on those category structures is given by
+  \begin{enumerate}
+  \item A function $\Phi \vdash F_1 : \alpha \to_{R} \beta$
+  \item Internal Associativity: $\Phi = \Phi_0,\phi : \gamma \to_{S}
+    \delta,\psi : \delta \to_{T} \epsilon,\Phi_1$ where $\gamma : \cat
+    E$ and $\delta : \cat F$, $\epsilon : \cat G$, an equality
+    \[ \Phi_0,\phi : \gamma\to_{S} \delta_0, \theta : \delta_0 \to_{\cat F} \delta_1,\psi : \delta\to_T \epsilon \vdash F_1[\theta \circ_{\cat F S} \phi/\phi] = F_1[\psi \circ_{T \cat F}\theta /\psi] \]
+  \item External Associativity:...
+  \end{enumerate}
+\end{definition}
 
 \end{document}
 
