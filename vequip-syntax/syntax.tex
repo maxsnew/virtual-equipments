@@ -4,6 +4,7 @@
 \usepackage{tikz-cd}
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{amsthm}
 \usepackage{mathpartir}
 
 \begin{document}
@@ -299,6 +300,86 @@ read exactly as the classical definitions.
     \[ \phi \circ_{\cat D R} F_1 = F_1[\psi \circ \phi/\psi]\]
   \end{enumerate}
 \end{definition}
+
+This last definition is probably unfamiliar to the reader that is not
+experienced with profunctors.
+%
+However, we can show that the traditional definition is equivalent to
+a natural transformation $\alpha : \cat C_0 \pipe \cdot \vdash
+t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha')$.
+
+\begin{definition}[Traditional Natural Transformation]
+  A traditional natural transformation from $\alpha : \cat C_0 \vdash
+  F(\alpha) : \cat D_0$ to $\alpha : \cat \vdash G(\alpha') : \cat
+  D_0$ consists of
+  \begin{enumerate}
+  \item A term $\cdot \vdash t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha)$
+  \item Such that
+    \[ \phi : \alpha \to_{\cat C} \alpha' \vdash t_{\alpha'} \circ F_1(\phi) \equiv G_1(\phi) \circ t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha')
+    \]
+  \end{enumerate}
+\end{definition}
+
+\begin{theorem}[Equivalent Presentations of Natural Transformations]
+  There is a bijection between traditional natural transformations $t
+  : F \to G$ and profunctor homomorphisms $h : \alpha \to_{\cat C}
+  \alpha' \vdash F(\alpha) \to_{\cat D} G(\alpha')$ given by
+  \begin{enumerate}
+  \item From a natural transformation $t$ we define a homomorphism
+    $h(t)$ by composing on the $F$ side. The choice of this side is
+    arbitrary and we could just as easily have used $G$ since they are
+    equal by naturality.
+    \[ \phi : \alpha \to_{\cat C} \alpha' \vdash t_{\alpha'} \circ F_1(\phi) : F(\alpha) \to_{\cat D} G_1(\alpha') \]
+  \item From a homomorphism $\phi.h$, we define a natural transformation $t(h)$ as
+    \[ \alpha \pipe \cdot \vdash h[{\id_{\alpha}}/\phi] \]
+  \end{enumerate}
+\end{theorem}
+\begin{proof}
+  First we show that the maps $h(\cdot),t(\cdot)$ actually produce
+  homomorphisms and natural transformations.
+  \begin{enumerate}
+  \item On the left, we need to show $h(t)_{\phi} \circ F_1(\psi) =
+    h(t)_{|phi \circ \psi}$. Expanding the definition, we just need
+    associativity and functoriality of $F_1$:
+    \begin{align*}
+      h(t)_{\phi} \circ F_1(\psi) &\equiv (t_{\alpha'} \circ F_1(\phi)) \circ F_1(\psi)\\
+      &\equiv t_{\alpha'} \circ F_1(\phi \circ \psi)\\
+      &\equiv h(t)_{\phi \circ \psi}
+    \end{align*}
+    on the right, we use naturality:
+    \begin{align*}
+      G_1(\theta) \circ h(t)_{\phi} &\equiv G_1(\theta) \circ (t_{\alpha'} \circ F_1(\phi))\\
+      &\equiv (t_{\alpha''} \circ F_1(\theta)) \circ F_1(\phi)\\
+      &\equiv t_{\alpha''} \circ F_1(\theta \circ \phi)\\
+      &\equiv t_{\theta \circ \phi}
+    \end{align*}
+  \item In the other direction, to prove naturality:
+    \begin{align*}
+      h[\id_\alpha/\phi] \circ F_1(\psi) &\equiv h[\id_\alpha \circ \psi/\phi]\\
+      &\equiv h[\psi/\phi]\\
+      &\equiv h[\psi \circ \id_{\alpha'}/\phi]\\
+      &\equiv G_1(\psi) \circ h[\id_{\alpha}/\phi]
+    \end{align*}
+  \end{enumerate}
+  Next we seek to prove that the functions are mutually inverse.
+  \begin{enumerate}
+  \item Round trip for homomorphisms:
+    \begin{align*}
+      h(t(h))_{\phi} &= t(h)_{\alpha} \circ F_1[\phi]\\
+      &= h[\id_{\alpha}] \circ F_1[\phi]\\
+      &= h[\id \circ \phi]\\
+      &= h[\phi]
+    \end{align*}
+  \item Round trip for natural transformations uses the fact that
+    functors preserve identity.
+    \begin{align*}
+      t(h(t))_{\alpha} &= h(t)_{\id_{\alpha}}\\
+      &= t_{\alpha} \circ F_1[\id_{\alpha}]\\
+      &= t_{\alpha} \circ \id_{F_0\alpha}\\
+      &= t_{\alpha}
+    \end{align*}
+  \end{enumerate}
+\end{proof}
 
 
 Next we show that internal categories provide us with our first
