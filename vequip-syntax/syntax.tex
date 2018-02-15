@@ -10,6 +10,7 @@
 \begin{document}
 
 \newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
 \newtheorem{definition}{Definition}
 \newcommand{\pto}{\nrightarrow}
 \newcommand{\pfrom}{\nleftarrow}
@@ -227,7 +228,7 @@ familiar and we have categories, objects/functors,
   \caption{Hom Sets}
 \end{figure}
 
-\section{Internal Categories}
+\section{Internal Categories and Synthetic Category Theory}
 
 Next, we introduce the notion of category internal to our syntactic
 virtual equipment and the \emph{monoids and modules} translation that
@@ -381,6 +382,154 @@ t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha')$.
   \end{enumerate}
 \end{proof}
 
+\subsection{Universal Properties, Synthetically}
+
+In a sense, the very purpose of category theory is to study universal
+properties and so it is essential that our syntax provide a nice
+presentation of universal properties.
+
+Fortunately, the central placement of spans/profunctors in our syntax
+makes the definition of a functor satisfying a universal property very
+natural (should I introduce the unit category earlier?).
+
+\begin{definition}[Right Representability]
+  Let $\cat C, \cat D$ be categories and $\alpha^o : \cat C;\beta :
+  \cat D \pipe \alpha \to_{Q} \beta$ be a profunctor between them. Then a \emph{right
+    representation} of $Q$ consists of
+  \begin{enumerate}
+  \item A functor $\beta : \cat D \vdash G[\beta] : \cat C$
+  \item An ``introduction rule'' homomorphism $\phi: \alpha \to_{Q}
+    \beta \vdash I_G[\phi] : \alpha \to_{\cat C} G[\beta]$.
+  \item An inverse homomorphism $\psi: \alpha \to_{\cat C} G[\beta]
+    \vdash I_G^{-1}[\psi] : \alpha \to_{Q} \beta$. That is, it satisfies
+    \begin{align*}
+      I_G[I_G^{-1}[\psi]/\phi] &= \psi\\
+      I_G^{-1}[I_G[\phi]/\psi] &= \phi
+    \end{align*}
+  \end{enumerate}
+\end{definition}
+
+While this is a fairly standard definition, it is likely unfamiliar to
+type theorists, who may be surprised that Right Representability is
+essentially the same as the definition of a negative type, which has
+an introduction rule, but instead of an inverse, there is an
+elimination rule, and the functoriality of the type is not primitive.
+Fortunately, we can prove the equivalence between these notions
+entirely synthetically.
+
+\begin{definition}[Negative Type]
+  A negative type (connective) $N$ between categories $\cat C$,$\cat D$ consists of
+  \begin{enumerate}
+  \item A judgment it represents $\alpha^o : \cat C;\beta : \cat D
+    \pipe \alpha \to_{Q} \beta$
+  \item A type $\beta : \cat D \vdash N[\beta] : \cat C$
+  \item An ``introduction rule'' $\phi : \alpha \to_{Q} \beta \vdash
+    I_N[\phi] : \alpha \to_{\cat C} N[\beta]$ that is a homomorphism
+    \emph{on the left}:
+    \[ I_N[\phi] \circ \psi \equiv I_N[\phi \circ \psi] \]
+  \item An ``elimination rule'' $\beta^o:\cat D;\beta : \cat D \pipe
+    \cdot \vdash \epsilon_{N}[\beta] : N[\beta] \to_{Q} \beta$
+  \item Such that $\psi : \alpha \to_{\cat C} N[\beta] \vdash \epsilon_N[\beta]
+    \circ_{Q} \psi : \alpha \to_{Q} \beta$ is an inverse to
+    $I_{N}[\phi]$ in that
+    \begin{align*}
+       I_n[\epsilon_N[\beta] \circ \psi/\phi] &= \psi \quad\quad (\eta)\\
+      \epsilon_N[\beta] \circ I_n[\phi] &= \phi\quad \quad (\beta)
+    \end{align*}
+  \end{enumerate}
+\end{definition}
+
+Part of this equivalence is the \emph{Yoneda Lemma}, which we state
+now in its synthetic, parameterized form.
+The usual non-parameterized Yoneda lemma can be formed if we have a
+unit sort.
+
+\begin{lemma}[Parameterized Yoneda Lemma]
+  Given categories $\cat C, \cat D$ and a profunctor $\alpha^o:\cat
+  C;\beta : \cat D \vdash \alpha \to_{Q} \beta$ and a function
+  $\beta : \cat D \vdash G[\beta] : \cat C$, then there is an
+  isomorphism between
+  \begin{enumerate}
+  \item Terms $\cdot \vdash t : G[\beta] \to_{Q} \beta$
+  \item left-homomorphisms $\phi : \alpha \to_{\cat C} G[\beta] \vdash
+    u : \alpha \to_{Q} \beta$ i.e. they satisfy homomorphism on the
+    left (the other side doesn't make sense if $G$ is not a functor):
+    $u[\phi \circ \psi] = u[\phi] \circ \psi$
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  First, the constructions
+  \begin{enumerate}
+  \item Given $t$, we define $u(t)$ to be
+    \[\phi : \alpha \to_{\cat C} G[\beta] \vdash t \circ_{Q} \phi : \alpha \to_{Q} \beta\]
+
+    Which is a left-homomorphism because:
+    \[ (t \circ_{Q} \phi) \circ_{Q} \psi = t \circ_{Q} (\phi \circ_{\cat C} \psi)\]
+  \item Given $u$, we define $t(u)$ to be
+    \[ \cdot \vdash u[\id_{G[\beta]}/\phi] : G[\beta] \to_{Q} \beta \]
+  \end{enumerate}
+  Now we show they are inverse
+  \begin{enumerate}
+  \item First, the very easy case, $\cdot \vdash t(u(t)) : G[\beta] \to_{Q} \beta$:
+    \begin{align*}
+      t \circ_{Q} \id_{G[\beta]} &= t
+    \end{align*}
+    by the fact that $Q$ is a profunctor.
+  \item Next, $\phi : \alpha \to_{\cat C} G[\beta] \vdash u(t(u)) : \alpha \to_{Q} \beta$:
+    \begin{align*}
+      u[\id_{G[\beta]}/\phi] \circ_{Q} \phi &= u[\id \circ_{\cat C} \phi/\phi]\\
+      &= u[\phi/\phi]\\
+      &= u
+    \end{align*}
+    which uses the fact that $u$ is a left-homomorphism.
+  \end{enumerate}
+\end{proof}
+
+\begin{theorem}[Negative Types and Right Representables are Equivalent]
+  For any profunctor $\alpha^o: \cat C; \beta : \cat D \pipe \alpha
+  \to_{Q} \beta$, there is a bijection between
+  \begin{enumerate}
+  \item Right Represntables $\beta : \cat D \vdash G[\beta] : \cat C$ for $Q$.
+  \item Negative Types $\beta : \cat D \vdash N[\beta] : \cat C$
+    representing $Q$.
+  \end{enumerate}
+\end{theorem}
+\begin{proof}
+  \begin{enumerate}
+  \item Given a right representable $G[\beta]$, we set $N(G)[\beta] =
+    G[\beta]$, the introduction rule is the same and the elimination
+    rule is given as in the Yoneda lemma and the inverse property
+    follows by the Yoneda isomorphism and the fact that $I_G^{-1}$ is
+    an inverse for $I_G$.
+  \item Given a negative type $N[\beta]$ we set $G(N)[\beta] =
+    N[\beta]$, the introduction rule is the same and the inverse
+    introduction rule is given as in the Yoneda lemma.  We need to
+    show that $N[\beta]$ has the structure of a functor and that
+    $I_{N}^{-1}$ is a homomorphism on the right with respect to that
+    structure.
+    Define $N_1$ as follows:
+    \begin{mathpar}
+      \inferrule
+          {\beta_1^o:\cat D;\beta_2:\cat D \vdash \psi \circ \epsilon : N[\beta_1/\beta] \to_{Q} \beta_2\\
+            \phi : N[\beta_1/\beta] \to_{Q} \beta_2 \vdash I_N[\phi] : N[\beta_1/\beta] \to_{\cat C} N[\beta_2/\beta]
+          }
+          {\beta_1^o:\cat D;\beta_2:\cat D\pipe \psi : \beta_1 \to_{\cat D} \beta_2 \vdash I_N[\psi \circ \epsilon_{\beta_1}/\phi] : N[\beta_1/\beta] \to_{\cat C} N[\beta_2/\beta]}
+    \end{mathpar}
+    We need to show functoriality.
+    For identity we have
+    \begin{align*}
+      I_N[\id_{\beta} \circ \epsilon_{\beta}/\phi] &= I_N[\epsilon_{\beta}]\\
+      &= I_N[\epsilon \circ \id_{N[\beta]}]\\
+      &= id_{N[\beta]}
+    \end{align*}
+    For composition,
+    \begin{align*}
+      I_N[(\theta \circ \psi) \circ \epsilon] &= ?
+    \end{align*}
+  \end{enumerate}
+\end{proof}
+
+\section{Equipment of Internal Categories}
 
 Next we show that internal categories provide us with our first
 \emph{model} of judgment type theory by interpreting sorts as
