@@ -6,6 +6,7 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{mathpartir}
+\usepackage{bbm}
 
 \begin{document}
 
@@ -15,7 +16,7 @@
 \newcommand{\pto}{\nrightarrow}
 \newcommand{\pfrom}{\nleftarrow}
 \newcommand{\vcat}{\mathcal}
-\newcommand{\cat}{\mathbb}
+\newcommand{\cat}{\mathbbm}
 \newcommand{\vtkmnd}{\mathbb{K}\text{Mod} (\vcat{V},T)}
 \newcommand{\rmod}{\text{RMod}}
 \newcommand{\lmod}{\text{LMod}}
@@ -26,7 +27,7 @@
 \newcommand{\ctx}{\,\text{context}}
 \newcommand{\pipe}{\,|\,}
 
-\title{Judgment Theory: An Syntax for Virtual Equipments}
+\title{Judgment Theory: A Syntax for Virtual Equipments and Internal Category Theory}
 \author{Max S. New}
 
 \maketitle
@@ -228,7 +229,7 @@ familiar and we have categories, objects/functors,
   \caption{Hom Sets}
 \end{figure}
 
-\section{Internal Categories and Synthetic Category Theory}
+\section{Internal Categories and Category Theory}
 
 Next, we introduce the notion of category internal to our syntactic
 virtual equipment and the \emph{monoids and modules} translation that
@@ -279,6 +280,23 @@ read exactly as the classical definitions.
   \item Satisfying $\cat D$ associativity: $(\theta_1 \circ_{\cat D} \theta_0) \circ_{\cat DR} \psi = \theta_1 \circ_{\cat D R} (\theta_0 \circ_{\cat DR} \psi)$
   \item Satisfying $\cat D$ unitality: $\id_{\beta} \circ_{\cat D R} \psi = \psi$
   \item Satisfying mixed associativity: $(\theta \circ_{\cat D R} \psi) \circ_{R \cat C} \phi = \theta \circ_{\cat D R} (\psi \circ_{R \cat C} \phi)$
+  \end{enumerate}
+\end{definition}
+
+Next, we show that Profunctors can be restricted by functors
+
+\begin{definition}[Restriction of Profunctors]
+  If $\cat C, \cat D, \cat C', \cat D'$ are categories, and $\alpha' :
+  \cat C' \vdash F[\alpha'] : \cat C$ and $\beta' : \cat D' \vdash
+  G[\beta'] : \cat D$ are functors and $\alpha^o : \cat C;\beta : \cat
+  D \pipe \alpha^o \to_{R} \beta$ is a profunctor, then $F[\alpha']
+  \to_{R} G[\beta']$ is given the structure of a profunctor by:
+  \begin{enumerate}
+  \item $\cat C'$ composition:
+    \[ \phi : \alpha_0 \to_{\cat C'} \alpha_1, \psi : F[\alpha_1] \to_{R} G[\beta] \vdash \psi \circ_{R\cat C} F_1[\phi] : F[\alpha_1] \to_{R} G[\beta]
+    \]
+  \item $\cat D'$ composition:
+    \[ \alpha^o:\cat \cat C';\beta_1 : \cat D'\pipe \psi : F[\alpha] \to_{R} G[\beta], \theta : \beta_0 \to_{\cat D'} \beta_1 \vdash G[\theta] \circ_{\cat DR} \psi : F[\alpha] \to_{R} G[\beta_1] \]
   \end{enumerate}
 \end{definition}
 
@@ -382,7 +400,7 @@ t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha')$.
   \end{enumerate}
 \end{proof}
 
-\subsection{Universal Properties, Synthetically}
+\subsection{Universal Properties, Internally}
 
 In a sense, the very purpose of category theory is to study universal
 properties and so it is essential that our syntax provide a nice
@@ -415,7 +433,7 @@ essentially the same as the definition of a negative type, which has
 an introduction rule, but instead of an inverse, there is an
 elimination rule, and the functoriality of the type is not primitive.
 Fortunately, we can prove the equivalence between these notions
-entirely synthetically.
+entirely syntactically.
 
 \begin{definition}[Negative Type]
   A negative type (connective) $N$ between categories $\cat C$,$\cat D$ consists of
@@ -426,21 +444,21 @@ entirely synthetically.
   \item An ``introduction rule'' $\phi : \alpha \to_{Q} \beta \vdash
     I_N[\phi] : \alpha \to_{\cat C} N[\beta]$ that is a homomorphism
     \emph{on the left}:
-    \[ I_N[\phi] \circ \psi \equiv I_N[\phi \circ \psi] \]
+    \[ \psi : \alpha' \to_{\cat C} \alpha, \phi : \alpha \to_{Q} \beta \vdash I_N[\phi] \circ_{\cat C} \psi \equiv I_N[\phi \circ_{Q} \psi] : \alpha' \to_{\cat C} N[\beta]\]
   \item An ``elimination rule'' $\beta^o:\cat D;\beta : \cat D \pipe
     \cdot \vdash \epsilon_{N}[\beta] : N[\beta] \to_{Q} \beta$
   \item Such that $\psi : \alpha \to_{\cat C} N[\beta] \vdash \epsilon_N[\beta]
     \circ_{Q} \psi : \alpha \to_{Q} \beta$ is an inverse to
     $I_{N}[\phi]$ in that
     \begin{align*}
-       I_n[\epsilon_N[\beta] \circ \psi/\phi] &= \psi \quad\quad (\eta)\\
-      \epsilon_N[\beta] \circ I_n[\phi] &= \phi\quad \quad (\beta)
+       I_n[\epsilon_N[\beta] \circ \psi/\phi] &= \psi \tag{$\eta$}\\
+      \epsilon_N[\beta] \circ I_n[\phi] &= \phi \tag{$\beta$}
     \end{align*}
   \end{enumerate}
 \end{definition}
 
 Part of this equivalence is the \emph{Yoneda Lemma}, which we state
-now in its synthetic, parameterized form.
+now in its internal, parameterized form.
 The usual non-parameterized Yoneda lemma can be formed if we have a
 unit sort.
 
@@ -505,9 +523,8 @@ unit sort.
     N[\beta]$, the introduction rule is the same and the inverse
     introduction rule is given as in the Yoneda lemma.  We need to
     show that $N[\beta]$ has the structure of a functor and that
-    $I_{N}^{-1}$ is a homomorphism on the right with respect to that
-    structure.
-    Define $N_1$ as follows:
+    $I_{N}$ and $I_{N}^{-1}$ are homomorphisms on the right with
+    respect to that structure.  Define $N_1$ as follows:
     \begin{mathpar}
       \inferrule
           {\beta_1^o:\cat D;\beta_2:\cat D \vdash \psi \circ \epsilon : N[\beta_1/\beta] \to_{Q} \beta_2\\
@@ -520,14 +537,213 @@ unit sort.
     \begin{align*}
       I_N[\id_{\beta} \circ \epsilon_{\beta}/\phi] &= I_N[\epsilon_{\beta}]\\
       &= I_N[\epsilon \circ \id_{N[\beta]}]\\
-      &= id_{N[\beta]}
+      &= \id_{N[\beta]} \tag{$\eta$}
     \end{align*}
     For composition,
     \begin{align*}
-      I_N[(\theta \circ \psi) \circ \epsilon] &= ?
+      N_1[\theta] \circ N_1[\psi]
+      &= I_N[\theta \circ \epsilon] \circ I_N[\psi \circ \epsilon]\\
+      &= I_N[(\theta \circ \epsilon) \circ I_N[\psi \circ \epsilon]]\tag{left homomorphism}\\
+      &= I_N[\theta \circ (\epsilon \circ I_N[\psi \circ \epsilon])]\\
+      &= I_N[\theta \circ (\psi \circ \epsilon)] \tag{$\beta$}\\
+      &= I_N[(\theta \circ \psi) \circ \epsilon]\\
+      &= N_1[\theta \circ \psi]
+    \end{align*}
+    Next we show $I_N$ is a right homomorphism, the typing here is
+    $\phi : \alpha \to_{Q} \beta_1, \theta : \beta_1 \to_{\cat D}
+    \beta_2$.
+    \begin{align*}
+      N_1[\theta] \circ I_N[\phi] &= I_N[\theta \circ \epsilon] \circ I_N[\phi]\\
+      &= I_N[\theta \circ \epsilon \circ I_N[\phi]]\tag{left homomorphism}\\
+      &= I_N[\theta \circ \phi] \tag{$\beta$}
+    \end{align*}
+    and to show $I_N^{-1}$ is a right homomorphism under $\phi : \alpha \to_{\cat C}N[\beta_1], \theta : \beta_1 \to_{\cat D} \beta_2$
+    \begin{align*}
+      I_N^{-1}[N_1[\theta] \circ \phi] &= \epsilon \circ (N_1[\theta] \circ \phi) \tag{def}\\
+      &= \epsilon \circ (I_N[\theta \circ \epsilon] \circ \phi)\tag{def}\\
+      &= (\epsilon \circ I_N[\theta \circ \epsilon]) \circ \phi\tag{assoc}\\
+      &= (\theta \circ \epsilon) \circ \phi\tag{$\beta$}\\
+      &= \theta \circ (\epsilon \circ \phi)\tag{assoc}\\
+      &= \theta \circ I_N^{-1}[\phi] \tag{def}
+    \end{align*}
+  \end{enumerate}
+
+  Next we need to show that this is a \emph{bijection}.
+  \begin{enumerate}
+  \item Starting with a negative type $N[\beta]$, we recover the
+    original $\epsilon$ by the Yoneda lemma.
+  \item Starting with a right representable $G[\beta]$, we recover the
+    original $I_N^{-1}$ by the Yoneda lemma. We need to show that the
+    action of $G$ on arrows is the same as the one defined from $G$
+    viewed as a negative type, which we will call $G_1'$:
+    \begin{align*}
+      G_1'[\theta] &= I_G[\theta \circ \epsilon]\\
+      &= G_1[\theta] \circ I_G[\epsilon]\tag{right homomorphism}\\
+      &= G_1[\theta] \circ I_G[\epsilon \circ \id]\\
+      &= G_1[\theta] \circ \id\\
+      &= G_1[\theta]
     \end{align*}
   \end{enumerate}
 \end{proof}
+
+\section{Specific Universal Properties: The Microcosm Principle}
+
+While we have now proved a beautiful internal theorem in great
+generality that has many useful instances in different models, we are
+hard pressed to actually \emph{instantiate} the theorem in the syntax
+itself because we can't really come up with any useful universal properties!
+The reason is that Judgment Theory itself is too bare-bones.
+
+For instance how would we say that a category $\cat C$ has a
+\emph{terminal object}? Well, it would have to be in the first place a
+\emph{single} object in $\cat C$, but so far our syntax only enables
+us to talk about functions and functors. Well an object of $\cat C$ is
+the same as a function from the unit sort, but so far our syntax only
+has base sorts.
+
+So we see that defining the terminal object, \emph{necessitates} some
+notion of terminal object in our ``metatheory'': Judgment Theory.
+This mysterious and pervasive aspect of higher category theory is
+called the \emph{microcosm principle} because it says that in order to
+discuss a property of a single object in a single category (the
+microcosm), we need the same sort of object at the meta-level (the
+macrocosm).
+The adage here is ``As above, so below''.
+
+That might all sound very spiritual, but we'll see that it's actually
+quite a nice heuristic for formalizing universal properties in
+internal category theory.
+In the spirit of this heuristic, instead of first giving a bunch of
+new type constructions for Judgment Theory and then applying them to
+define universal properties, we will consider them in pairs, first
+above, and then below.
+
+\subsection{Terminal Sort/Terminal Object/Unit Type}
+
+First we consider the terminal sort and then the idea of a terminal
+object in an internal category.
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule{~}{1 \sort}
+
+    \inferrule*[right=1-Ty-Intro]{~}{\alpha : C \vdash () : 1}
+
+    \inferrule*[right=1-Ty-$\eta$]{\alpha : C \vdash A : 1}{\alpha : C \vdash A = () : 1}\\
+
+    \inferrule{~}{\alpha^o:C;\beta:D \pipe 1}
+
+    \inferrule*[right=1-Tm-Intro]{~}{\Phi \vdash () : 1}
+    
+    \inferrule*[right=1-Tm-$\eta$]{\Phi \vdash t : 1}{\Phi \vdash t = () : 1}\\
+
+    ()[\gamma] = ()\and 1[A/\alpha;B/\beta] = 1 \and ()[\phi] = ()
+  \end{mathpar}
+  \caption{Terminal Sort, Judgment}
+\end{figure}
+
+The rules say that there is a terminal sort $1$ that has an element
+$()$ and everything is equal to that element.
+Then we reproduce this at the level of judgments/terms: there is a
+terminal judgment $1$ that has an element $()$ and everything is equal
+to that element.
+
+Next, the terminal sort trivially has a category structure using the
+trivial judgment as its hom set:
+
+\begin{definition}[Terminal Category]
+  The terminal category $\cat 1$ consists of
+  \begin{enumerate}
+  \item Its object sort is $1$
+  \item Its arrow judgment is $\alpha^o:1;\alpha:1 \pipe 1$
+  \item Its identity arrow is given by $\alpha^o;\alpha \pipe \cdot \vdash () : 1$
+  \item Composition is defined by $\phi : 1, \psi : 1 \vdash () : 1$
+  \item Associativity and unitality are trivial by \textsc{1-$\eta$}
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}[Terminal Object Specification]
+  In judgment type theory with a terminal sort/judgment, we can define
+  for any category $\cat C$ a profunctor $\alpha^o:\cat C;\beta : \cat
+  1 \pipe 1$, which specifies a terminal object.
+\end{definition}
+
+Now let's instantiate the definition for the terminal object defined
+as a negative type and as a representable and see how it reproduces
+the standard type-theoretic and category-theoretic definitions.
+
+A representation of $\alpha^o:\cat C; \beta : \cat 1 \pipe 1$ consists
+of a functor $\beta : \cat 1 \vdash 1_{\cat C} : \cat C$, an introduction rule
+\[ \phi : 1 \vdash I_{1}[\phi] : \alpha \to_{\cat C} 1_{\cat C}[\beta] \]
+satisfying $I_{1}[\phi] \circ \gamma =I_{1}[\phi \circ \gamma]$ and an
+inverse $\psi : \alpha \to_{\cat C} 1_{\cat C}[\beta] \vdash
+I_{1}^{-1}[\psi] : 1$ which by \textsc{1-$\eta$} is equal to $()$ and
+therefore every $t : \alpha \to_{\cat C} 1_{\cat C}[\beta]$ is equal
+to $I_{1}[\phi]$. In light of this it would be appropriate to write
+$I_1[\phi]$ as $()$ and then the left-homomorphism property is $()
+\circ \gamma = ()$, which is precisely the definition of substitution.
+
+This alternate syntax makes even more sense in light of the negative
+type presentation. A negative type satisfying the terminal object
+specification consists of a functor $1_{\cat C}$ as above and an
+introduction rule as above and an elimination form $\vdash \epsilon :
+1$, which is trivial.
+
+\subsection{Products}
+
+Next the product
+
+\begin{figure}
+  \begin{mathpar}
+    
+    \inferrule{C \sort \and D\sort}{C \times D \sort}
+
+    \inferrule
+    {\alpha : C \vdash A_1 : D_1 \and \alpha : C \vdash A_2 : D_2}
+    {\alpha : C \vdash (A_1,A_2) : D_1 \times D_2}
+
+    (A_1,A_2)[B/\alpha] = (A_1[B/\alpha], A_2[B/\alpha])
+     
+    (\pi_i A)[B/\alpha] = \pi_i A[B/\alpha]
+
+    \inferrule{\alpha : C \vdash A : D_1 \times D_2}{\alpha : C \vdash \pi_i A : D_i}
+
+    \inferrule*[right=$\times-\beta$]{~}{\pi_i(A_1,A_2) = A_i}
+
+    \inferrule*{\alpha : C \vdash A : D_1 \times D_2}{\alpha : C \vdash A = (\pi_1 A, \pi_2 A) : D_1\times D_2}\\
+
+    \inferrule
+    {\alpha^o: C;\beta : D \pipe R_1 \and \alpha^o: C;\beta : D \pipe R_2}
+    {\alpha^o: C;\beta : D \pipe R_1 \times R_2}
+
+    (R_1 \times R_2)[A/\alpha;B/\beta] = (R_1[A/\alpha;B/\beta] \times R_2[A/\alpha;B/\beta])
+
+    \inferrule
+    {\Phi \vdash t_1 : R_1 \and \Phi \vdash t_2 : R_2}
+    {\Phi \vdash (t_1,t_2) : R_1 \times R_2}
+
+    (t_1,t_2)[\phi] = (t_1[\phi], t_2[\phi])
+
+    \inferrule
+    {\Phi \vdash u : R_1 \times R_2}
+    {\Phi \vdash \pi_i u : R_i}
+
+    (\pi_i u)[\phi] = \pi_i u[\phi] 
+
+    \inferrule{~}{\pi_i (t_1,t_2) = t_i}
+
+    \inferrule{\Phi \vdash t : R_1 \times R_2}{t = (\pi_1 t, \pi_2 t)}
+  \end{mathpar}
+  \caption{Product Sort, Judgment}
+\end{figure}
+
+\begin{definition}[Product Functor Specification]
+  For any category $\cat C$, we can specify the product functor by
+  \begin{enumerate}
+  \item The span is $\alpha^o:\cat C; \beta : (\cat C \times \cat C) \pipe (\alpha \to_{\cat C} \pi_1 \beta) \times (\alpha \to_{\cat C} \pi_2 \beta)$
+  \item Composition is defined as
+  \end{enumerate}
+\end{definition}
 
 \section{Equipment of Internal Categories}
 
@@ -543,6 +759,8 @@ the home sets come from the category structure.
 
 The interpretation of hom-formation and -introduction is obvious, but
 elim is more interesting...
+
+\section{Semantics of Judgment Theory}
 
 \end{document}
 
