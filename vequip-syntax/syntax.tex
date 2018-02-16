@@ -832,34 +832,37 @@ the judgmental structure of the theory.
 
 \begin{figure}
   \begin{mathpar}
-  \alpha : C \vdash \vec A \div D
+    \inferrule{C \sort}{TC \sort}
 
-  \Phi \vdash \vec t \div R
-
-  \inferrule*[right=*]
-  {\alpha : C \vdash B : D \and \beta : D \vdash \vec A \div E}
-  {\alpha : C \vdash \vec A[B/\beta] \div E}
-
-  \inferrule*[right=ret]
-  {\alpha : C \vdash A : D}
-  {\alpha : C \vdash [A] \div D}
+    \inferrule*[right=ret]
+    {\alpha : C \vdash A : D}
+    {\alpha : C \vdash [A] : TD}
 
   \inferrule*[right=kleisli]
-  {\alpha : C \vdash \vec A \div D \and \beta : D \vdash \vec B \div E}
-  {\alpha : C \vdash \for [\beta] \in \vec A.~\vec B \div E}
+  {\alpha : C \vdash \vec A : TD \and \beta : D \vdash \vec B : TE}
+  {\alpha : C \vdash \for [\beta] \in \vec A.~\vec B : TE}
   
   \inferrule{~}{\for [\beta] \in [A].~\vec A = \vec A[A/\beta]}
 
   \inferrule{~}{\for [\beta] \in \vec A.~[\beta] = \vec A}
 
-  \inferrule*[right=Kleisli-Restrict]
-  {\alpha' : C' \vdash \vec A \div C\and
-    \beta': D' \vdash \vec B \div D\and
+  \inferrule*[right=Monad-Judg]
+  {\alpha' : C' \vdash \vec A : TC\and
+    \beta': D' \vdash \vec B : TD\and
     \alpha^o : C;\beta: D \pipe R}
   {\alpha'^o;\beta' \pipe \for [\alpha;\beta] \in \vec A\wr\vec B.~R}
 
+  \inferrule
+  {\alpha^o;\beta \pipe \Phi \vdash t : R}
+  {\Phi \vdash [t] : \for[\alpha;\beta] \in [\alpha]\wr[\beta].~R}
+
+  \inferrule
+  {\Psi \vdash \vec u : \for[\alpha;\beta] \in \vec A\wr \vec B.~R\and
+    \Phi,\psi : R,\Phi' \vdash t : \for[\cdots] \in \cdots.~S
+  }
+  {\Phi,\Psi,\Phi \vdash \for [\phi] \in u.~t : \for[\cdots] \in \cdots.~ S}
   \end{mathpar}
-  \caption{Virtually Monadal Judgment Theory (additions to judgment theory)}
+  \caption{Monadal Judgment Theory (additions to judgment theory)}
 \end{figure}
 
 
