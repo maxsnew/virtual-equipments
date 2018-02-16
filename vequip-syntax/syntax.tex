@@ -737,11 +737,70 @@ Next the product
   \caption{Product Sort, Judgment}
 \end{figure}
 
+First the product category
+
+\begin{definition}[Product category]
+  For any categories $\cat C_1$, $\cat C_2$ we can form the product
+  category whose sort of objects is $\cat C_1 \times \cat C_2$, whose
+  arrow judgment is $\alpha^o : \cat C_1 \times \cat C_2;\alpha \pipe
+  (\pi_1 \alpha \to_{\cat C_1} \pi_1 \alpha) \times (\pi_2 \alpha
+  \to_{\cat C_2} \pi_2 \alpha)$. Identity is given by $\alpha^o : \cat
+  C_1 \times \cat C_2;\alpha\pipe\cdot \vdash (\id_{\pi_1 \alpha},
+  \id_{\pi_2 \alpha}) : (\pi_1 \alpha \to_{\cat C_1} \pi_1 \alpha)
+  \times (\pi_2 \alpha \to_{\cat C_2} \pi_2 \alpha)$ and composition
+  by
+  \[
+  \phi %: (\pi_1 \alpha_0 \to_{\cat C_1} \pi_1 \alpha_1) \times (\pi_2 \alpha_0 \to_{\cat C_2} \pi_2 \alpha_1)
+  ,
+  \psi %: (\pi_1 \alpha_1 \to_{\cat C_1} \pi_1 \alpha_2) \times (\pi_2 \alpha_1 \to_{\cat C_2} \pi_2 \alpha_2)
+  \vdash ((\pi_1 \phi) \circ (\pi_1 \psi), (\pi_2 \psi) \circ (\pi_2 \phi)) :
+  (\pi_1 \alpha_0 \to_{\cat C_1} \pi_1 \alpha_2) \times (\pi_2 \alpha_0 \to_{\cat C_2} \pi_2 \alpha_2)  
+  \]
+  unitality, associativity follow from the same properties of $\cat C_1,\cat C_2$
+\end{definition}
+
 \begin{definition}[Product Functor Specification]
   For any category $\cat C$, we can specify the product functor by
   \begin{enumerate}
-  \item The span is $\alpha^o:\cat C; \beta : (\cat C \times \cat C) \pipe (\alpha \to_{\cat C} \pi_1 \beta) \times (\alpha \to_{\cat C} \pi_2 \beta)$
-  \item Composition is defined as
+  \item The span is $\alpha^o:\cat C; \beta : \cat C \times \cat C \pipe (\alpha \to_{\cat C} \pi_1 \beta) \times (\alpha \to_{\cat C} \pi_2 \beta)$
+  \item Left Composition is defined as
+    \[ \phi, \psi \vdash (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi)\]
+  \item Left unitality:
+    \begin{align*}
+      (\pi_1 \phi \circ \id, \pi_2 \phi \circ \id)
+      &= (\pi_1 \phi, \pi_2 \phi)\\
+      &= \phi\tag{$\times-eta$}
+    \end{align*}
+  \item Left associativity:
+    \begin{align*}
+      (\phi \circ \psi) \circ \psi'
+      &= (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi) \circ \psi'\\
+      &= (\pi_1 (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi) \circ \psi',
+      \pi_2 (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi) \circ \psi')\\
+      &= ((\pi_1 \phi \circ \psi) \circ \psi', (\pi_2 \phi \circ \psi) \circ \psi')\\
+      &= (\pi_1 \phi \circ (\psi \circ \psi'), \pi_2 \phi \circ (\psi \circ \psi'))\\
+      &= \phi \circ (\psi \circ \psi')
+    \end{align*}
+  \item Right composition is defined as
+    \[ \phi, \theta \vdash (\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi) \]
+  \item Right unitality:
+    \begin{align*}
+      (\pi_1 (\id,\id) \circ \pi_1 \phi, \pi_2 (\id,\id) \circ \pi_2 \phi)
+      &= (\id \circ \pi_1 \phi, \id \circ \pi_2 \phi) \tag{$\times-\beta$}\\
+      &= (\pi_1 \phi, \id \circ \pi_2 \phi)\\
+      &= \phi \tag{$\times-\eta$}
+    \end{align*}
+  \item Right associativity
+    \begin{align*}
+      \theta' \circ (\theta \circ \phi)
+      &= \theta' \circ (\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi)\\
+      &= (\pi_1 \theta' \circ \pi_1(\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi),
+      \pi_2 \theta' \circ \pi_2(\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi))\\
+      &= (\pi_1 \theta' \circ (\pi_1 \theta \circ \pi_1 \phi), \pi_2 \theta' \circ (\pi_2 \theta \circ \pi_2 \phi))\\
+      &= ((\pi_1 \theta' \circ \pi_1 \theta) \circ \pi_1 \phi, (\pi_2 \theta' \circ \pi_2 \theta) \circ \pi_2 \phi)\\
+      &= (\pi_1(\theta' \circ \theta) \circ \pi_1 \phi, \pi_2(\theta' \circ \theta) \circ \pi_2 \phi)\\
+      &= (\theta' \circ \theta) \circ \phi \\
+    \end{align*}
   \end{enumerate}
 \end{definition}
 
