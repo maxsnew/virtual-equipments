@@ -22,10 +22,11 @@
 \newcommand{\lmod}{\text{LMod}}
 
 \newcommand{\id}{\text{id}}
+\newcommand{\for}{\text{for}\,}
 \newcommand{\when}{\text{when}\,}
 \newcommand{\sort}{\,\text{sort}}
 \newcommand{\ctx}{\,\text{context}}
-\newcommand{\pipe}{\,|\,}
+\newcommand{\pipe}{\mathrel{|}}
 
 \title{Judgment Theory: A Syntax for Virtual Equipments and Internal Category Theory}
 \author{Max S. New}
@@ -818,6 +819,49 @@ the home sets come from the category structure.
 
 The interpretation of hom-formation and -introduction is obvious, but
 elim is more interesting...
+
+\section{Monads and Multicategories}
+
+It is well-established at this point that defining enriched
+multicategories requires an appropriate notion of \emph{monad} on the
+enriching ``category''. As such we need to extend our language to be
+``monadic'' in some way.
+However, there can be many monads on a single virtual equipment, so in
+order to introduce a monad by a universal property, we need to enrich
+the judgmental structure of the theory.
+
+\begin{figure}
+  \begin{mathpar}
+  \alpha : C \vdash \vec A \div D
+
+  \Phi \vdash \vec t \div R
+
+  \inferrule*[right=*]
+  {\alpha : C \vdash B : D \and \beta : D \vdash \vec A \div E}
+  {\alpha : C \vdash \vec A[B/\beta] \div E}
+
+  \inferrule*[right=ret]
+  {\alpha : C \vdash A : D}
+  {\alpha : C \vdash [A] \div D}
+
+  \inferrule*[right=kleisli]
+  {\alpha : C \vdash \vec A \div D \and \beta : D \vdash \vec B \div E}
+  {\alpha : C \vdash \for [\beta] \in \vec A.~\vec B \div E}
+  
+  \inferrule{~}{\for [\beta] \in [A].~\vec A = \vec A[A/\beta]}
+
+  \inferrule{~}{\for [\beta] \in \vec A.~[\beta] = \vec A}
+
+  \inferrule*[right=Kleisli-Restrict]
+  {\alpha' : C' \vdash \vec A \div C\and
+    \beta': D' \vdash \vec B \div D\and
+    \alpha^o : C;\beta: D \pipe R}
+  {\alpha'^o;\beta' \pipe \for [\alpha;\beta] \in \vec A\wr\vec B.~R}
+
+  \end{mathpar}
+  \caption{Virtually Monadal Judgment Theory (additions to judgment theory)}
+\end{figure}
+
 
 \section{Semantics of Judgment Theory}
 
