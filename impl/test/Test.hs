@@ -1,5 +1,3 @@
-module Test where
-
 import Data.Foldable
 
 import Grammar
