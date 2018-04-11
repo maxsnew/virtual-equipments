@@ -1,8 +1,9 @@
 module Grammar where
 
 -- | A Program is a sequence of signature and module definitions.
-data Program = ProgMT | ProgSig SigDef Program | ProgMod ModDef Program
-  deriving (Show, Read)
+type Program = [TopLevel]
+data TopLevel = TLSig SigDef | TLMod ModDef
+  deriving (Show, Read, Eq)
 
 -- | A Signature Definition defines a name, parameterized by some
 -- other signatures, and consists of a sequence of judgments
@@ -10,14 +11,14 @@ data SigDef = SigDef { _sigDefName :: SigName
                      , _sigDefArgs :: [(ModName, SigExp)]
                      , _sigDefBody :: [SigDecl]
                      }
-  deriving (Show, Read)
+  deriving (Show, Read, Eq)
 
 data ModDef = ModDef { _modDefName :: ModName
                      , _modDefArgs :: [(ModName, SigExp)]
                      , _modDefSig  :: SigExp
                      , _modDefBody :: [ModDecl]
                      }
-  deriving (Show, Read)
+  deriving (Show, Read, Eq)
 
 -- | A Signature Declaration can be for a set, a function, a span, a
 -- span function, or an equality axiom between span functions
@@ -27,13 +28,13 @@ data SigDecl
   | SigDeclSpan SpanName SetExp SetExp
   | SigDeclTerm TermName TermFunType
   | SigDeclAx   AxName TermFunType TermExp TermExp
-  deriving (Show, Read)
+  deriving (Show, Read, Eq)
 
 data FunType = FunType { _dom :: SetExp, _cod :: SetExp }
-  deriving (Show, Read)
+  deriving (Show, Read, Eq)
 -- | TODO: encode this
 data TermFunType = TermFunType { _tftPrint :: String }
-  deriving (Show, Read)
+  deriving (Show, Read, Eq)
 
 -- | A Module Declaration is an *instance* of a signature declaration.
 data ModDecl
@@ -42,30 +43,30 @@ data ModDecl
   | ModDeclSpan SpanName EltVar EltVar SpanExp -- | M(x;y) = N
   | ModDeclTerm TermName EltVar EltVar SpanCtx TermExp -- | forall x, y. alpha(phi_1,...phi_n) = t
   | ModDeclProof AxName Proof
-  deriving (Show, Read)
+  deriving (Show, Read, Eq)
 
 -- | Expression Language
 -- These are the actual terms in the language, there's one for each
 -- sort of judgment, including signature and module references
-data SigExp = SigExp
-  deriving (Show, Read)
+
+data SigExp = SigApp { _sigCtor :: SigName, _sigArgs :: [ModExp] }
+  deriving (Show, Read, Eq)
 data ModExp
-  = ModCurrent
-  | ModName ModName
-  deriving (Show, Read)
+  = ModBase ModName
+  deriving (Show, Read, Eq)
 data SetExp = SetExp (ModDeref SetName)
-  deriving (Show, Read)
+  deriving (Show, Read, Eq)
 data EltExp = EltExp
-  deriving (Show, Read)
+  deriving (Show, Read, Eq)
 data SpanExp
   = SpanEApp String TermExp TermExp
-  deriving (Show, Read)
+  deriving (Show, Read, Eq)
 data TermExp = TermExp
-  deriving (Show, Read)
+  deriving (Show, Read, Eq)
 
 -- | Going to figure out Proofs later
 data Proof = Admit
-  deriving (Show, Read)
+  deriving (Show, Read, Eq)
 
 -- | Variables and Names.
 
@@ -87,7 +88,7 @@ type SpanCtx = [SpanEltVar]
 -- signatures and modules themselves
 
 data ModDeref n = ModDeref { _derefMod :: ModExp, _derefName :: n }
-  deriving (Show, Read)
+  deriving (Show, Read, Eq)
 type SigName  = String
 type ModName  = String
 type SetName  = String
@@ -96,18 +97,3 @@ type SpanName = String
 type TermName = String
 type AxName   = String
 
--- | Examples
-category :: SigDef
-category =
-  SigDef
-  { _sigDefName = "Category"
-  , _sigDefArgs = [ ]
-  , _sigDefBody =
-    [ SigDeclSet "Ob"
-    , SigDeclSpan "Arr" (SetExp (ModDeref ModCurrent "Ob")) (SetExp (ModDeref ModCurrent "Ob"))
-    , SigDeclTerm "id" (TermFunType "forall a. Arr(a,a)")
-    , SigDeclTerm "comp" (TermFunType "forall a,b,c. (Arr(a,b), Arr(b,c)) -> Arr(a,c)")
-    , SigDeclAx   "id-left" (TermFunType "forall a,b. (Arr(a,b)) -> Arr(a,b)") TermExp TermExp
-    -- | TODO: id-right, assoc
-    ]
-  }
