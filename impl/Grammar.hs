@@ -30,6 +30,13 @@ data SigDecl
   | SigDeclAx   AxName TermFunType TermExp TermExp
   deriving (Show, Read, Eq)
 
+getName :: SigDecl -> String
+getName (SigDeclSet name)      = name
+getName (SigDeclFun name _)    = name
+getName (SigDeclSpan name _ _) = name
+getName (SigDeclTerm name _)   = name
+getName (SigDeclAx name _ _ _) = name
+
 data FunType = FunType { _dom :: SetExp, _cod :: SetExp }
   deriving (Show, Read, Eq)
 -- | TODO: encode this
@@ -87,7 +94,7 @@ type SpanCtx = [SpanEltVar]
 -- There is one of these for every "sort" in the language, including
 -- signatures and modules themselves
 
-data ModDeref n = ModDeref { _derefMod :: ModExp, _derefName :: n }
+data ModDeref n = ModDeref { _derefMod :: Maybe ModExp, _derefName :: n }
   deriving (Show, Read, Eq)
 type SigName  = String
 type ModName  = String

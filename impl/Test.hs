@@ -15,22 +15,103 @@ main = do
     case typeCheckProg p [] of
       Right _ -> error ("Program should have errored, but type checked: " ++ show p)
       Left err -> return ()
-  print "all tests passed"
+  putStrLn "all tests passed"
+
+-- | for running individual tests in the repl
+testProg p = putStrLn $ case typeCheckProg p [] of
+  Left err -> err
+  Right () -> "Program is well formed"
 
 -- | Examples
+set :: SigDef
+set = SigDef
+  { _sigDefName = "Set"
+  , _sigDefArgs = []
+  , _sigDefBody =
+    [ SigDeclSet "X"
+    ]
+  }
+
+sets :: SigDef
+sets = SigDef
+  { _sigDefName = "Sets"
+  , _sigDefArgs = []
+  , _sigDefBody =
+    [ SigDeclSet "X"
+    , SigDeclSet "Y"
+    , SigDeclSet "Z"
+    ]
+  }
+
+badSets = SigDef
+  { _sigDefName = "Sets"
+  , _sigDefArgs = []
+  , _sigDefBody =
+    [ SigDeclSet "X"
+    , SigDeclSet "Y"
+    , SigDeclSet "X"
+    ]
+  }
+
+function :: SigDef
+function = SigDef
+  { _sigDefName = "Fun"
+  , _sigDefArgs = []
+  , _sigDefBody =
+    [ SigDeclSet "X"
+    , SigDeclSet "Y"
+    , SigDeclFun "f" (FunType (SetExp (ModDeref Nothing "X")) (SetExp (ModDeref Nothing "Y")))
+    ]
+  }
+
+fun2 = SigDef
+  { _sigDefName = "Fun"
+  , _sigDefArgs = []
+  , _sigDefBody =
+    [ SigDeclSet "X"
+    , SigDeclFun "f" (FunType (SetExp (ModDeref Nothing "X")) (SetExp (ModDeref Nothing "X")))
+    , SigDeclSet "Y"
+    ]
+  }
+
+badfun = SigDef
+  { _sigDefName = "Fun"
+  , _sigDefArgs = []
+  , _sigDefBody =
+    [ SigDeclSet "X"
+    , SigDeclFun "f" (FunType (SetExp (ModDeref Nothing "X")) (SetExp (ModDeref Nothing "Y")))
+    ]
+  }
+
+extfun = SigDef
+  { _sigDefName = "Endo"
+  , _sigDefArgs = [ ("A", SigApp "Set" [])]
+  , _sigDefBody =
+    [ SigDeclFun "f" (FunType (SetExp (ModDeref (Just (ModBase "A")) "X")) (SetExp (ModDeref (Just (ModBase "A")) "X")))
+    ]
+  }
+
+badextfun = SigDef
+  { _sigDefName = "Endo"
+  , _sigDefArgs = [ ("A", SigApp "Set" [])]
+  , _sigDefBody =
+    [ SigDeclFun "f" (FunType (SetExp (ModDeref (Just (ModBase "A")) "Y")) (SetExp (ModDeref (Just (ModBase "A")) "Y")))
+    ]
+  }
+
 category :: SigDef
 category =
   SigDef
   { _sigDefName = "Category"
   , _sigDefArgs = [ ]
-  , _sigDefBody = [ ]
-    -- [ SigDeclSet "Ob"
+  , _sigDefBody =
+    [ SigDeclSet "Ob"
     -- , SigDeclSpan "Arr" (SetExp (ModDeref (ModBase "Category") "Ob")) (SetExp (ModDeref (ModBase "Category") "Ob"))
     -- , SigDeclTerm "id" (TermFunType "forall a. Arr(a,a)")
     -- , SigDeclTerm "comp" (TermFunType "forall a,b,c. (Arr(a,b), Arr(b,c)) -> Arr(a,c)")
     -- , SigDeclAx   "id-left" (TermFunType "forall a,b. (Arr(a,b)) -> Arr(a,b)") TermExp TermExp
-    -- -- | TODO: id-right, assoc
-    -- ]
+    -- | TODO: id-right, assoc
+    ]
   }
 
 fctor :: SigDef
@@ -105,15 +186,22 @@ weird =
   , _sigDefBody = []
   }
 
+simpProg sig = [ TLSig sig ]
+
 good1 = [ TLSig category ]
 good2 = good1 ++ [ TLSig fctor ]
 good3 = good2 ++ [ TLSig trans ]
-
-goods = [ good1, good2, good3 ]
+goodset = map TLSig [ set, sets ]
+goodfun = map TLSig [ function, fun2 ]
+goodextfun = goodset ++ simpProg extfun
+goods = [ good1, good2, good3, goodset, goodfun , goodextfun ]
 
 bad1 = good2 ++ [ TLSig bad_trans ]
 bad2 = good2 ++ [ TLSig badTrans2 ]
 bad3 = good2 ++ [ TLSig badTrans3 ]
 bad4 = good2 ++ [ TLSig badTrans4 ]
 bad5 = good3 ++ [ TLSig weird ]
-bads = [ bad1, bad2, bad3, bad4, bad5 ]
+badfunprog = [TLSig badfun ]
+badset = [TLSig badSets ]
+badextfunprog = goodset ++ simpProg badextfun
+bads = [ bad1, bad2, bad3, bad4, bad5, badset, badextfunprog ]
