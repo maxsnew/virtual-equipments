@@ -57,20 +57,27 @@ typeCheckModArgs args env = case args of
       else typeError (modName ++ " has signature " ++ show modSig ++ " but was used where a " ++ show sig ++ " is expected")
   
 -- | TODO
-typeCheckSigBody :: [SigDecl] -> [SigDecl] -> CheckingEnv -> Either String ()
-typeCheckSigBody [] resolvedDecls env = return ()
-typeCheckSigBody (decl:decls) resolvedDecls env = case decl of
+typeCheckSigDecl :: SigDecl -> [SigDecl] -> CheckingEnv -> Either String ()
+typeCheckSigDecl decl resolvedDecls env = case decl of
   SigDeclSet  set -> do
     notDupName set resolvedDecls
-    typeCheckSigBody decls (decl:resolvedDecls) env
   SigDeclFun  funName (FunType dom cod) -> do
     notDupName funName resolvedDecls
     typeCheckSetExp dom resolvedDecls env
     typeCheckSetExp cod resolvedDecls env
-    typeCheckSigBody decls (decl:resolvedDecls) env
-  SigDeclSpan spanName covar contra     -> typeError "no spans yet"
+  SigDeclSpan spanName covar contra     -> do
+    notDupName spanName resolvedDecls
+    typeCheckSetExp covar resolvedDecls env
+    typeCheckSetExp contra resolvedDecls env
   SigDeclTerm termName termType         -> typeError "no terms yet"
   SigDeclAx   axName termType t1 t2     -> typeError "axioms are not yet supported"
+
+
+typeCheckSigBody :: [SigDecl] -> [SigDecl] -> CheckingEnv -> Either String ()
+typeCheckSigBody [] resolvedDecls env = return ()
+typeCheckSigBody (decl:decls) resolvedDecls env = do
+  typeCheckSigDecl decl resolvedDecls env
+  typeCheckSigBody decls (decl:resolvedDecls) env
 
 typeCheckSetExp :: SetExp -> [SigDecl] -> CheckingEnv -> Either String ()
 typeCheckSetExp (SetExp (ModDeref mayMod setName)) resolved env = case mayMod of
