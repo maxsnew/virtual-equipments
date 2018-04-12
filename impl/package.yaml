@@ -21,9 +21,14 @@ description:         Please see the README on Github at <https://github.com/maxs
 
 dependencies:
 - base >= 4.7 && < 5
+- parsec
+- mtl
 
 library:
   source-dirs: src
+  ghc-options:
+    - -Wincomplete-patterns
+    - -Wmonomorphism-restriction
 
 executables:
   impl-exe:

@@ -1,6 +1,12 @@
 import Data.Foldable
 
+import Control.Applicative
+import Data.Functor
+import Data.List (intercalate)
+import Text.Parsec (parse)
+
 import Grammar
+import Parse
 import TypeCheck
 
 main :: IO ()
@@ -20,7 +26,16 @@ testProg p = putStrLn $ case typeCheckProg p [] of
   Left err -> err
   Right () -> "Program is well formed"
 
+testParse syn = parse program "" syn
+
 -- | Examples
+setSyn :: String
+setSyn = intercalate "\n" $
+  [ "signature Set() where"
+  , "  set X"
+  , "end"
+  ]
+
 set :: SigDef
 set = SigDef
   { _sigDefName = "Set"
@@ -29,6 +44,14 @@ set = SigDef
     [ SigDeclSet "X"
     ]
   }
+
+setsSyn = ((setSyn ++ "\n\n") ++) $ intercalate "\n" $
+  [ "signature Sets() where"
+  , "  set X;"
+  , "  set Y;"
+  , "  set Z"
+  , "end"
+  ]
 
 sets :: SigDef
 sets = SigDef
@@ -41,6 +64,14 @@ sets = SigDef
     ]
   }
 
+badSetsSyn = ((setSyn ++ "\n\n") ++) $ intercalate "\n" $
+  [ "signature Sets() where"
+  , "  set X;"
+  , "  set Y;"
+  , "  set X"
+  , "end"
+  ]
+
 badSets = SigDef
   { _sigDefName = "Sets"
   , _sigDefArgs = []
@@ -51,6 +82,13 @@ badSets = SigDef
     ]
   }
 
+functionSyn = intercalate "\n" $
+  [ "signature Fun() where"
+  , "  set X;"
+  , "  set Y;"
+  , "  fun f : X -> Y"
+  , "end"
+  ]
 function :: SigDef
 function = SigDef
   { _sigDefName = "Fun"
@@ -62,6 +100,14 @@ function = SigDef
     ]
   }
 
+fun2Syn = intercalate "\n" $
+  [ "signature Fun() where"
+  , "  set X;"
+  , "  fun f : X -> Y;"
+  , "  set Y"
+  , "end"
+  ]
+
 fun2 = SigDef
   { _sigDefName = "Fun"
   , _sigDefArgs = []
@@ -72,6 +118,12 @@ fun2 = SigDef
     ]
   }
 
+badfunSyn = intercalate "\n" $
+  [ "signature Fun() where"
+  , "  set X;"
+  , "  fun f : X -> Y"
+  , "end"
+  ]
 badfun = SigDef
   { _sigDefName = "Fun"
   , _sigDefArgs = []
@@ -96,6 +148,28 @@ badextfun = SigDef
     [ SigDeclFun "f" (FunType (SetExp (ModDeref (Just (ModBase "A")) "Y")) (SetExp (ModDeref (Just (ModBase "A")) "Y")))
     ]
   }
+
+tricky_mod =
+  [ TLSig $ set
+  , TLSig $ SigDef
+    { _sigDefName = "Weird-Endo"
+    , _sigDefArgs = [("A", SigApp "Set" [])]
+    , _sigDefBody =
+      [ SigDeclSet "X"
+      , SigDeclFun "e" (FunType (SetExp (ModDeref (Just $ ModBase "A") "X"))
+                                (SetExp (ModDeref (Just $ ModBase "A") "X")))
+      ]
+    }
+  , TLMod $ ModDef
+    { _modDefName = "E1"
+    , _modDefArgs = [("A", SigApp "Set" [])]
+    , _modDefSig  = SigApp "Weird-Endo" [ ModBase "A" ]
+    , _modDefBody =
+      [ ModDeclSet "X" (SetExp (ModDeref (Just $ ModBase "A") "X"))
+      , ModDeclFun "e" "x" EltExp
+      ]
+    }
+  ]
 
 category :: SigDef
 category =
@@ -203,3 +277,4 @@ badfunprog = [TLSig badfun ]
 badset = [TLSig badSets ]
 badextfunprog = goodset ++ simpProg badextfun
 bads = [ bad1, bad2, bad3, bad4, bad5, badset, badextfunprog ]
+

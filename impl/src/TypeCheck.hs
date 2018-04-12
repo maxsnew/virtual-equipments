@@ -20,16 +20,15 @@ typeCheckProg [] _env = return ()
 typeCheckProg (TLSig sigDef : rest) env = do
   typeCheckSigDef sigDef env
   typeCheckProg rest (KnownSig sigDef : env)
-typeCheckProg (TLMod modDef : rest) env = modules_unimplemented
-  -- typeCheckModDef modDef env
-  -- typeCheckProg rest (KnownMod modDef : env)
+typeCheckProg (TLMod modDef : rest) env = do
+  typeCheckModDef modDef env
+  typeCheckProg rest (undefined : env) -- | TODO: fix
 
 typeCheckSigDef :: SigDef -> CheckingEnv -> Either String ()
 typeCheckSigDef (SigDef _ sigDefArgs sigDefBody) env = do
   typeCheckSigArgs sigDefArgs env
   typeCheckSigBody sigDefBody [] (addArgs sigDefArgs env)
 
--- | TODO
 typeCheckSigArgs :: [(ModName, SigExp)] -> CheckingEnv -> Either String ()
 typeCheckSigArgs args env = case args of
   [] -> return ()
@@ -110,14 +109,19 @@ addArgs sigDefArgs env = map (uncurry UnknownMod) sigDefArgs ++ env
 lookupSig :: SigName -> CheckingEnv -> Either String SigDef
 lookupSig name = find_else matchingSig ("undefined signature: " ++ name)
   where
-    matchingSig (KnownSig sigDef) | name == (_sigDefName sigDef) = Just sigDef
-    matchingSig _ = Nothing
+    matchingSig (KnownSig sigDef) =
+      if name == (_sigDefName sigDef)
+      then Just sigDef
+      else Nothing
+    -- matchingSig (KnownMod _) = Nothing
+    matchingSig (UnknownMod _ _)  = Nothing
 
 lookupMod :: ModName -> CheckingEnv -> Either String SigExp
 lookupMod name = find_else matchingMod ("undefined module: " ++ name)
   where
-    matchingMod (UnknownMod name' sig) | name == name' = Just sig
-    matchingMod _ = Nothing
+    matchingMod (UnknownMod name' sig) = if name == name' then Just sig else Nothing
+    -- matchingMod (KnownMod mod) = if name == _modDefName mod then Just (_modDefSig mod) else Nothing
+    matchingMod (KnownSig _) = Nothing
 
 find_else :: (a -> Maybe b) -> e -> [a] -> Either e b
 find_else f err = maybe (Left err) Right . getFirst . foldMap (First . f)
