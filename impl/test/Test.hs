@@ -82,6 +82,9 @@ badSets = SigDef
     ]
   }
 
+
+
+
 functionSyn = intercalate "\n" $
   [ "signature Fun() where"
   , "  set X;"
@@ -167,13 +170,13 @@ tricky_modSyn = intercalate "\n" $
   , "end"
   , ""
   , "module E1(A : Set) : Weird-Endo(A) where"
-  , "  set X := A.X;"
-  , "  fun e(x) := x"
+  , "  set X = A.X;"
+  , "  fun e(x) = x"
   , "end"
   , ""
   -- , "module E2(A : Set, E : Weird-Endo(E1(A).X)) : Weird-Endo(A) where"
-  -- , "  set X := A.X;"
-  -- , "  fun e(x) := E1(A).e(x)"
+  -- , "  set X = A.X;"
+  -- , "  fun e(x) = E1(A).e(x)"
   -- , "end"
   ]
 tricky_mod =
@@ -193,7 +196,48 @@ tricky_mod =
     , _modDefSig  = SigApp "Weird-Endo" [ ModBase "A" ]
     , _modDefBody =
       [ ModDeclSet "X" (SetExp (ModDeref (Just $ ModBase "A") "X"))
-      , ModDeclFun "e" "x" EltExp
+      , ModDeclFun "e" "x" (EEVar "x")
+      ]
+    }
+  ]
+
+fun_comp_ex = intercalate "\n" $
+  [ setSyn
+  , "signature Function(A : Set(), B : Set()) where"
+  , "  fun f : A.X -> B.X"
+  , "end"
+  , "module Id(A : Set()) : Function(A, A) where"
+  , "  fun f(x) = x"
+  , "end"
+  , "module Comp(A : Set(), B : Set(), C:Set(), F: Function(A,B), G :Function(B,C)) : Function(A,C) where"
+  , "  fun f(a) = G.f(F.f(a))"
+  , "end"
+  ]
+
+fun_comp_tree =
+  [ TLSig $ set
+  , TLSig $ SigDef
+    { _sigDefName = "Function"
+    , _sigDefArgs = [("A", SigApp "Set" []), ("B", SigApp "Set" [])]
+    , _sigDefBody =
+      [ SigDeclFun "f" (FunType (SetExp (ModDeref (Just $ ModBase "A") "X"))
+                                (SetExp (ModDeref (Just $ ModBase "B") "X")))
+      ]
+    }
+  , TLMod $ ModDef
+    { _modDefName = "Id"
+    , _modDefArgs = [("A", SigApp "Set" [])]
+    , _modDefSig  = SigApp "Function" [ ModBase "A" , ModBase "A"]
+    , _modDefBody =
+      [ ModDeclFun "f" "x" (EEVar "x")
+      ]
+    }
+  , TLMod $ ModDef
+    { _modDefName = "Comp"
+    , _modDefArgs = [("A", SigApp "Set" []),("B", SigApp "Set" []),("C", SigApp "Set" []), ("F", SigApp "Function" [ModBase "A", ModBase "B"]), ("G", SigApp "Function" [ModBase "B", ModBase "C"])]
+    , _modDefSig  = SigApp "Function" [ ModBase "A" , ModBase "C"]
+    , _modDefBody =
+      [ ModDeclFun "f" "a" (EEApp (ModDeref (Just $ ModBase "G") "f") . EEApp (ModDeref (Just $ ModBase "F") "f") $ EEVar "a")
       ]
     }
   ]

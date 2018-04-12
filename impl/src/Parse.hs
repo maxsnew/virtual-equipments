@@ -90,14 +90,25 @@ sigdecl
     funType = FunType <$> (setExp <* symbol "->") <*> setExp
 
 moddecl :: Parse ModDecl
-moddecl = mzero
+moddecl
+  =   reserved "set" *> (ModDeclSet <$> setName <* symbol "=" <*> setExp)
+  <|> reserved "fun" *> (ModDeclFun <$> funName <*> parens eltVar <* symbol "=" <*> eltExp)
 
 setExp :: Parse SetExp
 setExp
-  = SetExp <$> (try derefExp <|> litExp)
+  = SetExp <$> modDeref setName
+
+eltExp :: Parse EltExp
+eltExp
+  = try (EEApp <$> (modDeref funName) <*> parens eltExp)
+  <|> EEVar <$> eltVar
+
+modDeref :: Parse n -> Parse (ModDeref n)
+modDeref nP = try derefExp <|> litExp
   where
-    derefExp = ModDeref <$> (Just <$> modulExp) <*> (char '.' *> identifier)
-    litExp = ModDeref Nothing <$> identifier
+    derefExp = ModDeref <$> (Just <$> modulExp) <*> (char '.' *> nP)
+    litExp = ModDeref Nothing <$> nP
+
 
 modName :: Parse ModName
 modName = identifier
@@ -111,4 +122,6 @@ termName :: Parse TermName
 termName = identifier
 axName :: Parse AxName
 axName = identifier
-  
+
+eltVar :: Parse EltVar
+eltVar = identifier

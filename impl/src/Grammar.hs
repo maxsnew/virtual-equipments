@@ -63,7 +63,9 @@ data ModExp
   deriving (Show, Read, Eq)
 data SetExp = SetExp (ModDeref SetName)
   deriving (Show, Read, Eq)
-data EltExp = EltExp
+data EltExp
+  = EEVar EltVar
+  | EEApp (ModDeref FunName) EltExp
   deriving (Show, Read, Eq)
 data SpanExp
   = SpanEApp String TermExp TermExp

@@ -1,5 +1,6 @@
 module TypeCheck where
 
+import Control.Monad (when)
 import Data.Monoid
 import Data.Foldable
 import Data.Traversable
@@ -27,14 +28,19 @@ typeCheckProg (TLMod modDef : rest) env = do
 typeCheckSigDef :: SigDef -> CheckingEnv -> Either String ()
 typeCheckSigDef (SigDef _ sigDefArgs sigDefBody) env = do
   typeCheckSigArgs sigDefArgs env
-  typeCheckSigBody sigDefBody [] (addArgs sigDefArgs env)
+  typeCheckSigBody sigDefBody (addArgs sigDefArgs env)
 
 typeCheckSigArgs :: [(ModName, SigExp)] -> CheckingEnv -> Either String ()
-typeCheckSigArgs args env = case args of
-  [] -> return ()
-  (name, sig):args -> do
-    typeCheckSigExp sig env
-    typeCheckSigArgs args (addArgs [(name, sig)] env)
+typeCheckSigArgs args env = loop args [] env
+  where
+    loop args oldNames env =
+      case args of
+        [] -> return ()
+        (name, sig):args -> do
+          when (elem name oldNames) $
+            typeError $ "duplicate name in arguments: " ++ name
+          typeCheckSigExp sig env
+          loop args (name:oldNames) (addArgs [(name, sig)] env)
 
 typeCheckSigExp :: SigExp -> CheckingEnv -> Either String ()
 typeCheckSigExp (SigApp ctor mod_args) env = do
@@ -71,12 +77,13 @@ typeCheckSigDecl decl resolvedDecls env = case decl of
   SigDeclTerm termName termType         -> typeError "no terms yet"
   SigDeclAx   axName termType t1 t2     -> typeError "axioms are not yet supported"
 
-
-typeCheckSigBody :: [SigDecl] -> [SigDecl] -> CheckingEnv -> Either String ()
-typeCheckSigBody [] resolvedDecls env = return ()
-typeCheckSigBody (decl:decls) resolvedDecls env = do
-  typeCheckSigDecl decl resolvedDecls env
-  typeCheckSigBody decls (decl:resolvedDecls) env
+typeCheckSigBody :: [SigDecl] -> CheckingEnv -> Either String ()
+typeCheckSigBody decls env = loop decls [] env
+  where
+    loop [] resolvedDecls env = return ()
+    loop (decl:decls) resolvedDecls env = do
+      typeCheckSigDecl decl resolvedDecls env
+      loop decls (decl:resolvedDecls) env
 
 typeCheckSetExp :: SetExp -> [SigDecl] -> CheckingEnv -> Either String ()
 typeCheckSetExp (SetExp (ModDeref mayMod setName)) resolved env = case mayMod of
@@ -101,7 +108,15 @@ notDupName name decls = case find ((name ==) . getName) decls of
   Just decl -> typeError $ "duplicate name: " ++ name
 
 typeCheckModDef :: ModDef -> CheckingEnv -> Either String ()
-typeCheckModDef mod env = modules_unimplemented
+typeCheckModDef (ModDef _name args osig bod) env = do
+  typeCheckSigArgs args env
+  let arg_env = addArgs args env
+  typeCheckSigExp osig arg_env
+  typeCheckModBody bod osig arg_env
+
+-- | 
+typeCheckModBody :: [ModDecl] -> SigExp -> CheckingEnv -> Either String ()
+typeCheckModBody decls sig env = _
 
 addArgs :: [(ModName, SigExp)] -> CheckingEnv -> CheckingEnv
 addArgs sigDefArgs env = map (uncurry UnknownMod) sigDefArgs ++ env
