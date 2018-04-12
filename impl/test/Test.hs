@@ -133,6 +133,11 @@ badfun = SigDef
     ]
   }
 
+extfunSyn = intercalate "\n" $
+  [ "signature Endo(A: Set) where"
+  , "  f : A.X -> A.X"
+  , "end"
+  ]
 extfun = SigDef
   { _sigDefName = "Endo"
   , _sigDefArgs = [ ("A", SigApp "Set" [])]
@@ -141,6 +146,11 @@ extfun = SigDef
     ]
   }
 
+badextfunSyn = intercalate "\n" $
+  [ "signature Endo(A: Set()) where"
+  , "  f : A.Y -> A.Y"
+  , "end"
+  ]
 badextfun = SigDef
   { _sigDefName = "Endo"
   , _sigDefArgs = [ ("A", SigApp "Set" [])]
@@ -149,6 +159,23 @@ badextfun = SigDef
     ]
   }
 
+tricky_modSyn = intercalate "\n" $
+  [ setSyn
+  , "signature Weird-Endo(A : Set()) where"
+  , "  set X;"
+  , "  fun e : A.X -> A.X"
+  , "end"
+  , ""
+  , "module E1(A : Set) : Weird-Endo(A) where"
+  , "  set X := A.X;"
+  , "  fun e(x) := x"
+  , "end"
+  , ""
+  -- , "module E2(A : Set, E : Weird-Endo(E1(A).X)) : Weird-Endo(A) where"
+  -- , "  set X := A.X;"
+  -- , "  fun e(x) := E1(A).e(x)"
+  -- , "end"
+  ]
 tricky_mod =
   [ TLSig $ set
   , TLSig $ SigDef

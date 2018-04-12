@@ -48,10 +48,18 @@ signature = do
   bod  <- semiSep sigdecl
   reserved "end"
   return $ SigDef name args bod
-  
-parameters :: Parse [(ModName, SigExp)]
-parameters = many parameter
 
+modul :: Parse ModDef
+modul = do
+  reserved "module"
+  (name, args) <- multi_app modName parameter
+  colon
+  osig <- sigExp
+  reserved "where"
+  bod <- semiSep moddecl
+  reserved "end"
+  return $ ModDef name args osig bod
+  
 parameter :: Parse (ModName, SigExp)
 parameter = do
   name <- identifier
@@ -81,6 +89,9 @@ sigdecl
   where
     funType = FunType <$> (setExp <* symbol "->") <*> setExp
 
+moddecl :: Parse ModDecl
+moddecl = mzero
+
 setExp :: Parse SetExp
 setExp
   = SetExp <$> (try derefExp <|> litExp)
@@ -88,8 +99,8 @@ setExp
     derefExp = ModDeref <$> (Just <$> modulExp) <*> (char '.' *> identifier)
     litExp = ModDeref Nothing <$> identifier
 
-
-
+modName :: Parse ModName
+modName = identifier
 setName :: Parse SetName
 setName = identifier
 funName :: Parse FunName
@@ -101,6 +112,3 @@ termName = identifier
 axName :: Parse AxName
 axName = identifier
   
-
-modul :: Parse ModDef
-modul = mzero
