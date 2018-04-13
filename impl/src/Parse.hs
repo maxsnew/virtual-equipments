@@ -58,7 +58,7 @@ modul = do
   reserved "where"
   bod <- semiSep moddecl
   reserved "end"
-  return $ ModDef name args osig bod
+  return $ ModDef name $ ModLam args osig bod
   
 parameter :: Parse (ModName, SigExp)
 parameter = do

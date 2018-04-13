@@ -18,10 +18,7 @@ typeCheckProg (Program (tl : rest)) = do
 
 typeCheckTL :: TopLevel -> TC ()
 typeCheckTL (TLSig (SigDef name lam)) = typeCheckSigLam lam
-
--- typeCheckProg (TLMod modDef : rest) env = do
---   typeCheckModDef modDef env
---   typeCheckProg rest env -- TODO: fix, should save
+typeCheckTL (TLMod (ModDef name lam)) = typeCheckModLam lam
 
 typeCheckSigLam :: SigLambda -> TC ()
 typeCheckSigLam (SigLam sigDefArgs sigDefBody) = do
@@ -37,10 +34,10 @@ typeCheckSigArgs args = loop args []
         (name, sig):args -> do
           when (elem name (map fst prevArgs)) $
             typeError $ "duplicate name in arguments: " ++ name
-          sig' <- normalizeSigExp sig prevArgs
-          loop args ((name, sig') : prevArgs)
+          (sigName, sigDecls) <- normalizeSigExp sig prevArgs
+          loop args ((name, SigApp (SELam sigName (SigLam [] sigDecls)) []) : prevArgs)
 
-normalizeSigExp :: SigExp -> CheckingEnv -> TC SigExp
+normalizeSigExp :: SigExp -> CheckingEnv -> TC (SigName, [SigDecl])
 normalizeSigExp (SigApp sigCtor args) env = case sigCtor of
   SEName name -> typeError $ "undefined signature " ++ name
   SELam name (SigLam params body)  -> do
@@ -49,7 +46,7 @@ normalizeSigExp (SigApp sigCtor args) env = case sigCtor of
     when (sig_len /= mod_len) $
       typeError ("signature " ++ name ++ " expected " ++ show sig_len ++ " args, but got " ++ show mod_len ++ ".")
     newBod <- betaSigApp name (zip params args) body env
-    return $ SigApp (SELam name (SigLam [] newBod)) []
+    return (name, newBod)
 
 -- Substitute all of the arguments into the declarations.
 -- Precondition is that the sigDecls are already well-typed with respect to the parameters
@@ -131,29 +128,28 @@ notDupName name decls = case find ((name ==) . declName) decls of
   Nothing   -> return ()
   Just decl -> typeError $ "duplicate name: " ++ name
 
--- typeCheckModDef :: ModDef -> CheckingEnv -> Either String ()
--- typeCheckModDef (ModDef _name args osig bod) env = do
---   typeCheckSigArgs args env
---   let arg_env = addArgs args env
---   sigdecls <- resolveSigExp osig arg_env
---   typeCheckModBody bod sigdecls arg_env
+typeCheckModLam :: ModLambda -> TC ()
+typeCheckModLam (ModLam params osig bod) = do
+  typeCheckSigArgs params
+  (osigName, osigDecls) <- normalizeSigExp osig params
+  typeCheckModBody bod osigName osigDecls params
 
--- -- Strategy: 
--- typeCheckModBody :: [ModDecl] -> [SigDecl] -> CheckingEnv -> Either String ()
--- typeCheckModBody decls sigdecls env = undefined
-
--- addArgs :: [(ModName, SigExp)] -> CheckingEnv -> CheckingEnv
--- addArgs sigDefArgs env = map (uncurry UnknownMod) sigDefArgs ++ env
-
--- lookupSig :: SigName -> CheckingEnv -> Either String SigLambda
--- lookupSig name = find_else matchingSig ("undefined signature: " ++ name)
---   where
---     matchingSig (KnownSig sigDef) =
---       if name == (_sigDefName sigDef)
---       then Just (_sigLambda sigDef)
---       else Nothing
---     -- matchingSig (KnownMod _) = Nothing
---     matchingSig (UnknownMod _ _)  = Nothing
+-- todo: get the module name over here
+typeCheckModBody :: [ModDecl] -> SigName -> [SigDecl] -> CheckingEnv -> Either String ()
+typeCheckModBody mdecls signame sigdecls env = case (mdecls, sigdecls) of
+  ([],[]) -> return ()
+  (mdecl:_,[]) -> typeError $ "Module has field " ++ show mdecl ++ " that is not in signature " ++ signame
+  ([],sigdecl:_) -> typeError $ "Module is missing field " ++ show sigdecl ++ " from signature " ++ signame
+  (mdecl:mdecls, sigdecl:sigdecls) -> do
+    when (mdeclName mdecl /= declName sigdecl) $ misAligned mdecl sigdecl
+    case (mdecl, sigdecl) of
+      (ModDeclSet sname setExp, SigDeclSet sname') -> typeCheckModBody mdecls signame sigdecls env
+      (ModDeclFun fname var eltExp, SigDeclFun fname' (FunType dom cod)) -> typeError "no funs yet"
+      (ModDeclSpan _ _ _ _, SigDeclSpan _ _ _) -> typeError "no spans yet"
+      (ModDeclTerm _ _ _ _ _, SigDeclTerm _ _) -> typeError "no terms yet"
+      (ModDeclProof _ _, SigDeclAx _ _ _ _)-> typeError "no proofs yet"
+      (mdecl, sigdecl) -> misAligned mdecl sigdecl 
+  where misAligned mdecl sigdecl = typeError $ "module and signature names don't align, expected a  " ++ show sigdecl ++ " but got a " ++ show mdecl
 
 lookupMod :: ModName -> CheckingEnv -> Either String SigExp
 lookupMod name = find_else matchingMod ("undefined module: " ++ name)

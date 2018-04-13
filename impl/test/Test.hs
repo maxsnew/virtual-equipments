@@ -4,6 +4,7 @@ import Control.Applicative
 import Control.Monad
 import Data.Functor
 import Data.List (intercalate)
+import Data.Traversable
 import Text.Parsec (parse)
 
 import Grammar
@@ -31,7 +32,11 @@ main = do
                 , "got: " ++ show tree'
                 ] in
           error msg
-  for_ goods $ \p ->
+  let moreGoods = (`foldMap` shouldParse) $ \should ->
+        case parse program "sets module" should of
+          Left e -> error $ "This should have parsed\n" ++ should
+          Right t -> [t]
+  for_ (goods ++ moreGoods) $ \p ->
     case typeCheckProg p of
       Left err -> error ("Program should have type checked but instead got error: " ++ err)
       Right _ -> return ()
@@ -41,6 +46,7 @@ main = do
       Left err -> return ()
   putStrLn "all tests passed"
   where
+    shouldParse = [intercalate "\n" [setSyn, setsSyn, setsModuleSyn]]
     parsePairs =
       map (\(syn, tree) -> (syn, Program tree)) $
       [ (setSyn, [ TLSig set ])
@@ -95,6 +101,14 @@ sets = SigDef "Sets" $ SigLam
     , SigDeclSet "Z"
     ]
   }
+
+setsModuleSyn = intercalate "\n" $
+  [ "module FanOut(A : Set()) : Sets() where"
+  , "  set X = A.X;"
+  , "  set Y = A.X;"
+  , "  set Z = A.X"
+  , "end"
+  ]
 
 badSetsSyn = ((setSyn ++ "\n\n") ++) $ intercalate "\n" $
   [ "signature Sets() where"
@@ -215,11 +229,10 @@ tricky_mod =
                                 (SetExp (ModDeref (Just $ ModBase $ Bound "A") "X")))
       ]
     }
-  , TLMod $ ModDef
-    { _modDefName = "E1"
-    , _modDefArgs = [("A", seapp (SEName "Set") [])]
-    , _modDefSig  = seapp (SEName "Weird-Endo") [ ModBase $ Bound "A" ]
-    , _modDefBody =
+  , TLMod $ ModDef "E1" $ ModLam
+    { _modLamParams = [("A", seapp (SEName "Set") [])]
+    , _modOSig  = seapp (SEName "Weird-Endo") [ ModBase $ Bound "A" ]
+    , _modBody =
       [ ModDeclSet "X" (SetExp (ModDeref (Just $ ModBase $ Bound "A") "X"))
       , ModDeclFun "e" "x" (EEVar "x")
       ]
@@ -248,23 +261,21 @@ fun_comp_tree =
                                 (SetExp (ModDeref (Just $ ModBase $ Bound "B") "X")))
       ]
     }
-  , TLMod $ ModDef
-    { _modDefName = "Id"
-    , _modDefArgs = [("A", seapp (SEName "Set") [])]
-    , _modDefSig  = seapp (SEName "Function") [ ModBase $ Bound "A" , ModBase $ Bound "A"]
-    , _modDefBody =
+  , TLMod $ ModDef "Id" $ ModLam
+    { _modLamParams = [("A", seapp (SEName "Set") [])]
+    , _modOSig  = seapp (SEName "Function") [ ModBase $ Bound "A" , ModBase $ Bound "A"]
+    , _modBody =
       [ ModDeclFun "f" "x" (EEVar "x")
       ]
     }
-  , TLMod $ ModDef
-    { _modDefName = "Comp"
-    , _modDefArgs = [ ("A", seapp (SEName "Set") [])
+  , TLMod $ ModDef "Comp" $ ModLam
+    { _modLamParams = [ ("A", seapp (SEName "Set") [])
                     , ("B", seapp (SEName "Set") [])
                     , ("C", seapp (SEName "Set") [])
                     , ("F", seapp (SEName "Function") [ModBase . Bound $ "A", ModBase . Bound $ "B"])
                     , ("G", seapp (SEName "Function") [ModBase . Bound $ "B", ModBase . Bound $ "C"])]
-    , _modDefSig  = seapp (SEName "Function") [ ModBase . Bound $ "A" , ModBase . Bound $ "C"]
-    , _modDefBody =
+    , _modOSig  = seapp (SEName "Function") [ ModBase . Bound $ "A" , ModBase . Bound $ "C"]
+    , _modBody =
       [ ModDeclFun "f" "a" (EEApp (ModDeref (Just $ ModBase . Bound $ "G") "f") . EEApp (ModDeref (Just $ ModBase . Bound $ "F") "f") $ EEVar "a")
       ]
     }

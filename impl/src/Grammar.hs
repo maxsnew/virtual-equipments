@@ -45,10 +45,14 @@ data ModExp
   deriving (Show, Read, Eq)
 
 data ModDef = ModDef { _modDefName :: ModName
-                     , _modDefArgs :: [(ModName, SigExp)]
-                     , _modDefSig  :: SigExp
-                     , _modDefBody :: [ModDecl]
-                     }
+                     , _modLam :: ModLambda }
+  deriving (Show, Read, Eq)
+
+data ModLambda = ModLam
+  { _modLamParams :: [(ModName, SigExp)]
+  , _modOSig  :: SigExp
+  , _modBody :: [ModDecl]
+  }
   deriving (Show, Read, Eq)
 
 -- | A Signature Declaration can be for a set, a function, a span, a
@@ -82,6 +86,15 @@ data ModDecl
   | ModDeclTerm TermName EltVar EltVar SpanCtx TermExp -- | forall x, y. alpha(phi_1,...phi_n) = t
   | ModDeclProof AxName Proof
   deriving (Show, Read, Eq)
+
+mdeclName :: ModDecl -> String
+mdeclName (ModDeclSet name _) = name
+mdeclName (ModDeclFun name _ _) = name
+mdeclName (ModDeclSpan name _ _ _) = name
+mdeclName (ModDeclTerm name _ _ _ _) = name
+mdeclName (ModDeclProof name _) = name
+
+
 
 -- | Expression Language
 -- These are the actual terms in the language, there's one for each
@@ -157,6 +170,14 @@ instance Subst SigLambda where
     where (is_shadowed, new_args) = substArgs tl args
           new_bod = if is_shadowed then bod else map (subst tl) bod
 instance Subst ModDef where
+  subst tl (ModDef name lam) = ModDef name $ subst tl lam
+
+instance Subst ModLambda where
+  subst tl (ModLam params osig bod) = ModLam new_params new_osig new_bod
+    where (is_shadowed, new_params) = substArgs tl params
+          unlessShadowed f = if is_shadowed then id else f
+          new_osig = unlessShadowed (subst tl) osig
+          new_bod  = unlessShadowed (map (subst tl)) bod
   
 instance Subst SigApp where
   subst tl (SigApp ho args) = SigApp (subst tl ho) (map (subst tl) args)
@@ -174,6 +195,9 @@ instance Subst SigDecl where
   subst tl sdecl = case sdecl of
     SigDeclSet sname -> SigDeclSet sname
     SigDeclFun fname ftype -> SigDeclFun fname (subst tl ftype)
+    SigDeclSpan sname e1 e2 -> SigDeclSpan sname (subst tl e1) (subst tl e2)
+    SigDeclTerm tname tft -> error "term substitution isn't done not yet"
+    SigDeclAx   axname tft t1 t2 -> error "axioms aren't supported yet"
 
 instance Subst FunType where
   subst tl (FunType dom cod) = FunType (subst tl dom) (subst tl cod)
@@ -181,9 +205,18 @@ instance Subst FunType where
 instance Subst SetExp where
   subst tl (SetExp deref) = SetExp (subst tl deref)
 
+instance Subst EltExp where
+  subst tl ee = case ee of
+    EEVar v -> EEVar v
+    EEApp modref ee -> EEApp (subst tl modref) (subst tl ee)
+
 instance Subst (ModDeref n) where
   subst tl (ModDeref m n) = ModDeref (fmap (subst tl) m) n
 
+instance Subst ModDecl where
+  subst tl mdecl = case mdecl of
+    ModDeclSet sname setExp -> ModDeclSet sname (subst tl setExp)
+    ModDeclFun fname eltvar eltexp -> ModDeclFun fname eltvar (subst tl eltexp)
 
 -- returns true if the binding is shadowed by one of the argument bindings
 substArgs :: TopLevel -> [(ModName, SigExp)] -> (Bool, [(ModName, SigExp)])
