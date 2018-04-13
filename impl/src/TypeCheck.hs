@@ -86,85 +86,50 @@ substModArg name exp = runIdentity . sigDeclModDerefs (Identity . plug)
         in
           ModDeref (Just exp') fld
 
-typeCheckSigBody sigDefBody sigDefArgs = return ()
+typeCheckSigBody :: [SigDecl] -> CheckingEnv -> TC ()
+typeCheckSigBody decls env = loop decls []
+  where
+    loop [] prev           = return ()
+    loop (decl:decls) prev =
+      let name = declName decl in
+        do notDupName name prev
+           typeCheckSigDecl decl prev env
+           loop decls (decl:prev)
 
--- typeCheckSigExp :: SigExp -> CheckingEnv -> Either String ()
--- typeCheckSigExp (SEApp (SigApp ctor mod_args)) env = do
---   (SigLam sig_args _bod) <- lookupSig ctor env
---   let sig_len = length sig_args
---       mod_len = length mod_args
---   if sig_len /= mod_len
---     then typeError ("constructor " ++ ctor ++ " expected " ++ show sig_len ++ " args, but got " ++ show mod_len ++ ".")
---     else typeCheckModArgs (zip mod_args (map snd sig_args)) env
--- typeCheckSigExp (SELam sigLam) env = typeCheckSigLam sigLam env
+typeCheckSigDecl :: SigDecl -> [SigDecl] -> CheckingEnv -> Either String ()
+typeCheckSigDecl decl resolvedDecls env = case decl of
+  SigDeclSet  set -> return ()
+  SigDeclFun  funName (FunType dom cod) -> do
+    typeCheckSetExp dom resolvedDecls env
+    typeCheckSetExp cod resolvedDecls env
+  SigDeclSpan spanName covar contra     -> do
+    typeCheckSetExp covar resolvedDecls env
+    typeCheckSetExp contra resolvedDecls env
+  SigDeclTerm termName termType         -> typeError "no terms yet"
+  SigDeclAx   axName termType t1 t2     -> typeError "axioms are not yet supported"
 
--- resolveSigExp :: SigExp -> CheckingEnv -> Either String (CheckingEnv, [SigDecl])
--- resolveSigExp (SELam sigLam) env = do
---   typeCheckSigLam sigLam env
---   return $ ([], _sigBody sigLam)
--- resolveSigExp (SEApp (SigApp ctor mod_args)) env = do
---   (SigLam sig_args bod) <- lookupSig ctor env
---   let sig_len = length sig_args
---       mod_len = length mod_args
---   unless (sig_len == mod_len) $
---     typeError ("constructor " ++ ctor ++ " expected " ++ show sig_len ++ " args, but got " ++ show mod_len ++ ".")
---   typeCheckModArgs (zip mod_args (map snd sig_args)) env
---   return (_, bod)
-
--- typeCheckModArgs :: [(ModExp, SigExp)] -> CheckingEnv -> Either String ()
--- typeCheckModArgs args env = case args of
---   [] -> success
---   (ModBase modName, sig):args -> do
---     modSig <- lookupMod modName env
---     if modSig == sig
---       then typeCheckModArgs args env
---       else typeError (modName ++ " has signature " ++ show modSig ++ " but was used where a " ++ show sig ++ " is expected")
-  
--- -- | TODO
--- typeCheckSigDecl :: SigDecl -> [SigDecl] -> CheckingEnv -> Either String ()
--- typeCheckSigDecl decl resolvedDecls env = case decl of
---   SigDeclSet  set -> do
---     notDupName set resolvedDecls
---   SigDeclFun  funName (FunType dom cod) -> do
---     notDupName funName resolvedDecls
---     typeCheckSetExp dom resolvedDecls env
---     typeCheckSetExp cod resolvedDecls env
---   SigDeclSpan spanName covar contra     -> do
---     notDupName spanName resolvedDecls
---     typeCheckSetExp covar resolvedDecls env
---     typeCheckSetExp contra resolvedDecls env
---   SigDeclTerm termName termType         -> typeError "no terms yet"
---   SigDeclAx   axName termType t1 t2     -> typeError "axioms are not yet supported"
-
--- typeCheckSigBody :: [SigDecl] -> CheckingEnv -> Either String ()
--- typeCheckSigBody decls env = loop decls [] env
---   where
---     loop [] resolvedDecls env = return ()
---     loop (decl:decls) resolvedDecls env = do
---       typeCheckSigDecl decl resolvedDecls env
---       loop decls (decl:resolvedDecls) env
-
--- typeCheckSetExp :: SetExp -> [SigDecl] -> CheckingEnv -> Either String ()
--- typeCheckSetExp (SetExp (ModDeref mayMod setName)) resolved env = case mayMod of
---   Just (ModBase modName) -> do
---     (SEApp (SigApp ctor _)) <- lookupMod modName env
---     sig             <- lookupSig ctor env
---     findSet (_sigBody sig)
---   Nothing -> findSet resolved
---   where
---     findSet resolved = case getFirst $ foldMap keepIfSame resolved of
---       Just (SigDeclSet _) -> return ()
---       Just decl' -> typeError $ "got " ++ show decl' ++ " where a set was expected"
---       Nothing -> typeError $ "undefined set " ++ setName
+typeCheckSetExp :: SetExp -> [SigDecl] -> CheckingEnv -> TC ()
+typeCheckSetExp (SetExp (ModDeref mayMod setName)) resolved env = case mayMod of
+  Just (ModBase (Bound modName)) -> do
+    (SigApp ctor args) <- lookupMod modName env
+    case ctor of
+      SEName unBoundSig -> typeError $ "THIS IS A BUGGGGGGG"
+      SELam name lam -> findSet (_sigBody lam)
+  Nothing -> findSet resolved
+  where
+    findSet resolved = case getFirst $ foldMap keepIfSame resolved of
+      Just (SigDeclSet _) -> return ()
+      Just decl' -> typeError $ "got " ++ show decl' ++ " where a set was expected"
+      Nothing -> typeError $ "undefined set " ++ setName
     
---     keepIfSame :: SigDecl -> First SigDecl
---     keepIfSame decl | setName == (getName decl) = First . Just $ decl
---     keepIfSame _ = First Nothing
+    keepIfSame :: SigDecl -> First SigDecl
+    keepIfSame decl | setName == (declName decl) = First . Just $ decl
+    keepIfSame _ = First Nothing
 
--- notDupName :: String -> [SigDecl] -> Either String ()
--- notDupName name decls = case find ((name ==) . getName) decls of
---   Nothing   -> return ()
---   Just decl -> typeError $ "duplicate name: " ++ name
+notDupName :: String -> [SigDecl] -> Either String ()
+notDupName name decls = case find ((name ==) . declName) decls of
+  Nothing   -> return ()
+  Just decl -> typeError $ "duplicate name: " ++ name
 
 -- typeCheckModDef :: ModDef -> CheckingEnv -> Either String ()
 -- typeCheckModDef (ModDef _name args osig bod) env = do

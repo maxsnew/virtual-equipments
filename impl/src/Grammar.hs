@@ -61,12 +61,12 @@ data SigDecl
   | SigDeclAx   AxName TermFunType TermExp TermExp
   deriving (Show, Read, Eq)
 
-getName :: SigDecl -> String
-getName (SigDeclSet name)      = name
-getName (SigDeclFun name _)    = name
-getName (SigDeclSpan name _ _) = name
-getName (SigDeclTerm name _)   = name
-getName (SigDeclAx name _ _ _) = name
+declName :: SigDecl -> String
+declName (SigDeclSet name)      = name
+declName (SigDeclFun name _)    = name
+declName (SigDeclSpan name _ _) = name
+declName (SigDeclTerm name _)   = name
+declName (SigDeclAx name _ _ _) = name
 
 data FunType = FunType { _dom :: SetExp, _cod :: SetExp }
   deriving (Show, Read, Eq)
