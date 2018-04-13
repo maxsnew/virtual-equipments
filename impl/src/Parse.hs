@@ -17,7 +17,7 @@ sexp_lang = P.LanguageDef
   , P.commentLine = "--"
   , P.nestedComments = False
   , P.identStart = identChar
-  , P.identLetter = identChar
+  , P.identLetter = identChar <|> digit <|> char '\''
   , P.opStart = mzero
   , P.opLetter = mzero
   , P.reservedNames = ["module", "signature", "where", "end", "set", "span", "fun", "term"]
@@ -47,7 +47,7 @@ signature = do
   reserved "where"
   bod  <- semiSep sigdecl
   reserved "end"
-  return $ SigDef name args bod
+  return $ SigDef name (SigLam args bod)
 
 modul :: Parse ModDef
 modul = do
@@ -68,7 +68,7 @@ parameter = do
   return (name, sig)
 
 sigExp :: Parse SigExp
-sigExp = uncurry SigApp <$> multi_app sigName modulExp
+sigExp = SEApp . uncurry SigApp <$> multi_app sigName modulExp
 
 sigName :: Parse SigName
 sigName = identifier

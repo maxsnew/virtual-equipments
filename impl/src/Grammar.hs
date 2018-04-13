@@ -5,12 +5,39 @@ type Program = [TopLevel]
 data TopLevel = TLSig SigDef | TLMod ModDef
   deriving (Show, Read, Eq)
 
+-- | These are already type-checked modules, and bindings earlier in
+-- the list shadow later ones
+type CheckingEnv = [Binding]
+data Binding
+  = KnownSig SigDef
+  -- | KnownMod ModDef -- ^ TODO
+  | UnknownMod ModName SigExp
+
+
 -- | A Signature Definition defines a name, parameterized by some
 -- other signatures, and consists of a sequence of judgments
 data SigDef = SigDef { _sigDefName :: SigName
-                     , _sigDefArgs :: [(ModName, SigExp)]
-                     , _sigDefBody :: [SigDecl]
+                     , _sigLambda  :: SigLambda
                      }
+  deriving (Show, Read, Eq)
+
+data SigLambda = SigLam
+  { _sigLamArgs :: [(ModName, SigExp)]
+  , _sigBody :: [SigDecl]
+  }
+  deriving (Show, Read, Eq)
+data SigExp
+  = SEApp SigApp
+  | SELam SigLambda
+  deriving (Show, Read, Eq)
+
+seapp = (SEApp .) . SigApp
+
+data SigApp = SigApp { _sigCtor :: SigName, _sigAppArgs :: [ModExp] }
+  deriving (Show, Read, Eq)
+
+data ModExp
+  = ModBase ModName
   deriving (Show, Read, Eq)
 
 data ModDef = ModDef { _modDefName :: ModName
@@ -56,11 +83,6 @@ data ModDecl
 -- These are the actual terms in the language, there's one for each
 -- sort of judgment, including signature and module references
 
-data SigExp = SigApp { _sigCtor :: SigName, _sigArgs :: [ModExp] }
-  deriving (Show, Read, Eq)
-data ModExp
-  = ModBase ModName
-  deriving (Show, Read, Eq)
 data SetExp = SetExp (ModDeref SetName)
   deriving (Show, Read, Eq)
 data EltExp

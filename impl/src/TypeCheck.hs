@@ -6,13 +6,6 @@ import Data.Foldable
 import Data.Traversable
 import Grammar
 
--- | These are already type-checked modules, and bindings earlier in
--- the list shadow later ones
-type CheckingEnv = [Binding]
-data Binding
-  = KnownSig SigDef
-  -- | KnownMod ModDef -- ^ TODO
-  | UnknownMod ModName SigExp
 
 type TC a = CheckingEnv -> Either String a
 
@@ -23,10 +16,10 @@ typeCheckProg (TLSig sigDef : rest) env = do
   typeCheckProg rest (KnownSig sigDef : env)
 typeCheckProg (TLMod modDef : rest) env = do
   typeCheckModDef modDef env
-  typeCheckProg rest (undefined : env) -- | TODO: fix
+  typeCheckProg rest (undefined : env) -- TODO: fix
 
 typeCheckSigDef :: SigDef -> CheckingEnv -> Either String ()
-typeCheckSigDef (SigDef _ sigDefArgs sigDefBody) env = do
+typeCheckSigDef (SigDef _ (SigLam sigDefArgs sigDefBody)) env = do
   typeCheckSigArgs sigDefArgs env
   typeCheckSigBody sigDefBody (addArgs sigDefArgs env)
 
@@ -43,12 +36,12 @@ typeCheckSigArgs args env = loop args [] env
           loop args (name:oldNames) (addArgs [(name, sig)] env)
 
 typeCheckSigExp :: SigExp -> CheckingEnv -> Either String ()
-typeCheckSigExp (SigApp ctor mod_args) env = do
-  (SigDef _ctor sig_args _bod) <- lookupSig ctor env
+typeCheckSigExp (SEApp (SigApp ctor mod_args)) env = do
+  (SigLam sig_args _bod) <- lookupSig ctor env
   let sig_len = length sig_args
       mod_len = length mod_args
   if sig_len /= mod_len
-    then typeError ("constructor " ++ _ctor ++ " expected " ++ show sig_len ++ " args, but got " ++ show mod_len ++ ".")
+    then typeError ("constructor " ++ ctor ++ " expected " ++ show sig_len ++ " args, but got " ++ show mod_len ++ ".")
     else typeCheckModArgs (zip mod_args (map snd sig_args)) env
 
 
@@ -88,9 +81,9 @@ typeCheckSigBody decls env = loop decls [] env
 typeCheckSetExp :: SetExp -> [SigDecl] -> CheckingEnv -> Either String ()
 typeCheckSetExp (SetExp (ModDeref mayMod setName)) resolved env = case mayMod of
   Just (ModBase modName) -> do
-    (SigApp ctor _) <- lookupMod modName env
+    (SEApp (SigApp ctor _)) <- lookupMod modName env
     sig             <- lookupSig ctor env
-    findSet (_sigDefBody sig)
+    findSet (_sigBody sig)
   Nothing -> findSet resolved
   where
     findSet resolved = case getFirst $ foldMap keepIfSame resolved of
@@ -116,17 +109,17 @@ typeCheckModDef (ModDef _name args osig bod) env = do
 
 -- | 
 typeCheckModBody :: [ModDecl] -> SigExp -> CheckingEnv -> Either String ()
-typeCheckModBody decls sig env = _
+typeCheckModBody decls sig env = undefined
 
 addArgs :: [(ModName, SigExp)] -> CheckingEnv -> CheckingEnv
 addArgs sigDefArgs env = map (uncurry UnknownMod) sigDefArgs ++ env
 
-lookupSig :: SigName -> CheckingEnv -> Either String SigDef
+lookupSig :: SigName -> CheckingEnv -> Either String SigLambda
 lookupSig name = find_else matchingSig ("undefined signature: " ++ name)
   where
     matchingSig (KnownSig sigDef) =
       if name == (_sigDefName sigDef)
-      then Just sigDef
+      then Just (_sigLambda sigDef)
       else Nothing
     -- matchingSig (KnownMod _) = Nothing
     matchingSig (UnknownMod _ _)  = Nothing

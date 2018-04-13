@@ -1,6 +1,7 @@
 import Data.Foldable
 
 import Control.Applicative
+import Control.Monad
 import Data.Functor
 import Data.List (intercalate)
 import Text.Parsec (parse)
@@ -11,6 +12,25 @@ import TypeCheck
 
 main :: IO ()
 main = do
+  for_ parsePairs $ \(syn,tree) ->
+    case parse program "test" syn of
+      Left e ->
+        let msg = intercalate "\n" $
+              [ "A program should have parsed, but didn't."
+              , "The program is"
+              , syn
+              , "The error message is"
+              , show e
+              ] in
+        error msg
+      Right tree' ->
+        unless (tree == tree') $
+          let msg = intercalate "\n" $
+                [ "Program didn't parse into expected tree:\n" ++ syn
+                , "expected: " ++ show tree
+                , "got: " ++ show tree'
+                ] in
+          error msg
   for_ goods $ \p ->
     case typeCheckProg p [] of
       Left err -> error ("Program should have type checked but instead got error: " ++ err)
@@ -20,6 +40,18 @@ main = do
       Right _ -> error ("Program should have errored, but type checked: " ++ show p)
       Left err -> return ()
   putStrLn "all tests passed"
+  where
+    parsePairs = [ (setSyn, [ TLSig set ])
+                 , (setsSyn, [TLSig set, TLSig sets])
+                 , (badSetsSyn, [TLSig set, TLSig badSets ])
+                 , (functionSyn, [TLSig function])
+                 , (fun2Syn, [TLSig fun2])
+                 , (badfunSyn, [TLSig badfun])
+                 , (extfunSyn, [TLSig extfun])
+                 , (badextfunSyn, [ TLSig badextfun ])
+                 , (tricky_modSyn, tricky_mod)
+                 , (fun_comp_ex, fun_comp_tree)
+                 ]
 
 -- | for running individual tests in the repl
 testProg p = putStrLn $ case typeCheckProg p [] of
@@ -37,10 +69,9 @@ setSyn = intercalate "\n" $
   ]
 
 set :: SigDef
-set = SigDef
-  { _sigDefName = "Set"
-  , _sigDefArgs = []
-  , _sigDefBody =
+set = SigDef "Set" $ SigLam
+  { _sigLamArgs = []
+  , _sigBody =
     [ SigDeclSet "X"
     ]
   }
@@ -54,10 +85,9 @@ setsSyn = ((setSyn ++ "\n\n") ++) $ intercalate "\n" $
   ]
 
 sets :: SigDef
-sets = SigDef
-  { _sigDefName = "Sets"
-  , _sigDefArgs = []
-  , _sigDefBody =
+sets = SigDef "Sets" $ SigLam
+  { _sigLamArgs = []
+  , _sigBody =
     [ SigDeclSet "X"
     , SigDeclSet "Y"
     , SigDeclSet "Z"
@@ -72,10 +102,9 @@ badSetsSyn = ((setSyn ++ "\n\n") ++) $ intercalate "\n" $
   , "end"
   ]
 
-badSets = SigDef
-  { _sigDefName = "Sets"
-  , _sigDefArgs = []
-  , _sigDefBody =
+badSets = SigDef "Sets" $ SigLam
+  { _sigLamArgs = []
+  , _sigBody =
     [ SigDeclSet "X"
     , SigDeclSet "Y"
     , SigDeclSet "X"
@@ -93,10 +122,9 @@ functionSyn = intercalate "\n" $
   , "end"
   ]
 function :: SigDef
-function = SigDef
-  { _sigDefName = "Fun"
-  , _sigDefArgs = []
-  , _sigDefBody =
+function = SigDef "Fun" $ SigLam
+  { _sigLamArgs = []
+  , _sigBody =
     [ SigDeclSet "X"
     , SigDeclSet "Y"
     , SigDeclFun "f" (FunType (SetExp (ModDeref Nothing "X")) (SetExp (ModDeref Nothing "Y")))
@@ -106,15 +134,14 @@ function = SigDef
 fun2Syn = intercalate "\n" $
   [ "signature Fun() where"
   , "  set X;"
-  , "  fun f : X -> Y;"
+  , "  fun f : X -> X;"
   , "  set Y"
   , "end"
   ]
 
-fun2 = SigDef
-  { _sigDefName = "Fun"
-  , _sigDefArgs = []
-  , _sigDefBody =
+fun2 = SigDef "Fun" $ SigLam
+  { _sigLamArgs = []
+  , _sigBody =
     [ SigDeclSet "X"
     , SigDeclFun "f" (FunType (SetExp (ModDeref Nothing "X")) (SetExp (ModDeref Nothing "X")))
     , SigDeclSet "Y"
@@ -127,37 +154,34 @@ badfunSyn = intercalate "\n" $
   , "  fun f : X -> Y"
   , "end"
   ]
-badfun = SigDef
-  { _sigDefName = "Fun"
-  , _sigDefArgs = []
-  , _sigDefBody =
+badfun = SigDef "Fun" $ SigLam
+  { _sigLamArgs = []
+  , _sigBody =
     [ SigDeclSet "X"
     , SigDeclFun "f" (FunType (SetExp (ModDeref Nothing "X")) (SetExp (ModDeref Nothing "Y")))
     ]
   }
 
 extfunSyn = intercalate "\n" $
-  [ "signature Endo(A: Set) where"
-  , "  f : A.X -> A.X"
+  [ "signature Endo(A: Set()) where"
+  , "  fun f : A.X -> A.X"
   , "end"
   ]
-extfun = SigDef
-  { _sigDefName = "Endo"
-  , _sigDefArgs = [ ("A", SigApp "Set" [])]
-  , _sigDefBody =
+extfun = SigDef "Endo" $ SigLam
+  { _sigLamArgs = [ ("A", seapp "Set" [])]
+  , _sigBody =
     [ SigDeclFun "f" (FunType (SetExp (ModDeref (Just (ModBase "A")) "X")) (SetExp (ModDeref (Just (ModBase "A")) "X")))
     ]
   }
 
 badextfunSyn = intercalate "\n" $
   [ "signature Endo(A: Set()) where"
-  , "  f : A.Y -> A.Y"
+  , "  fun f : A.Y -> A.Y"
   , "end"
   ]
-badextfun = SigDef
-  { _sigDefName = "Endo"
-  , _sigDefArgs = [ ("A", SigApp "Set" [])]
-  , _sigDefBody =
+badextfun = SigDef "Endo" $ SigLam
+  { _sigLamArgs = [ ("A", seapp "Set" [])]
+  , _sigBody =
     [ SigDeclFun "f" (FunType (SetExp (ModDeref (Just (ModBase "A")) "Y")) (SetExp (ModDeref (Just (ModBase "A")) "Y")))
     ]
   }
@@ -169,7 +193,7 @@ tricky_modSyn = intercalate "\n" $
   , "  fun e : A.X -> A.X"
   , "end"
   , ""
-  , "module E1(A : Set) : Weird-Endo(A) where"
+  , "module E1(A : Set()) : Weird-Endo(A) where"
   , "  set X = A.X;"
   , "  fun e(x) = x"
   , "end"
@@ -181,10 +205,9 @@ tricky_modSyn = intercalate "\n" $
   ]
 tricky_mod =
   [ TLSig $ set
-  , TLSig $ SigDef
-    { _sigDefName = "Weird-Endo"
-    , _sigDefArgs = [("A", SigApp "Set" [])]
-    , _sigDefBody =
+  , TLSig $ SigDef "Weird-Endo" $ SigLam
+    { _sigLamArgs = [("A", seapp "Set" [])]
+    , _sigBody =
       [ SigDeclSet "X"
       , SigDeclFun "e" (FunType (SetExp (ModDeref (Just $ ModBase "A") "X"))
                                 (SetExp (ModDeref (Just $ ModBase "A") "X")))
@@ -192,8 +215,8 @@ tricky_mod =
     }
   , TLMod $ ModDef
     { _modDefName = "E1"
-    , _modDefArgs = [("A", SigApp "Set" [])]
-    , _modDefSig  = SigApp "Weird-Endo" [ ModBase "A" ]
+    , _modDefArgs = [("A", seapp "Set" [])]
+    , _modDefSig  = seapp "Weird-Endo" [ ModBase "A" ]
     , _modDefBody =
       [ ModDeclSet "X" (SetExp (ModDeref (Just $ ModBase "A") "X"))
       , ModDeclFun "e" "x" (EEVar "x")
@@ -216,26 +239,25 @@ fun_comp_ex = intercalate "\n" $
 
 fun_comp_tree =
   [ TLSig $ set
-  , TLSig $ SigDef
-    { _sigDefName = "Function"
-    , _sigDefArgs = [("A", SigApp "Set" []), ("B", SigApp "Set" [])]
-    , _sigDefBody =
+  , TLSig $ SigDef "Function" $ SigLam
+    { _sigLamArgs = [("A", seapp "Set" []), ("B", seapp "Set" [])]
+    , _sigBody =
       [ SigDeclFun "f" (FunType (SetExp (ModDeref (Just $ ModBase "A") "X"))
                                 (SetExp (ModDeref (Just $ ModBase "B") "X")))
       ]
     }
   , TLMod $ ModDef
     { _modDefName = "Id"
-    , _modDefArgs = [("A", SigApp "Set" [])]
-    , _modDefSig  = SigApp "Function" [ ModBase "A" , ModBase "A"]
+    , _modDefArgs = [("A", seapp "Set" [])]
+    , _modDefSig  = seapp "Function" [ ModBase "A" , ModBase "A"]
     , _modDefBody =
       [ ModDeclFun "f" "x" (EEVar "x")
       ]
     }
   , TLMod $ ModDef
     { _modDefName = "Comp"
-    , _modDefArgs = [("A", SigApp "Set" []),("B", SigApp "Set" []),("C", SigApp "Set" []), ("F", SigApp "Function" [ModBase "A", ModBase "B"]), ("G", SigApp "Function" [ModBase "B", ModBase "C"])]
-    , _modDefSig  = SigApp "Function" [ ModBase "A" , ModBase "C"]
+    , _modDefArgs = [("A", seapp "Set" []),("B", seapp "Set" []),("C", seapp "Set" []), ("F", seapp "Function" [ModBase "A", ModBase "B"]), ("G", seapp "Function" [ModBase "B", ModBase "C"])]
+    , _modDefSig  = seapp "Function" [ ModBase "A" , ModBase "C"]
     , _modDefBody =
       [ ModDeclFun "f" "a" (EEApp (ModDeref (Just $ ModBase "G") "f") . EEApp (ModDeref (Just $ ModBase "F") "f") $ EEVar "a")
       ]
@@ -244,10 +266,9 @@ fun_comp_tree =
 
 category :: SigDef
 category =
-  SigDef
-  { _sigDefName = "Category"
-  , _sigDefArgs = [ ]
-  , _sigDefBody =
+  SigDef "Category" $ SigLam
+  { _sigLamArgs = [ ]
+  , _sigBody =
     [ SigDeclSet "Ob"
     -- , SigDeclSpan "Arr" (SetExp (ModDeref (ModBase "Category") "Ob")) (SetExp (ModDeref (ModBase "Category") "Ob"))
     -- , SigDeclTerm "id" (TermFunType "forall a. Arr(a,a)")
@@ -259,74 +280,67 @@ category =
 
 fctor :: SigDef
 fctor =
-  SigDef
-  { _sigDefName = "Functor"
-  , _sigDefArgs = [ ("C", SigApp "Category" [])
-                  , ("D", SigApp "Category" [])
+  SigDef "Functor" $ SigLam
+  { _sigLamArgs = [ ("C", seapp "Category" [])
+                  , ("D", seapp "Category" [])
                   ]
-  , _sigDefBody = []
+  , _sigBody = []
   }
 
 -- | Error: C undefined
 bad_trans :: SigDef
 bad_trans =
-  SigDef
-  { _sigDefName = "Bad Trans"
-  , _sigDefArgs = [ ("F", SigApp "Functor" [ModBase "C", ModBase "D"])]
-  , _sigDefBody = []
+  SigDef "Bad Trans" $ SigLam
+  { _sigLamArgs = [ ("F", seapp "Functor" [ModBase "C", ModBase "D"])]
+  , _sigBody = []
   }
 badTrans2 :: SigDef
 badTrans2 =
-  SigDef
-  { _sigDefName = "Bad Trans"
-  , _sigDefArgs = [ ("F", SigApp "Functor" [])]
-  , _sigDefBody = []
+  SigDef "Bad Trans" $ SigLam
+  { _sigLamArgs = [ ("F", seapp "Functor" [])]
+  , _sigBody = []
   }
 badTrans3 :: SigDef
 badTrans3 =
-  SigDef
-  { _sigDefName = "Bad Trans"
-  , _sigDefArgs = [ ("F", SigApp "Functor" [ModBase "F", ModBase "F"])]
-  , _sigDefBody = []
+  SigDef "Bad Trans" $ SigLam
+  { _sigLamArgs = [ ("F", seapp "Functor" [ModBase "F", ModBase "F"])]
+  , _sigBody = []
   }
 
 badTrans4 :: SigDef
 badTrans4 =
-  SigDef
-  { _sigDefName = "Bad Trans"
-  , _sigDefArgs = [ ("A", SigApp "Category" [])
-                  , ("B", SigApp "Category" [])
-                  , ("F", SigApp "Functor"  [ModBase "A", ModBase "B"])
-                  , ("G", SigApp "Functor" [ModBase "F", ModBase "F"])
+  SigDef "Bad Trans" $ SigLam
+  { _sigLamArgs = [ ("A", seapp "Category" [])
+                  , ("B", seapp "Category" [])
+                  , ("F", seapp "Functor"  [ModBase "A", ModBase "B"])
+                  , ("G", seapp "Functor" [ModBase "F", ModBase "F"])
                   ]
-  , _sigDefBody = []
+  , _sigBody = []
   }
   
 
 trans :: SigDef
 trans =
-  SigDef
-  { _sigDefName = "Natural-Transformation"
-  , _sigDefArgs = [ ("A", SigApp "Category" [])
-                  , ("B", SigApp "Category" [])
-                  , ("F", SigApp "Functor"  [ModBase "A", ModBase "B"])
-                  , ("G", SigApp "Functor"  [ModBase "A", ModBase "B"])
+  SigDef "Natural-Transformation" $ SigLam
+  { _sigLamArgs = [ ("A", seapp "Category" [])
+                  , ("B", seapp "Category" [])
+                  , ("F", seapp "Functor"  [ModBase "A", ModBase "B"])
+                  , ("G", seapp "Functor"  [ModBase "A", ModBase "B"])
                   ]
-  , _sigDefBody = []
+  , _sigBody = []
   }
 
 weird :: SigDef
 weird =
-  SigDef
-  { _sigDefName = "2-Cell"
-  , _sigDefArgs = [ ("A", SigApp "Category" [])
-                  , ("B", SigApp "Category" [])
-                  , ("C", SigApp "Category" [])
-                  , ("F", SigApp "Functor"  [ModBase "A", ModBase "B"])
-                  , ("G", SigApp "Functor"  [ModBase "B", ModBase "C"])
-                  , ("alpha", SigApp "Natural-Transformation" [ModBase "A", ModBase "B", ModBase "F", ModBase "G"])
+  SigDef "2-Cell" $ SigLam
+  { _sigLamArgs = [ ("A", seapp "Category" [])
+                  , ("B", seapp "Category" [])
+                  , ("C", seapp "Category" [])
+                  , ("F", seapp "Functor"  [ModBase "A", ModBase "B"])
+                  , ("G", seapp "Functor"  [ModBase "B", ModBase "C"])
+                  , ("alpha", seapp "Natural-Transformation" [ModBase "A", ModBase "B", ModBase "F", ModBase "G"])
                   ]
-  , _sigDefBody = []
+  , _sigBody = []
   }
 
 simpProg sig = [ TLSig sig ]
