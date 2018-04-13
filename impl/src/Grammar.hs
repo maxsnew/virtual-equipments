@@ -1,21 +1,17 @@
 module Grammar where
 
 -- | A Program is a sequence of signature and module definitions.
-type Program = [TopLevel]
+newtype Program = Program { _defs :: [TopLevel] }
+  deriving (Show, Read, Eq)
 data TopLevel = TLSig SigDef | TLMod ModDef
   deriving (Show, Read, Eq)
 
--- | These are already type-checked modules, and bindings earlier in
--- the list shadow later ones
-type CheckingEnv = [Binding]
-data Binding
-  = KnownSig SigDef
-  -- | KnownMod ModDef -- ^ TODO
-  | UnknownMod ModName SigExp
+nameOf :: TopLevel -> String
+nameOf (TLSig sigdef) = _sigDefName sigdef
+nameOf (TLMod moddef) = _modDefName moddef
 
+type CheckingEnv = [(ModName, SigExp)]
 
--- | A Signature Definition defines a name, parameterized by some
--- other signatures, and consists of a sequence of judgments
 data SigDef = SigDef { _sigDefName :: SigName
                      , _sigLambda  :: SigLambda
                      }
@@ -26,18 +22,26 @@ data SigLambda = SigLam
   , _sigBody :: [SigDecl]
   }
   deriving (Show, Read, Eq)
-data SigExp
-  = SEApp SigApp
-  | SELam SigLambda
+
+-- | An expression that denotes a signature, must be the application
+-- of a defined signature to concrete module arguments
+type SigExp = SigApp
+
+seapp = SigApp
+
+data SigApp = SigApp { _sigCtor :: HOSigExp, _sigAppArgs :: [ModExp] }
   deriving (Show, Read, Eq)
 
-seapp = (SEApp .) . SigApp
-
-data SigApp = SigApp { _sigCtor :: SigName, _sigAppArgs :: [ModExp] }
+-- | A Higher-order signature expression
+data HOSigExp
+  = SEName SigName
+  | SELam SigName -- ^ just for error reporting
+          SigLambda -- ^ invariant: always closed, well-formed
   deriving (Show, Read, Eq)
 
 data ModExp
-  = ModBase ModName
+  = ModBase Bound
+  -- | ModA
   deriving (Show, Read, Eq)
 
 data ModDef = ModDef { _modDefName :: ModName
@@ -122,9 +126,79 @@ data ModDeref n = ModDeref { _derefMod :: Maybe ModExp, _derefName :: n }
   deriving (Show, Read, Eq)
 type SigName  = String
 type ModName  = String
+newtype Bound = Bound { unbound :: String }
+  deriving (Show, Read, Eq, Ord)
 type SetName  = String
 type FunName  = String
 type SpanName = String
 type TermName = String
 type AxName   = String
 
+class Subst a where
+  subst :: TopLevel -> a -> a
+
+instance Subst Program where
+  subst tl (Program []) = Program []
+  subst tl (Program (def:rest)) =
+    Program (subst tl def : rest')
+    where
+      rest' = if nameOf def == nameOf tl
+              then rest
+              else _defs $ subst tl $ Program rest
+
+instance Subst TopLevel where
+  subst tl (TLSig sigdef) = TLSig $ subst tl sigdef
+  subst tl (TLMod moddef) = TLMod $ subst tl moddef
+
+instance Subst SigDef where
+  subst tl (SigDef name lam) = SigDef name $ subst tl lam
+instance Subst SigLambda where
+  subst tl (SigLam args bod) = SigLam new_args new_bod
+    where (is_shadowed, new_args) = substArgs tl args
+          new_bod = if is_shadowed then bod else map (subst tl) bod
+instance Subst ModDef where
+  
+instance Subst SigApp where
+  subst tl (SigApp ho args) = SigApp (subst tl ho) (map (subst tl) args)
+
+instance Subst HOSigExp where
+  subst (TLMod mod) ho = ho
+  subst tl ho@(SELam _ _) = ho -- lambdas are always closed
+  subst (TLSig (SigDef defName lam)) ho@(SEName name) =
+    if defName == name then SELam defName lam else ho
+
+instance Subst ModExp where
+  subst (TLSig sig) me = me
+  subst (TLMod mod) me = error "substitution for modules isn't done"
+instance Subst SigDecl where
+  subst tl sdecl = case sdecl of
+    SigDeclSet sname -> SigDeclSet sname
+    SigDeclFun fname ftype -> SigDeclFun fname (subst tl ftype)
+
+instance Subst FunType where
+  subst tl (FunType dom cod) = FunType (subst tl dom) (subst tl cod)
+
+instance Subst SetExp where
+  subst tl (SetExp deref) = SetExp (subst tl deref)
+
+instance Subst (ModDeref n) where
+  subst tl (ModDeref m n) = ModDeref (fmap (subst tl) m) n
+
+
+-- returns true if the binding is shadowed by one of the argument bindings
+substArgs :: TopLevel -> [(ModName, SigExp)] -> (Bool, [(ModName, SigExp)])
+substArgs tl args = loop tl args []
+  where
+    loop tl [] acc = (False, reverse acc)
+    loop tl ((name, exp) : args) acc =
+      if nameOf tl == name
+      then (True, reverse acc ++ (name, subst tl exp) : args)
+      else loop tl args ((name, subst tl exp) : acc)
+
+
+-- traverse modnames
+sigDeclModDerefs :: (Applicative f) => (ModDeref String -> f (ModDeref String)) -> SigDecl -> f SigDecl
+sigDeclModDerefs k sdecl = case sdecl of
+  SigDeclSet sname -> pure $ SigDeclSet sname
+  SigDeclFun fname (FunType (SetExp dom) (SetExp cod)) ->
+    (SigDeclFun fname .) . FunType <$> (SetExp <$> k dom) <*> (SetExp <$> k cod)

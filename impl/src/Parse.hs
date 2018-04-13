@@ -38,7 +38,7 @@ semiSep = P.semiSep lexer
 symbol = P.symbol lexer
 
 program :: Parse Program
-program = many (TLSig <$> signature <|> TLMod <$> modul)
+program = Program <$> many (TLSig <$> signature <|> TLMod <$> modul)
 
 signature :: Parse SigDef
 signature = do
@@ -68,13 +68,13 @@ parameter = do
   return (name, sig)
 
 sigExp :: Parse SigExp
-sigExp = SEApp . uncurry SigApp <$> multi_app sigName modulExp
+sigExp = uncurry seapp <$> multi_app (SEName <$> sigName) modulExp
 
 sigName :: Parse SigName
 sigName = identifier
 
 modulExp :: Parse ModExp
-modulExp = ModBase <$> identifier
+modulExp = ModBase <$> (Bound <$> identifier)
 
 multi_app :: Parse n -> Parse arg -> Parse (n, [arg])
 multi_app nameP argP = (,) <$> nameP <*> parens (commaSep argP)

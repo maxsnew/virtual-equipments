@@ -32,16 +32,18 @@ main = do
                 ] in
           error msg
   for_ goods $ \p ->
-    case typeCheckProg p [] of
+    case typeCheckProg p of
       Left err -> error ("Program should have type checked but instead got error: " ++ err)
       Right _ -> return ()
   for_ bads $ \p ->
-    case typeCheckProg p [] of
+    case typeCheckProg p of
       Right _ -> error ("Program should have errored, but type checked: " ++ show p)
       Left err -> return ()
   putStrLn "all tests passed"
   where
-    parsePairs = [ (setSyn, [ TLSig set ])
+    parsePairs =
+      map (\(syn, tree) -> (syn, Program tree)) $
+      [ (setSyn, [ TLSig set ])
                  , (setsSyn, [TLSig set, TLSig sets])
                  , (badSetsSyn, [TLSig set, TLSig badSets ])
                  , (functionSyn, [TLSig function])
@@ -54,7 +56,7 @@ main = do
                  ]
 
 -- | for running individual tests in the repl
-testProg p = putStrLn $ case typeCheckProg p [] of
+testProg p = putStrLn $ case typeCheckProg p of
   Left err -> err
   Right () -> "Program is well formed"
 
@@ -168,9 +170,9 @@ extfunSyn = intercalate "\n" $
   , "end"
   ]
 extfun = SigDef "Endo" $ SigLam
-  { _sigLamArgs = [ ("A", seapp "Set" [])]
+  { _sigLamArgs = [ ("A", seapp (SEName "Set") [])]
   , _sigBody =
-    [ SigDeclFun "f" (FunType (SetExp (ModDeref (Just (ModBase "A")) "X")) (SetExp (ModDeref (Just (ModBase "A")) "X")))
+    [ SigDeclFun "f" (FunType (SetExp (ModDeref (Just (ModBase (Bound "A"))) "X")) (SetExp (ModDeref (Just (ModBase $ Bound "A")) "X")))
     ]
   }
 
@@ -180,9 +182,9 @@ badextfunSyn = intercalate "\n" $
   , "end"
   ]
 badextfun = SigDef "Endo" $ SigLam
-  { _sigLamArgs = [ ("A", seapp "Set" [])]
+  { _sigLamArgs = [ ("A", seapp (SEName "Set") [])]
   , _sigBody =
-    [ SigDeclFun "f" (FunType (SetExp (ModDeref (Just (ModBase "A")) "Y")) (SetExp (ModDeref (Just (ModBase "A")) "Y")))
+    [ SigDeclFun "f" (FunType (SetExp (ModDeref (Just (ModBase $ Bound "A")) "Y")) (SetExp (ModDeref (Just (ModBase $ Bound "A")) "Y")))
     ]
   }
 
@@ -206,19 +208,19 @@ tricky_modSyn = intercalate "\n" $
 tricky_mod =
   [ TLSig $ set
   , TLSig $ SigDef "Weird-Endo" $ SigLam
-    { _sigLamArgs = [("A", seapp "Set" [])]
+    { _sigLamArgs = [("A", seapp (SEName "Set") [])]
     , _sigBody =
       [ SigDeclSet "X"
-      , SigDeclFun "e" (FunType (SetExp (ModDeref (Just $ ModBase "A") "X"))
-                                (SetExp (ModDeref (Just $ ModBase "A") "X")))
+      , SigDeclFun "e" (FunType (SetExp (ModDeref (Just $ ModBase $ Bound "A") "X"))
+                                (SetExp (ModDeref (Just $ ModBase $ Bound "A") "X")))
       ]
     }
   , TLMod $ ModDef
     { _modDefName = "E1"
-    , _modDefArgs = [("A", seapp "Set" [])]
-    , _modDefSig  = seapp "Weird-Endo" [ ModBase "A" ]
+    , _modDefArgs = [("A", seapp (SEName "Set") [])]
+    , _modDefSig  = seapp (SEName "Weird-Endo") [ ModBase $ Bound "A" ]
     , _modDefBody =
-      [ ModDeclSet "X" (SetExp (ModDeref (Just $ ModBase "A") "X"))
+      [ ModDeclSet "X" (SetExp (ModDeref (Just $ ModBase $ Bound "A") "X"))
       , ModDeclFun "e" "x" (EEVar "x")
       ]
     }
@@ -240,26 +242,30 @@ fun_comp_ex = intercalate "\n" $
 fun_comp_tree =
   [ TLSig $ set
   , TLSig $ SigDef "Function" $ SigLam
-    { _sigLamArgs = [("A", seapp "Set" []), ("B", seapp "Set" [])]
+    { _sigLamArgs = [("A", seapp (SEName "Set") []), ("B", seapp (SEName "Set") [])]
     , _sigBody =
-      [ SigDeclFun "f" (FunType (SetExp (ModDeref (Just $ ModBase "A") "X"))
-                                (SetExp (ModDeref (Just $ ModBase "B") "X")))
+      [ SigDeclFun "f" (FunType (SetExp (ModDeref (Just $ ModBase $ Bound "A") "X"))
+                                (SetExp (ModDeref (Just $ ModBase $ Bound "B") "X")))
       ]
     }
   , TLMod $ ModDef
     { _modDefName = "Id"
-    , _modDefArgs = [("A", seapp "Set" [])]
-    , _modDefSig  = seapp "Function" [ ModBase "A" , ModBase "A"]
+    , _modDefArgs = [("A", seapp (SEName "Set") [])]
+    , _modDefSig  = seapp (SEName "Function") [ ModBase $ Bound "A" , ModBase $ Bound "A"]
     , _modDefBody =
       [ ModDeclFun "f" "x" (EEVar "x")
       ]
     }
   , TLMod $ ModDef
     { _modDefName = "Comp"
-    , _modDefArgs = [("A", seapp "Set" []),("B", seapp "Set" []),("C", seapp "Set" []), ("F", seapp "Function" [ModBase "A", ModBase "B"]), ("G", seapp "Function" [ModBase "B", ModBase "C"])]
-    , _modDefSig  = seapp "Function" [ ModBase "A" , ModBase "C"]
+    , _modDefArgs = [ ("A", seapp (SEName "Set") [])
+                    , ("B", seapp (SEName "Set") [])
+                    , ("C", seapp (SEName "Set") [])
+                    , ("F", seapp (SEName "Function") [ModBase . Bound $ "A", ModBase . Bound $ "B"])
+                    , ("G", seapp (SEName "Function") [ModBase . Bound $ "B", ModBase . Bound $ "C"])]
+    , _modDefSig  = seapp (SEName "Function") [ ModBase . Bound $ "A" , ModBase . Bound $ "C"]
     , _modDefBody =
-      [ ModDeclFun "f" "a" (EEApp (ModDeref (Just $ ModBase "G") "f") . EEApp (ModDeref (Just $ ModBase "F") "f") $ EEVar "a")
+      [ ModDeclFun "f" "a" (EEApp (ModDeref (Just $ ModBase . Bound $ "G") "f") . EEApp (ModDeref (Just $ ModBase . Bound $ "F") "f") $ EEVar "a")
       ]
     }
   ]
@@ -281,8 +287,8 @@ category =
 fctor :: SigDef
 fctor =
   SigDef "Functor" $ SigLam
-  { _sigLamArgs = [ ("C", seapp "Category" [])
-                  , ("D", seapp "Category" [])
+  { _sigLamArgs = [ ("C", seapp (SEName "Category") [])
+                  , ("D", seapp (SEName "Category") [])
                   ]
   , _sigBody = []
   }
@@ -291,29 +297,29 @@ fctor =
 bad_trans :: SigDef
 bad_trans =
   SigDef "Bad Trans" $ SigLam
-  { _sigLamArgs = [ ("F", seapp "Functor" [ModBase "C", ModBase "D"])]
+  { _sigLamArgs = [ ("F", seapp (SEName "Functor") [ModBase . Bound $ "C", ModBase . Bound $ "D"])]
   , _sigBody = []
   }
 badTrans2 :: SigDef
 badTrans2 =
   SigDef "Bad Trans" $ SigLam
-  { _sigLamArgs = [ ("F", seapp "Functor" [])]
+  { _sigLamArgs = [ ("F", seapp (SEName "Functor") [])]
   , _sigBody = []
   }
 badTrans3 :: SigDef
 badTrans3 =
   SigDef "Bad Trans" $ SigLam
-  { _sigLamArgs = [ ("F", seapp "Functor" [ModBase "F", ModBase "F"])]
+  { _sigLamArgs = [ ("F", seapp (SEName "Functor") [ModBase . Bound $ "F", ModBase . Bound $ "F"])]
   , _sigBody = []
   }
 
 badTrans4 :: SigDef
 badTrans4 =
   SigDef "Bad Trans" $ SigLam
-  { _sigLamArgs = [ ("A", seapp "Category" [])
-                  , ("B", seapp "Category" [])
-                  , ("F", seapp "Functor"  [ModBase "A", ModBase "B"])
-                  , ("G", seapp "Functor" [ModBase "F", ModBase "F"])
+  { _sigLamArgs = [ ("A", seapp (SEName "Category") [])
+                  , ("B", seapp (SEName "Category") [])
+                  , ("F", seapp (SEName "Functor")  [ModBase . Bound $ "A", ModBase . Bound $ "B"])
+                  , ("G", seapp (SEName "Functor") [ModBase . Bound $ "F", ModBase . Bound $ "F"])
                   ]
   , _sigBody = []
   }
@@ -322,10 +328,10 @@ badTrans4 =
 trans :: SigDef
 trans =
   SigDef "Natural-Transformation" $ SigLam
-  { _sigLamArgs = [ ("A", seapp "Category" [])
-                  , ("B", seapp "Category" [])
-                  , ("F", seapp "Functor"  [ModBase "A", ModBase "B"])
-                  , ("G", seapp "Functor"  [ModBase "A", ModBase "B"])
+  { _sigLamArgs = [ ("A", seapp (SEName "Category") [])
+                  , ("B", seapp (SEName "Category") [])
+                  , ("F", seapp (SEName "Functor")  [ModBase . Bound $ "A", ModBase . Bound $ "B"])
+                  , ("G", seapp (SEName "Functor")  [ModBase . Bound $ "A", ModBase . Bound $ "B"])
                   ]
   , _sigBody = []
   }
@@ -333,12 +339,12 @@ trans =
 weird :: SigDef
 weird =
   SigDef "2-Cell" $ SigLam
-  { _sigLamArgs = [ ("A", seapp "Category" [])
-                  , ("B", seapp "Category" [])
-                  , ("C", seapp "Category" [])
-                  , ("F", seapp "Functor"  [ModBase "A", ModBase "B"])
-                  , ("G", seapp "Functor"  [ModBase "B", ModBase "C"])
-                  , ("alpha", seapp "Natural-Transformation" [ModBase "A", ModBase "B", ModBase "F", ModBase "G"])
+  { _sigLamArgs = [ ("A", seapp (SEName "Category") [])
+                  , ("B", seapp (SEName "Category") [])
+                  , ("C", seapp (SEName "Category") [])
+                  , ("F", seapp (SEName "Functor")  [ModBase . Bound $ "A", ModBase . Bound $ "B"])
+                  , ("G", seapp (SEName "Functor")  [ModBase . Bound $ "B", ModBase . Bound $ "C"])
+                  , ("alpha", seapp (SEName "Natural-Transformation") [ModBase . Bound $ "A", ModBase . Bound $ "B", ModBase . Bound $ "F", ModBase . Bound $ "G"])
                   ]
   , _sigBody = []
   }
@@ -351,7 +357,7 @@ good3 = good2 ++ [ TLSig trans ]
 goodset = map TLSig [ set, sets ]
 goodfun = map TLSig [ function, fun2 ]
 goodextfun = goodset ++ simpProg extfun
-goods = [ good1, good2, good3, goodset, goodfun , goodextfun ]
+goods = map Program [ good1, good2, good3, goodset, goodfun , goodextfun ]
 
 bad1 = good2 ++ [ TLSig bad_trans ]
 bad2 = good2 ++ [ TLSig badTrans2 ]
@@ -361,5 +367,8 @@ bad5 = good3 ++ [ TLSig weird ]
 badfunprog = [TLSig badfun ]
 badset = [TLSig badSets ]
 badextfunprog = goodset ++ simpProg badextfun
-bads = [ bad1, bad2, bad3, bad4, bad5, badset, badextfunprog ]
+bads = map Program [ bad1, bad2, bad3, bad4, bad5, badset, badextfunprog
+                   ]
 
+clofctor = subst (TLSig category) fctor
+clobad = subst (TLSig clofctor) . subst (TLSig category) $ badTrans4
