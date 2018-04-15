@@ -234,4 +234,16 @@ sigDeclModDerefs :: (Applicative f) => (ModDeref String -> f (ModDeref String)) 
 sigDeclModDerefs k sdecl = case sdecl of
   SigDeclSet sname -> pure $ SigDeclSet sname
   SigDeclFun fname (FunType (SetExp dom) (SetExp cod)) ->
-    (SigDeclFun fname .) . FunType <$> (SetExp <$> k dom) <*> (SetExp <$> k cod)
+    SigDeclFun fname <$> (FunType <$> (SetExp <$> k dom) <*> (SetExp <$> k cod))
+  
+
+sigDeclSetExps :: Applicative f => (SetExp -> f SetExp) -> SigDecl -> f SigDecl
+sigDeclSetExps k sdecl = case sdecl of
+  og@(SigDeclSet _) -> pure og
+  SigDeclFun fname (FunType dom cod) -> SigDeclFun fname <$> (FunType <$> k dom <*> k cod)
+  SigDeclSpan sname covar contravar -> SigDeclSpan sname <$> k covar <*> k contravar
+  
+-- modDeclSetExps :: Applicative f => (SetExp -> f SetExp) -> ModDecl -> f ModDecl
+-- modDeclSetExps k mdecl = case mdecl of
+--   ModDeclSet name exp -> ModDeclSet name <$> k exp
+--   ModDeclFun f var elt -> _

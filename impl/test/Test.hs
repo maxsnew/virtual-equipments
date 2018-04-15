@@ -27,6 +27,10 @@ goodTests = "Successful Type Checks" ~: test
   , typeChecks (Program goodset) ~? "sets signature"
   , typeChecks (Program goodfun) ~? "function signature"
   , typeChecks (Program goodextfun) ~? "module deref in signature"
+  , typeChecks modTest1 ~? "module with identity function"
+  , typeChecks modTest2 ~? "module with supplied function"
+  , typeChecks modTest3 ~? "module with composition of functions"
+  , typeChecks modTest4 ~? "module with big composition of function"
   ]
 badTests = "Type Checking Failures" ~: test
   [ not (typeChecks (Program bad1)) ~? "C should be undefined"
@@ -35,7 +39,11 @@ badTests = "Type Checking Failures" ~: test
   , not (typeChecks (Program bad4)) ~? "Functor applied to non-category arguments"
   , not (typeChecks (Program bad5)) ~? "G should have type Functor(A,B) but has type Functor(B,C)"
   , not (typeChecks (Program badset)) ~? "X bound twice in signature"
-  , not (typeChecks (Program badset)) ~? "Invalid field Y in Set"
+  , not (typeChecks (Program badextfunprog)) ~? "Invalid field Y in Set"
+  , not (typeChecks wrongOrder) ~? "module fields defined in wrong order"
+  , not (typeChecks wrongVar) ~? "free variable in element expr"
+  , not (typeChecks badField) ~? "undefined field referenced in module"
+  , not (typeChecks badTypeFun) ~? "ill typed element expr"
   ]
 
 typeChecks p = case typeCheckProg p of
@@ -62,6 +70,7 @@ badset = [TLSig badSets ]
 badextfunprog = goodset ++ simpProg badextfun
 bads = map Program [ bad1, bad2, bad3, bad4, bad5, badset, badextfunprog
                    ]
+
 
 -- foo = do
 --   for_ parsePairs $ \(syn,tree) ->
@@ -429,4 +438,91 @@ restrictSyn = intercalate "\n" $
   [ "module Restrict(A : Set(), A' : Set(), B : Set(), B' : Set(), F : Fun(A,A'), G : Fun(B,B'), R : Span(A',B')) : Span(A,B) where"
   , "  span M(a,b) = R.M(F.f(a), G.f(b))"
   , "end"
+  ]
+
+-- | Module Tests
+modTestSig = intercalate "\n"
+  [ "signature Preamble() where"
+  , "  set X;"
+  , "  set Y;"
+  , "  set Z;"
+  , "  fun f : X -> Y;"
+  , "  fun g : Y -> X;"
+  , "  fun h : Y -> Z"
+  , "end"
+  , "signature Main() where"
+  , "  set X"
+  , ";  set Z"
+  , ";  fun p : X -> Z"
+  , "end"
+  ]
+
+modTest1 = tried
+  where Right tried = parse program "test" $ intercalate "\n"
+          [ modTestSig
+          , "module M(P : Preamble()) : Main() where"
+          , "  set X = P.X"
+          , ";  set Z = P.X"
+          , ";  fun p(x) = x"
+          , "end"
+          ]
+modTest2Syn =           intercalate "\n"
+          [ modTestSig
+          , "module M(P : Preamble()) : Main() where"
+          , "  set X = P.X"
+          , ";  set Z = P.Y"
+          , ";  fun p(x) = P.f(x)"
+          , "end"
+          ]
+modTest2 = tried
+  where Right tried = parse program "test" $ modTest2Syn
+modTest3 = tried
+  where Right tried = parse program "test" $ intercalate "\n"
+          [ modTestSig
+          , "module M(P : Preamble()) : Main() where"
+          , "  set X = P.X"
+          , ";  set Z = P.Z"
+          , ";  fun p(x) = P.h(P.f(x))"
+          , "end"
+          ]
+modTest4 = tried
+  where Right tried = parse program "test" $ intercalate "\n"
+          [ modTestSig
+          , "module M(P : Preamble()) : Main() where"
+          , "  set X = P.X"
+          , ";  set Z = P.Z"
+          , ";  fun p(x) = P.h(P.f(P.g(P.f(x))))"
+          , "end"
+          ]
+-- | Failing Modules
+mainSyn p = intercalate "\n"
+  [ modTestSig
+  , "module M(P: Preamble()) : Main() where"
+  , p
+  , "end"
+  ]
+fromRight (Right x) = x
+wrongOrder = fromRight $ parse program "test" wrongOrderModSyn
+wrongOrderModSyn = mainSyn . intercalate "\n" $
+  [ "  set Z = P.Y"
+  , "; set X = P.Y"
+  , "; fun p(x) = x"
+  ]
+wrongVar = fromRight $ parse program "test" wrongVarModSyn
+wrongVarModSyn = mainSyn . intercalate "\n" $
+  [ "  set X = P.X"
+  , ";  set Z = P.Y"
+  , ";  fun p(x) = P.f(y)"
+  ]
+badField = fromRight $ parse program "test" badFieldModSyn
+badFieldModSyn = mainSyn . intercalate "\n" $
+  [ "  set X = P.X"
+  , ";  set Z = P.Y"
+  , ";  fun p(x) = P.l(y)"
+  ]
+badTypeFun = fromRight $ parse program "test" badTypeFunModSyn
+badTypeFunModSyn = mainSyn . intercalate "\n" $
+  [ "  set X = P.X"
+  , ";  set Z = P.X"
+  , ";  fun p(x) = P.f(x)"
   ]

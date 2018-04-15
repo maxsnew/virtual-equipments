@@ -70,6 +70,26 @@ typeCheckModArg sigName argName mod sig env = case mod of
     when (msig /= sig) $
       typeError $ "Module " ++ modName ++ " used as argument " ++ argName ++ " of " ++ sigName ++ " should have signature " ++ show sig ++ " but instead has signature " ++ show msig
 
+substMDSD :: ModDecl -> SigDecl -> SigDecl
+substMDSD mdsubster = case mdsubster of
+  ModDeclSet sname sexp -> runIdentity . sigDeclSetExps (Identity . plugSet sname sexp)
+  ModDeclFun fname var elt -> error "substituting functions not ready yet"
+  where
+    plugSet sname sexp og@(SetExp (ModDeref maymod fld)) = case maymod of
+      Nothing -> if fld == sname
+                 then sexp
+                 else og
+      Just _ -> og
+
+substModDeref :: String -> ModDeref String -> SigDecl -> SigDecl
+substModDeref fld mexp = runIdentity . sigDeclModDerefs (Identity . plug)
+  where plug :: ModDeref String -> ModDeref String
+        plug og@(ModDeref maymod fld') = case maymod of
+          Nothing -> if fld == fld'
+                     then mexp
+                     else og
+          Just _  -> og
+
 substModArg :: ModName -> ModExp -> SigDecl -> SigDecl
 substModArg name exp = runIdentity . sigDeclModDerefs (Identity . plug)
   where
@@ -121,27 +141,27 @@ typeCheckModLam :: ModLambda -> TC ()
 typeCheckModLam (ModLam params osig bod) = do
   typeCheckSigArgs params
   (osigName, osigDecls) <- normalizeSigExp osig params
-  typeCheckModBody bod osigName osigDecls params
+  typeCheckModBody bod osigName osigDecls [] params
 
 -- todo: get the module name over here
-typeCheckModBody :: [ModDecl] -> SigName -> [SigDecl] -> CheckingEnv -> Either String ()
-typeCheckModBody mdecls signame sigdecls env = case (mdecls, sigdecls) of
+typeCheckModBody :: [ModDecl] -> SigName -> [SigDecl] -> [SigDecl] -> CheckingEnv -> Either String ()
+typeCheckModBody mdecls signame sigdecls prevdecls env = case (mdecls, sigdecls) of
   ([],[]) -> return ()
   (mdecl:_,[]) -> typeError $ "Module has field " ++ show mdecl ++ " that is not in signature " ++ signame
   ([],sigdecl:_) -> typeError $ "Module is missing field " ++ show sigdecl ++ " from signature " ++ signame
-  (mdecl:mdecls, sigdecl:sigdecls) -> do
+  (mdecl:mdecls, sigdecl:sigdecls') -> do
     when (mdeclName mdecl /= declName sigdecl) $ misAligned mdecl sigdecl
     case (mdecl, sigdecl) of
       (ModDeclSet _ setExp, SigDeclSet _) -> return ()
       (ModDeclFun fname var eltExp, SigDeclFun fname' (FunType dom cod)) -> do
-        typeCheckSetExp dom sigdecls env
-        typeCheckSetExp cod sigdecls env
-        typeCheckEltExp var dom eltExp cod sigdecls env
+        typeCheckSetExp dom prevdecls env
+        typeCheckSetExp cod prevdecls env
+        typeCheckEltExp var dom eltExp cod prevdecls env
       (ModDeclSpan _ _ _ _, SigDeclSpan _ _ _) -> typeError "no spans yet"
       (ModDeclTerm _ _ _ _ _, SigDeclTerm _ _) -> typeError "no terms yet"
       (ModDeclProof _ _, SigDeclAx _ _ _ _)-> typeError "no proofs yet"
       (mdecl, sigdecl) -> misAligned mdecl sigdecl
-    typeCheckModBody mdecls signame sigdecls env
+    typeCheckModBody mdecls signame (map (substMDSD mdecl) sigdecls') (sigdecl:prevdecls) env
   where misAligned mdecl sigdecl = typeError $ "module and signature names don't align, expected a  " ++ show sigdecl ++ " but got a " ++ show mdecl
 
 typeCheckEltExp :: EltVar
@@ -154,7 +174,7 @@ typeCheckEltExp :: EltVar
 typeCheckEltExp var varType e oType sdecls env = do
   infType <- typeInferEltExp var varType e sdecls env
   when (infType /= oType) $
-    typeError $ "element expression " ++ show e ++ "has type" ++ show infType ++ " but should have type" ++ show oType
+    typeError $ "element expression " ++ show e ++ "has type" ++ show infType ++ " but should have type" ++ show oType ++ "\n more info: " ++ show sdecls
 
 typeInferEltExp :: EltVar
              -> SetExp
@@ -169,33 +189,38 @@ typeInferEltExp var varType e sdecls env = case e of
     return varType
   EEApp fun earg -> do
     infcod <- typeInferEltExp var varType earg sdecls env
-    (FunType fdom fcod) <- lookupFun fun sdecls env
+    (FunType fdom fcod) <- lookupFun fun env
     when (fdom /= infcod) $
-      typeError $ "function " ++ show fun ++ " expects a " ++ show fdom ++ " input, but was applied to expression " ++ show earg ++ " which has type " ++ show infcod
+      typeError $ "function " ++ show fun ++ " expects a " ++ show fdom ++ " input, but was applied to expression " ++ show earg ++ " which has type " ++ show infcod ++ "\n" ++ show env
     return fcod
 
+-- | Looks up a field 
 lookupFld :: ModDeref String -> [SigDecl] -> CheckingEnv -> TC SigDecl
-lookupFld (ModDeref mod fld) sdecls env = case mod of
+lookupFld (ModDeref mod fld) decls env = case mod of
   Just (ModBase (Bound modName)) -> do
     (SigApp ctor args) <- lookupMod modName env
     case ctor of
       SEName unBoundSig -> typeError $ "THIS IS A BUGGGGGGG"
-      SELam name lam -> findFld (_sigBody lam)
-  Nothing -> findFld sdecls
+      SELam name lam -> localize modName <$> findFld (_sigBody lam)
+  Nothing -> findFld decls
   where
+    localize :: String -> SigDecl -> SigDecl
+    localize modName = (runIdentity .) . sigDeclModDerefs $ \og@(ModDeref maymod fld) -> case maymod of
+      Nothing -> pure $ ModDeref (Just $ ModBase $ Bound modName) fld
+      Just x ->  pure $ og
     findFld resolved = case getFirst $ foldMap keepIfSame resolved of
       Just decl -> return decl
-      Nothing -> typeError $ "undefined field " ++ fld
+      Nothing -> typeError $ "undefined field " ++ fld ++ " I looked here: " ++ show resolved
     
     keepIfSame :: SigDecl -> First SigDecl
     keepIfSame decl | fld == (declName decl) = First . Just $ decl
     keepIfSame _ = First Nothing
 
-lookupFun :: ModDeref FunName -> [SigDecl] -> CheckingEnv -> TC FunType
-lookupFun mderef sdecls env = do
-  decl <- lookupFld mderef sdecls env
+lookupFun :: ModDeref FunName -> CheckingEnv -> TC FunType
+lookupFun mderef env = do
+  decl <- lookupFld mderef [] env
   case decl of
-    SigDeclFun _ typ -> return typ
+    SigDeclFun _ ftype -> return ftype
     _ -> typeError $ "got a " ++ show decl ++ " where a fun was expected"
 
 lookupMod :: ModName -> CheckingEnv -> Either String SigExp
