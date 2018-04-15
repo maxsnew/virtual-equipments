@@ -106,22 +106,11 @@ typeCheckSigDecl decl resolvedDecls env = case decl of
   SigDeclAx   axName termType t1 t2     -> typeError "axioms are not yet supported"
 
 typeCheckSetExp :: SetExp -> [SigDecl] -> CheckingEnv -> TC ()
-typeCheckSetExp (SetExp (ModDeref mayMod setName)) resolved env = case mayMod of
-  Just (ModBase (Bound modName)) -> do
-    (SigApp ctor args) <- lookupMod modName env
-    case ctor of
-      SEName unBoundSig -> typeError $ "THIS IS A BUGGGGGGG"
-      SELam name lam -> findSet (_sigBody lam)
-  Nothing -> findSet resolved
-  where
-    findSet resolved = case getFirst $ foldMap keepIfSame resolved of
-      Just (SigDeclSet _) -> return ()
-      Just decl' -> typeError $ "got " ++ show decl' ++ " where a set was expected"
-      Nothing -> typeError $ "undefined set " ++ setName
-    
-    keepIfSame :: SigDecl -> First SigDecl
-    keepIfSame decl | setName == (declName decl) = First . Just $ decl
-    keepIfSame _ = First Nothing
+typeCheckSetExp (SetExp mderef) resolved env = do
+  decl <- lookupFld mderef resolved env
+  case decl of
+    SigDeclSet _ -> return ()
+    _ -> typeError $ "got " ++ show decl ++ " where a set was expected"
 
 notDupName :: String -> [SigDecl] -> Either String ()
 notDupName name decls = case find ((name ==) . declName) decls of
@@ -143,13 +132,71 @@ typeCheckModBody mdecls signame sigdecls env = case (mdecls, sigdecls) of
   (mdecl:mdecls, sigdecl:sigdecls) -> do
     when (mdeclName mdecl /= declName sigdecl) $ misAligned mdecl sigdecl
     case (mdecl, sigdecl) of
-      (ModDeclSet sname setExp, SigDeclSet sname') -> typeCheckModBody mdecls signame sigdecls env
-      (ModDeclFun fname var eltExp, SigDeclFun fname' (FunType dom cod)) -> typeError "no funs yet"
+      (ModDeclSet _ setExp, SigDeclSet _) -> return ()
+      (ModDeclFun fname var eltExp, SigDeclFun fname' (FunType dom cod)) -> do
+        typeCheckSetExp dom sigdecls env
+        typeCheckSetExp cod sigdecls env
+        typeCheckEltExp var dom eltExp cod sigdecls env
       (ModDeclSpan _ _ _ _, SigDeclSpan _ _ _) -> typeError "no spans yet"
       (ModDeclTerm _ _ _ _ _, SigDeclTerm _ _) -> typeError "no terms yet"
       (ModDeclProof _ _, SigDeclAx _ _ _ _)-> typeError "no proofs yet"
-      (mdecl, sigdecl) -> misAligned mdecl sigdecl 
+      (mdecl, sigdecl) -> misAligned mdecl sigdecl
+    typeCheckModBody mdecls signame sigdecls env
   where misAligned mdecl sigdecl = typeError $ "module and signature names don't align, expected a  " ++ show sigdecl ++ " but got a " ++ show mdecl
+
+typeCheckEltExp :: EltVar
+             -> SetExp
+             -> EltExp
+             -> SetExp
+             -> [SigDecl]
+             -> CheckingEnv
+             -> TC ()
+typeCheckEltExp var varType e oType sdecls env = do
+  infType <- typeInferEltExp var varType e sdecls env
+  when (infType /= oType) $
+    typeError $ "element expression " ++ show e ++ "has type" ++ show infType ++ " but should have type" ++ show oType
+
+typeInferEltExp :: EltVar
+             -> SetExp
+             -> EltExp
+             -> [SigDecl]
+             -> CheckingEnv
+             -> TC SetExp
+typeInferEltExp var varType e sdecls env = case e of
+  EEVar var' -> do
+    when (var /= var') $
+      typeError $ "unbound variable " ++ var'
+    return varType
+  EEApp fun earg -> do
+    infcod <- typeInferEltExp var varType earg sdecls env
+    (FunType fdom fcod) <- lookupFun fun sdecls env
+    when (fdom /= infcod) $
+      typeError $ "function " ++ show fun ++ " expects a " ++ show fdom ++ " input, but was applied to expression " ++ show earg ++ " which has type " ++ show infcod
+    return fcod
+
+lookupFld :: ModDeref String -> [SigDecl] -> CheckingEnv -> TC SigDecl
+lookupFld (ModDeref mod fld) sdecls env = case mod of
+  Just (ModBase (Bound modName)) -> do
+    (SigApp ctor args) <- lookupMod modName env
+    case ctor of
+      SEName unBoundSig -> typeError $ "THIS IS A BUGGGGGGG"
+      SELam name lam -> findFld (_sigBody lam)
+  Nothing -> findFld sdecls
+  where
+    findFld resolved = case getFirst $ foldMap keepIfSame resolved of
+      Just decl -> return decl
+      Nothing -> typeError $ "undefined field " ++ fld
+    
+    keepIfSame :: SigDecl -> First SigDecl
+    keepIfSame decl | fld == (declName decl) = First . Just $ decl
+    keepIfSame _ = First Nothing
+
+lookupFun :: ModDeref FunName -> [SigDecl] -> CheckingEnv -> TC FunType
+lookupFun mderef sdecls env = do
+  decl <- lookupFld mderef sdecls env
+  case decl of
+    SigDeclFun _ typ -> return typ
+    _ -> typeError $ "got a " ++ show decl ++ " where a fun was expected"
 
 lookupMod :: ModName -> CheckingEnv -> Either String SigExp
 lookupMod name = find_else matchingMod ("undefined module: " ++ name)
