@@ -74,6 +74,7 @@ substMDSD :: ModDecl -> SigDecl -> SigDecl
 substMDSD mdsubster = case mdsubster of
   ModDeclSet sname sexp -> runIdentity . sigDeclSetExps (Identity . plugSet sname sexp)
   ModDeclFun fname var elt -> error "substituting functions not ready yet"
+  ModDeclSpan sname var covar contravar -> error "substituting spans not ready yet"
   where
     plugSet sname sexp og@(SetExp (ModDeref maymod fld)) = case maymod of
       Nothing -> if fld == sname
@@ -156,8 +157,9 @@ typeCheckModBody mdecls signame sigdecls prevdecls env = case (mdecls, sigdecls)
       (ModDeclFun fname var eltExp, SigDeclFun fname' (FunType dom cod)) -> do
         typeCheckSetExp dom prevdecls env
         typeCheckSetExp cod prevdecls env
-        typeCheckEltExp var dom eltExp cod prevdecls env
-      (ModDeclSpan _ _ _ _, SigDeclSpan _ _ _) -> typeError "no spans yet"
+        typeCheckEltExp var dom eltExp cod env
+      (ModDeclSpan _ covar contravar spexp, SigDeclSpan _ coty contraty) ->
+        typeCheckSpanExp covar coty contravar contraty spexp env
       (ModDeclTerm _ _ _ _ _, SigDeclTerm _ _) -> typeError "no terms yet"
       (ModDeclProof _ _, SigDeclAx _ _ _ _)-> typeError "no proofs yet"
       (mdecl, sigdecl) -> misAligned mdecl sigdecl
@@ -168,31 +170,39 @@ typeCheckEltExp :: EltVar
              -> SetExp
              -> EltExp
              -> SetExp
-             -> [SigDecl]
              -> CheckingEnv
              -> TC ()
-typeCheckEltExp var varType e oType sdecls env = do
-  infType <- typeInferEltExp var varType e sdecls env
+typeCheckEltExp var varType e oType env = do
+  infType <- typeInferEltExp var varType e env
   when (infType /= oType) $
-    typeError $ "element expression " ++ show e ++ "has type" ++ show infType ++ " but should have type" ++ show oType ++ "\n more info: " ++ show sdecls
+    typeError $ "element expression " ++ show e ++ "has type" ++ show infType ++ " but should have type" ++ show oType
 
 typeInferEltExp :: EltVar
              -> SetExp
              -> EltExp
-             -> [SigDecl]
              -> CheckingEnv
              -> TC SetExp
-typeInferEltExp var varType e sdecls env = case e of
+typeInferEltExp var varType e env = case e of
   EEVar var' -> do
     when (var /= var') $
       typeError $ "unbound variable " ++ var'
     return varType
   EEApp fun earg -> do
-    infcod <- typeInferEltExp var varType earg sdecls env
+    infcod <- typeInferEltExp var varType earg env
     (FunType fdom fcod) <- lookupFun fun env
     when (fdom /= infcod) $
       typeError $ "function " ++ show fun ++ " expects a " ++ show fdom ++ " input, but was applied to expression " ++ show earg ++ " which has type " ++ show infcod ++ "\n" ++ show env
     return fcod
+
+typeCheckSpanExp :: EltVar -> SetExp
+                 -> EltVar -> SetExp
+                 -> SpanExp
+                 -> CheckingEnv
+                 -> TC ()
+typeCheckSpanExp covar coty contravar contraty (SpanEApp mderef coe contrae) env = do
+  (ocoty, ocontraty) <- lookupSpan mderef env
+  typeCheckEltExp covar coty coe ocoty env
+  typeCheckEltExp contravar contraty contrae ocontraty env
 
 -- | Looks up a field 
 lookupFld :: ModDeref String -> [SigDecl] -> CheckingEnv -> TC SigDecl
@@ -221,7 +231,14 @@ lookupFun mderef env = do
   decl <- lookupFld mderef [] env
   case decl of
     SigDeclFun _ ftype -> return ftype
-    _ -> typeError $ "got a " ++ show decl ++ " where a fun was expected"
+    _ -> typeError $ "got a " ++ show decl ++ " where a fun was expected."
+
+lookupSpan :: ModDeref String -> CheckingEnv -> TC (SetExp, SetExp)
+lookupSpan mderef env = do
+  decl <- lookupFld mderef [] env
+  case decl of
+    SigDeclSpan _ coty contraty -> return (coty, contraty)
+    _ -> typeError $ "got a " ++ show decl ++ " where a span was expected."
 
 lookupMod :: ModName -> CheckingEnv -> Either String SigExp
 lookupMod name = find_else matchingMod ("undefined module: " ++ name)

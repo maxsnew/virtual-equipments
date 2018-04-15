@@ -31,6 +31,10 @@ goodTests = "Successful Type Checks" ~: test
   , typeChecks modTest2 ~? "module with supplied function"
   , typeChecks modTest3 ~? "module with composition of functions"
   , typeChecks modTest4 ~? "module with big composition of function"
+  , typeChecks spanmod0 ~? "span signatures"
+  , typeChecks spanmod1 ~? "eta expanded span"
+  , typeChecks spanmod2 ~? "span with restriction"
+  , typeChecks spanmod3 ~? "span with more restriction"
   ]
 badTests = "Type Checking Failures" ~: test
   [ not (typeChecks (Program bad1)) ~? "C should be undefined"
@@ -71,7 +75,6 @@ badextfunprog = goodset ++ simpProg badextfun
 bads = map Program [ bad1, bad2, bad3, bad4, bad5, badset, badextfunprog
                    ]
 
-
 -- foo = do
 --   for_ parsePairs $ \(syn,tree) ->
 --     case parse program "test" syn of
@@ -109,6 +112,13 @@ bads = map Program [ bad1, bad2, bad3, bad4, bad5, badset, badextfunprog
 --     shouldParse = [intercalate "\n" [setSyn, setsSyn, setsModuleSyn]]
 
 parseTests = "Parsing tests" ~: test
+  [ "shouldParse" ~: test
+    [ parses spanPreamble @? "signatures with spans"
+    , parses simpSpan @? "Eta expand a span"
+    , parses restrictSpan @? "span with restrictions"
+    , parses restrictSpan2 @? "span with bigger restrictions"
+    ]
+  , "parseEqs" ~: test
   [ "basic signature" ~: (setSyn ~>=? [ TLSig set ])
   , "multi field sig" ~: (setsSyn ~>=?[TLSig set, TLSig sets])
   , "multi field sig 2" ~: (badSetsSyn ~>=? [TLSig set, TLSig badSets ])
@@ -120,7 +130,11 @@ parseTests = "Parsing tests" ~: test
   , "parse mdule " ~: (tricky_modSyn ~>=? tricky_mod)
   , "module 2" ~: (fun_comp_ex ~>=? fun_comp_tree)
   ]
+  ]
   where
+    parses p = case parse program "test" p of
+      Left _ -> False
+      Right _ -> True
     (~>=?) :: String -> [TopLevel] -> IO Bool
     syn ~>=? prog = case parse program "test" syn of
       Left e   -> assertFailure $ show e
@@ -525,4 +539,52 @@ badTypeFunModSyn = mainSyn . intercalate "\n" $
   [ "  set X = P.X"
   , ";  set Z = P.X"
   , ";  fun p(x) = P.f(x)"
+  ]
+
+-- | Simple Span Tests
+spanmod0 = itParses spanPreamble
+spanPreamble = intercalate "\n" $
+  [ "signature Preamble() where"
+  , "   set A"
+  , ";  set A'"
+  , ";  set B"
+  , ";  set B'"
+  , ";  fun f : A -> A'"
+  , ";  fun g : B -> B'"
+  , ";  fun ae : A -> A"
+  , ";  fun be : B -> B"
+  , ";  span R : A' ~~ B'"
+  , "end"
+  , "signature Main() where"
+  , "   set X"
+  , ";  set Y"
+  , ";  span Q : X ~~ Y"
+  , "end"
+  ]
+
+spanMainSyn p = intercalate "\n" $
+  [ spanPreamble
+  , "module M(P : Preamble()) : Main() where"
+  , p
+  , "end"
+  ]
+
+itParses = fromRight . parse program "test"
+spanmod1 = itParses simpSpan
+simpSpan = spanMainSyn . intercalate "\n" $
+  [ "   set X = P.A'"
+  , ";  set Y = P.B'"
+  , ";  span Q(a', b') = P.R(a', b')"
+  ]
+spanmod2 = itParses restrictSpan
+restrictSpan = spanMainSyn . intercalate "\n" $
+  [ "   set X = P.A"
+  , ";  set Y = P.B"
+  , ";  span Q(a, b) = P.R(P.f(a), P.g(b))"
+  ]
+spanmod3 = itParses restrictSpan2
+restrictSpan2 = spanMainSyn . intercalate "\n" $
+  [ "   set X = P.A"
+  , ";  set Y = P.B"
+  , ";  span Q(a, b) = P.R(P.f(P.ae(a)), P.g(P.be(b)))"
   ]

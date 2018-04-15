@@ -36,6 +36,7 @@ colon = P.colon lexer
 commaSep = P.commaSep lexer
 semiSep = P.semiSep lexer
 symbol = P.symbol lexer
+comma = P.comma lexer
 
 program :: Parse Program
 program = Program <$> many (TLSig <$> signature <|> TLMod <$> modul)
@@ -83,17 +84,25 @@ sigdecl :: Parse SigDecl
 sigdecl
   =   reserved "set"   *> (SigDeclSet <$> setName)
   <|> reserved "fun"   *> (SigDeclFun <$> (funName <* colon) <*> funType)
-  -- <|> reserved "span"  *> (SigDeclSpan <$> _ <*>  _ <*> _)
+  <|> reserved "span"  *> (SigDeclSpan <$> (spanName <* colon) <*> (setExp <* twiddle) <*> setExp)
   -- <|> reserved "term"  *> (SigDeclTerm <$> _)
   -- <|> reserved "axiom" *> (SigDeclAx <$> _)
   where
     funType = FunType <$> (setExp <* symbol "->") <*> setExp
+    twiddle = symbol "~~"
 
 moddecl :: Parse ModDecl
 moddecl
   =   reserved "set" *> (ModDeclSet <$> setName <* symbol "=" <*> setExp)
   <|> reserved "fun" *> (ModDeclFun <$> funName <*> parens eltVar <* symbol "=" <*> eltExp)
-
+  <|> reserved "span" *> modDeclSpan
+  where
+    modDeclSpan = do
+      name <- spanName
+      (covar, contravar) <- twoArgs eltVar
+      symbol "="
+      sexp <- spanExp
+      return $ ModDeclSpan name covar contravar sexp
 setExp :: Parse SetExp
 setExp
   = SetExp <$> modDeref setName
@@ -102,6 +111,13 @@ eltExp :: Parse EltExp
 eltExp
   = try (EEApp <$> (modDeref funName) <*> parens eltExp)
   <|> EEVar <$> eltVar
+
+twoArgs :: Parse a -> Parse (a, a)
+twoArgs p = parens $ (,) <$> (p <* comma) <*> p
+
+spanExp :: Parse SpanExp
+spanExp = uncurSpanEApp <$> modDeref spanName <*> twoArgs eltExp
+  where uncurSpanEApp x (y,z) = SpanEApp x y z
 
 modDeref :: Parse n -> Parse (ModDeref n)
 modDeref nP = try derefExp <|> litExp

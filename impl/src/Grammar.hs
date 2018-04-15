@@ -107,7 +107,7 @@ data EltExp
   | EEApp (ModDeref FunName) EltExp
   deriving (Show, Read, Eq)
 data SpanExp
-  = SpanEApp String TermExp TermExp
+  = SpanEApp (ModDeref String) EltExp EltExp
   deriving (Show, Read, Eq)
 data TermExp = TermExp
   deriving (Show, Read, Eq)
@@ -210,6 +210,10 @@ instance Subst EltExp where
     EEVar v -> EEVar v
     EEApp modref ee -> EEApp (subst tl modref) (subst tl ee)
 
+instance Subst SpanExp where
+  subst tl se = case se of
+    SpanEApp spanref coe contrae -> SpanEApp (subst tl spanref) (subst tl coe) (subst tl contrae)
+
 instance Subst (ModDeref n) where
   subst tl (ModDeref m n) = ModDeref (fmap (subst tl) m) n
 
@@ -217,6 +221,7 @@ instance Subst ModDecl where
   subst tl mdecl = case mdecl of
     ModDeclSet sname setExp -> ModDeclSet sname (subst tl setExp)
     ModDeclFun fname eltvar eltexp -> ModDeclFun fname eltvar (subst tl eltexp)
+    ModDeclSpan sname covar contravar spanexp -> ModDeclSpan sname covar contravar (subst tl spanexp)
 
 -- returns true if the binding is shadowed by one of the argument bindings
 substArgs :: TopLevel -> [(ModName, SigExp)] -> (Bool, [(ModName, SigExp)])
@@ -235,7 +240,7 @@ sigDeclModDerefs k sdecl = case sdecl of
   SigDeclSet sname -> pure $ SigDeclSet sname
   SigDeclFun fname (FunType (SetExp dom) (SetExp cod)) ->
     SigDeclFun fname <$> (FunType <$> (SetExp <$> k dom) <*> (SetExp <$> k cod))
-  
+  SigDeclSpan sname (SetExp coset) (SetExp contraset) -> SigDeclSpan sname <$> (SetExp <$> (k coset)) <*> (SetExp <$> (k contraset))
 
 sigDeclSetExps :: Applicative f => (SetExp -> f SetExp) -> SigDecl -> f SigDecl
 sigDeclSetExps k sdecl = case sdecl of
