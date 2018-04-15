@@ -7,59 +7,115 @@ import Data.List (intercalate)
 import Data.Traversable
 import Text.Parsec (parse)
 
+import Test.HUnit
+
 import Grammar
 import Parse
 import TypeCheck
 
 main :: IO ()
-main = do
-  for_ parsePairs $ \(syn,tree) ->
-    case parse program "test" syn of
-      Left e ->
-        let msg = intercalate "\n" $
-              [ "A program should have parsed, but didn't."
-              , "The program is"
-              , syn
-              , "The error message is"
-              , show e
-              ] in
-        error msg
-      Right tree' ->
-        unless (tree == tree') $
-          let msg = intercalate "\n" $
-                [ "Program didn't parse into expected tree:\n" ++ syn
-                , "expected: " ++ show tree
-                , "got: " ++ show tree'
-                ] in
-          error msg
-  let moreGoods = (`foldMap` shouldParse) $ \should ->
-        case parse program "sets module" should of
-          Left e -> error $ "This should have parsed\n" ++ should
-          Right t -> [t]
-  for_ (goods ++ moreGoods) $ \p ->
-    case typeCheckProg p of
-      Left err -> error ("Program should have type checked but instead got error: " ++ err)
-      Right _ -> return ()
-  for_ bads $ \p ->
-    case typeCheckProg p of
-      Right _ -> error ("Program should have errored, but type checked: " ++ show p)
-      Left err -> return ()
-  putStrLn "all tests passed"
+main = void $ runTestTT tests
+  where tests = test [ parseTests
+                     , tcTests
+                     ]
+
+tcTests = "Type Checking Tests" ~: test [ goodTests, badTests ]
+goodTests = "Successful Type Checks" ~: test
+  [ typeChecks (Program good1) ~? "category signature"
+  , typeChecks (Program good2) ~? "functor signature"
+  , typeChecks (Program good3) ~? "transformation signature"
+  , typeChecks (Program goodset) ~? "sets signature"
+  , typeChecks (Program goodfun) ~? "function signature"
+  , typeChecks (Program goodextfun) ~? "module deref in signature"
+  ]
+badTests = "Type Checking Failures" ~: test
+  [ not (typeChecks (Program bad1)) ~? "C should be undefined"
+  , not (typeChecks (Program bad2)) ~? "Functor given wrong number of arguments"
+  , not (typeChecks (Program bad3)) ~? "Functor applied to unbound arguments"
+  , not (typeChecks (Program bad4)) ~? "Functor applied to non-category arguments"
+  , not (typeChecks (Program bad5)) ~? "G should have type Functor(A,B) but has type Functor(B,C)"
+  , not (typeChecks (Program badset)) ~? "X bound twice in signature"
+  , not (typeChecks (Program badset)) ~? "Invalid field Y in Set"
+  ]
+
+typeChecks p = case typeCheckProg p of
+  Left e -> False
+  Right () -> True
+
+simpProg sig = [ TLSig sig ]
+
+good1 = [ TLSig category ]
+good2 = good1 ++ [ TLSig fctor ]
+good3 = good2 ++ [ TLSig trans ]
+goodset = map TLSig [ set, sets ]
+goodfun = map TLSig [ function, fun2 ]
+goodextfun = goodset ++ simpProg extfun
+goods = map Program [ good1, good2, good3, goodset, goodfun , goodextfun ]
+
+bad1 = good2 ++ [ TLSig bad_trans ]
+bad2 = good2 ++ [ TLSig badTrans2 ]
+bad3 = good2 ++ [ TLSig badTrans3 ]
+bad4 = good2 ++ [ TLSig badTrans4 ]
+bad5 = good3 ++ [ TLSig weird ]
+badfunprog = [TLSig badfun ]
+badset = [TLSig badSets ]
+badextfunprog = goodset ++ simpProg badextfun
+bads = map Program [ bad1, bad2, bad3, bad4, bad5, badset, badextfunprog
+                   ]
+
+-- foo = do
+--   for_ parsePairs $ \(syn,tree) ->
+--     case parse program "test" syn of
+--       Left e ->
+--         let msg = intercalate "\n" $
+--               [ "A program should have parsed, but didn't."
+--               , "The program is"
+--               , syn
+--               , "The error message is"
+--               , show e
+--               ] in
+--         error msg
+--       Right tree' ->
+--         unless (tree == tree') $
+--           let msg = intercalate "\n" $
+--                 [ "Program didn't parse into expected tree:\n" ++ syn
+--                 , "expected: " ++ show tree
+--                 , "got: " ++ show tree'
+--                 ] in
+--           error msg
+--   let moreGoods = (`foldMap` shouldParse) $ \should ->
+--         case parse program "sets module" should of
+--           Left e -> error $ "This should have parsed\n" ++ should
+--           Right t -> [t]
+--   for_ (goods ++ moreGoods) $ \p ->
+--     case typeCheckProg p of
+--       Left err -> error ("Program should have type checked but instead got error: " ++ err)
+--       Right _ -> return ()
+--   for_ bads $ \p ->
+--     case typeCheckProg p of
+--       Right _ -> error ("Program should have errored, but type checked: " ++ show p)
+--       Left err -> return ()
+--   putStrLn "all tests passed"
+--   where
+--     shouldParse = [intercalate "\n" [setSyn, setsSyn, setsModuleSyn]]
+
+parseTests = "Parsing tests" ~: test
+  [ "basic signature" ~: (setSyn ~>=? [ TLSig set ])
+  , "multi field sig" ~: (setsSyn ~>=?[TLSig set, TLSig sets])
+  , "multi field sig 2" ~: (badSetsSyn ~>=? [TLSig set, TLSig badSets ])
+  , "function sig" ~: (functionSyn ~>=? [TLSig function])
+  , "fun before set sig" ~: (fun2Syn ~>=? [TLSig fun2])
+  , "fun sig 2" ~: (badfunSyn ~>=? [TLSig badfun])
+  , "deref in sig" ~: (extfunSyn ~>=? [TLSig extfun])
+  , "deref in sig 2" ~: (badextfunSyn ~>=? [ TLSig badextfun ])
+  , "parse mdule " ~: (tricky_modSyn ~>=? tricky_mod)
+  , "module 2" ~: (fun_comp_ex ~>=? fun_comp_tree)
+  ]
   where
-    shouldParse = [intercalate "\n" [setSyn, setsSyn, setsModuleSyn]]
-    parsePairs =
-      map (\(syn, tree) -> (syn, Program tree)) $
-      [ (setSyn, [ TLSig set ])
-                 , (setsSyn, [TLSig set, TLSig sets])
-                 , (badSetsSyn, [TLSig set, TLSig badSets ])
-                 , (functionSyn, [TLSig function])
-                 , (fun2Syn, [TLSig fun2])
-                 , (badfunSyn, [TLSig badfun])
-                 , (extfunSyn, [TLSig extfun])
-                 , (badextfunSyn, [ TLSig badextfun ])
-                 , (tricky_modSyn, tricky_mod)
-                 , (fun_comp_ex, fun_comp_tree)
-                 ]
+    (~>=?) :: String -> [TopLevel] -> IO Bool
+    syn ~>=? prog = case parse program "test" syn of
+      Left e   -> assertFailure $ show e
+      Right p' -> return $ Program prog == p'
 
 -- | for running individual tests in the repl
 testProg p = putStrLn $ case typeCheckProg p of
@@ -360,26 +416,17 @@ weird =
   , _sigBody = []
   }
 
-simpProg sig = [ TLSig sig ]
-
-good1 = [ TLSig category ]
-good2 = good1 ++ [ TLSig fctor ]
-good3 = good2 ++ [ TLSig trans ]
-goodset = map TLSig [ set, sets ]
-goodfun = map TLSig [ function, fun2 ]
-goodextfun = goodset ++ simpProg extfun
-goods = map Program [ good1, good2, good3, goodset, goodfun , goodextfun ]
-
-bad1 = good2 ++ [ TLSig bad_trans ]
-bad2 = good2 ++ [ TLSig badTrans2 ]
-bad3 = good2 ++ [ TLSig badTrans3 ]
-bad4 = good2 ++ [ TLSig badTrans4 ]
-bad5 = good3 ++ [ TLSig weird ]
-badfunprog = [TLSig badfun ]
-badset = [TLSig badSets ]
-badextfunprog = goodset ++ simpProg badextfun
-bads = map Program [ bad1, bad2, bad3, bad4, bad5, badset, badextfunprog
-                   ]
 
 clofctor = subst (TLSig category) fctor
 clobad = subst (TLSig clofctor) . subst (TLSig category) $ badTrans4
+
+spanSyn = intercalate "\n" $
+  [ "signature Span(A : Set(), B : Set()) where"
+  , "  span M : A.X ~~ B.X"
+  , "end"
+  ]
+restrictSyn = intercalate "\n" $
+  [ "module Restrict(A : Set(), A' : Set(), B : Set(), B' : Set(), F : Fun(A,A'), G : Fun(B,B'), R : Span(A',B')) : Span(A,B) where"
+  , "  span M(a,b) = R.M(F.f(a), G.f(b))"
+  , "end"
+  ]
