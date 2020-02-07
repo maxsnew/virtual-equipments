@@ -409,6 +409,25 @@ dT(M_0) \times C &  &  &  & M_0 \arrow[llll, "P"]
   \end{enumerate}
 \end{definition}
 
+\section{Polynomial Multicategories}
+
+$T$-multicategories for an arbitrary monad on a virtual equipment are
+maybe too general. Things get a bit more concrete if we consider the
+case where $T$ is a \emph{polynomial monad}, and we can get a toy
+theory by considering polynomials in \emph{one} variable, i.e., spans.
+
+In this case, we consider the double category of polynomials in some
+rich category $E$, whose 2-cells are given by cartesian
+morphisms. Then we can define a \emph{flavor} of multicategory to just
+be some (horizontal) monad $T : I \pto I$ in that double category, and
+can define a $T$-multicategory to be a monad in the slice over
+$T$. This makes our monad $T$ much more concrete: the object $I$ is an
+object of \emph{sorts}, each ``shape'' gives us a \emph{judgment} of
+our multicategory, and the positions in the shape tell us what the
+free variables are. The monad structure gives us identity judgments
+and the different cuts available between judgments (i.e., all of
+them).
+
 
 
 \end{document}
