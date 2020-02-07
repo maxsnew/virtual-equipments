@@ -12,6 +12,7 @@
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
+\newtheorem{construction}{Construction}
 \newtheorem{definition}{Definition}
 \newcommand{\pto}{\nrightarrow}
 \newcommand{\pfrom}{\nleftarrow}
@@ -574,6 +575,148 @@ unit sort.
     \end{align*}
   \end{enumerate}
 \end{proof}
+
+\subsection{Adjunctions by Universal Morphism}
+
+As an example of formal category theory in our syntax, let's prove the
+equivalence between two definitions of an adjunction: one by universal
+morphism and the other by natural hom isomorphism.
+%
+Though the definitions and proof will look like we are doing ordinary
+category theory, since it is syntactic it immediately applies to all
+models, including enriched and internal category theory.
+
+We start with the usual definition of an adjunction using
+hom-isomorphism and a profunctor.
+\begin{definition}
+  Let $C,D$ be categories and $c^o:C_0,d:D_0 \vdash H[c,d]$ a
+  profunctor between them. A \emph{left adjoint} to $H$ consists of
+  \begin{enumerate}
+  \item A functor $c:C \vdash F[c] : D$
+  \item A natural isomorphism $c,d \pipe h : H[c,d] \vdash
+    F_{ind}[h]: D_1[F_0[c],d]$. Call the inverse $g. F_{ind}^{-1}[g]$.
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}
+  Let $c:C_0,d:D_0 \vdash H[c,d]$ be a profunctor.
+  A \emph{universal $H$-heteromorphism from $C$} consists of
+  \begin{enumerate}
+  \item For every $c:C_0$, an $H$-morphism $\eta_c : H(c,F_0[c])$ for
+    some function $c:C_0 \vdash F_0[c] : D_0$.
+  \item Such that every $h : H[c,d]$ factors through $\eta_c$ in that
+    there is a unique $h : H[c,d] \vdash F_{ind}[h] : D[F_0[c],d]$
+    such that $h = F_{ind}[h] \circ \eta_c$.  Uniqueness means
+    validity of the following rule:
+    \begin{mathpar}
+      \inferrule
+      {g:D[F_0[c],d] \vdash g \circ \eta = h}
+      {g:D[F_0[c],d] \vdash g = F_{ind}[h]}
+    \end{mathpar}
+    (Note that we do not require $F_{ind}$ to be natural in any sense)
+  \end{enumerate}
+\end{definition}
+
+It is easy to see that a left adjoint gives a universal heteromorphism
+by a Yoneda-like argument:
+\begin{construction}
+  Let $F$ be a left adjoint to $H$. Then we define a left universal
+  $H$-heteromorphism by
+  \begin{enumerate}
+  \item $c \vdash \eta_c = F_{ind}^{-1}[\id[F_0[c]]]: H[c,F_0[c]]$
+  \item Every $h : H[c,d]$ factorizes through $\eta$ because
+    \begin{align*}
+      F_{ind}[h] \circ F_{ind}^{-1}[\id] &= F_{ind}^{-1}[F_{ind}[h] \circ \id] \tag{naturality}\\
+      &= F_{ind}^{-1}[F_{ind}[h]] \tag{unit}\\
+      &= h \tag{isomorphism}
+    \end{align*}
+    This factorization is unique because if $g \circ F^{-1}[\id] = h$,
+    then
+    \begin{align*}
+      F_{ind}[h] &= F_{ind}[g \circ F^{-1}[\id]] \tag{congruence}\\
+      &= g \circ F_{ind}[F^{-1}[\id]] \tag{naturality}\\
+      &= g \circ \id \tag{iso}\\
+      &= g \tag{unit}
+    \end{align*}
+  \end{enumerate}
+\end{construction}
+
+But the utility of the universal morphism definition is that the
+universal morphism extracted from a left adjoint is enough to uniquely
+reconstruct the rest of the structure, which includes (1)
+functoriality of $F$ and (2) naturality of $F_{ind}$.
+\begin{construction}
+  Let $(F_0,\eta,F_{ind}[h])$ be a left universal $H$-morphism.
+  We extend this to a left adjoint as follows.
+  \begin{enumerate}
+  \item First, $F$ acts on morphisms by
+    \begin{mathpar}
+      \inferrule
+      {
+        \inferrule
+         {f : C[c,c'] \and \eta_{c'} : H[c',F_0[c']]}
+         {f : C[c,c'] \vdash \eta_{c'} \circ f : H[c,F_0[c']]}
+      }
+      {f : C[c,c'] \vdash F_{ind}[\eta_{c'} \circ f] : D[F_0[c],F_0[c']]}
+    \end{mathpar}
+    This preserves identity
+    \begin{mathpar}
+      \inferrule
+      {
+        \inferrule
+        {\id \circ \eta = \eta}
+        {\id = F_{ind}[\eta]}
+      }
+      {\id = F_{ind}[\eta \circ \id]}
+    \end{mathpar}
+    And composition
+    \begin{mathpar}
+      \inferrule
+      {F_{ind}[\eta \circ f] \circ F_{ind}[\eta \circ g] \circ \eta = \eta \circ f \circ g}
+      {F_{ind}[\eta \circ f] \circ F_{ind}[\eta \circ g] = F_{ind}[\eta \circ f \circ g]}
+    \end{mathpar}
+    Which follows by a couple uses of the factorization:
+    \begin{align*}
+      F_{ind}[\eta \circ f] \circ F_{ind}[\eta \circ g] \circ \eta
+      &= F_{ind}[\eta \circ f] \circ \eta \circ g \\
+      &= \eta \circ f \circ g
+    \end{align*}
+  \item Next, we show that $h : H[c,d] \vdash F_{ind}[h] :
+    D[F_0[c],d]$ is a natural transformation. As a first step, we show
+    that $\eta_c : H[c,F_0[c]]$ is natural in $c$ with the action of
+    $F$ on morphisms we have just defined.
+    \[ \eta \circ f = F[f] \circ \eta \]
+    expanding the definition, this is precisely the factorization
+    property:
+    \[ \eta \circ f = F_{ind}[\eta \circ f] \circ \eta \]
+    
+    Next, to show that $F_{ind}$ is natural, we need to show that
+    (when it is well-defined):
+    \[F_{ind}[g \circ h \circ f] = g \circ F_{ind}[h] \circ F[f] \]
+    By the factorization property, the following sufficeth:
+    \begin{align*}
+     g \circ F_{ind}[h] \circ F[f] \circ \eta
+     &= g \circ F_{ind}[h] \circ \eta \circ f \tag{naturality of $\eta$}\\
+     &= g \circ h \circ f \tag{factorization}
+    \end{align*}
+  \item Finally, we define $F_{ind}^{-1}[g]$ as
+    \[ g : D[F_0[c],d] \vdash F_{ind}^{-1}[g] = g \circ \eta : H[c,d] \]
+    And we need to confirm that it is (1) a section of $F_{ind}$ (2) a
+    retraction of $F_{ind}$ and (3) natural.
+    \begin{enumerate}
+    \item For retraction we need to show $h \vdash F_{ind}[h] \circ
+      \eta = h$ which is precisely the factorization property.
+    \item For section, we need to show $g \vdash F_{ind}[g \circ \eta]
+      = g$. Immediately the uniquenes principle says its sufficient to
+      show $g \circ \eta = g \circ \eta$.
+    \item For naturality, we need to show
+      \[ F_{ind}^{-1}[k \circ g \circ F[f]] = k \circ F_{ind}^{-1}[g] \circ f \]
+      expanding the definition this is just:
+      \[ k \circ g \circ F[f] \circ \eta = k \circ g \circ \eta \circ f \]
+      which is just naturality of $\eta$.
+    \end{enumerate}
+  \end{enumerate}
+\end{construction}
 
 \section{Synthetic Category Theory}
 
