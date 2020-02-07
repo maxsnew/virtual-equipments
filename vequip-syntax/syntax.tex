@@ -24,6 +24,7 @@
 \newcommand{\id}{\text{id}}
 \newcommand{\for}{\text{for}\,}
 \newcommand{\when}{\text{when}\,}
+\newcommand{\lett}{\text{let}\,}
 \newcommand{\sort}{\,\text{sort}}
 \newcommand{\ctx}{\,\text{context}}
 \newcommand{\pipe}{\mathrel{|}}
@@ -32,6 +33,22 @@
 \author{Max S. New}
 
 \maketitle
+
+\begin{abstract}
+  We present a formal type theory for Virtual Equipments we call
+  Judgment Theory. Virtual equipments are known as a ``good place to
+  do category theory'', i.e. an alternative to 2-categories for doing
+  formal category theory where profunctors/distributors and their
+  morphisms are as fundamental as functors and natural
+  transformations. We show 2 different applications of judgment
+  theory. First, we can do \emph{internal category theory}, defining
+  categories in a virtual equipment and prove some basic lemmas about
+  them, such as the equivalence between the definition of adjoint
+  functors in terms of hom-set isomorphism and universal
+  morphism. Second, we can do \emph{synthetic} category theory by
+  defining synthetic notions of Hom set and tensor/cotensor of
+  profunctors.
+\end{abstract}
 
 In what follows we present an internal language for virtual equipments
 (TODO: cite Crutwell-Shulman, Leinster, Hermida)
@@ -88,7 +105,6 @@ Finally when we develop multicategory theory we will use
 category-theoretic terminology, in which the structure is most
 familiar and we have categories, objects/functors,
 \emph{profunctors}/bimodules and 2-cells/homomorphisms of bimodules.
-
 
 \begin{figure}
   \begin{mathpar}
@@ -179,6 +195,7 @@ familiar and we have categories, objects/functors,
   \caption{Basic Rules of Judgment Theory, starred rules are
     admissible, non-starred are primitive}
 \end{figure}
+
 \begin{figure}
   \begin{mathpar}
     \begin{array}{rcl}
@@ -199,38 +216,7 @@ familiar and we have categories, objects/functors,
   \caption{Algebraic Properties of Basic Rules}
 \end{figure}
 
-\begin{figure}
-  \begin{mathpar}
-    \inferrule*[right=Hom-Formation]
-    {\beta : \cat D \vdash A : \cat C\and
-    \gamma : \cat E \vdash A' : \cat C}
-    {\beta^o : \cat D;\gamma : \cat E \pipe A \to_{\cat C} A'}
-
-    \inferrule*[right=Hom-Introduction]
-    {~}
-    {\alpha^o : \cat C, \alpha : \cat C | \cdot \vdash \id_{\alpha} : \alpha \to_{\cat C} \alpha}
-
-    %% \inferrule*[right=Hom-Left (Sequent Style)]
-    %% {\alpha^o,\beta|\Phi,\phi : R[\delta/\delta_1], \psi : S[\delta/\delta_2],\Psi \vdash Q }
-    %% {\alpha^o,\beta|\Phi,\phi : R, \chi : \delta_1 \to \delta_2, \psi : S,\Psi \vdash Q}
-    
-    \inferrule*[right=Hom-Elim]
-    {\beta_1^o;\beta_2\pipe\Psi \vdash f : \beta_1 \to_{C} \beta_2\and
-      \alpha^o;\beta\pipe \Phi\and
-      \beta^o;\gamma\pipe \Phi'\and
-      \Phi,\Phi' \vdash g : R}
-    {\Phi[\cdot;\beta_1/\beta],\Psi,\Phi'[\beta_2/\beta;\cdot]\vdash \when f = \id_{\beta}.~ g : R[\beta_1/\beta;\beta_2/\beta]}
-
-    \when \id_{\alpha} = \id_{\beta}.~ g \equiv g[\alpha/\beta]
-
-    \inferrule*[right=Hom-$\eta$]
-    {...}
-    {\beta_1^o : \cat C;\beta_2:\cat C\pipe \Phi \vdash f \equiv \when f = \id_{\alpha} .~ \id_{\alpha} : \beta_1 \to_{\cat C} \beta_2}
-  \end{mathpar}
-  \caption{Hom Sets}
-\end{figure}
-
-\section{Internal Categories and Category Theory}
+\section{Internal Category Theory}
 
 Next, we introduce the notion of category internal to our syntactic
 virtual equipment and the \emph{monoids and modules} translation that
@@ -411,6 +397,8 @@ Fortunately, the central placement of spans/profunctors in our syntax
 makes the definition of a functor satisfying a universal property very
 natural (should I introduce the unit category earlier?).
 
+This is closest to the definition of adjoint functors by natural
+isomorphism of hom-sets.
 \begin{definition}[Right Representability]
   Let $\cat C, \cat D$ be categories and $\alpha^o : \cat C;\beta :
   \cat D \pipe \alpha \to_{Q} \beta$ be a profunctor between them. Then a \emph{right
@@ -587,6 +575,184 @@ unit sort.
   \end{enumerate}
 \end{proof}
 
+\section{Synthetic Category Theory}
+
+Next, we look at Synthetic category theory in a virtual equipment. In
+this section we will use category-theoretic terminology for judgment
+theory: categories, functors/objects, profunctors and transformations.
+
+David Jaz Myers tells me that to do all of formal category theory in
+an equipment, you just need to have hom sets, tensors and cotensors.
+%
+Let's look at what the syntax for these should be.
+
+First, we have Hom-sets, with syntax very similar to the identity type
+in dependent type theory.
+%
+First the formation rule says given two objects $A,A'$ in the same
+category $\cat C$, we can form the hom-set from $A$ to $A'$.
+%
+The introduction rule says that given any object $A$, we can define
+the identity arrow from $A$ to itself.
+%
+Without knowing more about the category in question, these are the
+only arrows we know exist.
+%
+Next the elimination form says that to define a term whose input is a
+morphism $f : \beta \to_{\cat C} \beta'$, we need only define how it
+is behaved on the identity function.
+\begin{mathpar}
+    \inferrule*[right=Hom-Formation]
+    {\beta : \cat D \vdash A : \cat C\and
+    \gamma : \cat E \vdash A' : \cat C}
+    {\beta^o : \cat D;\gamma : \cat E \pipe A \to_{\cat C} A'}
+
+    \inferrule*[right=Hom-Introduction]
+    {\alpha : \cat D \vdash A : \cat C}
+    {\alpha^o : \cat D, \alpha : \cat D | \cdot \vdash \id_{A} : A \to_{\cat C} A}
+
+    %% \inferrule*[right=Hom-Left (Sequent Style)]
+    %% {\alpha^o,\beta|\Phi,\phi : R[\delta/\delta_1], \psi : S[\delta/\delta_2],\Psi \vdash Q }
+    %% {\alpha^o,\beta|\Phi,\phi : R, \chi : \delta_1 \to \delta_2, \psi : S,\Psi \vdash Q}
+    
+    \inferrule*[right=Hom-Elim]
+    {\beta_1^o;\beta_2\pipe\Psi \vdash f : \beta_1 \to_{C} \beta_2\and
+      \alpha^o;\beta\pipe \Phi\and
+      \beta^o;\gamma\pipe \Phi'\and
+      \Phi,\Phi' \vdash g : R}
+    {\Phi[\cdot;\beta_1/\beta],\Psi,\Phi'[\beta_2/\beta;\cdot]\vdash \when f = \id_{\beta}.~ g : R[\beta_1/\beta;\beta_2/\beta]}
+
+    \when \id_{\alpha} = \id_{\beta}.~ g \equiv g[\alpha/\beta]
+
+    \inferrule*[right=Hom-$\eta$]
+    {...}
+    {\beta_1^o : \cat C;\beta_2:\cat C\pipe \Phi \vdash f \equiv \when f = \id_{\alpha} .~ \id_{\alpha} : \beta_1 \to_{\cat C} \beta_2}
+\end{mathpar}
+
+As our first synthetic construction, we can \emph{define} composition using
+the elimination form.
+%
+\begin{definition}[Composition of Morphisms]
+  We define composition of morphisms as follows
+  \[
+  f : \beta \to_{\cat C} \beta', g : \beta' \to_{\cat C} \beta'' \vdash g \circ f :=
+  \when f = \id_{\beta}.~ \when g = \id_{\beta}.~ \id_{\beta} : \beta \to_{\cat c} \beta''
+  \]
+\end{definition}
+It should follow by $\beta\eta$ that this is associative and unital.
+
+Next, let's define the tensor product of profunctors, also known as
+the \emph{composition} of profunctors.
+\begin{mathpar}
+  \inferrule*[right=Tensor formation]
+  {\alpha^o : \cat C; \beta : \cat D \pipe Q \and \beta^o : \cat D; \gamma : \cat E \pipe R}
+  {\alpha^o : \cat C; \gamma : \cat E \pipe \exists \beta.~Q \odot R}
+
+  \inferrule*[right=Tensor introduction]
+  {\Phi \vdash M : Q[B/\beta] \and \Psi \vdash N : R[B/\beta]}
+  {\Phi,\Psi\vdash (B,M,N) : \exists \beta. Q \odot R}
+
+  \inferrule*[right=Tensor elimination]
+  {\Psi \vdash M : \exists \beta. Q \odot R \and \Phi,x:Q,y:R,\Phi' \vdash N : P}
+  {\Phi,\Psi,\Phi' \vdash \lett (\beta,x,y) = M.~N : P}
+
+  (\lett (\beta,x,y) = (B,M_l,M_r).~ N) = N[B/\beta][M_l/x][M_r/y]\\
+
+  N = \lett(\beta, x,y) = z.~ N[(\beta, x,y)/z]
+\end{mathpar}
+First, the syntax for tensor is based on the coend formula that gives
+the definition in $Cat$, but using logical syntax $\exists$ rather
+than integrals because I don't like integral syntax and the syntax
+matches existential quantification in type theory.
+%
+Note that $\exists \beta. ~Q \odot R$ is the application of a single
+connective to $Q$ and $R$, and not separable into a quantifier
+$\exists$ connective and a product connective $\odot$.
+%
+Introduction, elimination and $\beta\eta$ are similar to a combination
+of existential quantification and the tensor product in linear logic.
+
+As another example synthetic theorem, we can prove the covariant and
+contravariant \emph{co-yoneda lemmas}, which are precisely the
+statement that Hom is the unit of the tensor product.
+\begin{lemma}[CoYoneda]
+  We can define isomorphisms
+  \[ \exists \beta. (\alpha \to_{\cat C} \beta) \odot Q \equiv Q[\alpha/\beta] \]
+  \[ \exists \beta. P \odot (\beta \to_{\cat C} \gamma) \equiv P[\gamma/\beta] \]
+  The forward direction is defined by considering the case that the
+  function is the identity and the backward direction by using the
+  identity.
+\end{lemma}
+\begin{proof}
+  The terms are
+  \[ f : \exists \beta. (\alpha\to_{\cat C} \beta) \odot Q \vdash
+  \lett (\beta,g,h) = f.~ \when g = \id_{\alpha}.~ h : Q[\alpha/\beta]
+  \]
+  And the inverse
+  \[ h : Q[\alpha/\beta] \vdash (\alpha, \id_{\alpha}, h) : \exists \beta. (\alpha\to_{\cat C}\beta)\odot Q\]
+
+  One direction of iso follows by $\beta$, the other by $\eta$.
+\end{proof}
+
+Finally, we can define \emph{cotensor} products of profunctors, which
+is the internal-hom to tensor products product. Since we are in an
+ordered setting, this splits into two connectives: a right-cotensor
+and a left cotensor. NOTE/TODO: one of these cotensor elimination
+rules breaks the syntactic invariant that all variable occurrences go
+from left to right syntactically. Should we fix or abandon that
+invariant?
+\begin{mathpar}
+  \inferrule*[right=(Right) Cotensor formation]
+  {\beta^o : \cat D; \gamma : \cat E \pipe R \and \alpha^o : \cat C; \gamma : \cat E \pipe P}
+  {\alpha^o : \cat C; \beta : \cat D \pipe \forall \gamma.~ P \triangleleft R}
+
+  \inferrule*[right=(Right) Cotensor introduction]
+  {\Phi , x : R \vdash M : P}
+  {\Phi \vdash \lambda^\triangleleft (\gamma,x). M : \forall \gamma.~ P \triangleleft R}
+
+  \inferrule*[right=(Right) Cotensor elimination]
+  {\Phi \vdash M : \forall \gamma.~P\triangleleft R \and \Psi \vdash N : R[B/\gamma]}
+  {\Phi, \Psi \vdash M(B,N)^{\triangleleft} : P[B/\gamma]}b
+
+  (\lambda (\gamma,x). M)(B,N) = M[B/\gamma][N/x]\\
+  M = \lambda^\triangleleft (\gamma,x). M(\gamma,x)
+
+  \inferrule*[right=(Left) Cotensor formation]
+  {\alpha^o : \cat C; \beta : \cat D \pipe Q \and \alpha^o : \cat C; \gamma : \cat E \pipe P}
+  {\beta^o : \cat D; \gamma : \cat E \pipe \forall \alpha.~ Q \triangleright P}
+
+  \inferrule*[right=(Left) Cotensor introduction]
+  {x:Q,\Phi \vdash M : P}
+  {\Phi \vdash \lambda^\triangleright(\alpha,x). M : \forall \alpha.~Q\triangleright P}
+
+  \inferrule*[right=(Left) Cotensor elimination]
+  {\Phi \vdash M : \forall \alpha. Q \triangleright P \and \Psi \vdash N : Q[A/\alpha]
+  }
+  {\Psi,\Phi \vdash M(A,N)^\triangleright : P[A/\alpha]}
+
+  (\lambda^\triangleright (\alpha,x). M)(A,N)^\triangleright = M[A/\alpha][N/x]\\
+  M = \lambda^\triangleright (\alpha, x). M(\alpha,x)^\triangleright
+\end{mathpar}
+
+And we get another synthetic theorem: the Yoneda lemma, which says
+that Hom is the unit for the cotensor product.
+\begin{lemma}[Synthetic Yoneda]
+  We can define isomorphisms
+  \[ \forall \alpha.~ (\alpha \to \beta) \triangleright P[\alpha;\gamma] \cong P[\beta/\alpha;\gamma] \]
+  \[ \forall \gamma.~ P[\alpha;\gamma] \triangleleft (\beta \to \gamma) \cong P[\alpha;\beta/\gamma]\]
+\end{lemma}
+\begin{proof}
+  Forward direction
+  \[ f : \forall \alpha.~(\alpha\to\beta)\triangleright P \vdash
+  f(\beta,\id_{\beta})^\triangleright : P[\beta/\alpha]
+  \]
+  Backwards
+  \[ x : P[\beta/\alpha]\vdash
+  \lambda^\triangleright(\alpha,\phi : \alpha \to \beta).~\when \phi = \id_{\beta}.~ x : \forall \alpha. (\alpha\to \beta) \trianglright P
+  \]
+  One direction is by $\beta$, the other $\eta$.
+\end{proof}
+
 \section{Specific Universal Properties: The Microcosm Principle}
 
 While we have now proved a beautiful internal theorem in great
@@ -608,12 +774,12 @@ This mysterious and pervasive aspect of higher category theory is
 called the \emph{microcosm principle} because it says that in order to
 discuss a property of a single object in a single category (the
 microcosm), we need the same sort of object at the meta-level (the
-macrocosm).
-The adage here is ``As above, so below''.
+macrocosm). The adage here is ``As above, so below''.
 
 That might all sound very spiritual, but we'll see that it's actually
 quite a nice heuristic for formalizing universal properties in
 internal category theory.
+%
 In the spirit of this heuristic, instead of first giving a bunch of
 new type constructions for Judgment Theory and then applying them to
 define universal properties, we will consider them in pairs, first
@@ -805,6 +971,17 @@ First the product category
   \end{enumerate}
 \end{definition}
 
+
+\section{Module System}
+
+Currently, the theorems presented in \ref{internal} were all
+metatheorems, we can give them a \emph{formal} status by incorporating
+a simple module system on top of span theory.
+%
+This serves as the basis for a \emph{domain specific proof assistant}
+for category theory that we plan to use to teach category theory.
+
+
 \section{Equipment of Internal Categories}
 
 Next we show that internal categories provide us with our first
@@ -822,13 +999,9 @@ elim is more interesting...
 
 \section{Monads and Multicategories}
 
-It is well-established at this point that defining enriched
-multicategories requires an appropriate notion of \emph{monad} on the
-enriching ``category''. As such we need to extend our language to be
-``monadic'' in some way.
-However, there can be many monads on a single virtual equipment, so in
-order to introduce a monad by a universal property, we need to enrich
-the judgmental structure of the theory.
+Defining enriched multicategories requires an appropriate notion of
+\emph{monad} on the enriching ``category'', so we next extend Judgment
+theory with a monad acting on sorts and judgments.
 
 \begin{figure}
   \begin{mathpar}
@@ -865,8 +1038,9 @@ the judgmental structure of the theory.
   \caption{Monadal Judgment Theory (additions to judgment theory)}
 \end{figure}
 
-
 \section{Semantics of Judgment Theory}
+
+
 
 \end{document}
 
