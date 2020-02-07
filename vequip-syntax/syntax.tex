@@ -891,10 +891,70 @@ that Hom is the unit for the cotensor product.
   \]
   Backwards
   \[ x : P[\beta/\alpha]\vdash
-  \lambda^\triangleright(\alpha,\phi : \alpha \to \beta).~\when \phi = \id_{\beta}.~ x : \forall \alpha. (\alpha\to \beta) \trianglright P
+  \lambda^\triangleright(\alpha,\phi : \alpha \to \beta).~\when \phi = \id_{\beta}.~ x : \forall \alpha. (\alpha\to \beta) \triangleright P
   \]
   One direction is by $\beta$, the other $\eta$.
 \end{proof}
+
+\subsection{Kan Extensions}
+
+I \emph{think} this is the right way to define left and right Kan
+extensions using tensor/cotensor.
+
+The right Kan extension of $F$ along $J$ is the best way to fill in the following square:
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEQBfU9TXfIRQBGclVqMWbACLdeIDNjwEiZYePrNWiDgHJu4mFADm8IqABmAJwgBbJGRA4ISAEzVNUnQCk5lm-aIjs5IohJabABiBlxAA
+\begin{tikzcd}
+C \arrow[d, "J"] \arrow[r, "F"] & D \\
+C'                              &  
+\end{tikzcd}\]
+I.e. a functor $Ran_J F : C' \to D$ that is universal something something.
+
+If $D$ is complete, there is a formula using ends for this. Using
+cotensor, we can directly adapt this to define a \emph{profunctor}
+that is a universal filler. We can then say that a right Kan extension
+is a functor that represents this profunctor.
+
+\begin{definition}
+  Let $\cat C, \cat C', \cat D$ be categories and let $\alpha : \cat C
+  \vdash A : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be
+  functors. Then the right Kan extension profunctor is a profunctor
+  $\beta^o:\cat D; \gamma:\cat C' \pipe (RPan_J F)[\beta;\gamma]$ which we can define as
+  \[ \beta^o:\cat D; \gamma:\cat C' \pipe (RPan_J A)[\beta;\gamma] = \forall \alpha:\cat C.~ (\gamma \to_{\cat C'} J) \to (\beta \to_{\cat D} A)
+  \]
+  A right Kan extension is then a functor $\gamma:\cat C' \vdash
+  Ran_J[\alpha] : \cat D$ that represents $RPan_J A$ in that
+  \[ (\beta \to_{\cat D} Ran_J[\gamma]) \cong (RPan_J A)[\beta;\gamma] \]
+\end{definition}
+
+If we have a unit type, then we can now define limits as a special
+case.
+\begin{definition}
+  The limit of a functor $\alpha : \cat C \vdash A : \cat D$ is the
+  right Kan extension of $A$ along $\alpha : \cat C \vdash () : 1$.
+
+  Unraveling the definition this means
+  \[ (\beta \to_{\cat D} \lim_\alpha A) \cong \forall \alpha:\cat C.~ (\gamma \to_{1} ()) \to (\beta \to_{\cat D} A) \]
+\end{definition}
+Since morphisms in $1$ are trivial, we can almost directly read this
+as saying that a morphism into a limit of a functor is precisely a
+cone: for every $\alpha$, a morphism from $\beta$ to $A[\alpha]$.
+
+We can also define a left Kan extensions using tensors.
+\begin{definition}
+  Let $\cat C,\cat C',\cat D$ be cats and let $\alpha:\cat C \vdash A
+  : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be functors.
+  Then the left Kan extension profunctor $\beta^o:\cat D; \gamma:\cat
+  C' \pipe (PLan_J F)[\beta;\gamma]$ is defined as
+  \[
+  \beta^o:\cat D; \gamma:\cat C' \pipe (PLan_J A)[\beta;\gamma] :=
+  \exists \alpha:\cat C. (\beta \to_{\cat D} A[\alpha]) \odot (J[\alpha] \to_{\cat C'} \gamma)
+  \]
+  And a left Kan extension is a functor $\gamma :\cat C' \vdash Lan_J
+  A : \cat D$ that represents $PLan_J A$ in that
+  \[ (\beta \to_{\cat D} Lan_J A[\alpha]) \cong (PLan_J A)[\beta;\alpha] \]
+\end{definition}
+
+And similarly Kan lifts.
 
 \section{Specific Universal Properties: The Microcosm Principle}
 
