@@ -8,6 +8,8 @@
 \usepackage{mathpartir}
 \usepackage{bbm}
 
+\DeclareMathOperator*{\colim}{colim}
+
 \begin{document}
 
 \newtheorem{theorem}{Theorem}
@@ -724,10 +726,7 @@ Next, we look at Synthetic category theory in a virtual equipment. In
 this section we will use category-theoretic terminology for judgment
 theory: categories, functors/objects, profunctors and transformations.
 
-David Jaz Myers tells me that to do all of formal category theory in
-an equipment, you just need to have hom sets, tensors and cotensors.
-%
-Let's look at what the syntax for these should be.
+\subsection{Syntax: Hom Set}
 
 First, we have Hom-sets, with syntax very similar to the identity type
 in dependent type theory.
@@ -772,8 +771,11 @@ is behaved on the identity function.
     {\beta_1^o : \cat C;\beta_2:\cat C\pipe \Phi \vdash f \equiv \when f = \id_{\alpha} .~ \id_{\alpha} : \beta_1 \to_{\cat C} \beta_2}
 \end{mathpar}
 
-As our first synthetic construction, we can \emph{define} composition using
-the elimination form.
+\subsection{Constructions: Categories, Functors and Natural Transformations}
+
+Hom sets don't provide primitive syntax for composition of morphisms
+in a category. As our first synthetic construction, we can
+\emph{define} composition using the elimination form.
 %
 \begin{definition}[Composition of Morphisms]
   We define composition of morphisms as follows
@@ -783,6 +785,65 @@ the elimination form.
   \]
 \end{definition}
 It should follow by $\beta\eta$ that this is associative and unital.
+
+Next, let's prove synthetically that every type $\alpha : \cat C
+\vdash A : \cat D$ is in fact functorial.
+\begin{definition}
+  There is a morphism
+  \[ \alpha^o:\cat C;\alpha':\cat C \vdash f : \alpha \to_{\cat C} \alpha' \vdash
+  \when f = \id_{\alpha}.~ \id_{A} : A[\alpha] \to_{\cat D} A[\alpha']
+  \]
+  which we call $A[f/\alpha]$.
+
+  Note that
+  \[ A[\id_\alpha/\alpha] = \id_{A} \]
+  \[ A[f;g] = A[f];A[g] \]
+\end{definition}
+Note the similarity to the proof that all functions are congruences in
+MLTT/HoTT.
+
+Next we can define natural transformations as specific kinds of
+terms whose type is (F \alpha \to G \alpha').
+\begin{definition}
+  A natural transformation $\phi$ from $\alpha : \cat C \vdash A : \cat D$ to
+  $A'[\alpha]$ of the same type is a term
+  \[ \alpha\pipe \cdot \vdash \phi_\alpha : A[\alpha] \to_{\cat D} A'[\alpha] \]
+
+  Note that
+  \[ \alpha;\alpha' \pipe f : \alpha \to \alpha' \vdash
+  f \circ \phi_{\alpha} = \phi_{\alpha'} \circ f
+  \]
+  Because if $f$ is the identity, then both sides are the same.
+\end{definition}
+
+\subsection{Adjoint Functors}
+
+There are two common definitions of adjoint functors, one in terms of
+Hom-sets and one in terms of units and counits.
+
+\begin{definition}
+  A functor $\alpha : \cat C \vdash L : \cat D$ is left adjoint to a
+  functor $\beta : \cat D \vdash R : \cat C$ if there is an isomorphism
+  \[ (L[\alpha] \to_{\cat D} \beta) \cong (\alpha \to_{\cat C} R[\beta]) \]
+
+  Alternatively, $L$ is left adjoint to $R$ if there exist
+  transformations
+  \[ \eta : \alpha \to_{\cat C} R[L[\alpha]/\beta] \] % unit of the monad 1 -> RL 
+  \[ \epsilon : L[R[\beta]/\alpha] \to_{\cat D} \beta  \] % counit of the comonad LR -> 1
+  satisfying the triangle/zig-zag identities
+  \[ \id_{R[\beta]} = R[\epsilon_{\beta}] \circ \eta_{R[\beta]} \]
+  \[ \id_{L[\alpha]} = \epsilon_{L[\alpha]} \circ L[\eta_{\alpha}] \]
+\end{definition}
+
+We should be able to synthetically prove these are equivalent.
+
+\subsection{Tensors and CoTensors/Powers}
+
+David Jaz Myers tells me that to do all of formal category theory in
+an equipment, you just need to have hom sets, tensors and cotensors.
+%
+Let's look at what the syntax for these should be.
+
 
 Next, let's define the tensor product of profunctors, also known as
 the \emph{composition} of profunctors.
@@ -845,30 +906,30 @@ rules breaks the syntactic invariant that all variable occurrences go
 from left to right syntactically. Should we fix or abandon that
 invariant?
 \begin{mathpar}
-  \inferrule*[right=(Right) Cotensor formation]
+  \inferrule*[right=Covariant Cotensor formation]
   {\beta^o : \cat D; \gamma : \cat E \pipe R \and \alpha^o : \cat C; \gamma : \cat E \pipe P}
   {\alpha^o : \cat C; \beta : \cat D \pipe \forall \gamma.~ P \triangleleft R}
 
-  \inferrule*[right=(Right) Cotensor introduction]
+  \inferrule*[right=Covariant Cotensor introduction]
   {\Phi , x : R \vdash M : P}
   {\Phi \vdash \lambda^\triangleleft (\gamma,x). M : \forall \gamma.~ P \triangleleft R}
 
-  \inferrule*[right=(Right) Cotensor elimination]
+  \inferrule*[right=Covariant Cotensor elimination]
   {\Phi \vdash M : \forall \gamma.~P\triangleleft R \and \Psi \vdash N : R[B/\gamma]}
-  {\Phi, \Psi \vdash M(B,N)^{\triangleleft} : P[B/\gamma]}b
+  {\Phi, \Psi \vdash M(B,N)^{\triangleleft} : P[B/\gamma]}
 
   (\lambda (\gamma,x). M)(B,N) = M[B/\gamma][N/x]\\
-  M = \lambda^\triangleleft (\gamma,x). M(\gamma,x)
+  M = \lambda^\triangleleft (\gamma,x). M(\gamma,x)\\
 
-  \inferrule*[right=(Left) Cotensor formation]
+  \inferrule*[right=Contravariant Cotensor formation]
   {\alpha^o : \cat C; \beta : \cat D \pipe Q \and \alpha^o : \cat C; \gamma : \cat E \pipe P}
   {\beta^o : \cat D; \gamma : \cat E \pipe \forall \alpha.~ Q \triangleright P}
 
-  \inferrule*[right=(Left) Cotensor introduction]
+  \inferrule*[right=Contravariant Cotensor introduction]
   {x:Q,\Phi \vdash M : P}
   {\Phi \vdash \lambda^\triangleright(\alpha,x). M : \forall \alpha.~Q\triangleright P}
 
-  \inferrule*[right=(Left) Cotensor elimination]
+  \inferrule*[right=Contravariant Cotensor elimination]
   {\Phi \vdash M : \forall \alpha. Q \triangleright P \and \Psi \vdash N : Q[A/\alpha]
   }
   {\Psi,\Phi \vdash M(A,N)^\triangleright : P[A/\alpha]}
@@ -896,6 +957,7 @@ that Hom is the unit for the cotensor product.
   One direction is by $\beta$, the other $\eta$.
 \end{proof}
 
+
 \subsection{Kan Extensions}
 
 I \emph{think} this is the right way to define left and right Kan
@@ -918,8 +980,8 @@ is a functor that represents this profunctor.
   Let $\cat C, \cat C', \cat D$ be categories and let $\alpha : \cat C
   \vdash A : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be
   functors. Then the right Kan extension profunctor is a profunctor
-  $\beta^o:\cat D; \gamma:\cat C' \pipe (RPan_J F)[\beta;\gamma]$ which we can define as
-  \[ \beta^o:\cat D; \gamma:\cat C' \pipe (RPan_J A)[\beta;\gamma] = \forall \alpha:\cat C.~ (\gamma \to_{\cat C'} J) \to (\beta \to_{\cat D} A)
+  $\beta^o:\cat D; \gamma:\cat C' \pipe (RPan_J A)[\beta;\gamma]$ which we can define as
+  \[ \beta^o:\cat D; \gamma:\cat C' \pipe (RPan_J A)[\beta;\gamma] = \forall \alpha:\cat C.~ (\beta \to_{\cat D} A) \triangleleft (\gamma \to_{\cat C'} J)
   \]
   A right Kan extension is then a functor $\gamma:\cat C' \vdash
   Ran_J[\alpha] : \cat D$ that represents $RPan_J A$ in that
@@ -933,28 +995,74 @@ case.
   right Kan extension of $A$ along $\alpha : \cat C \vdash () : 1$.
 
   Unraveling the definition this means
-  \[ (\beta \to_{\cat D} \lim_\alpha A) \cong \forall \alpha:\cat C.~ (\gamma \to_{1} ()) \to (\beta \to_{\cat D} A) \]
+  \[ (\beta \to_{\cat D} \lim_\alpha A) \cong \forall \alpha:\cat C.~ (\beta \to_{\cat D} A) \triangleleft (\gamma \to_{1} ()) \]
 \end{definition}
 Since morphisms in $1$ are trivial, we can almost directly read this
 as saying that a morphism into a limit of a functor is precisely a
-cone: for every $\alpha$, a morphism from $\beta$ to $A[\alpha]$.
+cone: for every $\alpha$, a morphism from $\beta$ to $A[\alpha]$. The
+side condition of naturality of this family is automatically
+satisfied.
 
-We can also define a left Kan extensions using tensors.
+We can also define a left Kan extensions using the contravariant
+cotensors.  Normally the left Kan extension is defined using tensors,
+but the definition using profunctors doesn't look right to me. Let's
+work backwards from the definition of colimit to see why.
+
+Let $\alpha : \cat C \vdash A : \cat D$ be a functor we want the
+colimit of. The UP of a colimit is that maps out of it are equivalent
+to cocones from $A$. Semi-formally this looks like
+\[ (\colim_{\alpha} A \to_{\cat D} \beta) \cong \forall \alpha:\cat C.~ A \to_{\cat D} \beta \]
+This looks a lot like a cotensor with a trivial domain:
+\[ (\colim_{\alpha} A \to_{\cat D} \beta) \cong \forall \alpha. (() \to_{1} \gamma) \triangleright (A \to_{\cat D} \beta) \]
+Suggesting that we define the left Kan extension profunctor as a
+contravariant cotensor as follows.
 \begin{definition}
   Let $\cat C,\cat C',\cat D$ be cats and let $\alpha:\cat C \vdash A
   : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be functors.
-  Then the left Kan extension profunctor $\beta^o:\cat D; \gamma:\cat
-  C' \pipe (PLan_J F)[\beta;\gamma]$ is defined as
+  Then the left Kan extension profunctor $\gamma^o:\cat C'; \beta:\cat
+  D \pipe (PLan_J A)[\gamma;\beta]$ is defined as
   \[
-  \beta^o:\cat D; \gamma:\cat C' \pipe (PLan_J A)[\beta;\gamma] :=
-  \exists \alpha:\cat C. (\beta \to_{\cat D} A[\alpha]) \odot (J[\alpha] \to_{\cat C'} \gamma)
+  \gamma^o:\cat C'; \beta:\cat D \pipe (PLan_J A)[\gamma;\beta]
+  := \forall \alpha : \cat C.~ (J \to_{\cat C'} \gamma) \triangleright (A \to_{\cat D} \beta)
   \]
-  And a left Kan extension is a functor $\gamma :\cat C' \vdash Lan_J
-  A : \cat D$ that represents $PLan_J A$ in that
-  \[ (\beta \to_{\cat D} Lan_J A[\alpha]) \cong (PLan_J A)[\beta;\alpha] \]
+  Then a left Kan extension of $A$ along $J$ is a functor $\gamma :
+  \cat C' \vdash Lan_J A : \cat D$ that represents $PLan_J A$ in that
+  \[ (Lan_J A \to_{\cat D} \beta) \cong (LPan_J A)[\gamma;\beta] \]
 \end{definition}
 
-And similarly Kan lifts.
+
+%% \begin{definition}
+  %% Let $\cat C,\cat C',\cat D$ be cats and let $\alpha:\cat C \vdash
+  %% : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be functors.
+  %% Then the left Kan extension profunctor $\beta^o:\cat D; \gamma:\cat
+  %% C' \pipe (PLan_J F)[\beta;\gamma]$ is defined as
+%%   \[
+%%   \beta^o:\cat D; \gamma:\cat C' \pipe (PLan_J A)[\beta;\gamma] :=
+%%   \exists \alpha:\cat C. (\beta \to_{\cat D} A[\alpha]) \odot (J[\alpha] \to_{\cat C'} \gamma)
+%%   \]
+%%   And a left Kan extension is a functor $\gamma :\cat C' \vdash Lan_J
+%%   A : \cat D$ that represents $PLan_J A$ in that
+%%   \[ (\beta \to_{\cat D} Lan_J A[\alpha]) \cong (PLan_J A)[\beta;\alpha] \]
+%% \end{definition}
+
+\subsection{Right (Left) Adjoints preserve (co-)Limits}
+
+Let's prove that classic theorem!
+
+\begin{theorem}
+  Let $\alpha : \cat C \vdash A \cat D$ be an arbitrary functor and
+  $\beta : \cat D \vdash R : \cat E$ be a functor with a left adjoint
+  $L$. Then, if the limit $\lim_\alpha A$ exists, then $\lim_\alpha
+  R[A/\beta]$ also exists and is
+  \[ \lim_\alpha R[A/\beta] = R[\lim_\alpha A] \]
+\end{theorem}
+\begin{proof}
+  We need to give an isomorphism
+  \[ \gamma \to R[\lim_\alpha A/\beta] \cong PRan_{()}{\alpha. R[A/\beta]} = \forall \alpha. (\gamma \to R[A/\beta]) \triangleleft (() \to_1 ()) \]
+  By assumption we have an isomorphism
+  \[ l : \beta \to \lim_\alpha A \cong PRan_{()}{\alpha. A} = \forall \alpha. (\beta \to A[\alpha]) \triangleleft (()\to_1 ())\]
+  TODO.
+\end{proof}
 
 \section{Specific Universal Properties: The Microcosm Principle}
 
@@ -1174,8 +1282,10 @@ First the product category
   \end{enumerate}
 \end{definition}
 
+\section{TODOs}
 
-\section{Module System}
+
+\subsection{Module System}
 
 Currently, the theorems presented in \ref{internal} were all
 metatheorems, we can give them a \emph{formal} status by incorporating
@@ -1185,7 +1295,7 @@ This serves as the basis for a \emph{domain specific proof assistant}
 for category theory that we plan to use to teach category theory.
 
 
-\section{Equipment of Internal Categories}
+\subsection{Equipment of Internal Categories}
 
 Next we show that internal categories provide us with our first
 \emph{model} of judgment type theory by interpreting sorts as
@@ -1200,7 +1310,7 @@ the home sets come from the category structure.
 The interpretation of hom-formation and -introduction is obvious, but
 elim is more interesting...
 
-\section{Monads and Multicategories}
+\subsection{Monads and Multicategories}
 
 Defining enriched multicategories requires an appropriate notion of
 \emph{monad} on the enriching ``category'', so we next extend Judgment
@@ -1241,9 +1351,11 @@ theory with a monad acting on sorts and judgments.
   \caption{Monadal Judgment Theory (additions to judgment theory)}
 \end{figure}
 
-\section{Semantics of Judgment Theory}
+\subsection{Semantics of Judgment Theory}
 
-
+We should have soundness and completeness theorems for the
+interpretation of Judgment Theory in virtual equipments (with the
+corresponding UPs of Hom/Tensor/cotensor/products etc).
 
 \end{document}
 
