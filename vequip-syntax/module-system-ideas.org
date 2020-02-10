@@ -1,0 +1,39 @@
+* What is a module system?
+
+  In categorical logic, the standard dogma is that syntax is a left
+  adjoint functor
+
+    Syn : Sig(nature) -> Mod(el)
+
+  from a category of signatures and translations to a category of
+  models and homomorphisms. where the right adjoint is a functor
+
+    Complete : Mod -> Sig
+
+  that takes a module to its complete signature.
+
+  Then a term in the language is an "element" in some sense of Syn(Σ)
+  for some signature Σ.
+
+  Based on this idea, a simple model of a module system is that
+  modules are just Kleisli arrows for the induced monad. That is a
+  morphism
+
+    Σ → Comp(Syn(Σ'))
+  
+  is a module that gives a definition for each of the items in the
+  signature Σ as terms in the syntax generated from the signature Σ'
+  (note that this might be the opposite of the direction you expect).
+
+  A nice thing about this is it tells us *what* modules should be
+  parameterized by: the stuff in the signature.
+
+  However, there's a lot more to modules: we want signatures
+  parameterized by other signatures, modules importing from other
+  modules etc. This should be given by some kind of monoidal/cwf
+  structure on the category of signatures.
+
+
+References to check out
+1. Initial Algebra Semantics and Continuous Algebras by Goguen, Thatcher, Wagner and Wrigth
+2. A category-theoretic account of program modules by Moggi
