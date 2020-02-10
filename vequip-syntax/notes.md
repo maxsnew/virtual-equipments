@@ -1,4 +1,3 @@
-
 # Internal Categories as a syntactic construction
 
 Because the monads and modules construction is an endomorphism VEquip
@@ -40,3 +39,28 @@ Could be written as an equalizer of
     (forall a. R[a,b] -> P[a,c]) => (forall a,a'. A[a,a'] -> R[a',b] -> P[a,c])
 
 so if we add equalizers/pullbacks we can define this internally.
+
+## Tensors, Powers and (Co)-equalizers in Span
+
+Let's see if the previous section can be carried out in Span.
+I.e., does Span have tensors and powers?
+
+Clearly it has tensors
+
+    A <- R -> B <- Q -> C
+
+can be composed by pullback
+
+    A <- R x_B Q -> C
+
+And the syntax is very accurate to the construction (R x_B Q)(a,c) = exists b. R(a,b) x Q(b,c)
+
+What about cotensors? Since span is symmetric, the two are the same
+
+A <- R -> B
+A <- P -> C
+
+B <- R ▹ P -> C
+
+the formula is (R ▹ P)(b,c) = forall a. R(a,b) -> P(a,c)
+
