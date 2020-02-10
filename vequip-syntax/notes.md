@@ -1,3 +1,12 @@
+# What's to be done
+
+1. Formalize the syntax and admissible rules
+2. Initiality theorem for virtual equipments
+3. Internal category theory
+4. Synthetic category theory
+5. implementation as a proof assistant
+   - formalization of the module system
+
 # Internal Categories as a syntactic construction
 
 Because the monads and modules construction is an endomorphism VEquip
