@@ -37,3 +37,109 @@
 References to check out
 1. Initial Algebra Semantics and Continuous Algebras by Goguen, Thatcher, Wagner and Wrigth
 2. A category-theoretic account of program modules by Moggi
+
+** Parameterized Signatures, Parameterized Modules
+
+   For code re-use we really want to have *parameterized* signatures
+   and modules.
+
+   For instance, after we define a signature Cat : Sig for a category,
+   we want to define a signature Functor(C : Cat,D:Cat) : Sig for a
+   functor. How do we interpret this? Well in some sense Functor is
+   just a big signature with two copies of the Cat signature at the
+   front:
+     set C.ob
+     span C.Mor : C.ob ~~ C.Ob
+     ...
+     set D.ob
+     span D.Mor : D.ob ~~ D.Ob
+     ...
+     function F.ob : C.Ob -> D.Ob
+     function F.mor : forall c,c'. C.Ob(c,c') => D.Ob(F.ob c, F.ob c')
+     
+   But that's not enough for what we want to do because we can
+   *instantiate* parameterized signatures with *modules*.
+
+   For instance we might construct a unit category module
+
+     Unit : Cat
+
+   and then construct the identity functor IdUnit : Functor(Unit, Unit)
+
+   How is this modeled in our setting?
+
+   Well the important thing about Functor is that it's not just a
+   signature, but it's a signature that *extends* the signature
+   (C:Cat,D:Cat) consisting of two copies of the Cat signature.  We
+   can model this by saying that functor is not just a signature, but
+   a *morphism* of signatures from the signature with just C and D to
+   the signature extended with Functor(C,D):
+
+     Functor : (C:Cat,D:Cat) -> (C:Cat,D:Cat,Functor(C,D))
+   
+   So we define
+
+     an open Signature PΣ parameterized by a closed signature Σ is a
+     morphism of signatures PΣ : Σ -> ∫PΣ.
+
+   Note that a *closed* signature Σ is then equivalent to an open
+   signature parameterized by the empty signature
+
+     duh(Σ) : ∅ -> Σ
+
+   Now say we have a closed *module* M for a closed signature Σ, i.e. a
+   morphism
+
+     M : Σ -> Syn(∅)
+
+   and an open signature PΣ parameterized by Σ, i.e. a morphism
+     PΣ : Σ -> ∫PΣ
+
+   then the substitution of M in PΣ is a closed signature PΣ[M/Σ]
+   defined as the pushout of M and PΣ? This seems off to me. Wouldn't
+   this pushout be *huge* since we're using the complete signature
+   here? i.e., the complete signature is usually infinite and we are
+   probably only quotienting out finitely many things so we get out an
+   infinite signature :/.
+
+   Next, we can define *parameterized modules*. As an example we
+   can define the identity endofunctor for any category:
+
+     module IdFunctor(C : Cat) : Functor(C,C) where
+       F.Ob : C.Ob -> C.Ob
+       F.Ob(a) = a
+
+       F.Mor : forall a,a'. C.Mor(a,a') -> C.Mor(a,a')
+       F.Mor(f) = f
+
+   Let's break this down. First, the module is parameterized by a
+   closed signature (C : Cat), let's call this Σ. Second, the
+   signature of the module Functor(C,C) is a parameterized signature
+   with the same parameter PΣ : Σ -> ∫PΣ . Finally, all of the
+   definitions in the body of the module are defined under the input
+   signature, so we apply the monad there Syn(Σ)
+   
+   An open module PM parameterized by a closed signature Σ satisfying
+   signature PΣ ∈ Sig(Σ) is a morphism
+     PM : ∫PΣ -> Syn(Σ)
+   that extends PΣ in that the diagram
+
+   PM : ∫PΣ -> Syn(Σ)
+        /\       /\
+	| PΣ     | η
+	Σ ====== Σ
+   commutes
+
+   And finally we can define substitution of *parameterized* modules
+   into *parameterized signatures*. This is needed
+
+   If we have a parameterized module M(Σ) : PΣ and a parameterized
+   signature PΣ'(∫PΣ), there is a parameterized signature PΣ'(M(Σ))
+   parameterized by Σ.
+
+   1. M : ∫PΣ -> Syn(Σ) extending PΣ : Σ -> ∫PΣ along η : Σ -> Syn(Σ)
+   2. PΣ' : ∫PΣ -> ∫PΣ'
+
+   the result should be a PΣ'(M(Σ)) : Σ -> ...
+   we can take the pushout of M and PΣ' and then compose with PΣ but
+   it doesn't seem quite right.
