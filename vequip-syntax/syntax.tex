@@ -53,6 +53,8 @@
   profunctors.
 \end{abstract}
 
+\section{Introduction}
+
 In what follows we present an internal language for virtual equipments
 (TODO: cite Crutwell-Shulman, Leinster, Hermida)
 %
@@ -60,23 +62,26 @@ Despite sounding slightly obscure, virtual equipments are quite useful
 as ``a good place to do category theory'', that is a virtual equipment
 has enough structure to define internal notions of category,
 multicategory and polycategory.
-%
-From a type-theoretic angle and a sprinkle of Curry-Howard-Lambek
-ideology, we can also see a virtual equipment as a ``good place to
-study type theories'' and so we call the type theory ``judgment
-theory''.
+%% %
+%% From a type-theoretic angle and a sprinkle of Curry-Howard-Lambek
+%% ideology, we can also see a virtual equipment as a ``good place to
+%% study type theories'' and so we call the type theory ``judgment
+%% theory''.
 
+\section{Syntax}
+
+\subsection{Judgments}
 The following figures present the basic formation, primitive and
-admissible and equality rules of a type theory we call judgment
-theory, an internal language for virtual equipments.
+admissible and equality rules of our type theory, an internal language
+for virtual equipments.
 %
 Note that contra Crutwell-Shulman, we define a virtual equipment to be
 a virtual double category with all restrictions, whereas they
 additionally require the category to have all \emph{units}.
 %
-Judgment theory has 4 central concepts, which we will refer to
-sometimes using type theoretic and at other times category-theoretic
-terminology.
+The type theory has 4 central concepts, which we will refer to
+sometimes using type theoretic/set theoretic and at other times
+category-theoretic terminology.
 %
 In type theoretic terminology, judgment theory has \emph{sorts} $\cat
 C, \cat D, \cat E$, and \emph{types} $A,B,C$ which have a given sort
@@ -218,6 +223,265 @@ familiar and we have categories, objects/functors,
   \end{mathpar}  
   \caption{Algebraic Properties of Basic Rules}
 \end{figure}
+
+\subsection{Multiplicatives}
+
+Now that we have established the central judgments and their algebraic
+structure, we can study connectives that internalize this judgmental
+structure. The ``monoidal'' part of the structure here is the
+structure of the term context $\phi$, which includes the empty context
+$\cdot_{\alpha}$ as unit and concatenation as ``product''.  We
+correspondingly can add multiplicative connectives to the syntax that
+internalize $\cdot$ and comma.
+
+First, to internalize $\cdot_{\alpha : \cat C}$ we can define the
+\emph{hom judgment} $A \to_{\cat C} A'$, which in set-theoretic
+settings we might call the \emph{identity/equality judgment}
+$A \equiv_{\cat C} A'$.
+%
+First the formation rule says given two objects $A,A'$ in the same
+category $\cat C$, we can form the hom-set from $A$ to $A'$.
+%
+The introduction rule says that given any object $A$, we can define
+the identity arrow from $A$ to itself.
+%
+Without knowing more about the category in question, these are the
+only arrows we know exist.
+%
+Next the elimination form says that to define a term whose input is a
+morphism $f : \beta \to_{\cat C} \beta'$, we need only define how it
+is behaved on the identity function.
+\begin{mathpar}
+    \inferrule*[right=Hom-Formation]
+    {\beta : \cat D \vdash A : \cat C\and
+    \gamma : \cat E \vdash A' : \cat C}
+    {\beta^o : \cat D;\gamma : \cat E \pipe A \to_{\cat C} A'}
+
+    (A \to A')[B/\alpha;B'/\beta] = (A[B/\alpha] \to A'[B'/\beta])
+
+    \inferrule*[right=Hom-Introduction]
+    {\alpha : \cat D \vdash A : \cat C}
+    {\alpha^o : \cat D, \alpha : \cat D | \cdot \vdash \id_{A} : A \to_{\cat C} A}
+
+    \id_{A}[B/\alpha] = \id_{A[B/\alpha]}
+
+    \inferrule*[right=Hom-Left (Sequent Style)]
+    {\alpha^o,\beta|\Phi,\phi : R[\delta/\delta_1], \psi : S[\delta/\delta_2],\Psi \vdash Q }
+    {\alpha^o,\beta|\Phi,\phi : R, \chi : \delta_1 \to \delta_2, \psi : S,\Psi \vdash Q}
+    
+    \inferrule*[right=Hom-Elim]
+    {\beta_1^o;\beta_2\pipe\Psi \vdash f : \beta_1 \to_{C} \beta_2\and
+      \alpha^o;\beta\pipe \Phi\and
+      \beta^o;\gamma\pipe \Phi'\and
+      \Phi,\Phi' \vdash g : R}
+    {\Phi[\cdot;\beta_1/\beta],\Psi,\Phi'[\beta_2/\beta;\cdot]\vdash \when f = \id_{\beta}.~ g : R[\beta_1/\beta;\beta_2/\beta]}
+
+    (\when f = \id_{\beta}. g)[l,m,r] = \when f[m] = \id_{\beta}. g[l,r] \textrm{TODO: dig into this}
+    
+    \when \id_{\alpha} = \id_{\beta}.~ g \equiv g[\alpha/\beta]
+
+    \inferrule*[right=Hom-$\eta$]
+    {...}
+    {\beta_1^o : \cat C;\beta_2:\cat C\pipe \Phi \vdash f \equiv \when f = \id_{\alpha} .~ \id_{\alpha} : \beta_1 \to_{\cat C} \beta_2}
+\end{mathpar}
+
+Next, we can internalize the $,$ in judgment contexts in one of two
+ways: on the left as a tensor product or on the right as a power.
+
+
+Next, let's define the tensor product of profunctors, also known as
+the \emph{composition} of profunctors.
+\begin{mathpar}
+  \inferrule*[right=Tensor formation]
+  {\alpha^o : \cat C; \beta : \cat D \pipe Q \and \beta^o : \cat D; \gamma : \cat E \pipe R}
+  {\alpha^o : \cat C; \gamma : \cat E \pipe \exists \beta.~Q \odot R}
+
+  \inferrule*[right=Tensor introduction]
+  {\Phi \vdash M : Q[B/\beta] \and \Psi \vdash N : R[B/\beta]}
+  {\Phi,\Psi\vdash (B,M,N) : \exists \beta. Q \odot R}
+
+  \inferrule*[right=Tensor elimination]
+  {\Psi \vdash M : \exists \beta. Q \odot R \and \Phi,x:Q,y:R,\Phi' \vdash N : P}
+  {\Phi,\Psi,\Phi' \vdash \lett (\beta,x,y) = M.~N : P}
+
+  (\lett (\beta,x,y) = (B,M_l,M_r).~ N) = N[B/\beta][M_l/x][M_r/y]\\
+
+  N = \lett(\beta, x,y) = z.~ N[(\beta, x,y)/z]
+\end{mathpar}
+First, the syntax for tensor is based on the coend formula that gives
+the definition in $Cat$, but using logical syntax $\exists$ rather
+than integrals because I don't like integral syntax and the syntax
+matches existential quantification in type theory.
+%
+Note that $\exists \beta. ~Q \odot R$ is the application of a single
+connective to $Q$ and $R$, and not separable into a quantifier
+$\exists$ connective and a product connective $\odot$.
+%
+Introduction, elimination and $\beta\eta$ are similar to a combination
+of existential quantification and the tensor product in linear logic.
+
+Finally, we can define \emph{cotensor} products of profunctors, which
+is the internal-hom to tensor products product. Since we are in an
+ordered setting, this splits into two connectives: a right-cotensor
+and a left cotensor. NOTE/TODO: one of these cotensor elimination
+rules breaks the syntactic invariant that all variable occurrences go
+from left to right syntactically. Should we fix or abandon that
+invariant?
+\begin{mathpar}
+  \inferrule*[right=Covariant Cotensor formation]
+  {\beta^o : \cat D; \gamma : \cat E \pipe R \and \alpha^o : \cat C; \gamma : \cat E \pipe P}
+  {\alpha^o : \cat C; \beta : \cat D \pipe \forall \gamma.~ P \triangleleft R}
+
+  \inferrule*[right=Covariant Cotensor introduction]
+  {\Phi , x : R \vdash M : P}
+  {\Phi \vdash \lambda^\triangleleft (\gamma,x). M : \forall \gamma.~ P \triangleleft R}
+
+  \inferrule*[right=Covariant Cotensor elimination]
+  {\Phi \vdash M : \forall \gamma.~P\triangleleft R \and \Psi \vdash N : R[B/\gamma]}
+  {\Phi, \Psi \vdash M(B,N)^{\triangleleft} : P[B/\gamma]}
+
+  (\lambda (\gamma,x). M)(B,N) = M[B/\gamma][N/x]\\
+  M = \lambda^\triangleleft (\gamma,x). M(\gamma,x)\\
+
+  \inferrule*[right=Contravariant Cotensor formation]
+  {\alpha^o : \cat C; \beta : \cat D \pipe Q \and \alpha^o : \cat C; \gamma : \cat E \pipe P}
+  {\beta^o : \cat D; \gamma : \cat E \pipe \forall \alpha.~ Q \triangleright P}
+
+  \inferrule*[right=Contravariant Cotensor introduction]
+  {x:Q,\Phi \vdash M : P}
+  {\Phi \vdash \lambda^\triangleright(\alpha,x). M : \forall \alpha.~Q\triangleright P}
+
+  \inferrule*[right=Contravariant Cotensor elimination]
+  {\Phi \vdash M : \forall \alpha. Q \triangleright P \and \Psi \vdash N : Q[A/\alpha]
+  }
+  {\Psi,\Phi \vdash M(A,N)^\triangleright : P[A/\alpha]}
+
+  (\lambda^\triangleright (\alpha,x). M)(A,N)^\triangleright = M[A/\alpha][N/x]\\
+  M = \lambda^\triangleright (\alpha, x). M(\alpha,x)^\triangleright
+\end{mathpar}
+
+\subsection{Additives}
+
+Next, we consider what we need to do to add additive connectives.
+%
+Since we have two category-like structures (types/functors and
+terms/transformations) we can define additive connectives for each of
+their objects: sorts and judgments.
+%
+These seem to be entirely independent constructions: we can define the
+product of sorts and we can separately define the product of judgments
+and neither relies on the other existing.
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule{~}{1 \sort}
+
+    \inferrule*[right=1-Ty-Intro]{~}{\alpha : C \vdash () : 1}
+
+    \inferrule*[right=1-Ty-$\eta$]{\alpha : C \vdash A : 1}{\alpha : C \vdash A = () : 1}\\
+
+    \inferrule{~}{\alpha^o:C;\beta:D \pipe 1}
+
+    \inferrule*[right=1-Tm-Intro]{~}{\Phi \vdash () : 1}
+    
+    \inferrule*[right=1-Tm-$\eta$]{\Phi \vdash t : 1}{\Phi \vdash t = () : 1}\\
+
+    ()[\gamma] = ()\and 1[A/\alpha;B/\beta] = 1 \and ()[\phi] = ()
+  \end{mathpar}
+  \caption{Terminal Sort, Judgment}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    
+    \inferrule{C \sort \and D\sort}{C \times D \sort}
+
+    \inferrule
+    {\alpha : C \vdash A_1 : D_1 \and \alpha : C \vdash A_2 : D_2}
+    {\alpha : C \vdash (A_1,A_2) : D_1 \times D_2}
+
+    (A_1,A_2)[B/\alpha] = (A_1[B/\alpha], A_2[B/\alpha])
+     
+    (\pi_i A)[B/\alpha] = \pi_i A[B/\alpha]
+
+    \inferrule{\alpha : C \vdash A : D_1 \times D_2}{\alpha : C \vdash \pi_i A : D_i}
+
+    \inferrule*[right=$\times-\beta$]{~}{\pi_i(A_1,A_2) = A_i}
+
+    \inferrule*{\alpha : C \vdash A : D_1 \times D_2}{\alpha : C \vdash A = (\pi_1 A, \pi_2 A) : D_1\times D_2}\\
+
+    \inferrule
+    {\alpha^o: C;\beta : D \pipe R_1 \and \alpha^o: C;\beta : D \pipe R_2}
+    {\alpha^o: C;\beta : D \pipe R_1 \times R_2}
+
+    (R_1 \times R_2)[A/\alpha;B/\beta] = (R_1[A/\alpha;B/\beta] \times R_2[A/\alpha;B/\beta])
+
+    \inferrule
+    {\Phi \vdash t_1 : R_1 \and \Phi \vdash t_2 : R_2}
+    {\Phi \vdash (t_1,t_2) : R_1 \times R_2}
+
+    (t_1,t_2)[\phi] = (t_1[\phi], t_2[\phi])
+
+    \inferrule
+    {\Phi \vdash u : R_1 \times R_2}
+    {\Phi \vdash \pi_i u : R_i}
+
+    (\pi_i u)[\phi] = \pi_i u[\phi] 
+
+    \inferrule{~}{\pi_i (t_1,t_2) = t_i}
+
+    \inferrule{\Phi \vdash t : R_1 \times R_2}{t = (\pi_1 t, \pi_2 t)}
+  \end{mathpar}
+  \caption{Product Sort, Judgment}
+\end{figure}
+
+To define internal ends and coends, we need to go beyond the usual
+simple types and add equalizers (a form of subsets) and co-equalizers
+(a form of quotients) of judgments. Here's a sketch of the syntax for
+each. These make type checking very difficult as they result in
+obligations for proving equality of certain terms, which may or may
+not be decidable.
+
+\begin{mathpar}
+  \inferrule*[right=Equalizer Formation]
+  {\alpha;\beta\,|\, R \and
+  x : R \vdash t : S x:R \vdash u : S}
+  {\alpha;\beta\,|\,\{ x : R \,|\, t = u \}}
+
+  \inferrule*[right=Equalizer Intro]
+  {\Phi \vdash r : R \and t[r/x] = u[r/x]}
+  {\Phi \vdash \textrm{assert}(x.t = u)(r) : \{ x : R \,|\, t = u \}}
+
+  \inferrule*[right=Equalizer Elim]
+  {\Phi \vdash r : \{ x : R \,|\, t = u \}}
+  {\Phi \vdash \textrm{forget}(r) : R}
+
+  t[\textrm{forget}(r)/x] = u[\textrm{forget(r)}/x]
+
+  \textrm{assert}(x.t = u)(\textrm{forget}(r)) = r
+  \textrm{forget}(\textrm{assert}(x.t = u)(r)) = r
+\end{mathpar}
+
+\begin{mathpar}
+  \inferrule*[right=Co-equalizer Formation]
+  {\alpha;\beta\,|\, R \and
+  x : S \vdash t : R x:S \vdash u : R}
+  {\alpha;\beta\,|\,R/(\forall x:S. t = u)}
+
+  \inferrule*[right=Coequalizer Intro]
+  {\Phi \vdash r : R}
+  {\Phi \vdash \textrm{equate}(x:S.t=u)(r) : R/(\forall x.t=u)}
+
+  \inferrule*[right=Coequalizer Elim]
+  {\Psi \vdash r : R/(x.t = u) \and
+    \Phi,y:R,\Phi' \vdash s : S \and
+    s[t/y] = s[u/y]}
+  {\Phi,\Psi,\Phi' \vdash \textrm{lett} \textrm{equate}(y) = r.~s : S}
+
+  \textrm{equate}(x:S.t = u)(t[\gamma]) = \textrm{equate}(x:S.t = u)(u[\gamma])
+
+  \cdots
+\end{mathpar}
 
 \section{Internal Category Theory}
 
@@ -720,56 +984,243 @@ functoriality of $F$ and (2) naturality of $F_{ind}$.
   \end{enumerate}
 \end{construction}
 
+\subsection{Products and Units of Internal Categories}
+
+%% While we have now proved a beautiful internal theorem in great
+%% generality that has many useful instances in different models, we are
+%% hard pressed to actually \emph{instantiate} the theorem in the syntax
+%% itself because we can't really come up with any useful universal properties!
+%% The reason is that Judgment Theory itself is too bare-bones.
+
+%% For instance how would we say that a category $\cat C$ has a
+%% \emph{terminal object}? Well, it would have to be in the first place a
+%% \emph{single} object in $\cat C$, but so far our syntax only enables
+%% us to talk about functions and functors. Well an object of $\cat C$ is
+%% the same as a function from the unit sort, but so far our syntax only
+%% has base sorts.
+
+%% So we see that defining the terminal object, \emph{necessitates} some
+%% notion of terminal object in our ``metatheory'': Judgment Theory.
+%% This mysterious and pervasive aspect of higher category theory is
+%% called the \emph{microcosm principle} because it says that in order to
+%% discuss a property of a single object in a single category (the
+%% microcosm), we need the same sort of object at the meta-level (the
+%% macrocosm). The adage here is ``As above, so below''.
+
+%% That might all sound very spiritual, but we'll see that it's actually
+%% quite a nice heuristic for formalizing universal properties in
+%% internal category theory.
+%% %
+%% In the spirit of this heuristic, instead of first giving a bunch of
+%% new type constructions for Judgment Theory and then applying them to
+%% define universal properties, we will consider them in pairs, first
+%% above, and then below.
+
+First we consider the terminal sort and then the idea of a terminal
+object in an internal category.
+
+Next, the terminal sort trivially has a category structure using the
+trivial judgment as its hom set:
+
+\begin{definition}[Terminal Category]
+  The terminal category $\cat 1$ consists of
+  \begin{enumerate}
+  \item Its object sort is $1$
+  \item Its arrow judgment is $\alpha^o:1;\alpha:1 \pipe 1$
+  \item Its identity arrow is given by $\alpha^o;\alpha \pipe \cdot \vdash () : 1$
+  \item Composition is defined by $\phi : 1, \psi : 1 \vdash () : 1$
+  \item Associativity and unitality are trivial by \textsc{1-$\eta$}
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}[Terminal Object Specification]
+  In judgment type theory with a terminal sort/judgment, we can define
+  for any category $\cat C$ a profunctor $\alpha^o:\cat C;\beta : \cat
+  1 \pipe 1$, which specifies a terminal object.
+\end{definition}
+
+Now let's instantiate the definition for the terminal object defined
+as a negative type and as a representable and see how it reproduces
+the standard type-theoretic and category-theoretic definitions.
+
+A representation of $\alpha^o:\cat C; \beta : \cat 1 \pipe 1$ consists
+of a functor $\beta : \cat 1 \vdash 1_{\cat C} : \cat C$, an introduction rule
+\[ \phi : 1 \vdash I_{1}[\phi] : \alpha \to_{\cat C} 1_{\cat C}[\beta] \]
+satisfying $I_{1}[\phi] \circ \gamma =I_{1}[\phi \circ \gamma]$ and an
+inverse $\psi : \alpha \to_{\cat C} 1_{\cat C}[\beta] \vdash
+I_{1}^{-1}[\psi] : 1$ which by \textsc{1-$\eta$} is equal to $()$ and
+therefore every $t : \alpha \to_{\cat C} 1_{\cat C}[\beta]$ is equal
+to $I_{1}[\phi]$. In light of this it would be appropriate to write
+$I_1[\phi]$ as $()$ and then the left-homomorphism property is $()
+\circ \gamma = ()$, which is precisely the definition of substitution.
+
+This alternate syntax makes even more sense in light of the negative
+type presentation. A negative type satisfying the terminal object
+specification consists of a functor $1_{\cat C}$ as above and an
+introduction rule as above and an elimination form $\vdash \epsilon :
+1$, which is trivial.
+
+First the product category
+\begin{definition}[Product category]
+  For any categories $\cat C_1$, $\cat C_2$ we can form the product
+  category whose sort of objects is $\cat C_1 \times \cat C_2$, whose
+  arrow judgment is $\alpha^o : \cat C_1 \times \cat C_2;\alpha \pipe
+  (\pi_1 \alpha \to_{\cat C_1} \pi_1 \alpha) \times (\pi_2 \alpha
+  \to_{\cat C_2} \pi_2 \alpha)$. Identity is given by $\alpha^o : \cat
+  C_1 \times \cat C_2;\alpha\pipe\cdot \vdash (\id_{\pi_1 \alpha},
+  \id_{\pi_2 \alpha}) : (\pi_1 \alpha \to_{\cat C_1} \pi_1 \alpha)
+  \times (\pi_2 \alpha \to_{\cat C_2} \pi_2 \alpha)$ and composition
+  by
+  \[
+  \phi %: (\pi_1 \alpha_0 \to_{\cat C_1} \pi_1 \alpha_1) \times (\pi_2 \alpha_0 \to_{\cat C_2} \pi_2 \alpha_1)
+  ,
+  \psi %: (\pi_1 \alpha_1 \to_{\cat C_1} \pi_1 \alpha_2) \times (\pi_2 \alpha_1 \to_{\cat C_2} \pi_2 \alpha_2)
+  \vdash ((\pi_1 \phi) \circ (\pi_1 \psi), (\pi_2 \psi) \circ (\pi_2 \phi)) :
+  (\pi_1 \alpha_0 \to_{\cat C_1} \pi_1 \alpha_2) \times (\pi_2 \alpha_0 \to_{\cat C_2} \pi_2 \alpha_2)  
+  \]
+  unitality, associativity follow from the same properties of $\cat C_1,\cat C_2$
+\end{definition}
+
+\begin{definition}[Product Functor Specification]
+  For any category $\cat C$, we can specify the product functor by
+  \begin{enumerate}
+  \item The span is $\alpha^o:\cat C; \beta : \cat C \times \cat C \pipe (\alpha \to_{\cat C} \pi_1 \beta) \times (\alpha \to_{\cat C} \pi_2 \beta)$
+  \item Left Composition is defined as
+    \[ \phi, \psi \vdash (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi)\]
+  \item Left unitality:
+    \begin{align*}
+      (\pi_1 \phi \circ \id, \pi_2 \phi \circ \id)
+      &= (\pi_1 \phi, \pi_2 \phi)\\
+      &= \phi\tag{$\times-eta$}
+    \end{align*}
+  \item Left associativity:
+    \begin{align*}
+      (\phi \circ \psi) \circ \psi'
+      &= (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi) \circ \psi'\\
+      &= (\pi_1 (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi) \circ \psi',
+      \pi_2 (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi) \circ \psi')\\
+      &= ((\pi_1 \phi \circ \psi) \circ \psi', (\pi_2 \phi \circ \psi) \circ \psi')\\
+      &= (\pi_1 \phi \circ (\psi \circ \psi'), \pi_2 \phi \circ (\psi \circ \psi'))\\
+      &= \phi \circ (\psi \circ \psi')
+    \end{align*}
+  \item Right composition is defined as
+    \[ \phi, \theta \vdash (\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi) \]
+  \item Right unitality:
+    \begin{align*}
+      (\pi_1 (\id,\id) \circ \pi_1 \phi, \pi_2 (\id,\id) \circ \pi_2 \phi)
+      &= (\id \circ \pi_1 \phi, \id \circ \pi_2 \phi) \tag{$\times-\beta$}\\
+      &= (\pi_1 \phi, \id \circ \pi_2 \phi)\\
+      &= \phi \tag{$\times-\eta$}
+    \end{align*}
+  \item Right associativity
+    \begin{align*}
+      \theta' \circ (\theta \circ \phi)
+      &= \theta' \circ (\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi)\\
+      &= (\pi_1 \theta' \circ \pi_1(\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi),
+      \pi_2 \theta' \circ \pi_2(\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi))\\
+      &= (\pi_1 \theta' \circ (\pi_1 \theta \circ \pi_1 \phi), \pi_2 \theta' \circ (\pi_2 \theta \circ \pi_2 \phi))\\
+      &= ((\pi_1 \theta' \circ \pi_1 \theta) \circ \pi_1 \phi, (\pi_2 \theta' \circ \pi_2 \theta) \circ \pi_2 \phi)\\
+      &= (\pi_1(\theta' \circ \theta) \circ \pi_1 \phi, \pi_2(\theta' \circ \theta) \circ \pi_2 \phi)\\
+      &= (\theta' \circ \theta) \circ \phi \\
+    \end{align*}
+  \end{enumerate}
+\end{definition}
+
+\subsection{Discrete and Codiscrete Categories}
+
+If we have terminal judgments, then we can define the
+\emph{codiscrete} category for any sort $\cat C$.
+\begin{definition}
+  The codiscrete category $\textrm{CoDisc} \cat C$ is defined as
+  \begin{enumerate}
+  \item Object sort is $\cat C$
+  \item Morphisms judgment is $1$
+  \item Identity and composition are given by the unique terms of
+    those types, making associativity and unitality trivial to verify.
+  \end{enumerate}
+\end{definition}
+
+If we have \emph{identity} objects, which we write as $\equiv_A$, then we
+can define discrete categories.
+\begin{definition}
+  The discrete category $\textrm{Disc} \cat C$ is defined as
+  \begin{enumerate}
+  \item Object sort is $\cat C$
+  \item Morphisms judgment is $\alpha;\alpha' \pipe \alpha \equiv \alpha'$
+  \item Identity and composition are defined as in the section on
+    synthetic category theory.
+  \end{enumerate}
+\end{definition}
+
+\subsection{Internal Tensor, Cotensor}
+
+We should be able to define internal \emph{tensor} using synthetic
+tensor and coequalizers and also internal \emph{cotensor} using
+synthetic cotensor and equalizers. These look exactly like the
+set-theoretic definitions.
+\begin{definition}
+  Let $R$ be an internal profunctor from $C$ to $D$ and $S$ be an
+  internal profunctor from $D$ to $E$.
+
+  Then we can define the internal tensor product $R \odot S$, a
+  profunctor from $C$ to $E$ as
+  \begin{enumerate}
+  \item The underlying span can be defined as a quotient of the synthetic tensor product
+    \[ (R \odot S)[\alpha;\gamma] = \exists \beta:\cat D. R \odot S/Rcomp = Scomp \]
+
+    Where R-comp and S-comp have as source the span
+    \[ \exists \beta:\cat D.~ R[\alpha;\beta] \odot (\exists \beta':\cat D. Hom_C(\beta,\beta') \odot S[\beta';\gamma]) \]
+    or the isomorphic
+    \[ \exists \beta':\cat D.~ (\exists \beta:\cat D. R[\alpha;\beta] \odot Hom_C(\beta,\beta')) \odot S[\beta';\gamma] \]
+    where R-comp composes the $C$-morphism with the $R$-morphism and
+    S-comp the $S$-morphism.
+  \item Composition is defined using composition in $R,S$.
+  \end{enumerate}
+\end{definition}
+Note that $R$-comp and $S$-comp are each constructed using the 
+
+\begin{definition}
+  Let $R$ be an internal profunctor from $C$ to $D$ and $S$ be an
+  internal profunctor from $C$ to $E$. Then the internal contravariant
+  cotensor product $R \triangleright S$ is defined as
+  \[ (R \triangleright S)[\beta;\gamma] = \{ p : \forall \alpha:\cat C.~ R[\alpha;\beta] \triangleright S[\alpha;\gamma] 
+  \pipe R-comp = S-comp \}  \]
+  R-comp and S-comp have as codomain the span
+  \[ \forall \alpha:\cat C.~ R[\alpha;\beta] \triangleright \forall \alpha':\cat C.~ Hom_C(\alpha',\alpha) \triangleright S[\alpha';\gamma] \]
+  or the isomorphic
+  \[ \forall \alpha':\cat C.~ (\exists \alpha. Hom_C(\alpha',\alpha) \odot R[\alpha;\beta]) \triangleright S[\alpha';\gamma]
+  \]
+\end{definition}
+
+We can also construct the \emph{free profunctor} from a span using tensor:
+
+\begin{definition}
+  Let $\cat C$ and $\cat D$ be internal categories and let $R[\alpha;\beta]$ be a
+  span from $Ob(\cat C)$ to $Ob(\cat D)$. Then the free profunctor
+  extending $R$ to be an internal profunctor from $\cat C$ to $\cat D$ is
+  \[ F_{\cat C,\cat D}R[\alpha';\beta'] = \exists \alpha. Hom_C(\alpha',\alpha) \odot (\exists \beta. R[\alpha;\beta] \odot Hom_C(\beta,\beta')) \]
+  or the isomorphic
+  \[ F_{\cat C,\cat D}R[\alpha';\beta'] = \exists \beta. (\exists \alpha. Hom_C(\alpha',\alpha) \odot R[\alpha;\beta]) \odot Hom_C(\beta,\beta') \]
+\end{definition}
+
+And maybe we can even define the co-free profunctor from a span using cotensor?
+\begin{definition}
+  Let $\cat C$ and $\cat D$ be internal categories and let $R[\alpha;\beta]$ be a
+  span from $Ob(\cat C)$ to $Ob(\cat D)$. Then the co-free profunctor
+  extending $R$ to be an internal profunctor from $\cat C$ to $\cat D$ is
+  \[ G_{\cat C,\cat D}R[\alpha';\beta'] =
+  \forall \alpha. Hom_C(\alpha,\alpha') \triangleright (\forall \beta. R[\alpha;\beta] \triangleleft Hom_D(\beta',\beta)) \]
+  or the isomorphic
+  \[ G_{\cat C,\cat D}R[\alpha';\beta'] =
+  \forall \beta. 
+  (\forall \alpha. Hom_C(\alpha,\alpha') \triangleright R[\alpha;\beta]) \triangleleft Hom_D(\beta',\beta)) \]
+\end{definition}
+
 \section{Synthetic Category Theory}
 
 Next, we look at Synthetic category theory in a virtual equipment. In
 this section we will use category-theoretic terminology for judgment
 theory: categories, functors/objects, profunctors and transformations.
-
-\subsection{Syntax: Hom Set}
-
-First, we have Hom-sets, with syntax very similar to the identity type
-in dependent type theory.
-%
-First the formation rule says given two objects $A,A'$ in the same
-category $\cat C$, we can form the hom-set from $A$ to $A'$.
-%
-The introduction rule says that given any object $A$, we can define
-the identity arrow from $A$ to itself.
-%
-Without knowing more about the category in question, these are the
-only arrows we know exist.
-%
-Next the elimination form says that to define a term whose input is a
-morphism $f : \beta \to_{\cat C} \beta'$, we need only define how it
-is behaved on the identity function.
-\begin{mathpar}
-    \inferrule*[right=Hom-Formation]
-    {\beta : \cat D \vdash A : \cat C\and
-    \gamma : \cat E \vdash A' : \cat C}
-    {\beta^o : \cat D;\gamma : \cat E \pipe A \to_{\cat C} A'}
-
-    \inferrule*[right=Hom-Introduction]
-    {\alpha : \cat D \vdash A : \cat C}
-    {\alpha^o : \cat D, \alpha : \cat D | \cdot \vdash \id_{A} : A \to_{\cat C} A}
-
-    %% \inferrule*[right=Hom-Left (Sequent Style)]
-    %% {\alpha^o,\beta|\Phi,\phi : R[\delta/\delta_1], \psi : S[\delta/\delta_2],\Psi \vdash Q }
-    %% {\alpha^o,\beta|\Phi,\phi : R, \chi : \delta_1 \to \delta_2, \psi : S,\Psi \vdash Q}
-    
-    \inferrule*[right=Hom-Elim]
-    {\beta_1^o;\beta_2\pipe\Psi \vdash f : \beta_1 \to_{C} \beta_2\and
-      \alpha^o;\beta\pipe \Phi\and
-      \beta^o;\gamma\pipe \Phi'\and
-      \Phi,\Phi' \vdash g : R}
-    {\Phi[\cdot;\beta_1/\beta],\Psi,\Phi'[\beta_2/\beta;\cdot]\vdash \when f = \id_{\beta}.~ g : R[\beta_1/\beta;\beta_2/\beta]}
-
-    \when \id_{\alpha} = \id_{\beta}.~ g \equiv g[\alpha/\beta]
-
-    \inferrule*[right=Hom-$\eta$]
-    {...}
-    {\beta_1^o : \cat C;\beta_2:\cat C\pipe \Phi \vdash f \equiv \when f = \id_{\alpha} .~ \id_{\alpha} : \beta_1 \to_{\cat C} \beta_2}
-\end{mathpar}
 
 \subsection{Constructions: Categories, Functors and Natural Transformations}
 
@@ -841,40 +1292,6 @@ We should be able to synthetically prove these are equivalent.
 
 David Jaz Myers tells me that to do all of formal category theory in
 an equipment, you just need to have hom sets, tensors and cotensors.
-%
-Let's look at what the syntax for these should be.
-
-
-Next, let's define the tensor product of profunctors, also known as
-the \emph{composition} of profunctors.
-\begin{mathpar}
-  \inferrule*[right=Tensor formation]
-  {\alpha^o : \cat C; \beta : \cat D \pipe Q \and \beta^o : \cat D; \gamma : \cat E \pipe R}
-  {\alpha^o : \cat C; \gamma : \cat E \pipe \exists \beta.~Q \odot R}
-
-  \inferrule*[right=Tensor introduction]
-  {\Phi \vdash M : Q[B/\beta] \and \Psi \vdash N : R[B/\beta]}
-  {\Phi,\Psi\vdash (B,M,N) : \exists \beta. Q \odot R}
-
-  \inferrule*[right=Tensor elimination]
-  {\Psi \vdash M : \exists \beta. Q \odot R \and \Phi,x:Q,y:R,\Phi' \vdash N : P}
-  {\Phi,\Psi,\Phi' \vdash \lett (\beta,x,y) = M.~N : P}
-
-  (\lett (\beta,x,y) = (B,M_l,M_r).~ N) = N[B/\beta][M_l/x][M_r/y]\\
-
-  N = \lett(\beta, x,y) = z.~ N[(\beta, x,y)/z]
-\end{mathpar}
-First, the syntax for tensor is based on the coend formula that gives
-the definition in $Cat$, but using logical syntax $\exists$ rather
-than integrals because I don't like integral syntax and the syntax
-matches existential quantification in type theory.
-%
-Note that $\exists \beta. ~Q \odot R$ is the application of a single
-connective to $Q$ and $R$, and not separable into a quantifier
-$\exists$ connective and a product connective $\odot$.
-%
-Introduction, elimination and $\beta\eta$ are similar to a combination
-of existential quantification and the tensor product in linear logic.
 
 As another example synthetic theorem, we can prove the covariant and
 contravariant \emph{co-yoneda lemmas}, which are precisely the
@@ -898,46 +1315,6 @@ statement that Hom is the unit of the tensor product.
   One direction of iso follows by $\beta$, the other by $\eta$.
 \end{proof}
 
-Finally, we can define \emph{cotensor} products of profunctors, which
-is the internal-hom to tensor products product. Since we are in an
-ordered setting, this splits into two connectives: a right-cotensor
-and a left cotensor. NOTE/TODO: one of these cotensor elimination
-rules breaks the syntactic invariant that all variable occurrences go
-from left to right syntactically. Should we fix or abandon that
-invariant?
-\begin{mathpar}
-  \inferrule*[right=Covariant Cotensor formation]
-  {\beta^o : \cat D; \gamma : \cat E \pipe R \and \alpha^o : \cat C; \gamma : \cat E \pipe P}
-  {\alpha^o : \cat C; \beta : \cat D \pipe \forall \gamma.~ P \triangleleft R}
-
-  \inferrule*[right=Covariant Cotensor introduction]
-  {\Phi , x : R \vdash M : P}
-  {\Phi \vdash \lambda^\triangleleft (\gamma,x). M : \forall \gamma.~ P \triangleleft R}
-
-  \inferrule*[right=Covariant Cotensor elimination]
-  {\Phi \vdash M : \forall \gamma.~P\triangleleft R \and \Psi \vdash N : R[B/\gamma]}
-  {\Phi, \Psi \vdash M(B,N)^{\triangleleft} : P[B/\gamma]}
-
-  (\lambda (\gamma,x). M)(B,N) = M[B/\gamma][N/x]\\
-  M = \lambda^\triangleleft (\gamma,x). M(\gamma,x)\\
-
-  \inferrule*[right=Contravariant Cotensor formation]
-  {\alpha^o : \cat C; \beta : \cat D \pipe Q \and \alpha^o : \cat C; \gamma : \cat E \pipe P}
-  {\beta^o : \cat D; \gamma : \cat E \pipe \forall \alpha.~ Q \triangleright P}
-
-  \inferrule*[right=Contravariant Cotensor introduction]
-  {x:Q,\Phi \vdash M : P}
-  {\Phi \vdash \lambda^\triangleright(\alpha,x). M : \forall \alpha.~Q\triangleright P}
-
-  \inferrule*[right=Contravariant Cotensor elimination]
-  {\Phi \vdash M : \forall \alpha. Q \triangleright P \and \Psi \vdash N : Q[A/\alpha]
-  }
-  {\Psi,\Phi \vdash M(A,N)^\triangleright : P[A/\alpha]}
-
-  (\lambda^\triangleright (\alpha,x). M)(A,N)^\triangleright = M[A/\alpha][N/x]\\
-  M = \lambda^\triangleright (\alpha, x). M(\alpha,x)^\triangleright
-\end{mathpar}
-
 And we get another synthetic theorem: the Yoneda lemma, which says
 that Hom is the unit for the cotensor product.
 \begin{lemma}[Synthetic Yoneda]
@@ -956,7 +1333,6 @@ that Hom is the unit for the cotensor product.
   \]
   One direction is by $\beta$, the other $\eta$.
 \end{proof}
-
 
 \subsection{Kan Extensions}
 
@@ -1064,298 +1440,85 @@ Let's prove that classic theorem!
   TODO.
 \end{proof}
 
-\section{Specific Universal Properties: The Microcosm Principle}
+\subsection{Additive Facts}
 
-While we have now proved a beautiful internal theorem in great
-generality that has many useful instances in different models, we are
-hard pressed to actually \emph{instantiate} the theorem in the syntax
-itself because we can't really come up with any useful universal properties!
-The reason is that Judgment Theory itself is too bare-bones.
+I think the following isomorphisms should hold, which connect additive
+connectives on objects with the analogous connective on profunctors:
+\[ () \to_1 () \cong () \]
+\[ (\pi_1 \alpha, \pi_2 \alpha) \to_{\cat C \times \cat D} (\pi_1 \beta, \pi_2 \beta) \cong
+((\pi_1 \alpha) \to_{\cat C} (\pi_1 \beta)) \times ((\pi_2 \alpha) \to_{\cat C} (\pi_2 \beta)) \]
 
-For instance how would we say that a category $\cat C$ has a
-\emph{terminal object}? Well, it would have to be in the first place a
-\emph{single} object in $\cat C$, but so far our syntax only enables
-us to talk about functions and functors. Well an object of $\cat C$ is
-the same as a function from the unit sort, but so far our syntax only
-has base sorts.
+%% \subsection{Module System}
 
-So we see that defining the terminal object, \emph{necessitates} some
-notion of terminal object in our ``metatheory'': Judgment Theory.
-This mysterious and pervasive aspect of higher category theory is
-called the \emph{microcosm principle} because it says that in order to
-discuss a property of a single object in a single category (the
-microcosm), we need the same sort of object at the meta-level (the
-macrocosm). The adage here is ``As above, so below''.
-
-That might all sound very spiritual, but we'll see that it's actually
-quite a nice heuristic for formalizing universal properties in
-internal category theory.
-%
-In the spirit of this heuristic, instead of first giving a bunch of
-new type constructions for Judgment Theory and then applying them to
-define universal properties, we will consider them in pairs, first
-above, and then below.
-
-\subsection{Terminal Sort/Terminal Object/Unit Type}
-
-First we consider the terminal sort and then the idea of a terminal
-object in an internal category.
-
-\begin{figure}
-  \begin{mathpar}
-    \inferrule{~}{1 \sort}
-
-    \inferrule*[right=1-Ty-Intro]{~}{\alpha : C \vdash () : 1}
-
-    \inferrule*[right=1-Ty-$\eta$]{\alpha : C \vdash A : 1}{\alpha : C \vdash A = () : 1}\\
-
-    \inferrule{~}{\alpha^o:C;\beta:D \pipe 1}
-
-    \inferrule*[right=1-Tm-Intro]{~}{\Phi \vdash () : 1}
-    
-    \inferrule*[right=1-Tm-$\eta$]{\Phi \vdash t : 1}{\Phi \vdash t = () : 1}\\
-
-    ()[\gamma] = ()\and 1[A/\alpha;B/\beta] = 1 \and ()[\phi] = ()
-  \end{mathpar}
-  \caption{Terminal Sort, Judgment}
-\end{figure}
-
-The rules say that there is a terminal sort $1$ that has an element
-$()$ and everything is equal to that element.
-Then we reproduce this at the level of judgments/terms: there is a
-terminal judgment $1$ that has an element $()$ and everything is equal
-to that element.
-
-Next, the terminal sort trivially has a category structure using the
-trivial judgment as its hom set:
-
-\begin{definition}[Terminal Category]
-  The terminal category $\cat 1$ consists of
-  \begin{enumerate}
-  \item Its object sort is $1$
-  \item Its arrow judgment is $\alpha^o:1;\alpha:1 \pipe 1$
-  \item Its identity arrow is given by $\alpha^o;\alpha \pipe \cdot \vdash () : 1$
-  \item Composition is defined by $\phi : 1, \psi : 1 \vdash () : 1$
-  \item Associativity and unitality are trivial by \textsc{1-$\eta$}
-  \end{enumerate}
-\end{definition}
-
-\begin{definition}[Terminal Object Specification]
-  In judgment type theory with a terminal sort/judgment, we can define
-  for any category $\cat C$ a profunctor $\alpha^o:\cat C;\beta : \cat
-  1 \pipe 1$, which specifies a terminal object.
-\end{definition}
-
-Now let's instantiate the definition for the terminal object defined
-as a negative type and as a representable and see how it reproduces
-the standard type-theoretic and category-theoretic definitions.
-
-A representation of $\alpha^o:\cat C; \beta : \cat 1 \pipe 1$ consists
-of a functor $\beta : \cat 1 \vdash 1_{\cat C} : \cat C$, an introduction rule
-\[ \phi : 1 \vdash I_{1}[\phi] : \alpha \to_{\cat C} 1_{\cat C}[\beta] \]
-satisfying $I_{1}[\phi] \circ \gamma =I_{1}[\phi \circ \gamma]$ and an
-inverse $\psi : \alpha \to_{\cat C} 1_{\cat C}[\beta] \vdash
-I_{1}^{-1}[\psi] : 1$ which by \textsc{1-$\eta$} is equal to $()$ and
-therefore every $t : \alpha \to_{\cat C} 1_{\cat C}[\beta]$ is equal
-to $I_{1}[\phi]$. In light of this it would be appropriate to write
-$I_1[\phi]$ as $()$ and then the left-homomorphism property is $()
-\circ \gamma = ()$, which is precisely the definition of substitution.
-
-This alternate syntax makes even more sense in light of the negative
-type presentation. A negative type satisfying the terminal object
-specification consists of a functor $1_{\cat C}$ as above and an
-introduction rule as above and an elimination form $\vdash \epsilon :
-1$, which is trivial.
-
-\subsection{Products}
-
-Next the product
-
-\begin{figure}
-  \begin{mathpar}
-    
-    \inferrule{C \sort \and D\sort}{C \times D \sort}
-
-    \inferrule
-    {\alpha : C \vdash A_1 : D_1 \and \alpha : C \vdash A_2 : D_2}
-    {\alpha : C \vdash (A_1,A_2) : D_1 \times D_2}
-
-    (A_1,A_2)[B/\alpha] = (A_1[B/\alpha], A_2[B/\alpha])
-     
-    (\pi_i A)[B/\alpha] = \pi_i A[B/\alpha]
-
-    \inferrule{\alpha : C \vdash A : D_1 \times D_2}{\alpha : C \vdash \pi_i A : D_i}
-
-    \inferrule*[right=$\times-\beta$]{~}{\pi_i(A_1,A_2) = A_i}
-
-    \inferrule*{\alpha : C \vdash A : D_1 \times D_2}{\alpha : C \vdash A = (\pi_1 A, \pi_2 A) : D_1\times D_2}\\
-
-    \inferrule
-    {\alpha^o: C;\beta : D \pipe R_1 \and \alpha^o: C;\beta : D \pipe R_2}
-    {\alpha^o: C;\beta : D \pipe R_1 \times R_2}
-
-    (R_1 \times R_2)[A/\alpha;B/\beta] = (R_1[A/\alpha;B/\beta] \times R_2[A/\alpha;B/\beta])
-
-    \inferrule
-    {\Phi \vdash t_1 : R_1 \and \Phi \vdash t_2 : R_2}
-    {\Phi \vdash (t_1,t_2) : R_1 \times R_2}
-
-    (t_1,t_2)[\phi] = (t_1[\phi], t_2[\phi])
-
-    \inferrule
-    {\Phi \vdash u : R_1 \times R_2}
-    {\Phi \vdash \pi_i u : R_i}
-
-    (\pi_i u)[\phi] = \pi_i u[\phi] 
-
-    \inferrule{~}{\pi_i (t_1,t_2) = t_i}
-
-    \inferrule{\Phi \vdash t : R_1 \times R_2}{t = (\pi_1 t, \pi_2 t)}
-  \end{mathpar}
-  \caption{Product Sort, Judgment}
-\end{figure}
-
-First the product category
-
-\begin{definition}[Product category]
-  For any categories $\cat C_1$, $\cat C_2$ we can form the product
-  category whose sort of objects is $\cat C_1 \times \cat C_2$, whose
-  arrow judgment is $\alpha^o : \cat C_1 \times \cat C_2;\alpha \pipe
-  (\pi_1 \alpha \to_{\cat C_1} \pi_1 \alpha) \times (\pi_2 \alpha
-  \to_{\cat C_2} \pi_2 \alpha)$. Identity is given by $\alpha^o : \cat
-  C_1 \times \cat C_2;\alpha\pipe\cdot \vdash (\id_{\pi_1 \alpha},
-  \id_{\pi_2 \alpha}) : (\pi_1 \alpha \to_{\cat C_1} \pi_1 \alpha)
-  \times (\pi_2 \alpha \to_{\cat C_2} \pi_2 \alpha)$ and composition
-  by
-  \[
-  \phi %: (\pi_1 \alpha_0 \to_{\cat C_1} \pi_1 \alpha_1) \times (\pi_2 \alpha_0 \to_{\cat C_2} \pi_2 \alpha_1)
-  ,
-  \psi %: (\pi_1 \alpha_1 \to_{\cat C_1} \pi_1 \alpha_2) \times (\pi_2 \alpha_1 \to_{\cat C_2} \pi_2 \alpha_2)
-  \vdash ((\pi_1 \phi) \circ (\pi_1 \psi), (\pi_2 \psi) \circ (\pi_2 \phi)) :
-  (\pi_1 \alpha_0 \to_{\cat C_1} \pi_1 \alpha_2) \times (\pi_2 \alpha_0 \to_{\cat C_2} \pi_2 \alpha_2)  
-  \]
-  unitality, associativity follow from the same properties of $\cat C_1,\cat C_2$
-\end{definition}
-
-\begin{definition}[Product Functor Specification]
-  For any category $\cat C$, we can specify the product functor by
-  \begin{enumerate}
-  \item The span is $\alpha^o:\cat C; \beta : \cat C \times \cat C \pipe (\alpha \to_{\cat C} \pi_1 \beta) \times (\alpha \to_{\cat C} \pi_2 \beta)$
-  \item Left Composition is defined as
-    \[ \phi, \psi \vdash (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi)\]
-  \item Left unitality:
-    \begin{align*}
-      (\pi_1 \phi \circ \id, \pi_2 \phi \circ \id)
-      &= (\pi_1 \phi, \pi_2 \phi)\\
-      &= \phi\tag{$\times-eta$}
-    \end{align*}
-  \item Left associativity:
-    \begin{align*}
-      (\phi \circ \psi) \circ \psi'
-      &= (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi) \circ \psi'\\
-      &= (\pi_1 (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi) \circ \psi',
-      \pi_2 (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi) \circ \psi')\\
-      &= ((\pi_1 \phi \circ \psi) \circ \psi', (\pi_2 \phi \circ \psi) \circ \psi')\\
-      &= (\pi_1 \phi \circ (\psi \circ \psi'), \pi_2 \phi \circ (\psi \circ \psi'))\\
-      &= \phi \circ (\psi \circ \psi')
-    \end{align*}
-  \item Right composition is defined as
-    \[ \phi, \theta \vdash (\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi) \]
-  \item Right unitality:
-    \begin{align*}
-      (\pi_1 (\id,\id) \circ \pi_1 \phi, \pi_2 (\id,\id) \circ \pi_2 \phi)
-      &= (\id \circ \pi_1 \phi, \id \circ \pi_2 \phi) \tag{$\times-\beta$}\\
-      &= (\pi_1 \phi, \id \circ \pi_2 \phi)\\
-      &= \phi \tag{$\times-\eta$}
-    \end{align*}
-  \item Right associativity
-    \begin{align*}
-      \theta' \circ (\theta \circ \phi)
-      &= \theta' \circ (\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi)\\
-      &= (\pi_1 \theta' \circ \pi_1(\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi),
-      \pi_2 \theta' \circ \pi_2(\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi))\\
-      &= (\pi_1 \theta' \circ (\pi_1 \theta \circ \pi_1 \phi), \pi_2 \theta' \circ (\pi_2 \theta \circ \pi_2 \phi))\\
-      &= ((\pi_1 \theta' \circ \pi_1 \theta) \circ \pi_1 \phi, (\pi_2 \theta' \circ \pi_2 \theta) \circ \pi_2 \phi)\\
-      &= (\pi_1(\theta' \circ \theta) \circ \pi_1 \phi, \pi_2(\theta' \circ \theta) \circ \pi_2 \phi)\\
-      &= (\theta' \circ \theta) \circ \phi \\
-    \end{align*}
-  \end{enumerate}
-\end{definition}
-
-\section{TODOs}
+%% Currently, the theorems presented in \ref{internal} were all
+%% metatheorems, we can give them a \emph{formal} status by incorporating
+%% a simple module system on top of span theory.
+%% %
+%% This serves as the basis for a \emph{domain specific proof assistant}
+%% for category theory that we plan to use to teach category theory.
 
 
-\subsection{Module System}
+%% \subsection{Equipment of Internal Categories}
 
-Currently, the theorems presented in \ref{internal} were all
-metatheorems, we can give them a \emph{formal} status by incorporating
-a simple module system on top of span theory.
-%
-This serves as the basis for a \emph{domain specific proof assistant}
-for category theory that we plan to use to teach category theory.
+%% Next we show that internal categories provide us with our first
+%% \emph{model} of judgment type theory by interpreting sorts as
+%% categories, functions as functors, spans as profunctors and 2-cells as
+%% natural transformations.
+%% %
+%% Furthermore, this model can be seen as an \emph{implementation} of
+%% Hom-sets, we translate Judgment type theory with hom sets into
+%% categories internal to judgmental type theory \emph{without} hom sets:
+%% the home sets come from the category structure.
 
+%% The interpretation of hom-formation and -introduction is obvious, but
+%% elim is more interesting...
 
-\subsection{Equipment of Internal Categories}
+%% \subsection{Monads and Multicategories}
 
-Next we show that internal categories provide us with our first
-\emph{model} of judgment type theory by interpreting sorts as
-categories, functions as functors, spans as profunctors and 2-cells as
-natural transformations.
-%
-Furthermore, this model can be seen as an \emph{implementation} of
-Hom-sets, we translate Judgment type theory with hom sets into
-categories internal to judgmental type theory \emph{without} hom sets:
-the home sets come from the category structure.
+%% Defining enriched multicategories requires an appropriate notion of
+%% \emph{monad} on the enriching ``category'', so we next extend Judgment
+%% theory with a monad acting on sorts and judgments.
 
-The interpretation of hom-formation and -introduction is obvious, but
-elim is more interesting...
+%% \begin{figure}
+%%   \begin{mathpar}
+%%     \inferrule{C \sort}{TC \sort}
 
-\subsection{Monads and Multicategories}
+%%     \inferrule*[right=ret]
+%%     {\alpha : C \vdash A : D}
+%%     {\alpha : C \vdash [A] : TD}
 
-Defining enriched multicategories requires an appropriate notion of
-\emph{monad} on the enriching ``category'', so we next extend Judgment
-theory with a monad acting on sorts and judgments.
-
-\begin{figure}
-  \begin{mathpar}
-    \inferrule{C \sort}{TC \sort}
-
-    \inferrule*[right=ret]
-    {\alpha : C \vdash A : D}
-    {\alpha : C \vdash [A] : TD}
-
-  \inferrule*[right=kleisli]
-  {\alpha : C \vdash \vec A : TD \and \beta : D \vdash \vec B : TE}
-  {\alpha : C \vdash \for [\beta] \in \vec A.~\vec B : TE}
+%%   \inferrule*[right=kleisli]
+%%   {\alpha : C \vdash \vec A : TD \and \beta : D \vdash \vec B : TE}
+%%   {\alpha : C \vdash \for [\beta] \in \vec A.~\vec B : TE}
   
-  \inferrule{~}{\for [\beta] \in [A].~\vec A = \vec A[A/\beta]}
+%%   \inferrule{~}{\for [\beta] \in [A].~\vec A = \vec A[A/\beta]}
 
-  \inferrule{~}{\for [\beta] \in \vec A.~[\beta] = \vec A}
+%%   \inferrule{~}{\for [\beta] \in \vec A.~[\beta] = \vec A}
 
-  \inferrule*[right=Monad-Judg]
-  {\alpha' : C' \vdash \vec A : TC\and
-    \beta': D' \vdash \vec B : TD\and
-    \alpha^o : C;\beta: D \pipe R}
-  {\alpha'^o;\beta' \pipe \for [\alpha;\beta] \in \vec A\wr\vec B.~R}
+%%   \inferrule*[right=Monad-Judg]
+%%   {\alpha' : C' \vdash \vec A : TC\and
+%%     \beta': D' \vdash \vec B : TD\and
+%%     \alpha^o : C;\beta: D \pipe R}
+%%   {\alpha'^o;\beta' \pipe \for [\alpha;\beta] \in \vec A\wr\vec B.~R}
 
-  \inferrule
-  {\alpha^o;\beta \pipe \Phi \vdash t : R}
-  {\Phi \vdash [t] : \for[\alpha;\beta] \in [\alpha]\wr[\beta].~R}
+%%   \inferrule
+%%   {\alpha^o;\beta \pipe \Phi \vdash t : R}
+%%   {\Phi \vdash [t] : \for[\alpha;\beta] \in [\alpha]\wr[\beta].~R}
 
-  \inferrule
-  {\Psi \vdash \vec u : \for[\alpha;\beta] \in \vec A\wr \vec B.~R\and
-    \Phi,\psi : R,\Phi' \vdash t : \for[\cdots] \in \cdots.~S
-  }
-  {\Phi,\Psi,\Phi \vdash \for [\phi] \in u.~t : \for[\cdots] \in \cdots.~ S}
-  \end{mathpar}
-  \caption{Monadal Judgment Theory (additions to judgment theory)}
-\end{figure}
+%%   \inferrule
+%%   {\Psi \vdash \vec u : \for[\alpha;\beta] \in \vec A\wr \vec B.~R\and
+%%     \Phi,\psi : R,\Phi' \vdash t : \for[\cdots] \in \cdots.~S
+%%   }
+%%   {\Phi,\Psi,\Phi \vdash \for [\phi] \in u.~t : \for[\cdots] \in \cdots.~ S}
+%%   \end{mathpar}
+%%   \caption{Monadal Judgment Theory (additions to judgment theory)}
+%% \end{figure}
 
-\subsection{Semantics of Judgment Theory}
+%% \subsection{Semantics of Judgment Theory}
 
-We should have soundness and completeness theorems for the
-interpretation of Judgment Theory in virtual equipments (with the
-corresponding UPs of Hom/Tensor/cotensor/products etc).
+%% We should have soundness and completeness theorems for the
+%% interpretation of Judgment Theory in virtual equipments (with the
+%% corresponding UPs of Hom/Tensor/cotensor/products etc).
 
 \end{document}
 
