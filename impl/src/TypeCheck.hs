@@ -7,7 +7,6 @@ import Data.Foldable
 import Data.Traversable
 import Grammar
 
-
 type TC a = Either String a
 
 typeCheckProg :: Program -> TC ()

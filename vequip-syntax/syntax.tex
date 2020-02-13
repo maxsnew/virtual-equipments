@@ -24,12 +24,14 @@
 \newcommand{\rmod}{\text{RMod}}
 \newcommand{\lmod}{\text{LMod}}
 
-\newcommand{\id}{\text{id}}
-\newcommand{\for}{\text{for}\,}
-\newcommand{\when}{\text{when}\,}
-\newcommand{\lett}{\text{let}\,}
-\newcommand{\sort}{\,\text{sort}}
-\newcommand{\ctx}{\,\text{context}}
+\newcommand{\id}{\textrm{id}}
+\newcommand{\for}{\textrm{for}\,}
+\newcommand{\when}{\textrm{when}\,}
+\newcommand{\lett}{\textrm{let}\,}
+\newcommand{\sort}{\,\textrm{sort}}
+\newcommand{\ctx}{\,\textrm{context}}
+\newcommand{\sigctx}{\,\textrm{sig-ctx}}
+\newcommand{\sig}{\,\textrm{sig}}
 \newcommand{\pipe}{\mathrel{|}}
 
 \title{Judgment Theory: A Syntax for Virtual Equipments with applications to Internal and Synthetic Theory}
@@ -1448,6 +1450,102 @@ connectives on objects with the analogous connective on profunctors:
 \[ (\pi_1 \alpha, \pi_2 \alpha) \to_{\cat C \times \cat D} (\pi_1 \beta, \pi_2 \beta) \cong
 ((\pi_1 \alpha) \to_{\cat C} (\pi_1 \beta)) \times ((\pi_2 \alpha) \to_{\cat C} (\pi_2 \beta)) \]
 
+\section{Implementation Concerns}
+
+So far all of the theorems we have presented are \emph{metatheorems},
+constructing some terms in our theory given some other terms we've
+alread constructed. For instance, for any collection of terms that
+defines an internal category, we can define another collection of
+terms that defines the identity functor from that category to
+itself. We would prefer to make this process a formal syntactic
+construction so that we can take advantage of an automatic type
+checker for our syntax. There are two obvious choices for this: first,
+we can formalize the syntax of judgment theory using a proof assistant
+such as Coq or Agda and define these as metatheorems essentially as we
+have done so far. Alternatively, we can define a \emph{domain
+  specific} proof assistant that extends judgment theory with a kind
+of \emph{module system} that enables us to define theorems and
+constructions fully formally. Such a module system could itself be
+defined in a proof assistant and its theorems internalized there. An
+advantage of the syntactic approach is that we should get out more
+than we put in: modules should be automatically \emph{homomorphisms}
+in some sense with respect to models (though I'm not sure yet how).
+This should be closely related to the initiality theorem for the
+syntax.
+
+In programming language terminology, we have defined an
+\emph{expression language} and we now want to define on top of that a
+\emph{definition language} or \emph{module system}.
+%
+First, we define a signature context $\Gamma$. In programming terms,
+we should think of this as the context of top-level definitions.
+%
+And we need to extend our expression language syntax as well to
+include references to the current signature context.
+
+To a first approximation, we can define signature contexts as
+follows. This is likely how we will define signatures in the
+initiality theorem.
+\begin{mathpar}
+  \inferrule*[right=Signature Ctx Formation]
+  {}
+  {\Gamma \sigctx}
+
+  \inferrule*[right=SigCtx Base Sort]
+  {\Gamma \sigctx}
+  {\Gamma , X \sigctx}
+
+  \inferrule*[right=Sort Base]
+  {\Gamma \ni X}
+  {\Gamma \vdash X \sort}
+
+  \inferrule*[right=SigCtx Function Symbol]
+  {\Gamma \sigctx \and
+    \Gamma \vdash \cat C\sort\and
+    \Gamma \vdash \cat D \sort    
+  }
+  {\Gamma , f : \cat C \to \cat D \sigctx}
+
+  \inferrule*[right=Type Function Symbol]
+  {\Gamma \ni f : \cat D \to \cat E
+  \and x : \cat C \vdash A : \cat D}
+  {\Gamma \pipe x:\cat C \vdash f(A) : \cat E}
+
+  \inferrule
+  {\Gamma \sigctx \and \Gamma \vdash \cat C \sort \and \Gamma \vdash \cat D \sort}
+  {\Gamma, R : \cat C \nrightarrow \cat D \sigctx}
+
+  \inferrule
+  {\Gamma \ni R : \cat C \nrightarrow \cat D \and
+    \Gamma \pipe \alpha' :\cat C' \vdash A : \cat C\and
+    \Gamma \pipe \beta' :\cat D' \vdash B : \cat D}
+  {\Gamma\pipe \alpha'^o:\cat C';\beta'^o:\cat D' \pipe R(A,B) }
+
+  \cdots
+\end{mathpar}
+
+But in our implementation we will also include \emph{named modules}
+and \emph{named signatures}, in which case we will have record
+selectors to refer to assumptions, not just names.
+
+Maybe $\Gamma$s include signature and module definitions, but
+$\Delta$s include only ``primitive'' definitions?
+\begin{mathpar}
+  % Signatures should be either parameterized signatures (possibly empty parameter set)
+  % or Signature references (for aliasing purposes)
+  \inferrule
+  {\Gamma, \Delta, \Delta' \sig}
+  {\Gamma , S = \textrm{signature} (\Delta) \{ \Delta' \} \sigctx}
+
+  % modules should either be parameterized modules or module
+  % references.
+  \inferrule
+  {}
+  {\Gamma , M = \textrm{module}(\Delta) \{ \Xi \}}
+
+  % the top level of a program is a module
+\end{mathpar}
+
 %% \subsection{Module System}
 
 %% Currently, the theorems presented in \ref{internal} were all
@@ -1456,63 +1554,6 @@ connectives on objects with the analogous connective on profunctors:
 %% %
 %% This serves as the basis for a \emph{domain specific proof assistant}
 %% for category theory that we plan to use to teach category theory.
-
-
-%% \subsection{Equipment of Internal Categories}
-
-%% Next we show that internal categories provide us with our first
-%% \emph{model} of judgment type theory by interpreting sorts as
-%% categories, functions as functors, spans as profunctors and 2-cells as
-%% natural transformations.
-%% %
-%% Furthermore, this model can be seen as an \emph{implementation} of
-%% Hom-sets, we translate Judgment type theory with hom sets into
-%% categories internal to judgmental type theory \emph{without} hom sets:
-%% the home sets come from the category structure.
-
-%% The interpretation of hom-formation and -introduction is obvious, but
-%% elim is more interesting...
-
-%% \subsection{Monads and Multicategories}
-
-%% Defining enriched multicategories requires an appropriate notion of
-%% \emph{monad} on the enriching ``category'', so we next extend Judgment
-%% theory with a monad acting on sorts and judgments.
-
-%% \begin{figure}
-%%   \begin{mathpar}
-%%     \inferrule{C \sort}{TC \sort}
-
-%%     \inferrule*[right=ret]
-%%     {\alpha : C \vdash A : D}
-%%     {\alpha : C \vdash [A] : TD}
-
-%%   \inferrule*[right=kleisli]
-%%   {\alpha : C \vdash \vec A : TD \and \beta : D \vdash \vec B : TE}
-%%   {\alpha : C \vdash \for [\beta] \in \vec A.~\vec B : TE}
-  
-%%   \inferrule{~}{\for [\beta] \in [A].~\vec A = \vec A[A/\beta]}
-
-%%   \inferrule{~}{\for [\beta] \in \vec A.~[\beta] = \vec A}
-
-%%   \inferrule*[right=Monad-Judg]
-%%   {\alpha' : C' \vdash \vec A : TC\and
-%%     \beta': D' \vdash \vec B : TD\and
-%%     \alpha^o : C;\beta: D \pipe R}
-%%   {\alpha'^o;\beta' \pipe \for [\alpha;\beta] \in \vec A\wr\vec B.~R}
-
-%%   \inferrule
-%%   {\alpha^o;\beta \pipe \Phi \vdash t : R}
-%%   {\Phi \vdash [t] : \for[\alpha;\beta] \in [\alpha]\wr[\beta].~R}
-
-%%   \inferrule
-%%   {\Psi \vdash \vec u : \for[\alpha;\beta] \in \vec A\wr \vec B.~R\and
-%%     \Phi,\psi : R,\Phi' \vdash t : \for[\cdots] \in \cdots.~S
-%%   }
-%%   {\Phi,\Psi,\Phi \vdash \for [\phi] \in u.~t : \for[\cdots] \in \cdots.~ S}
-%%   \end{mathpar}
-%%   \caption{Monadal Judgment Theory (additions to judgment theory)}
-%% \end{figure}
 
 %% \subsection{Semantics of Judgment Theory}
 
