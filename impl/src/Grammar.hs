@@ -60,14 +60,35 @@ isSet (DGExp (ScSet _)) = True
 isSet (DGGen GenSet)    = True
 isSet _                 = False
 
--- First order lambda calculus
+getFunTy :: DeforGen -> Maybe EltTy
+getFunTy (DGExp (ScFun scoped)) = return . eltScopeToTy . _eltscope $ scoped
+getFunTy (DGGen (GenFun ty)) = return $ ty
+getFunTy _ = Nothing
+
+-- | Semantic Signature Values.
+--   going to use HOAS
+--   either a ground signature,
+--   or parameterized by a specific type of
+--   term (which includes modules)
+-- data SigVal
+--   = SVSig [Decl Generator]
+--   | SVPSet (SetVal -> SigVal)
+  -- | FunVal -> SigVal
+  -- | SpanVal -> SigVal
+  -- | TransVal -> SigVal
+  -- 
+  
+
 data SigExp
   = SigBase GroundSigExp
   | SigApp GroundSigExp [AnyExp]
   deriving (Show, Read, Eq)
 
+type SigVal = [Decl Generator]
+
 data GroundSigExp
   = GSigVar String
+  | GSigVal SigVal
   | GSigLam SigLambda
   deriving (Show, Read, Eq)
 
@@ -116,7 +137,7 @@ data GroundModExp
 
 data ModLambda = ModLam
   { _modLamParams :: [Decl Generator]
-  , _modOSig  :: SigExp
+  , _modOSig      :: [Decl Generator]
   , _modBody :: ModuleBody
   }
   deriving (Show, Read, Eq)
@@ -148,7 +169,12 @@ data EltScope
 data EltTy = EltTy { _eltdomty :: SetExp, _eltcodty :: SetExp }
   deriving (Show, Read, Eq)
 
-type ScopedEltExp = (EltScope, EltExp)
+eltScopeToTy :: EltScope -> EltTy
+eltScopeToTy es = EltTy (_eltvarty . _eltinp $ es) (_eltty $ es)
+
+data ScopedEltExp =
+  ScopedEltExp { _eltscope :: EltScope , _eltExp :: EltExp }
+  deriving (Show, Read, Eq)
 
 data SpanExp
   = SpanEApp ModDeref EltExp EltExp

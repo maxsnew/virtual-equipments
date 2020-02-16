@@ -27,12 +27,16 @@ tcTests = "Type Checking Tests" ~: test [ goodTests
                                         ]
 goodTests = "Successful Type Checks" ~: test
   [ typeChecks "" ~? "empty program"
-  , typeChecks "(def-sig S (sig ()))" ~? "simpl signature"
-  , typeChecks "(def-sig S (sig ((set X)) (set Y)))" ~? "more signature"
-  , typeChecks "(def-sig S (sig ((set X)) (fun f X X)))" ~?  "more signature"
-  , typeChecks "(def-sig S (sig ((set X) (fun f X X)) ))" ~? "more signature"
-  , typeChecks "(def-sig S (sig ((set X) (set Y)) (fun f Y X)))" ~? "more signature"
-  , typeChecks "(def-sig S (sig ((set X) (set Y) (fun f X Y)) (span R X X)))" ~? "more signature"
+  , typeChecks "(def-sig S (sig))" ~? "simpl signature"
+  , typeChecks "(def-sig S (psig ((set X)) (set Y)))" ~? "more signature"
+  , typeChecks "(def-sig S (psig ((set X)) (fun f X X)))" ~?  "more signature"
+  , typeChecks "(def-sig S (psig ((set X) (fun f X X)) ))" ~? "more signature"
+  , typeChecks "(def-sig S (psig ((set X) (set Y)) (fun f Y X)))" ~? "more signature"
+  , typeChecks "(def-sig S (psig ((set X) (set Y) (fun f X Y)) (span R X X)))" ~? "more signature"
+  , typeChecks "(def-mod M (mod () (sig)))" ~? "world's smallest module"
+  , typeChecks "(def-mod M (mod ((set X)) (sig (set Y)) (def-set Y X)))" ~? "world's smallest module"
+  , typeChecks "(def-mod ID (mod ((set X)) (def-fun id (x X) X x))" ~? "id fun"
+  , typeChecks "(def-mod SELFCOMP (mod ((set X) (fun f X X)) (def-fun g (x X) X (f x)))" ~? "endo-comp"
   ]
 --   , typeChecks (Program good2) ~? "functor signature"
 --   , typeChecks (Program good3) ~? "transformation signature"
@@ -50,12 +54,14 @@ goodTests = "Successful Type Checks" ~: test
 --   ]
 badTests = "Type Checking Failures" ~: test
   [ not (typeChecks "()") ~? "empty decl"
-  , not (typeChecks "(def-sig S (sig (set X) (set Y)))") ~? "params are parenthesized"
-  , not (typeChecks "(def-sig S (sig ((set X)) (fun f X Y)))") ~? "var out of scope"
-  , not (typeChecks "(def-sig S (sig ((set X) (set Y) (fun f X Y)) (span R X f)))") ~? "more signature"
-  , not (typeChecks "(def-sig S (sig () (fun f X X)))") ~? "more signature"
-  , not (typeChecks "(def-sig S (sig () (fun R X X)))") ~? "more signature"
-  , not (typeChecks "(def-sig S (sig () (set X)))(def-sig T (sig () (fun R X X)))") ~? "locality of scope"
+  , not (typeChecks "(def-sig S (psig (set X) (set Y)))") ~? "params in psigs are parenthesized"
+  , not (typeChecks "(def-sig S (psig ((set X)) (fun f X Y)))") ~? "var out of scope"
+  , not (typeChecks "(def-sig S (psig ((set X) (set Y) (fun f X Y)) (span R X f)))") ~? "more signature"
+  , not (typeChecks "(def-sig S (psig () (fun f X X)))") ~? "more signature"
+  , not (typeChecks "(def-sig S (psig () (fun R X X)))") ~? "more signature"
+  , not (typeChecks "(def-sig S (psig () (set X)))(def-sig T (sig () (fun R X X)))") ~? "locality of scope"
+  , not (typeChecks "(def-mod M (mod ((set X)) (sig ) (def-set Y Y)))") ~? "set out of scope"
+--  , not (typeChecks "(def-mod M (mod ((set X)) (sig ) (def-set Y X)))") ~? "module defines too many things?"
   ]
 --   [ not (typeChecks (Program bad1)) ~? "C should be undefined"
 --   , not (typeChecks (Program bad2)) ~? "Functor given wrong number of arguments"

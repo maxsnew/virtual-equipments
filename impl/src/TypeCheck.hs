@@ -112,28 +112,37 @@ sideeffect k m = do
 
 decl :: TC (Decl ScopedExp)
 decl = list . sideeffect (declare . fmap DGExp) $
-      tcDecl "def-sig" (ScSig <$> sigExp)
-  <|> tcDecl "def-mod" (ScMod <$> modExp)
+      tcDecl "def-sig" (ScSig <$> only sigExp)
+  <|> tcDecl "def-mod" (ScMod <$> only modExp)
+  <|> tcDecl "def-set" (ScSet <$> only setExp)
+  <|> tcDecl "def-fun" (ScFun <$> scopedEltExp)
+  -- (def-fun f (x A) B
+  --   e)
+--  <|> tcDecl "def-fun" ()
+  -- TODO: fun, span, trans, assertion
   where
     tcDecl :: String -> TCS a -> TCS (Decl a)
     tcDecl def p = (tcHd (atomEq def) >> Decl <$> tcHd anyAtom <*> p)
 
--- (sig (param ...) param ...)
+-- (sig () param ...) -- sig value
+-- (sig (param param ...) param ...) -- sig lambda
 -- or S
 -- or (S ...)
 -- or (. C ...)
 
-sigExp :: TCS SigExp
-sigExp = only (sigBase <|> sigApp)
+sigExp :: TC SigExp
+sigExp = sigBase <|> sigApp
   where
-    sigBase = SigBase <$> (GSigVar <$> sigVar <|> GSigLam <$> sigLam)
+    sigBase = SigBase <$> (GSigVar <$> sigVar <|> GSigVal <$> sigVal <|> GSigLam <$> sigLam)
     sigVar  = do
       var <- anyAtom
       ctx <- get
       case fmap isSig $ lookupDecl var ctx of
         Just True -> return var
         _ -> empty
-    sigLam = localize $ list $ tcHd (atomEq "sig") >> SigLam <$> tcHd (list params) <*> params
+    sigLam = localize . list $ tcHd (atomEq "psig") >> SigLam <$> tcHd (list params) <*> params
+    sigVal = localize . list $ tcHd (atomEq "sig") >> params
+
     sigApp :: TC SigExp
     sigApp = empty -- TODO: signature application
 
@@ -141,17 +150,34 @@ sigExp = only (sigBase <|> sigApp)
 -- or C
 -- or (. C ...)
 -- or (M anyExpr ...)
-modExp :: TCS ModExp -- | TODO: module lambda
-modExp = only (modBase <|> modApp)
+modExp :: TC ModExp -- | TODO: module lambda
+modExp = modBase <|> modApp
   where
-    modBase = ModBase <$> (GModVar . MDCurMod <$> modVar)
+    modBase = ModBase <$>
+      ((GModVar . MDCurMod <$> modVar)
+       <|> GModLam <$> modLam)
     modVar = do
       var <- anyAtom
       ctx <- get
       case fmap isMod $ lookupDecl var ctx of
         Just True -> return var
         _ -> empty
+    modLam = localize $ list $
+      tcHd (atomEq "mod") >> do
+      params   <- tcHd (list params)
+      sigDecls <- resolveSignature =<< tcHd sigExp
+      modBod   <- moduleBody
+      guard $ (modBod `fulfilsSig` sigDecls)
+      return $ ModLam params sigDecls modBod 
     modApp = empty
+
+-- | TODO: impl
+resolveSignature :: SigExp -> TCS [Decl Generator]
+resolveSignature s = return []
+
+-- | TODO: impl
+fulfilsSig :: ModuleBody -> [Decl Generator] -> Bool
+fulfilsSig modBod sig = True
   
 setExp :: TC SetExp
 setExp = setVar -- TODO: add mod deref
@@ -163,9 +189,38 @@ setExp = setVar -- TODO: add mod deref
         Just True -> return $ SetVar var
         _ -> throwError $ var ++ " is not a set in scope."
 
+-- (x A) B t
+scopedEltExp :: TCS ScopedEltExp
+scopedEltExp = do
+  scope <- eltScope
+  exp   <- only eltExp
+  checkElt scope exp
+  return $ ScopedEltExp scope exp
+  where
+    eltScope    = EltScope <$> tcHd typedEltVar <*> tcHd setExp
+    typedEltVar = list $ TypedEltVar <$> tcHd anyAtom <*> tcHd setExp
+
+    eltExp = EEVar <$> anyAtom
+             <|> list (EEApp <$> tcHd modDeref <*> tcHd eltExp)
+
+    checkElt :: EltScope -> EltExp -> TCS ()
+    checkElt types (EEVar x) = guard $ (_eltvar . _eltinp $ types) == x
+    checkElt types (EEApp (MDCurMod f) e) = do
+      ctx <- snd <$> get
+      let Just eltty = getFunTy =<< lookupDecl f ctx
+      guard $ _eltcodty eltty == _eltty types
+      checkElt (types { _eltty = _eltdomty eltty }) e
+      
+
+
+modDeref :: TC ModDeref
+modDeref = MDCurMod <$> anyAtom
+           -- <|> selector
+
 params :: TCS [Decl Generator]
 params = several param
 
+-- | Warning: this has the effect of extending the current context
 param :: TC (Decl Generator)
 param = list . sideeffect (declare . fmap DGGen) $
       genName "set" (done $> GenSet)
