@@ -33,7 +33,9 @@ newtype TCS a = TCS { runTCS :: StateT ([ParsedSExp], Ctx) (ExceptT ErrMsg Ident
 newtype TC a = TC { runTC :: ReaderT ParsedSExp (StateT Ctx (ExceptT ErrMsg Identity)) a }
   deriving (Functor,Applicative,Monad,Alternative,MonadError ErrMsg, MonadReader ParsedSExp, MonadState Ctx)
 
-type ErrMsg = String
+type ErrMsg = First String
+
+mkErr = First . Just
 
 ctx :: TCS Ctx
 ctx = snd <$> get
@@ -42,18 +44,25 @@ popDecl :: TCS (SynDecl SemVal)
 popDecl = do
   (p, ctx) <- get
   case ctx of
-    [] -> throwError $ "unbound variable"
+    [] -> throwError . mkErr $ "unbound variable"
     (d:rest) -> do
       put (p, rest)
       return d
 
 typeCheck :: TCS a -> [ParsedSExp] -> Either String a
 typeCheck (TCS m) exps =
-  fmap fst $ runIdentity $ runExceptT $ runStateT m (exps, [])
+  lErrToStr .  fmap fst $ runIdentity $ runExceptT $ runStateT m (exps, [])
+  
 
 typeCheckOne :: TC a -> ParsedSExp -> Either String a
 typeCheckOne (TC m) exp =
-  fmap fst $ runIdentity $ runExceptT $ runStateT (runReaderT m exp) []
+  lErrToStr . fmap fst $ runIdentity $ runExceptT $ runStateT (runReaderT m exp) []
+
+lErrToStr = either (Left . errToStr) Right
+
+errToStr :: ErrMsg -> String
+errToStr (First Nothing) = "internal error: no cases"
+errToStr (First (Just s)) = s
 
 localize :: (MonadState s m) => m a -> m a
 localize m = do
@@ -66,16 +75,19 @@ localize m = do
 tcHd :: TC a -> TCS a
 tcHd p = TCS . StateT $ \(sexps, ctx) ->
   case sexps of
-    [] -> throwError "expected another thing but there was nothing left :("
+    [] -> empty
     (x:xs) -> do
       (a, ctx) <- runStateT (runReaderT (runTC p) $ x) ctx
       return (a, (xs,ctx))
+
+mayHd :: TC a -> TCS (Maybe a)
+mayHd p = Just <$> tcHd p <|> return Nothing
 
 -- ensure there's nothing left
 done :: TCS ()
 done = fst <$> get >>= \case
   [] -> return ()
-  _  -> throwError "there's some junk here"
+  _  -> throwError . mkErr $ "there's some junk here"
   
 
 only :: TC a -> TCS a
@@ -84,7 +96,7 @@ only p = tcHd p <* done
 -- "hanndle" the reader effect using the state effect?
 list :: TCS a -> TC a
 list k = TC . ReaderT $ \sexp -> StateT $ \ctx -> case _sexp sexp of
-  SEAtom a -> throwError $ "expected a list but got" ++ a
+  SEAtom a -> throwError . mkErr $ "expected a list but got" ++ a
   SEList sexps -> do
     (x, (leftover, ctx)) <- runStateT (runTCS k) (sexps, ctx)
     guard $ null leftover
@@ -96,13 +108,13 @@ several tc = ([] <$ done) <|> ((:) <$> tcHd tc <*> several tc)
 -- throwLocErr :: (Monaderror m ErrMsg) => String -> m a
 -- throwLocErr expected = do
 --   p <- fst <$> get
---   throwError $ "Error at " ++ show (_loc p) ++ " expected a " ++ expected  ++  ", but got: " ++ show (_sexp p)
+--   throwError . mkErr $ "Error at " ++ show (_loc p) ++ " expected a " ++ expected  ++  ", but got: " ++ show (_sexp p)
 
 
 anyAtom :: TC String
 anyAtom = _sexp <$> ask >>= \case
   SEAtom x -> return x
-  SEList _ -> throwError "got a list, wanted an atom"
+  SEList _ -> throwError . mkErr $ "got a list, wanted an atom"
 
 atomEq  :: String -> TC ()
 atomEq s = do
@@ -113,7 +125,7 @@ program :: TCS Program
 program = moduleBody
 
 moduleBody :: TCS ModuleBody
-moduleBody = ModuleBody <$> (several decl)
+moduleBody = ModuleBody <$> ((several decl) <|> (throwError . mkErr $ "expected a sequence of declaration"))
 
 declare :: SynDecl SemVal -> TCS ()
 declare d = modify (fmap (d:))
@@ -147,7 +159,7 @@ denoteSet mdref = do
   (Decl _ val) <- resolveRef mdref
   case val of
     (SemSet dbref) -> return dbref
-    _ -> throwError $ "expected a set but got...something else"
+    _ -> throwError . mkErr $ "expected a set but got...something else"
 
 denoteFun :: ScopedEltExp -> TCS (SetNF, SetNF, (EltNF -> EltNF))
 denoteFun (ScopedEltExp (EltScope (TypedEltVar x domTyExp) codTyExp) e) = do
@@ -169,19 +181,33 @@ denoteFunOpen x dom cod (EEApp ref e) = do
           guard $ cod == cod'
           g <- denoteFunOpen x dom dom' e
           return (f . g)
-        _ -> throwError $ "expected a function but got...something else"
+        _ -> throwError . mkErr $ "expected a function but got...something else"
 
 denoteSpan :: ScopedSpanExp -> TCS (SetNF, SetNF, (EltNF -> EltNF -> SpanNF))
-denoteSpan (SpanScope (TypedEltVar x contraSetExp) (TypedEltVar y covarSetExp) , (SpanEApp ref a b)) = do
+denoteSpan (SpanScope (TypedEltVar x contraSetExp) (TypedEltVar y covarSetExp) , e) = do
   contraSetDom <- denoteSet contraSetExp
   covarSetDom <- denoteSet covarSetExp
+  semspan <- denoteSpanOpen x contraSetDom y covarSetDom e
+  return (contraSetDom, covarSetDom, semspan)
+
+denoteSpanOpen :: String -> SetNF -> String -> SetNF -> SpanExp -> TCS (EltNF -> EltNF -> SpanNF)
+denoteSpanOpen x contraSetDom y covarSetDom (SpanEApp ref a b) = do
   (Decl _ val) <- resolveRef ref
   case val of
     (SemSpan contraSetCod covarSetCod spanfun') -> do
       contraFun <- denoteFunOpen x contraSetDom contraSetCod a
       covarFun  <- denoteFunOpen y covarSetDom covarSetCod b
-      return (contraSetDom, covarSetDom, (\contra covar -> spanfun' (contraFun contra) (covarFun covar)))
-    _ -> throwError $ "expected a span constructor but got...something else"
+      return $ \contra covar -> spanfun' (contraFun contra) (covarFun covar)
+    _ -> throwError . mkErr $ "expected a span constructor but got...something else"
+
+denoteSpanStringOpen :: NEList (String, SetNF) -> [SpanExp] -> TCS [EltNF -> EltNF -> SpanNF]
+denoteSpanStringOpen (Done _) [] = return []
+denoteSpanStringOpen (Cons (x, contraset) vars) (e : es) = do
+  span <- denoteSpanOpen x contraset y covarset e
+  (:) span <$> denoteSpanStringOpen vars es
+  where (y, covarset) = neHd vars
+denoteSpanStringOpen (Done _) (e : es) = throwError . mkErr $ "not enough indices for the inputs of a transformation"
+denoteSpanStringOpen (Cons _ _) [] = throwError . mkErr $ "too many indices for the inputs of a transformation"
 
 denoteAndDeclare :: SynDecl ScopedExp -> TCS ()
 denoteAndDeclare declaration = do
@@ -195,10 +221,9 @@ decl = list . sideeffect denoteAndDeclare $
   <|> tcSynDecl "def-set" (ScSet <$> only setExp)
   <|> tcSynDecl "def-fun" (ScFun <$> scopedEltExp)
   <|> tcSynDecl "def-span" (ScSpan <$> scopedSpanExp)
-  -- (def-fun f (x A) B
-  --   e)
---  <|> tcSynDecl "def-fun" ()
-  -- TODO: fun, span, trans, assertion
+
+  -- (def-trans t (a b c d) (Rab Sbc Qcd) Tad bod)
+  -- TODO: trans, assertion
   where
     tcSynDecl :: String -> TCS a -> TCS (SynDecl a)
     tcSynDecl def p = (tcHd (atomEq def) >> Decl <$> tcHd anyAtom <*> p)
@@ -234,7 +259,6 @@ sigExp = return dummy
 modExp :: TC ModExp -- | TODO: module lambda
 modExp = ModBase . GModLam <$> modLam -- <|> modApp parse don't check
   where
-    
     -- modBase = ModBase <$>
     --   ((GModVar . MDCurMod <$> modVar)
     --    <|> GModLam <$> modLam)
@@ -246,21 +270,12 @@ modExp = ModBase . GModLam <$> modLam -- <|> modApp parse don't check
   --       _ -> empty
     modLam = localize $ list $
       tcHd (atomEq "mod") >> do
-      params   <- tcHd (list params)
-      sigSynDecls <- resolveSignature =<< tcHd sigExp
-      modBod   <- moduleBody
-      guard $ (modBod `fulfilsSig` sigSynDecls)
+      params      <- tcHd (list params)
+      sigSynDecls <- mayHd sigExp
+      modBod      <- moduleBody
       return $ ModLam params sigSynDecls modBod 
   --   modApp = empty
 
--- | TODO: impl
-resolveSignature :: SigExp -> TCS [SynDecl Generator]
-resolveSignature s = return []
-
--- | TODO: impl
-fulfilsSig :: ModuleBody -> [SynDecl Generator] -> Bool
-fulfilsSig modBod sig = True
-  
 setExp :: TC SetExp
 setExp = modDeref -- TODO: add mod deref
 
@@ -281,7 +296,9 @@ scopedSpanExp :: TCS ScopedSpanExp
 scopedSpanExp = (,) <$> spanScope <*> only spanExp
   where
     spanScope = SpanScope <$> tcHd typedEltVar <*> tcHd typedEltVar
-    spanExp = list $ SpanEApp <$> tcHd modDeref <*> tcHd eltExp <*> tcHd eltExp
+
+spanExp :: TC SpanExp
+spanExp = list $ SpanEApp <$> tcHd modDeref <*> tcHd eltExp <*> tcHd eltExp
 
 modDeref :: TC ModDeref
 modDeref = MDCurMod <$> anyAtom
@@ -313,6 +330,20 @@ denoteGenerator = \case
     covar     <- denoteSet $ _spancoty     spanty
     spanName <- nextDB
     return $ SemSpan contravar covar (SNFSpanApp (DBCurMod spanName))
+  GenTrans transty -> do
+    -- setIndices :: [(String, SetNF)]
+    rawSetIndices <- traverse (traverse denoteSet . topair) (_eltVars $ transty)
+    case toNE rawSetIndices of
+      Nothing -> throwError . mkErr $ "expected at least one index in a span"
+      Just setIndices -> do
+        domSpans <- denoteSpanStringOpen setIndices (_domSpans transty)
+        let len = length domSpans
+        let ((x, contraty), (y, covarty)) = firstAndLast setIndices
+        codSpan  <- denoteSpanOpen x contraty y covarty (_codSpan transty)
+        name <- nextDB
+        return $ SemTrans (fmap snd setIndices) (map quoteSemSpan domSpans) (quoteSemSpan codSpan) (TNFApp (DBCurMod name) . take len)
+      where topair x = (_eltvar x, _eltvarty x)
+            
     -- first validate the type
 -- case _defn declGen of
 --   GenSet -> do
@@ -332,10 +363,14 @@ param = list . sideeffect (declareGenerator) $
       genName "set" (done $> GenSet)
   <|> genName "fun"  (GenFun  <$> (EltTy  <$> tcHd setExp <*> tcHd setExp <* done))
   <|> genName "span" (GenSpan <$> (SpanTy <$> tcHd setExp <*> tcHd setExp <* done))
+  <|> genName "trans" (GenTrans <$> (TransTy <$> tcHd (list (several typedEltVar)) <*> tcHd (list (several spanExp)) <*> tcHd spanExp))
+  -- (def-trans t (a b c d) (Rab Sbc Qcd) Tad bod)
   where
     genName keyword p = tcHd (atomEq keyword) >> Decl <$> tcHd anyAtom <*> p
   -- | GenSet -- "base type"                        (set X)
   -- | GenFun EltScope -- "function symbol"         (fun f A B)
   -- | GenSpan SpanScope -- "base type constructor" (span R A B)
-  -- | GenTrans TransScope -- "function symbol"     (fun f Phi R)
+  -- | GenTrans TransScope -- "function symbol"     (fun F Delta Phi R)
+  -- Delta = ((a A) ...)
+  -- Phi   = ((x R) ...)
   -- | and an axiom one too...

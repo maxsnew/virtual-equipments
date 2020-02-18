@@ -1,5 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveTraversable #-}
 module Grammar where
 
 import qualified Text.Parsec as Parsec
@@ -48,10 +49,22 @@ data SemVal
   | SemSpan SetNF -- contravariant dependency
             SetNF -- covariant dependency
             (EltNF -> EltNF -> SpanNF) -- Yoneda embedding of the term
--- | SemTrans ??
+  | SemTrans (NEList SetNF) -- set indices
+             [SpanNF] -- span domains
+             SpanNF   -- codomain
+             ([TransNF] -> TransNF)
 -- | SemProof ??
   -- | SemSig -- TODO
   | SemMod -- TODO
+
+quoteSemFun :: (EltNF -> EltNF) -> EltNF
+quoteSemFun f = f ENFId
+
+quoteSemSpan :: (EltNF -> EltNF -> SpanNF) -> SpanNF
+quoteSemSpan r = r ENFId ENFId
+
+quoteSemTrans :: ([TransNF] -> TransNF) -> TransNF
+quoteSemTrans t = t (repeat TNFId)
 
 type SetNF = DBRef
 data EltNF
@@ -62,10 +75,10 @@ data EltNF
 data SpanNF = SNFSpanApp { _spanSymb :: DBRef, _contraElt :: EltNF, _covarElt :: EltNF }
   deriving (Show, Eq)
 
--- A context
--- data NForGen
---   = NGNF  ScopedNF
---   | NGGen Generator
+data TransNF
+  = TNFId
+  | TNFApp DBRef [TransNF]
+  deriving (Show, Eq)
 
 lookupDecl :: (Eq name) => name -> [Decl name a] -> Maybe a
 lookupDecl s xs = lookup s (map declToPair xs)
@@ -140,6 +153,30 @@ data ModDeref
   | MDSelect ModExp [String]
   deriving (Show, Read, Eq)
 
+data NEList a
+  = Done a
+  | Cons a (NEList a)
+  deriving (Show, Read, Eq, Functor, Foldable, Traversable)
+
+toNE :: [a] -> Maybe (NEList a)
+toNE = foldr cons Nothing
+  where cons :: a -> Maybe (NEList a) -> Maybe (NEList a)
+        cons x   Nothing = Just (Done x)
+        cons x (Just xs) = Just (Cons x xs)
+
+neFold :: (a -> b -> b) -> (a -> b) -> NEList a -> b
+neFold cons done (Done x)    = done x
+neFold cons done (Cons x xs) = cons x (neFold cons done xs)
+
+neHd :: NEList a -> a
+neHd (Done x)   = x
+neHd (Cons x _) = x
+
+firstAndLast :: NEList a -> (a, a)
+firstAndLast = neFold cons done
+  where done x = (x,x)
+        cons first (_,last) = (first, last)
+
 -- | equivalent to NEListof Int, but more useful for recursion
 data DBRef
   = DBCurMod { _curMod :: Int }
@@ -171,7 +208,7 @@ data GroundModExp
 
 data ModLambda = ModLam
   { _modLamParams :: [SynDecl Generator]
-  , _modOSig      :: [SynDecl Generator]
+  , _modOSig      :: Maybe SigExp
   , _modBody :: ModuleBody
   }
   deriving (Show, Read, Eq)
@@ -229,7 +266,9 @@ data TransScope = TransScope
 
 type ScopedTransExp = (TransScope, TransExp)
 
-type TransTy = ()
+data TransTy = TransTy { _eltVars :: [TypedEltVar], _domSpans :: [SpanExp], _codSpan :: SpanExp }
+  deriving (Show, Read, Eq)
+
 
 -- | Going to figure out Proofs later
 data ProofExp = Assert

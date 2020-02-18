@@ -26,21 +26,29 @@ tcTests = "Type Checking Tests" ~: test [ goodTests
                                         , badTests
                                         ]
 goodTests = "Successful Type Checks" ~: test
-  [ typeChecks "" ~? "empty program"
-  , typeChecks "(def-mod M (mod () (sig)))" ~? "world's smallest module"
-  , typeChecks "(def-mod S (mod ((set X) (set Y)) (sig)))" ~? "sets in params"
-  , typeChecks "(def-mod M (mod ((set X)) (sig (set Y)) (def-set Y X)))" ~? "definition of a set"
-  , typeChecks "(def-mod S (mod ((set X) (fun f X X)) (sig)))" ~?  "fun in params"
-  , typeChecks "(def-mod S (mod ((set X) (set Y) (fun f Y X)) (sig)))" ~? "more fun in params"
-  , typeChecks "(def-mod ID (mod ((set X)) (sig) ))" ~? "id fun sig"
-  , typeChecks "(def-mod ID (mod ((set X)) (sig) (def-fun id (x X) X x)))" ~? "id fun"
-  , typeChecks "(def-mod SELFCOMP (mod ((set X) (fun f X X)) (sig) (def-fun g (x X) X (f x))))" ~? "endo-comp"
-  , typeChecks "(def-mod MANYSELFCOMP (mod ((set X) (fun f X X)) (sig) (def-fun g (x X) X (f (f (f (f x)))))))" ~? "many endo-comp"
-  , typeChecks "(def-mod COMP (mod ((set X) (set Y) (fun f X Y) (set Z) (fun g Y Z)) (sig) (def-fun h (x X) Z (g (f x))))))" ~? "many endo-comp"
-  , typeChecks "(def-mod S (mod ((set X) (set Y) (span R X Y)) (sig)))" ~? "span in params"
-  , typeChecks "(def-mod S (mod ((set X) (set Y) (span R X X)) (sig)))" ~? "span in params"
-  , typeChecks "(def-mod S (mod ((set X) (set Y) (fun f X Y) (span R X Y)) (sig) (def-span Q (x X) (y Y) (R x y))))" ~? "span eta"
-  , typeChecks "(def-mod S (mod ((set X) (set Y) (fun f X Y) (span R X Y)) (sig) (def-span Q (x X) (x' X) (R x (f x')))))" ~? "span subst"
+  [ assertTC "empty program" ""
+  , assertTC "world's smallest module" "(def-mod M (mod () (sig)))"
+  , assertTC "sets in params" "(def-mod S (mod ((set X) (set Y)) (sig)))"
+  , assertTC "definition of a set" "(def-mod M (mod ((set X)) (sig (set Y)) (def-set Y X)))"
+  , assertTC "fun in params"  "(def-mod S (mod ((set X) (fun f X X)) (sig)))"
+  , assertTC "more fun in params" "(def-mod S (mod ((set X) (set Y) (fun f Y X)) (sig)))"
+  , assertTC "id fun sig" "(def-mod ID (mod ((set X)) (sig) ))"
+  , assertTC "id fun" "(def-mod ID (mod ((set X)) (sig) (def-fun id (x X) X x)))"
+  , assertTC "endo-comp" "(def-mod SELFCOMP (mod ((set X) (fun f X X)) (sig) (def-fun g (x X) X (f x))))"
+  , assertTC "many endo-comp" "(def-mod MANYSELFCOMP (mod ((set X) (fun f X X)) (sig) (def-fun g (x X) X (f (f (f (f x)))))))"
+  , assertTC "many endo-comp" "(def-mod COMP (mod ((set X) (set Y) (fun f X Y) (set Z) (fun g Y Z)) (sig) (def-fun h (x X) Z (g (f x))))))"
+  , assertTC "span in params" "(def-mod S (mod ((set X) (set Y) (span R X Y)) (sig)))"
+  , assertTC "span in params" "(def-mod S (mod ((set X) (set Y) (span R X X)) (sig)))"
+  , assertTC "span eta" "(def-mod S (mod ((set X) (set Y) (fun f X Y) (span R X Y)) (def-span Q (x X) (y Y) (R x y))))"
+  , assertTC "span subst" "(def-mod S (mod ((set X) (set Y) (fun f X Y) (span R X Y)) (def-span Q (x X) (x' X) (R x (f x')))))"
+  , assertTC "cat id param"
+    "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans id ((X Ob)) () (Mor X X))) (sig)))"
+  , assertTC "cat compose params"
+    "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans comp ((X Ob) (Y Ob) (Z Ob)) ((Mor X Y) (Mor Y Z)) (Mor X Z))) (sig)))"
+  , assertTC "cat data params"
+    "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans id ((X Ob)) () (Mor X X)) (trans comp ((X Ob) (Y Ob) (Z Ob)) ((Mor X Y) (Mor Y Z)) (Mor X Z)))))"
+  , assertTC "RUP"
+    "(def-mod S (mod ((set A) (span HomA A A) (set B) (fun G B A) (span M A B) (trans counit ((b B)) () (M (G b) b)) (trans intro ((a A) (b B)) ((M a b)) (HomA a (G b))))))"
   ]
 --   , typeChecks (Program good2) ~? "functor signature"
 --   , typeChecks (Program good3) ~? "transformation signature"
@@ -67,6 +75,8 @@ badTests = "Type Checking Failures" ~: test
   , not (typeChecks "(def-mod M (mod ((set X) (set Y) (fun f X Y) (fun g X Y)) (sig) (def-fun h (x X) Y (g (f x)))))") ~? "type error in fun comp"
   , not (typeChecks "(def-mod ID (mod ((set X) (fun g X X)) (sig) (def-fun id (x g) g x)))") ~? "fun used as a set"
   , not (typeChecks "(def-mod ID (mod ((set X)) (sig) (def-fun id (x X) X (X x))))") ~? "set used as a fun"
+  , not (typeChecks "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans comp ((X Ob) (Y Ob)) () (Mor X X))) (sig)))") ~? "cat id too many indices"
+  , not (typeChecks "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans comp ((X Ob)) ((Mor X X)) (Mor X X))) (sig)))") ~? "cat not enough indices"
   -- , not (typeChecks "(def-mod S (() (set X)))(def-sig T (sig () (fun R X X)))") ~? "locality of scope"
 --  , not (typeChecks "(def-mod M (mod ((set X)) (sig ) (def-set Y X)))") ~? "module defines too many things?"
   ]
@@ -83,9 +93,16 @@ badTests = "Type Checking Failures" ~: test
 --   , not (typeChecks badTypeFun) ~? "ill typed element expr"
 --   ]
 
+assertTC errmsg syn =
+  assertEqual errmsg
+  (Right ())
+  (() <$ (typeCheck TypeCheck.program =<< (mapLeft show (parse Parse.program "test" syn))))
+
 typeChecks s = isRight $
   (mapLeft show (parse Parse.program "test" s)) >>=
   typeCheck TypeCheck.program
+
+-- notTypeChecks s = 
 
 mapLeft f = either (Left . f)  Right
 
