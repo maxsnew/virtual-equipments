@@ -7,19 +7,20 @@ import qualified Text.Parsec as Parsec
 -- | Raw S-expressions, the output of the parser.
 data ParsedSExp = ParsedSExp { _loc :: Parsec.SourcePos, _sexp :: SExp }
   deriving (Show)
+
 data SExp
   = SEAtom String
   | SEList [ParsedSExp]
   deriving (Show)
 
--- | A Program is just a module
+-- | A Program is just a module body
 type Program = ModuleBody
 
--- | A Module is a sequence of statements
-newtype ModuleBody = ModuleBody { _defs :: [Decl ScopedExp] }
+-- | A Module is a sequence of definitions
+newtype ModuleBody = ModuleBody { _defs :: [SynDecl ScopedExp] }
   deriving (Show, Read, Eq)
 
--- | A statement is a definition of a signature, module or term or an
+-- | A definition is a definition of a signature, module or term or an
 -- assertion of an equality (between transformations?)
 data ScopedExp
   = ScSig SigExp
@@ -31,39 +32,65 @@ data ScopedExp
   | ScAssert ScopedProofExp
   deriving (Show, Read, Eq)
 
-data Decl a = Decl { _name :: String , _defn :: a }
+data Decl name a = Decl { _name :: name , _defn :: a }
   deriving (Show, Read, Eq, Functor)
 
+type SynDecl = Decl String
 
-type Ctx = [Decl DeforGen]
-data DeforGen
-  = DGExp ScopedExp
-  | DGGen Generator
+type Ctx = [SynDecl SemVal]
 
-lookupDecl :: String -> [Decl DeforGen] -> Maybe DeforGen
+-- | 
+data SemVal
+  = SemSet SetNF
+  | SemFun SetNF -- domain set
+           SetNF -- codomain set
+           (EltNF -> EltNF) -- Yoneda-embedding of the term
+  | SemSpan SetNF -- contravariant dependency
+            SetNF -- covariant dependency
+            (EltNF -> EltNF -> SpanNF) -- Yoneda embedding of the term
+-- | SemTrans ??
+-- | SemProof ??
+  -- | SemSig -- TODO
+  | SemMod -- TODO
+
+type SetNF = DBRef
+data EltNF
+  = ENFId
+  | ENFFunApp DBRef EltNF
+  deriving (Show, Eq)
+
+data SpanNF = SNFSpanApp { _spanSymb :: DBRef, _contraElt :: EltNF, _covarElt :: EltNF }
+  deriving (Show, Eq)
+
+-- A context
+-- data NForGen
+--   = NGNF  ScopedNF
+--   | NGGen Generator
+
+lookupDecl :: (Eq name) => name -> [Decl name a] -> Maybe a
 lookupDecl s xs = lookup s (map declToPair xs)
   where
-    declToPair :: Decl a -> (String, a)
+    declToPair :: Decl name a -> (name, a)
     declToPair d = (_name d, _defn d)
 
-isSig :: DeforGen -> Bool
-isSig (DGExp (ScSig _)) = True
-isSig _                 = False
+-- isSig :: NForGen -> Bool
+-- isSig (DGExp (ScSig _)) = True
+-- isSig _                 = False
 
-isMod :: DeforGen -> Bool
-isMod (DGExp (ScMod _)) = True
-isMod (DGGen (GenMod _))    = True
-isMod _                 = False
+-- isMod :: NForGen -> Bool
+-- isMod (DGExp (ScMod _)) = True
+-- isMod (DGGen (GenMod _))    = True
+-- isMod _                 = False
 
-isSet :: DeforGen -> Bool
-isSet (DGExp (ScSet _)) = True
-isSet (DGGen GenSet)    = True
-isSet _                 = False
+-- isSet :: NForGen -> Bool
+-- isSet (DGExp (ScSet _)) = True
+-- isSet (DGGen GenSet)    = True
+-- isSet _                 = False
 
-getFunTy :: DeforGen -> Maybe EltTy
-getFunTy (DGExp (ScFun scoped)) = return . eltScopeToTy . _eltscope $ scoped
-getFunTy (DGGen (GenFun ty)) = return $ ty
-getFunTy _ = Nothing
+-- getFunTy :: NForGen -> Maybe EltTy
+-- getFunTy (DGExp (ScFun scoped)) = return . eltScopeToTy . _eltscope $ scoped
+-- getFunTy (DGGen (GenFun ty)) = return $ ty
+-- getFunTy _ = Nothing
 
 -- | Semantic Signature Values.
 --   going to use HOAS
@@ -84,7 +111,8 @@ data SigExp
   | SigApp GroundSigExp [AnyExp]
   deriving (Show, Read, Eq)
 
-type SigVal = [Decl Generator]
+-- This seems wrong
+type SigVal = [SynDecl Generator]
 
 data GroundSigExp
   = GSigVar String
@@ -93,8 +121,8 @@ data GroundSigExp
   deriving (Show, Read, Eq)
 
 data SigLambda = SigLam
-  { _sigLamArgs :: [Decl Generator]
-  , _sigBody :: [Decl Generator]
+  { _sigLamArgs :: [SynDecl Generator]
+  , _sigBody :: [SynDecl Generator]
   }
   deriving (Show, Read, Eq)
 
@@ -111,6 +139,12 @@ data ModDeref
   = MDCurMod String
   | MDSelect ModExp [String]
   deriving (Show, Read, Eq)
+
+-- | equivalent to NEListof Int, but more useful for recursion
+data DBRef
+  = DBCurMod { _curMod :: Int }
+  | DBSubMod { _curMod :: Int , _subMod :: DBRef }
+  deriving (Show, Eq)
 
 data AnyExp
   = ERef ModDeref -- after type checking this shouldn't be possible,
@@ -136,8 +170,8 @@ data GroundModExp
   deriving (Show, Read, Eq)
 
 data ModLambda = ModLam
-  { _modLamParams :: [Decl Generator]
-  , _modOSig      :: [Decl Generator]
+  { _modLamParams :: [SynDecl Generator]
+  , _modOSig      :: [SynDecl Generator]
   , _modBody :: ModuleBody
   }
   deriving (Show, Read, Eq)
@@ -148,10 +182,7 @@ data ModLambda = ModLam
 -- with them we define the "scoped" version of each, which is the
 -- version used in a definition
 
-data SetExp
-  = SetVar String
-  | SetDeref ModDeref
-  deriving (Show, Read, Eq)
+type SetExp = ModDeref
 
 data EltExp
   = EEVar String

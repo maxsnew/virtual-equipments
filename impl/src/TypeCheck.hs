@@ -20,18 +20,32 @@ import Grammar
 -- 2. We accumulate bindings in the Ctx
 -- 3. We consume the s-expression as we go
 
--- we're either parsing a sequence, or inspecting a single sexp
--- either err (s -> (s,a))
--- s -> (s, either err a)
--- s -> either err (s, a)
+-- The basic process is that we take in an S-expression, produce an
+-- AST for the purposes of parsing but in the context we produce
+-- semantic values for the purposes of simple equality checking
 
+-- There are two monads involved
+-- One for parsing a sequence of S-expressions
 newtype TCS a = TCS { runTCS :: StateT ([ParsedSExp], Ctx) (ExceptT ErrMsg Identity) a }
   deriving (Functor,Applicative,Monad,Alternative,MonadError ErrMsg, MonadState ([ParsedSExp], Ctx))
 
+-- And one for parsing a single S-expression
 newtype TC a = TC { runTC :: ReaderT ParsedSExp (StateT Ctx (ExceptT ErrMsg Identity)) a }
   deriving (Functor,Applicative,Monad,Alternative,MonadError ErrMsg, MonadReader ParsedSExp, MonadState Ctx)
 
 type ErrMsg = String
+
+ctx :: TCS Ctx
+ctx = snd <$> get
+
+popDecl :: TCS (SynDecl SemVal)
+popDecl = do
+  (p, ctx) <- get
+  case ctx of
+    [] -> throwError $ "unbound variable"
+    (d:rest) -> do
+      put (p, rest)
+      return d
 
 typeCheck :: TCS a -> [ParsedSExp] -> Either String a
 typeCheck (TCS m) exps =
@@ -41,7 +55,7 @@ typeCheckOne :: TC a -> ParsedSExp -> Either String a
 typeCheckOne (TC m) exp =
   fmap fst $ runIdentity $ runExceptT $ runStateT (runReaderT m exp) []
 
-localize :: TC a -> TC a
+localize :: (MonadState s m) => m a -> m a
 localize m = do
   s <- get
   x <- m
@@ -101,7 +115,7 @@ program = moduleBody
 moduleBody :: TCS ModuleBody
 moduleBody = ModuleBody <$> (several decl)
 
-declare :: Decl DeforGen -> TCS ()
+declare :: SynDecl SemVal -> TCS ()
 declare d = modify (fmap (d:))
 
 sideeffect :: Monad m => (a -> m ()) -> m a -> m a
@@ -110,19 +124,64 @@ sideeffect k m = do
   k x
   return x
 
-decl :: TC (Decl ScopedExp)
-decl = list . sideeffect (declare . fmap DGExp) $
-      tcDecl "def-sig" (ScSig <$> only sigExp)
-  <|> tcDecl "def-mod" (ScMod <$> only modExp)
-  <|> tcDecl "def-set" (ScSet <$> only setExp)
-  <|> tcDecl "def-fun" (ScFun <$> scopedEltExp)
+resolveRef :: ModDeref -> TCS (Decl DBRef SemVal)
+resolveRef (MDSelect _ _) = error "NYI: submodules"
+resolveRef (MDCurMod s) = localize (resolveCurMod s =<< curDB)
+  where
+    resolveCurMod :: String -> Int -> TCS (Decl DBRef SemVal)
+    resolveCurMod s db = do
+      decl <- popDecl
+      if _name decl == s
+        then return $ decl { _name = DBCurMod db }
+        else resolveCurMod s (subtract 1 db)
+
+denote :: ScopedExp -> TCS SemVal
+denote = \case 
+  (ScMod _) -> return SemMod
+  (ScSet e) -> SemSet <$> denoteSet e
+  (ScFun e) -> (\(dom,cod,f) -> SemFun dom cod f) <$> denoteFun e
+
+denoteSet :: SetExp -> TCS SetNF
+denoteSet mdref = do
+  (Decl _ (SemSet dbref)) <- resolveRef mdref
+  return dbref
+
+denoteFun :: ScopedEltExp -> TCS (SetNF, SetNF, (EltNF -> EltNF))
+denoteFun (ScopedEltExp (EltScope (TypedEltVar x domTyExp) codTyExp) e) = do
+  dom <- denoteSet domTyExp
+  cod <- denoteSet codTyExp
+  f <- loop x dom cod e
+  return (dom,cod,f)
+  where
+    loop :: String -> SetNF -> SetNF -> EltExp -> TCS (EltNF -> EltNF)
+    loop x dom cod (EEVar y) = do
+      guard $ x == y
+      guard $ dom == cod
+      return (\nf -> nf)
+    loop x dom cod (EEApp ref e) = do
+      (Decl _ (SemFun dom' cod' f)) <- resolveRef ref
+      guard $ cod == cod'
+      g <- loop x dom dom' e
+      return (f . g)
+
+denoteAndDeclare :: SynDecl ScopedExp -> TCS ()
+denoteAndDeclare declaration = do
+  v <- denote $ _defn declaration
+  declare (declaration { _defn = v })
+
+decl :: TC (SynDecl ScopedExp)
+decl = list . sideeffect denoteAndDeclare $
+      -- tcSynDecl "def-sig" (ScSig <$> only sigExp)
+  tcSynDecl "def-mod" (ScMod <$> only modExp)
+  <|> tcSynDecl "def-set" (ScSet <$> only setExp)
+  <|> tcSynDecl "def-fun" (ScFun <$> scopedEltExp)
   -- (def-fun f (x A) B
   --   e)
---  <|> tcDecl "def-fun" ()
+--  <|> tcSynDecl "def-fun" ()
   -- TODO: fun, span, trans, assertion
   where
-    tcDecl :: String -> TCS a -> TCS (Decl a)
-    tcDecl def p = (tcHd (atomEq def) >> Decl <$> tcHd anyAtom <*> p)
+    tcSynDecl :: String -> TCS a -> TCS (SynDecl a)
+    tcSynDecl def p = (tcHd (atomEq def) >> Decl <$> tcHd anyAtom <*> p)
 
 -- (sig () param ...) -- sig value
 -- (sig (param param ...) param ...) -- sig lambda
@@ -131,71 +190,63 @@ decl = list . sideeffect (declare . fmap DGExp) $
 -- or (. C ...)
 
 sigExp :: TC SigExp
-sigExp = sigBase <|> sigApp
-  where
-    sigBase = SigBase <$> (GSigVar <$> sigVar <|> GSigVal <$> sigVal <|> GSigLam <$> sigLam)
-    sigVar  = do
-      var <- anyAtom
-      ctx <- get
-      case fmap isSig $ lookupDecl var ctx of
-        Just True -> return var
-        _ -> empty
-    sigLam = localize . list $ tcHd (atomEq "psig") >> SigLam <$> tcHd (list params) <*> params
-    sigVal = localize . list $ tcHd (atomEq "sig") >> params
+sigExp = return dummy
+  where dummy = SigBase . GSigVar $ "NYI"
+  -- parse, don't check sigBase <|> sigApp
+  -- where
+  --   sigBase = SigBase <$> (GSigVar <$> sigVar <|> GSigVal <$> sigVal <|> GSigLam <$> sigLam)
+  --   sigVar  = do
+  --     var <- anyAtom
+  --     ctx <- get
+  --     case fmap isSig $ lookupSynDecl var ctx of
+  --       Just True -> return var
+  --       _ -> empty
+  --   sigLam = localize . list $ tcHd (atomEq "psig") >> SigLam <$> tcHd (list params) <*> params
+  --   sigVal = localize . list $ tcHd (atomEq "sig") >> params
 
-    sigApp :: TC SigExp
-    sigApp = empty -- TODO: signature application
+  --   sigApp :: TC SigExp
+  --   sigApp = empty -- TODO: signature application
 
 -- (mod (param ...) sig param ...)
 -- or C
 -- or (. C ...)
 -- or (M anyExpr ...)
 modExp :: TC ModExp -- | TODO: module lambda
-modExp = modBase <|> modApp
+modExp = ModBase . GModLam <$> modLam -- <|> modApp parse don't check
   where
-    modBase = ModBase <$>
-      ((GModVar . MDCurMod <$> modVar)
-       <|> GModLam <$> modLam)
-    modVar = do
-      var <- anyAtom
-      ctx <- get
-      case fmap isMod $ lookupDecl var ctx of
-        Just True -> return var
-        _ -> empty
+    
+    -- modBase = ModBase <$>
+    --   ((GModVar . MDCurMod <$> modVar)
+    --    <|> GModLam <$> modLam)
+  --   modVar = do
+  --     var <- anyAtom
+  --     ctx <- get
+  --     case fmap isMod $ lookupSynDecl var ctx of
+  --       Just True -> return var
+  --       _ -> empty
     modLam = localize $ list $
       tcHd (atomEq "mod") >> do
       params   <- tcHd (list params)
-      sigDecls <- resolveSignature =<< tcHd sigExp
+      sigSynDecls <- resolveSignature =<< tcHd sigExp
       modBod   <- moduleBody
-      guard $ (modBod `fulfilsSig` sigDecls)
-      return $ ModLam params sigDecls modBod 
-    modApp = empty
+      guard $ (modBod `fulfilsSig` sigSynDecls)
+      return $ ModLam params sigSynDecls modBod 
+  --   modApp = empty
 
 -- | TODO: impl
-resolveSignature :: SigExp -> TCS [Decl Generator]
+resolveSignature :: SigExp -> TCS [SynDecl Generator]
 resolveSignature s = return []
 
 -- | TODO: impl
-fulfilsSig :: ModuleBody -> [Decl Generator] -> Bool
+fulfilsSig :: ModuleBody -> [SynDecl Generator] -> Bool
 fulfilsSig modBod sig = True
   
 setExp :: TC SetExp
-setExp = setVar -- TODO: add mod deref
-  where
-    setVar = do
-      var <- anyAtom
-      ctx <- get
-      case fmap isSet $ lookupDecl var ctx of
-        Just True -> return $ SetVar var
-        _ -> throwError $ var ++ " is not a set in scope."
+setExp = modDeref -- TODO: add mod deref
 
 -- (x A) B t
 scopedEltExp :: TCS ScopedEltExp
-scopedEltExp = do
-  scope <- eltScope
-  exp   <- only eltExp
-  checkElt scope exp
-  return $ ScopedEltExp scope exp
+scopedEltExp = ScopedEltExp <$> eltScope <*> only eltExp
   where
     eltScope    = EltScope <$> tcHd typedEltVar <*> tcHd setExp
     typedEltVar = list $ TypedEltVar <$> tcHd anyAtom <*> tcHd setExp
@@ -203,26 +254,57 @@ scopedEltExp = do
     eltExp = EEVar <$> anyAtom
              <|> list (EEApp <$> tcHd modDeref <*> tcHd eltExp)
 
-    checkElt :: EltScope -> EltExp -> TCS ()
-    checkElt types (EEVar x) = guard $ (_eltvar . _eltinp $ types) == x
-    checkElt types (EEApp (MDCurMod f) e) = do
-      ctx <- snd <$> get
-      let Just eltty = getFunTy =<< lookupDecl f ctx
-      guard $ _eltcodty eltty == _eltty types
-      checkElt (types { _eltty = _eltdomty eltty }) e
+  --   checkElt :: EltScope -> EltExp -> TCS ()
+  --   checkElt types (EEVar x) = guard $ (_eltvar . _eltinp $ types) == x
+  --   checkElt types (EEApp (MDCurMod f) e) = do
+  --     ctx <- snd <$> get
+  --     let Just eltty = getFunTy =<< lookupSynDecl f ctx
+  --     guard $ _eltcodty eltty == _eltty types
+  --     checkElt (types { _eltty = _eltdomty eltty }) e
       
 
 
 modDeref :: TC ModDeref
 modDeref = MDCurMod <$> anyAtom
-           -- <|> selector
+           -- <|> selector -- TODO: implement selectors
 
-params :: TCS [Decl Generator]
+params :: TCS [SynDecl Generator]
 params = several param
 
+-- | check the generator for validity and then add the declaration to
+-- the context
+
+-- | TODO: improve the repr so this isn't linear
+nextDB :: TCS Int
+nextDB = length <$> ctx
+
+curDB :: TCS Int
+curDB = subtract 1 . length <$> ctx
+
+denoteGenerator :: Generator -> TCS SemVal
+denoteGenerator = \case
+  GenSet -> SemSet . DBCurMod <$> nextDB
+  GenFun eltty -> do
+    dom <- denoteSet $ _eltdomty eltty
+    cod <- denoteSet $ _eltcodty eltty
+    funName <- nextDB
+    return $ SemFun dom cod (ENFFunApp (DBCurMod funName))
+    -- first validate the type
+-- case _defn declGen of
+--   GenSet -> do
+--     ix <- nextDB
+--     return (declGen { _defn = _ })
+--   _      -> _
+
+declareGenerator :: SynDecl Generator -> TCS ()
+declareGenerator declGen = do
+  v <- denoteGenerator (_defn declGen)
+  declare (declGen { _defn = v })
+    
+    
 -- | Warning: this has the effect of extending the current context
-param :: TC (Decl Generator)
-param = list . sideeffect (declare . fmap DGGen) $
+param :: TC (SynDecl Generator)
+param = list . sideeffect (declareGenerator) $
       genName "set" (done $> GenSet)
   <|> genName "fun"  (GenFun  <$> (EltTy  <$> tcHd setExp <*> tcHd setExp <* done))
   <|> genName "span" (GenSpan <$> (SpanTy <$> tcHd setExp <*> tcHd setExp <* done))
