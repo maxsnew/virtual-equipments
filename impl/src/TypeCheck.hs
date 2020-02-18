@@ -140,29 +140,48 @@ denote = \case
   (ScMod _) -> return SemMod
   (ScSet e) -> SemSet <$> denoteSet e
   (ScFun e) -> (\(dom,cod,f) -> SemFun dom cod f) <$> denoteFun e
+  (ScSpan e) -> (\(contra,co,spanF) -> SemSpan contra co spanF) <$> denoteSpan e
 
 denoteSet :: SetExp -> TCS SetNF
 denoteSet mdref = do
-  (Decl _ (SemSet dbref)) <- resolveRef mdref
-  return dbref
+  (Decl _ val) <- resolveRef mdref
+  case val of
+    (SemSet dbref) -> return dbref
+    _ -> throwError $ "expected a set but got...something else"
 
 denoteFun :: ScopedEltExp -> TCS (SetNF, SetNF, (EltNF -> EltNF))
 denoteFun (ScopedEltExp (EltScope (TypedEltVar x domTyExp) codTyExp) e) = do
   dom <- denoteSet domTyExp
   cod <- denoteSet codTyExp
-  f <- loop x dom cod e
+  f <- denoteFunOpen x dom cod e
   return (dom,cod,f)
   where
-    loop :: String -> SetNF -> SetNF -> EltExp -> TCS (EltNF -> EltNF)
-    loop x dom cod (EEVar y) = do
+
+denoteFunOpen :: String -> SetNF -> SetNF -> EltExp -> TCS (EltNF -> EltNF)
+denoteFunOpen x dom cod (EEVar y) = do
       guard $ x == y
       guard $ dom == cod
       return (\nf -> nf)
-    loop x dom cod (EEApp ref e) = do
-      (Decl _ (SemFun dom' cod' f)) <- resolveRef ref
-      guard $ cod == cod'
-      g <- loop x dom dom' e
-      return (f . g)
+denoteFunOpen x dom cod (EEApp ref e) = do
+      (Decl _ val) <- resolveRef ref
+      case val of
+        (SemFun dom' cod' f) -> do
+          guard $ cod == cod'
+          g <- denoteFunOpen x dom dom' e
+          return (f . g)
+        _ -> throwError $ "expected a function but got...something else"
+
+denoteSpan :: ScopedSpanExp -> TCS (SetNF, SetNF, (EltNF -> EltNF -> SpanNF))
+denoteSpan (SpanScope (TypedEltVar x contraSetExp) (TypedEltVar y covarSetExp) , (SpanEApp ref a b)) = do
+  contraSetDom <- denoteSet contraSetExp
+  covarSetDom <- denoteSet covarSetExp
+  (Decl _ val) <- resolveRef ref
+  case val of
+    (SemSpan contraSetCod covarSetCod spanfun') -> do
+      contraFun <- denoteFunOpen x contraSetDom contraSetCod a
+      covarFun  <- denoteFunOpen y covarSetDom covarSetCod b
+      return (contraSetDom, covarSetDom, (\contra covar -> spanfun' (contraFun contra) (covarFun covar)))
+    _ -> throwError $ "expected a span constructor but got...something else"
 
 denoteAndDeclare :: SynDecl ScopedExp -> TCS ()
 denoteAndDeclare declaration = do
@@ -175,6 +194,7 @@ decl = list . sideeffect denoteAndDeclare $
   tcSynDecl "def-mod" (ScMod <$> only modExp)
   <|> tcSynDecl "def-set" (ScSet <$> only setExp)
   <|> tcSynDecl "def-fun" (ScFun <$> scopedEltExp)
+  <|> tcSynDecl "def-span" (ScSpan <$> scopedSpanExp)
   -- (def-fun f (x A) B
   --   e)
 --  <|> tcSynDecl "def-fun" ()
@@ -249,20 +269,19 @@ scopedEltExp :: TCS ScopedEltExp
 scopedEltExp = ScopedEltExp <$> eltScope <*> only eltExp
   where
     eltScope    = EltScope <$> tcHd typedEltVar <*> tcHd setExp
-    typedEltVar = list $ TypedEltVar <$> tcHd anyAtom <*> tcHd setExp
 
-    eltExp = EEVar <$> anyAtom
-             <|> list (EEApp <$> tcHd modDeref <*> tcHd eltExp)
+eltExp :: TC EltExp
+eltExp = EEVar <$> anyAtom
+         <|> list (EEApp <$> tcHd modDeref <*> tcHd eltExp)
 
-  --   checkElt :: EltScope -> EltExp -> TCS ()
-  --   checkElt types (EEVar x) = guard $ (_eltvar . _eltinp $ types) == x
-  --   checkElt types (EEApp (MDCurMod f) e) = do
-  --     ctx <- snd <$> get
-  --     let Just eltty = getFunTy =<< lookupSynDecl f ctx
-  --     guard $ _eltcodty eltty == _eltty types
-  --     checkElt (types { _eltty = _eltdomty eltty }) e
-      
-
+typedEltVar :: TC TypedEltVar
+typedEltVar = list $ TypedEltVar <$> tcHd anyAtom <*> tcHd setExp
+-- (x A) (y B) t
+scopedSpanExp :: TCS ScopedSpanExp      
+scopedSpanExp = (,) <$> spanScope <*> only spanExp
+  where
+    spanScope = SpanScope <$> tcHd typedEltVar <*> tcHd typedEltVar
+    spanExp = list $ SpanEApp <$> tcHd modDeref <*> tcHd eltExp <*> tcHd eltExp
 
 modDeref :: TC ModDeref
 modDeref = MDCurMod <$> anyAtom
@@ -289,6 +308,11 @@ denoteGenerator = \case
     cod <- denoteSet $ _eltcodty eltty
     funName <- nextDB
     return $ SemFun dom cod (ENFFunApp (DBCurMod funName))
+  GenSpan spanty -> do
+    contravar <- denoteSet $ _spancontraty spanty
+    covar     <- denoteSet $ _spancoty     spanty
+    spanName <- nextDB
+    return $ SemSpan contravar covar (SNFSpanApp (DBCurMod spanName))
     -- first validate the type
 -- case _defn declGen of
 --   GenSet -> do

@@ -37,7 +37,10 @@ goodTests = "Successful Type Checks" ~: test
   , typeChecks "(def-mod SELFCOMP (mod ((set X) (fun f X X)) (sig) (def-fun g (x X) X (f x))))" ~? "endo-comp"
   , typeChecks "(def-mod MANYSELFCOMP (mod ((set X) (fun f X X)) (sig) (def-fun g (x X) X (f (f (f (f x)))))))" ~? "many endo-comp"
   , typeChecks "(def-mod COMP (mod ((set X) (set Y) (fun f X Y) (set Z) (fun g Y Z)) (sig) (def-fun h (x X) Z (g (f x))))))" ~? "many endo-comp"
-  -- , typeChecks "(def-mod S (mod ((set X) (set Y) (fun f X Y) (span R X X))))" ~? "span in params"
+  , typeChecks "(def-mod S (mod ((set X) (set Y) (span R X Y)) (sig)))" ~? "span in params"
+  , typeChecks "(def-mod S (mod ((set X) (set Y) (span R X X)) (sig)))" ~? "span in params"
+  , typeChecks "(def-mod S (mod ((set X) (set Y) (fun f X Y) (span R X Y)) (sig) (def-span Q (x X) (y Y) (R x y))))" ~? "span eta"
+  , typeChecks "(def-mod S (mod ((set X) (set Y) (fun f X Y) (span R X Y)) (sig) (def-span Q (x X) (x' X) (R x (f x')))))" ~? "span subst"
   ]
 --   , typeChecks (Program good2) ~? "functor signature"
 --   , typeChecks (Program good3) ~? "transformation signature"
@@ -62,6 +65,8 @@ badTests = "Type Checking Failures" ~: test
   , not (typeChecks "(def-mod M (mod ((set X)) (sig ) (def-set Y Y)))") ~? "set out of scope"
   , not (typeChecks "(def-mod M (mod ((set X) (set Y)) (sig) (def-fun f (x X) Y x)))") ~? "type error in fun def"
   , not (typeChecks "(def-mod M (mod ((set X) (set Y) (fun f X Y) (fun g X Y)) (sig) (def-fun h (x X) Y (g (f x)))))") ~? "type error in fun comp"
+  , not (typeChecks "(def-mod ID (mod ((set X) (fun g X X)) (sig) (def-fun id (x g) g x)))") ~? "fun used as a set"
+  , not (typeChecks "(def-mod ID (mod ((set X)) (sig) (def-fun id (x X) X (X x))))") ~? "set used as a fun"
   -- , not (typeChecks "(def-mod S (() (set X)))(def-sig T (sig () (fun R X X)))") ~? "locality of scope"
 --  , not (typeChecks "(def-mod M (mod ((set X)) (sig ) (def-set Y X)))") ~? "module defines too many things?"
   ]
