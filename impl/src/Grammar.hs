@@ -258,13 +258,20 @@ data SpanTy
   = SpanTy { _spancontraty :: SetExp, _spancoty :: SetExp }
   deriving (Show, Read, Eq)
 
-data TransExp = TransExp -- TODO
+data TransExp =
+  TransEVar String
+  | TransEApp ModDeref [TransExp]
+  -- TODO: more stuff like hom eliminator etc
   deriving (Show, Read, Eq)
 
-data TransScope = TransScope
+data SpanVar = SpanVar String SpanExp
   deriving (Show, Read, Eq)
 
-type ScopedTransExp = (TransScope, TransExp)
+data TransScope = TransScope [TypedEltVar] [SpanVar] SpanExp
+  deriving (Show, Read, Eq)
+
+data ScopedTransExp = ScopedTransExp TransScope TransExp
+  deriving (Show, Read, Eq)
 
 data TransTy = TransTy { _eltVars :: [TypedEltVar], _domSpans :: [SpanExp], _codSpan :: SpanExp }
   deriving (Show, Read, Eq)

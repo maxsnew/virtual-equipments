@@ -153,6 +153,7 @@ denote = \case
   (ScSet e) -> SemSet <$> denoteSet e
   (ScFun e) -> (\(dom,cod,f) -> SemFun dom cod f) <$> denoteFun e
   (ScSpan e) -> (\(contra,co,spanF) -> SemSpan contra co spanF) <$> denoteSpan e
+  (ScTrans e) -> (\(indices, doms, cod, transF) -> SemTrans indices doms cod transF) <$> denoteTrans e
 
 denoteSet :: SetExp -> TCS SetNF
 denoteSet mdref = do
@@ -209,6 +210,9 @@ denoteSpanStringOpen (Cons (x, contraset) vars) (e : es) = do
 denoteSpanStringOpen (Done _) (e : es) = throwError . mkErr $ "not enough indices for the inputs of a transformation"
 denoteSpanStringOpen (Cons _ _) [] = throwError . mkErr $ "too many indices for the inputs of a transformation"
 
+denoteTrans :: ScopedTransExp -> TCS (NEList SetNF, [SpanNF], SpanNF, [TransNF] -> TransNF)
+denoteTrans = empty -- TODO
+
 denoteAndDeclare :: SynDecl ScopedExp -> TCS ()
 denoteAndDeclare declaration = do
   v <- denote $ _defn declaration
@@ -221,7 +225,7 @@ decl = list . sideeffect denoteAndDeclare $
   <|> tcSynDecl "def-set" (ScSet <$> only setExp)
   <|> tcSynDecl "def-fun" (ScFun <$> scopedEltExp)
   <|> tcSynDecl "def-span" (ScSpan <$> scopedSpanExp)
-
+  <|> tcSynDecl "def-trans" (ScTrans <$> scopedTransExp)
   -- (def-trans t (a b c d) (Rab Sbc Qcd) Tad bod)
   -- TODO: trans, assertion
   where
@@ -291,6 +295,10 @@ eltExp = EEVar <$> anyAtom
 
 typedEltVar :: TC TypedEltVar
 typedEltVar = list $ TypedEltVar <$> tcHd anyAtom <*> tcHd setExp
+
+spanVar :: TC SpanVar
+spanVar = list $ SpanVar <$> tcHd anyAtom <*> tcHd spanExp
+
 -- (x A) (y B) t
 scopedSpanExp :: TCS ScopedSpanExp      
 scopedSpanExp = (,) <$> spanScope <*> only spanExp
@@ -299,6 +307,15 @@ scopedSpanExp = (,) <$> spanScope <*> only spanExp
 
 spanExp :: TC SpanExp
 spanExp = list $ SpanEApp <$> tcHd modDeref <*> tcHd eltExp <*> tcHd eltExp
+
+-- ((a A) ... ((x (R a b)) ...) (S a a') t)
+scopedTransExp :: TCS ScopedTransExp
+scopedTransExp = ScopedTransExp <$> transScope <*> only transExp
+  where transScope :: TCS TransScope
+        transScope = TransScope <$> tcHd (list $ several typedEltVar) <*> tcHd (list $ several spanVar) <*> tcHd spanExp
+
+        transExp :: TC TransExp
+        transExp = TransEVar <$> anyAtom <|> list (TransEApp <$> tcHd modDeref <*> several transExp)
 
 modDeref :: TC ModDeref
 modDeref = MDCurMod <$> anyAtom
