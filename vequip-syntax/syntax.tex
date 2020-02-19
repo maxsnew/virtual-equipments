@@ -258,15 +258,15 @@ is behaved on the identity function.
     \inferrule*[right=Hom-Formation]
     {\beta : \cat D \vdash A : \cat C\and
     \gamma : \cat E \vdash A' : \cat C}
-    {\beta^o : \cat D;\gamma : \cat E \pipe A \to_{\cat C} A'}
+    {A \to_{\cat C} A' \span(\beta^o : \cat D;\gamma : \cat E)}
 
     (A \to A')[B/\alpha;B'/\beta] = (A[B/\alpha] \to A'[B'/\beta])
 
     \inferrule*[right=Hom-Introduction]
     {\alpha : \cat D \vdash A : \cat C}
-    {\alpha^o : \cat D, \alpha : \cat D | \cdot \vdash \id_{A} : A \to_{\cat C} A}
+    {\alpha : \cat D \vdash \id(A) : A \to_{\cat C} A}
 
-    \id_{A}[B/\alpha] = \id_{A[B/\alpha]}
+    \id({A})[B/\alpha] = \id({A[B/\alpha]})
 
     \inferrule*[right=Hom-Left (Sequent Style)]
     {\alpha^o,\beta|\Phi,\phi : R[\delta/\delta_1], \psi : S[\delta/\delta_2],\Psi \vdash Q }
@@ -288,20 +288,31 @@ is behaved on the identity function.
     {\beta_1^o : \cat C;\beta_2:\cat C\pipe \Phi \vdash f \equiv \when f = \id_{\alpha} .~ \id_{\alpha} : \beta_1 \to_{\cat C} \beta_2}
 \end{mathpar}
 
+How did we come up with this?
+%
+Well the identity function at least should really be thought of as a
+function symbol
+\[ id_{\cat C} : \alpha : \Cat C \Rightarrow \alpha \to_{\cat C} \alpha \]
+for each $\cat C$. Then we see that the introduction rule is just this
+rule with a substitution built in (substitutions into an ``empty''
+context are precisely index substitutions).
+%
+For the elim rule I'm still not sure.
+
 Next, we can internalize the $,$ in judgment contexts in one of two
 ways: on the left as a tensor product or on the right as a power.
-
 
 Next, let's define the tensor product of profunctors, also known as
 the \emph{composition} of profunctors.
 \begin{mathpar}
   \inferrule*[right=Tensor formation]
-  {\alpha^o : \cat C; \beta : \cat D \pipe Q \and \beta^o : \cat D; \gamma : \cat E \pipe R}
-  {\alpha^o : \cat C; \gamma : \cat E \pipe \exists \beta.~Q \odot R}
+  {Q \span(\alpha^o : \cat C; \beta : \cat D)
+   \and R \span(\beta^o : \cat D; \gamma : \cat E)}
+  {\exists \beta.~Q \odot R \span(\alpha^o : \cat C; \gamma : \cat E)}
 
   \inferrule*[right=Tensor introduction]
-  {\Phi \vdash M : Q[B/\beta] \and \Psi \vdash N : R[B/\beta]}
-  {\Phi,\Psi\vdash (B,M,N) : \exists \beta. Q \odot R}
+  {\Phi \vdash M : Q[A/\alpha;B/\beta] \and \Psi \vdash N : R[B/\beta;\Gamma/\gamma]}
+  {\Phi,\Psi\vdash (A,M,B,N,\Gamma) : \exists \beta. Q[A/\alpha] \odot R[\Gamma/\gamma]}
 
   \inferrule*[right=Tensor elimination]
   {\Psi \vdash M : \exists \beta. Q \odot R \and \Phi,x:Q,y:R,\Phi' \vdash N : P}
@@ -322,6 +333,14 @@ $\exists$ connective and a product connective $\odot$.
 %
 Introduction, elimination and $\beta\eta$ are similar to a combination
 of existential quantification and the tensor product in linear logic.
+%
+The introduction rule is justified by the fact that semantically what
+we have is a transformation
+\[ \textrm{pair} : (\alpha : \cat C,Q,\beta:\cat D,R,\gamma:\cat E) \Rightarrow \exists \beta. R \odot Q \]
+And the introduction rule is just building in a substitution to this
+transformation.
+%
+For the elim rule I'm not sure what it should be.
 
 Finally, we can define \emph{cotensor} products of profunctors, which
 is the internal-hom to tensor products product. Since we are in an
