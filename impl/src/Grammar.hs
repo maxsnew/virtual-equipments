@@ -3,7 +3,10 @@
 {-# LANGUAGE DeriveTraversable #-}
 module Grammar where
 
+import Data.Bifunctor
 import qualified Text.Parsec as Parsec
+
+import Util
 
 -- | Raw S-expressions, the output of the parser.
 data ParsedSExp = ParsedSExp { _loc :: Parsec.SourcePos, _sexp :: SExp }
@@ -43,19 +46,35 @@ type Ctx = [SynDecl SemVal]
 -- | 
 data SemVal
   = SemSet SetNF
-  | SemFun SetNF -- domain set
-           SetNF -- codomain set
-           (EltNF -> EltNF) -- Yoneda-embedding of the term
-  | SemSpan SetNF -- contravariant dependency
-            SetNF -- covariant dependency
-            (EltNF -> EltNF -> SpanNF) -- Yoneda embedding of the term
-  | SemTrans (NEList SetNF) -- set indices
-             [SpanNF] -- span domains
-             SpanNF   -- codomain
-             ([TransNF] -> TransNF)
+  | SemFun ScopedSemFun
+  | SemSpan ScopedSemSpan
+  | SemTrans ScopedSemTrans
 -- | SemProof ??
   -- | SemSig -- TODO
   | SemMod -- TODO
+
+data ScopedSemFun = ScopedSemFun { _scfunDom :: SetNF, _scfunCod :: SetNF, _scfun :: EltNF -> EltNF }
+data ScopedSemSpan = ScopedSemSpan { _scspContra :: SetNF, _scspCovar :: SetNF, _scspan :: EltNF -> EltNF -> SpanNF }
+
+type NamedSemTransCtx = ConsStar (String, SetNF, String, SpanNF) (String, SetNF)
+type SemTransCtx = ConsStar (SetNF, SpanNF) SetNF
+
+ctxIndices :: SemTransCtx -> NEList SetNF
+ctxIndices = consStartoNE . first fst
+
+ctxSpans :: SemTransCtx -> [SpanNF]
+ctxSpans = allAs . first snd
+
+ctxUnName :: NamedSemTransCtx -> SemTransCtx
+ctxUnName = bimap (\(_,a,_,r) -> (a,r)) snd
+
+boundary :: SemTransCtx -> (SetNF, SetNF)
+boundary = firstAndLast . ctxIndices
+
+data ScopedSemTrans
+  = ScopedSemTrans { _sctransCtx  :: SemTransCtx
+                   , _sctransCod     :: SpanNF   -- codomain
+                   , _sctrans        ::([TransNF] -> TransNF) }
 
 quoteSemFun :: (EltNF -> EltNF) -> EltNF
 quoteSemFun f = f ENFId
@@ -152,30 +171,6 @@ data ModDeref
   = MDCurMod String
   | MDSelect ModExp [String]
   deriving (Show, Read, Eq)
-
-data NEList a
-  = Done a
-  | Cons a (NEList a)
-  deriving (Show, Read, Eq, Functor, Foldable, Traversable)
-
-toNE :: [a] -> Maybe (NEList a)
-toNE = foldr cons Nothing
-  where cons :: a -> Maybe (NEList a) -> Maybe (NEList a)
-        cons x   Nothing = Just (Done x)
-        cons x (Just xs) = Just (Cons x xs)
-
-neFold :: (a -> b -> b) -> (a -> b) -> NEList a -> b
-neFold cons done (Done x)    = done x
-neFold cons done (Cons x xs) = cons x (neFold cons done xs)
-
-neHd :: NEList a -> a
-neHd (Done x)   = x
-neHd (Cons x _) = x
-
-firstAndLast :: NEList a -> (a, a)
-firstAndLast = neFold cons done
-  where done x = (x,x)
-        cons first (_,last) = (first, last)
 
 -- | equivalent to NEListof Int, but more useful for recursion
 data DBRef

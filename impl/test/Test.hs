@@ -49,6 +49,8 @@ goodTests = "Successful Type Checks" ~: test
     "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans id ((X Ob)) () (Mor X X)) (trans comp ((X Ob) (Y Ob) (Z Ob)) ((Mor X Y) (Mor Y Z)) (Mor X Z)))))"
   , assertTC "RUP"
     "(def-mod S (mod ((set A) (span HomA A A) (set B) (fun G B A) (span M A B) (trans counit ((b B)) () (M (G b) b)) (trans intro ((a A) (b B)) ((M a b)) (HomA a (G b))))))"
+  , assertTC "ID-trans"
+  "(def-mod ID-trans (mod ((set A) (span R A A)) (trans id (a A) (x (R a a)) (R a a) x)))"
   ]
 --   , typeChecks (Program good2) ~? "functor signature"
 --   , typeChecks (Program good3) ~? "transformation signature"
