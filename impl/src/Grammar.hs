@@ -76,6 +76,8 @@ data ScopedSemTrans
                    , _sctransCod     :: SpanNF   -- codomain
                    , _sctrans        ::([TransNF] -> TransNF) }
 
+type SemTransSubst = [TransNF] -> [TransNF]
+
 quoteSemFun :: (EltNF -> EltNF) -> EltNF
 quoteSemFun f = f ENFId
 
@@ -262,13 +264,13 @@ data TransExp =
 data SpanVar = SpanVar String SpanExp
   deriving (Show, Read, Eq)
 
-data TransScope = TransScope [TypedEltVar] [SpanVar] SpanExp
+data TransScope = TransScope (NEList TypedEltVar) [SpanVar] SpanExp
   deriving (Show, Read, Eq)
 
 data ScopedTransExp = ScopedTransExp TransScope TransExp
   deriving (Show, Read, Eq)
 
-data TransTy = TransTy { _eltVars :: [TypedEltVar], _domSpans :: [SpanExp], _codSpan :: SpanExp }
+data TransTy = TransTy { _eltVars :: (NEList TypedEltVar), _domSpans :: [SpanExp], _codSpan :: SpanExp }
   deriving (Show, Read, Eq)
 
 

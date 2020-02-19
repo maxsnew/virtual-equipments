@@ -29,7 +29,7 @@ goodTests = "Successful Type Checks" ~: test
   [ assertTC "empty program" ""
   , assertTC "world's smallest module" "(def-mod M (mod () (sig)))"
   , assertTC "sets in params" "(def-mod S (mod ((set X) (set Y)) (sig)))"
-  , assertTC "definition of a set" "(def-mod M (mod ((set X)) (sig (set Y)) (def-set Y X)))"
+  , assertTC "definition of a set" "(def-mod M (mod ((set X)) (def-set Y X)))"
   , assertTC "fun in params"  "(def-mod S (mod ((set X) (fun f X X)) (sig)))"
   , assertTC "more fun in params" "(def-mod S (mod ((set X) (set Y) (fun f Y X)) (sig)))"
   , assertTC "id fun sig" "(def-mod ID (mod ((set X)) (sig) ))"
@@ -49,8 +49,12 @@ goodTests = "Successful Type Checks" ~: test
     "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans id ((X Ob)) () (Mor X X)) (trans comp ((X Ob) (Y Ob) (Z Ob)) ((Mor X Y) (Mor Y Z)) (Mor X Z)))))"
   , assertTC "RUP"
     "(def-mod S (mod ((set A) (span HomA A A) (set B) (fun G B A) (span M A B) (trans counit ((b B)) () (M (G b) b)) (trans intro ((a A) (b B)) ((M a b)) (HomA a (G b))))))"
+  , assertTC "ID-trans-params"
+    "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) ))"
   , assertTC "ID-trans"
-  "(def-mod ID-trans (mod ((set A) (span R A A)) (trans id (a A) (x (R a a)) (R a a) x)))"
+    "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) (def-trans id ((a A) (a' A)) ((x (R a a'))) (R a a') x)))"
+  -- , assertTC "trans eta"
+  --   "(def-mod trans-eta (mod ((set A) (set B) (span R A B) (trans foo () () ()) )))"
   ]
 --   , typeChecks (Program good2) ~? "functor signature"
 --   , typeChecks (Program good3) ~? "transformation signature"
@@ -79,6 +83,14 @@ badTests = "Type Checking Failures" ~: test
   , not (typeChecks "(def-mod ID (mod ((set X)) (sig) (def-fun id (x X) X (X x))))") ~? "set used as a fun"
   , not (typeChecks "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans comp ((X Ob) (Y Ob)) () (Mor X X))) (sig)))") ~? "cat id too many indices"
   , not (typeChecks "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans comp ((X Ob)) ((Mor X X)) (Mor X X))) (sig)))") ~? "cat not enough indices"
+  , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) (def-trans id (a A) ((x (R a a))) (R a a) x)))")
+  ~? "trans indices need to be parenthesized"
+  , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) (def-trans id ((a A)) (x (R a a)) (R a a) x)))")
+  ~? "trans vars need to be parenthesized"
+  , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) (def-trans id ((a A)) ((x (R a a))) (R a a) x)))")
+  ~? "improper duplication of indices"
+  , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) (def-trans id ((a A) (a' A)) ((x (R a a))) (R a a') x)))")
+  ~? "more improper duplication of indices"
   -- , not (typeChecks "(def-mod S (() (set X)))(def-sig T (sig () (fun R X X)))") ~? "locality of scope"
 --  , not (typeChecks "(def-mod M (mod ((set X)) (sig ) (def-set Y X)))") ~? "module defines too many things?"
   ]
