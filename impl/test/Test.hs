@@ -53,8 +53,12 @@ goodTests = "Successful Type Checks" ~: test
     "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) ))"
   , assertTC "ID-trans"
     "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) (def-trans id ((a A) (a' A)) ((x (R a a'))) (R a a') x)))"
-  -- , assertTC "trans eta"
-  --   "(def-mod trans-eta (mod ((set A) (set B) (span R A B) (trans foo () () ()) )))"
+  , assertTC "trans eta empty"
+    "(def-mod trans-eta (mod ((set A) (span R A A) (trans foo ((a A)) () (R a a))) (sig) (def-trans bar ((a A)) () (R a a) (foo))))"
+  , assertTC "trans eta one-arg"
+    "(def-mod trans-eta (mod ((set A) (set B) (span Q A B) (span R A B) (trans foo ((a A) (b B)) ((Q a b)) (R a b))) (sig) (def-trans bar ((a A) (b B)) ((x (Q a b))) (R a b) (foo x))))"
+  , assertTC "trans eta inst"
+    "(def-mod trans-eta (mod ((set A) (set B) (fun F A B) (span R B B) (trans foo ((b B)) () (R b b))) (sig) (def-trans bar ((a A)) () (R (F a) (F a)) (foo))))"
   ]
 --   , typeChecks (Program good2) ~? "functor signature"
 --   , typeChecks (Program good3) ~? "transformation signature"
@@ -91,7 +95,16 @@ badTests = "Type Checking Failures" ~: test
   ~? "improper duplication of indices"
   , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) (def-trans id ((a A) (a' A)) ((x (R a a))) (R a a') x)))")
   ~? "more improper duplication of indices"
-  -- , not (typeChecks "(def-mod S (() (set X)))(def-sig T (sig () (fun R X X)))") ~? "locality of scope"
+  , not (typeChecks  
+    "(def-mod trans-eta (mod ((set A) (set B) (span Q A B) (span R A B) (trans foo ((a A) (b B)) ((Q a b)) (R a b))) (sig) (def-trans bar ((a A) (b B)) ((x (Q a b))) (R a b) (foo))))")
+    ~? "unused var"
+  , not (typeChecks  
+    "(def-mod trans-eta (mod ((set A) (set B) (span Q A B) (span R A B) (trans foo ((a A) (b B)) ((Q a b)) (R a b))) (sig) (def-trans bar ((a A) (b B)) ((x (Q a b))) (R a b) (foo x x))))")
+    ~? "doubly arity mismatch"
+  , not (typeChecks
+    "(def-mod trans-eta (mod ((set A) (set B) (fun F A B) (span R B B) (trans foo ((a A)) () (R (F a) (F a)))) (sig) (def-trans bar ((b B)) () (R b b) (foo))))")
+   ~? "transformations' type is too specific"
+-- , not (typeChecks "(def-mod S (() (set X)))(def-sig T (sig () (fun R X X)))") ~? "locality of scope"
 --  , not (typeChecks "(def-mod M (mod ((set X)) (sig ) (def-set Y X)))") ~? "module defines too many things?"
   ]
 --   [ not (typeChecks (Program bad1)) ~? "C should be undefined"

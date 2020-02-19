@@ -262,20 +262,24 @@ denoteTrans ctx codSpan (TransEApp r subTerms) =
     return $ transF . subst
   _ -> throwError $ "expected a previously defined transformation, but got...something else"
 
-denoteTransSubst :: NamedSemTransCtx -> EltNF -> EltNF -> SemTransCtx -> [TransExp] -> TCS SemTransSubst
-denoteTransSubst domCtx contraFun covarFun codCtx [] = case (domCtx, codCtx) of
-  (ConsA _ _, _) -> throwError $ "unused variables"
-  (DoneB _, ConsA _ _) -> throwError $ "transformation applied to too few arguments"
-  (DoneB _, DoneB _)   -> do guard $ contraFun == covarFun -- TODO: write an error message, when does this happen?
-                             return $ \_ -> []
-denoteTransSubst domCtx contraFun covarFun codCtx (e:es) = case codCtx of
+denoteTransSubst :: NamedSemTransCtx -> EltNF -> EltNF -> SemTransCtx -> [TransExp] -> TCS ([TransNF] -> [TransNF])
+denoteTransSubst domCtx contraFun covarFun codCtx es = do
+  (leftoverCtx, covarFun', composableSubst) <- denoteTransSubstComp domCtx contraFun codCtx es
+  case (leftoverCtx, covarFun == covarFun') of
+    (ConsA _ _, _) -> throwError $ "unused variables"
+    (_, False) -> throwError "some kind of mismatch, can this even happen?" -- TODO: write a better error message, when does this happen?
+    (DoneB _, True) -> return $ evalState composableSubst
+
+denoteTransSubstComp :: NamedSemTransCtx -> EltNF -> SemTransCtx -> [TransExp] -> TCS (NamedSemTransCtx,EltNF, State [TransNF] [TransNF])
+denoteTransSubstComp domCtx contraFun codCtx [] = case codCtx of
+  ConsA _ _ -> throwError $ "transformation applied to too few arguments"
+  DoneB _   -> return (domCtx, contraFun, return [])
+denoteTransSubstComp domCtx contraFun codCtx (e:es) = case codCtx of
   DoneB _ -> throwError $ "transformation applied to too many arguments"
   ConsA (_,cod) codCtx -> do
     (domCtx, contraFun, prefixEater) <- denoteTransSubstCons domCtx contraFun cod e
-    suffixEater <- denoteTransSubst domCtx contraFun covarFun codCtx es
-    return $ \inps ->
-      let (out, leftover) = runState prefixEater inps
-      in out : suffixEater leftover
+    (domCtx, covarFun, suffixEater) <- denoteTransSubstComp domCtx contraFun codCtx es
+    return $ (domCtx, covarFun, (:) <$> prefixEater <*> suffixEater)
 
 -- we are given the input context Phi ctx(a:C,-)
 -- we know a substitution for the left side A : C => C'
@@ -290,7 +294,6 @@ denoteTransSubst domCtx contraFun covarFun codCtx (e:es) = case codCtx of
 -- and we return Phi_r, B and a denotation for t that returns both its
 -- answer and the "leftover" args that it didn't consume
 denoteTransSubstCons :: NamedSemTransCtx -> EltNF -> SpanNF -> TransExp -> TCS (NamedSemTransCtx,EltNF, State [TransNF] TransNF)
-
 -- here we need to solve Phi_t |- x : R[A;B]
 -- clearly we have Phi_t = alpha : C, x : R[A;B], beta : B
 denoteTransSubstCons ctx contraFun codSpan (TransEVar x) = case ctx of
@@ -308,22 +311,35 @@ denoteTransSubstCons ctx contraFun codSpan (TransEVar x) = case ctx of
             (t:ts) <- get
             put ts
             return t
-denoteTransSubstCons ctx contraFun cod (TransEApp ref subterms) = error "NYI"
+
+-- here we are solving
+-- Phi_t |- f(t1,...,tn) : R[A;B]
+
+denoteTransSubstCons ctx contraFun cod (TransEApp ref subterms) = resolveRef ref >>= \case
+-- first we lookup f's type and match it against R[A;B]
+  Decl _ (SemTrans (ScopedSemTrans fCtx fCod transF)) -> do
+    (contraFun', covarFun) <- cod `spanDecomposesInto` fCod
+    guard $ contraFun' == contraFun -- TODO: will this ever error? write an error message if so
+    (ctx, covarFun', semArgs) <- denoteTransSubstComp ctx contraFun fCtx subterms
+    guard $ covarFun' == covarFun -- TODO: will this error either??
+    return (ctx, covarFun, transF <$> semArgs)
+  _ -> throwError $ "expected a previously defined transformation, but got...something else"
+  
+
 -- Unification time
 
--- special directed case of unification. The first input is
--- parameterized by two inputs and we want to find a substitution for
--- those inputs that would make it equal to the second argument.
+-- special directed case of unification.  want to find an
+-- instantiation of the second arg that makes it equal to the first.
 spanDecomposesInto :: SpanNF -> SpanNF -> TCS (EltNF, EltNF)
 (SNFSpanApp r1 f1 g1) `spanDecomposesInto` (SNFSpanApp r2 f2 g2) | r1 /= r2
   = throwError $ "transformation has wrong output span"
 SNFSpanApp r1 f1 g1 `spanDecomposesInto` SNFSpanApp r2 f2 g2 -- | r1 == r2
   = (,) <$> (f1 `funDecomposesInto` f2) <*> (g1 `funDecomposesInto` g2)
 
-
+-- f `fdi` g ~> h then f = quote (unquote g h)
 funDecomposesInto :: EltNF -> EltNF -> TCS EltNF
-ENFId `funDecomposesInto` e = return e
-ENFFunApp f e `funDecomposesInto` ENFId = throwError $ "instantiation failure: a transformation was used whose type is too specific"
+e `funDecomposesInto` ENFId = return e
+ENFId `funDecomposesInto` ENFFunApp f e = throwError $ "instantiation failure: a transformation was used whose type is too specific"
 ENFFunApp f e `funDecomposesInto` ENFFunApp f' e' | f /= f' = throwError $ "instantiation failure: a transformation's type doesn't match its expected type"
 ENFFunApp f e `funDecomposesInto` ENFFunApp f' e' = -- | f == f'
   ENFFunApp f <$> (e `funDecomposesInto` e')
