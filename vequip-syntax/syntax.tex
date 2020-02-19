@@ -28,10 +28,12 @@
 \newcommand{\for}{\textrm{for}\,}
 \newcommand{\when}{\textrm{when}\,}
 \newcommand{\lett}{\textrm{let}\,}
-\newcommand{\sort}{\,\textrm{sort}}
-\newcommand{\ctx}{\,\textrm{context}}
-\newcommand{\sigctx}{\,\textrm{sig-ctx}}
-\newcommand{\sig}{\,\textrm{sig}}
+\newcommand{\sort}{\,\,\textrm{sort}}
+\newcommand{\ctx}{\,\,\textrm{context}}
+\newcommand{\prof}{\,\,\textrm{span}}
+\newcommand{\subst}{\,\,\textrm{subst}}
+\newcommand{\sigctx}{\,\,\textrm{sig-ctx}}
+\newcommand{\sig}{\,\,\textrm{sig}}
 \newcommand{\pipe}{\mathrel{|}}
 
 \title{Judgment Theory: A Syntax for Virtual Equipments with applications to Internal and Synthetic Theory}
@@ -125,82 +127,80 @@ familiar and we have categories, objects/functors,
 
     \inferrule*[right=Relation/Judgment/Profunctor-formation]
     {\cat C \sort \and \cat D \sort}
-    {\alpha^{o}:\cat C; \beta : \cat D \pipe R}
+    { R \prof(\alpha^{o}:\cat C; \beta : \cat D)}
 
     \inferrule*[right=Context-formation]
     {\cat C \sort \and \cat D \sort}
-    {\alpha^{o}:\cat C ; \beta:\cat D\sort \pipe \Phi \ctx}
+    {\Phi \ctx(\alpha^o:\cat C;\beta:\cat D)}
 
     \inferrule*[right=Element/Term/Arrow-formation]
-    {\alpha^o:\cat C; \beta : \cat D \pipe \Phi\and
-      \alpha^o:\cat C; \beta : \cat D \pipe R}
-    {\alpha^{o}:\cat C;\beta : \cat D \pipe \Phi \vdash t : R}
+    {\Phi \ctx(\alpha^o:\cat C; \beta : \cat D)\and
+      R \prof(\alpha^o:\cat C; \beta : \cat D)}
+    {\Phi \vdash t : R}
 
     \inferrule*[right=Substitution-formation]
-    {\alpha : \cat C \vdash A : \cat C'\\
-      \beta : \cat D \vdash B : \cat D'\\
-      \alpha^o : \cat C; \beta : \cat D \pipe \Phi\\
-      \alpha'^o : \cat C'; \beta' : \cat D' \pipe \Psi}
-    {A;B \pipe \Phi\vdash \vec t : \Psi}
+    {\Phi \ctx(\alpha^o:\cat C;\beta:\cat D) \and \Psi \ctx(\alpha'^o:\cat C';\beta':\cat D')\\\\
+      \alpha:\cat C \vdash A : \cat C' \and \beta : \cat D \vdash B : \cat D'
+    }
+    {\psi : \Phi\vdash \Psi \subst(A/\alpha';B/\beta')}
   \end{mathpar}
   \caption{Formation Rules of Judgment Theory}
 \end{figure}
 
 \begin{figure}
   \begin{mathpar}
-    \inferrule*[right=]
+    \inferrule*[right=ObVar]
     {~}
     {\alpha : \cat C \vdash \alpha : \cat C}
 
-    \inferrule*[right=*]
+    \inferrule*[right=ObSubst*]
     {\alpha : \cat C \vdash B : \cat D\and
     \beta : \cat D \vdash A : \cat E}
     {\alpha : \cat C \vdash A[B/\beta] : \cat E}\\
 
-    \inferrule*[right=Restriction*]
-    {\alpha^o : \cat C;\beta : \cat D \pipe R\and
+    \inferrule*[right=SpanRestriction*]
+    {R\prof(\alpha^o : \cat C;\beta : \cat D) \and
       \alpha' : \cat C' \vdash A : \cat C\and
       \beta' : \cat D' \vdash B : \cat D'}
-    {\alpha'^o : \cat C';\beta':\cat D' \pipe R[A/\alpha,B/\beta]}\\
+    {R[A/\alpha,B/\beta] \prof(\alpha'^o : \cat C';\beta':\cat D')}\\\\
 
-    \inferrule
+    \inferrule*[right=MtCtx]
+    {\cat C \sort}
+    {\alpha : \cat C}
+
+    \inferrule*[right=CtxExt]
+    {\Phi \ctx(\alpha^o : \cat C; \beta : \cat D)\and
+      R \prof(\beta^o : \cat D; \gamma : \cat E)}
+    {\Phi,x : R, \gamma : \cat E \ctx(\alpha^o : \cat C ; \gamma : \cat E)}
+
+    \inferrule*[right=CtxTensor*]
+    {\Phi(\alpha^o : \cat C; \beta : \cat D) \and
+    \Psi \ctx(\beta^o : \cat D; \gamma : \cat E)}
+    {\Phi, \Psi\ctx(\alpha^o : \cat C; \gamma : \cat E)}\\\\
+
+    \inferrule*[right=TransVar]
     {~}
-    {\alpha^o : \cat C ; \alpha : \cat C \pipe \cdot}
-
-    \inferrule
-    {\alpha^o : \cat C; \beta : \cat D \pipe \Phi\and
-      \beta^o : \cat D; \gamma : \cat E\pipe R}
-    {\alpha^o : \cat C : \gamma : \cat E \pipe \Phi, \phi : R}
-
-    \inferrule*[right=*]
-    {\alpha^o : \cat C; \beta : \cat D \pipe \Phi\and
-    \beta^o : \cat D; \gamma : \cat E \pipe \Psi}
-    {\alpha^o : \cat C; \gamma : \cat E \pipe \Phi, \Psi}\\
-
-    \inferrule*[right=]
-    {\Phi \vdash t : R[A/\alpha,B/\beta]}
-    {A;B \pipe \Phi \vdash t/\phi : (\phi : R)}
-
-    \inferrule*[right=]
-    {A;B \pipe \Psi \vdash \vec t : \Phi \and
-      B;C \pipe \Psi' \vdash s : R[B/\beta, C/\gamma]}
-    {A;C \pipe \Psi,\Psi' \vdash \vec t, s/\phi : (\Phi, \phi : R)}
-
-    \inferrule*[right=*]
-    {A;B \pipe \Psi \vdash \vec t : \Phi \and
-    B;C \pipe \Psi' \vdash \vec s : \Phi'}
-    {A;C \pipe \Psi,\Psi' \vdash \vec t, \vec s : \Phi,\Phi'}
-    \\
-
-    \inferrule*[right=]
-    {~}
-    {\alpha^o;\beta\pipe \phi : R \vdash \phi : R}
+    {\alpha : \cat C, x : R, \beta : \cat D \vdash x : R}
     
-    \inferrule*[right=*]
-    {A;B \pipe \Psi \vdash \vec s : \Phi\and
-      \alpha'^o : \cat C'; \beta' : \cat D' \pipe \Phi \vdash t : R
-    }
-    {\alpha^o:\cat C; \beta : \cat D \pipe \Psi \vdash t[\vec s] : R[A/\alpha',B/\beta']}
+    \inferrule*[right=TransSubst*]
+    {\psi : \Phi \vdash \Psi \subst(A/\alpha;B/\beta) \and
+    \Psi \vdash t : R}
+    {\Phi \vdash t[\psi] : R[A/\alpha;B/\beta]}\\\\
+
+    \inferrule*[right=TransSubstMt]
+    {\alpha : \cat C \vdash B : \beta}
+    {B : (\alpha : \cat C) \vdash (\beta : \cat D) \subst(B/\beta;B/\beta)}
+
+    \inferrule*[right=TransSubstExt]
+    {\psi : \Phi \vdash \Psi \subst(A/\alpha;B/\beta) \and
+     \Phi' \vdash t : R[B/\beta;\Gamma/\gamma]}
+    {\psi, t, \Gamma : \Phi,\Phi' \vdash \Psi, x:R, \gamma : \cat E \subst(A/\alpha;\Gamma/\gamma)}
+
+    \inferrule*[right=TransSubstTensor*]
+    {\psi : \Phi \vdash \Psi \subst(A/\alpha;B/\beta)\and
+     \psi' : \Phi' \vdash \Psi' \subst(B/\beta;\Gamma/\gamma)}
+    {\psi,\psi' : \Phi,\Phi' \vdash \Psi,\Psi' \subst(A/\alpha;\Gamma/\gamma)}
+    \\\\
   \end{mathpar}
   \caption{Basic Rules of Judgment Theory, starred rules are
     admissible, non-starred are primitive}
@@ -218,9 +218,10 @@ familiar and we have categories, objects/functors,
       \Phi,\cdot &=& \Phi\\
       \cdot,\Phi &=& \Phi\\
       (\Phi,\Psi),\Theta &=& \Phi,(\Psi,\Theta)\\\\
-      (\vec t,\vec s),\vec u &=& \vec t, (\vec s, \vec u)\\\\
-      t[\phi_1/\phi_1,\ldots\phi_n/\phi_n] &=& t\\
-      t[\Psi_1.s_1/\phi_1,\ldots,\Psi_n.s_n/\phi_n][\vec u_1/\Psi_1,\ldots,\vec u_n/\Psi_n] &=& t[s_1[\vec u_1/\Psi_1]/\phi_1,\ldots,s_n[\vec u_n/\Psi_n]/\phi_n]\\
+      (\phi,\chi),\psi &=& \phi, (\chi, \psi)\\\\
+      t[\alpha_0,x_0,\ldots,\alpha_n] &=& t\\
+      TODO: associativity
+      %% t[\Psi_1.s_1/\phi_1,\ldots,\Psi_n.s_n/\phi_n][\vec u_1/\Psi_1,\ldots,\vec u_n/\Psi_n] &=& t[s_1[\vec u_1/\Psi_1]/\phi_1,\ldots,s_n[\vec u_n/\Psi_n]/\phi_n]\\
     \end{array}
   \end{mathpar}  
   \caption{Algebraic Properties of Basic Rules}
