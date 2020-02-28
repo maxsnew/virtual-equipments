@@ -324,9 +324,9 @@ decl = list $
 -- or S
 -- or (S ...)
 -- or (. C ...)
-sigExp :: TC SigExp
-sigExp = list $ tcHd (atomEq "sig") >> return dummy
-  where dummy = SigBase . GSigVar $ "NYI"
+-- sigExp :: TC SigExp
+-- sigExp = list $ tcHd (atomEq "sig") >> return dummy
+--   where dummy = SigBase . GSigVar $ "NYI"
   -- parse, don't check sigBase <|> sigApp
   -- where
   --   sigBase = SigBase <$> (GSigVar <$> sigVar <|> GSigVal <$> sigVal <|> GSigLam <$> sigLam)
