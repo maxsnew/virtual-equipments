@@ -169,7 +169,7 @@ denote = \case
   (ScSet e) -> SemSet <$> denoteSet e
   (ScFun e) -> SemFun <$> denoteScopedFun e
   (ScSpan e) -> SemSpan <$> denoteScopedSpan e
-  (ScTrans e) -> error "NYI: trans" -- SemTrans <$> denoteScopedTrans e
+  (ScTrans e) -> SemTrans <$> denoteScopedTrans e
 
 denoteMod :: ModExp -> TCS ([ScopedVal] -> [ScopedVal])
 denoteMod (ModBase (GModLam l)) = denoteModLam l
@@ -217,117 +217,117 @@ denoteSpan x contraSetDom y covarSetDom (SpanEApp ref a b) = resolveRef ref >>= 
       return $ unquoteSpan span contraFun covarFun
     _ -> throwError $ "expected a span constructor but got...something else"
 
--- denoteSpanString :: NEList (String, SetNF) -> [SpanVar] -> TCS NamedSemTransCtx
--- denoteSpanString (Done tvar) [] = return $ DoneB tvar
--- denoteSpanString (Cons (contravar, contraset) vars) ((SpanVar spanVar spanE) : es) = do
---   span <- quoteSemSpan <$> denoteSpan contravar contraset covarvar covarset spanE
---   ConsA (contravar, contraset, spanVar, span) <$> denoteSpanString vars es
---   where (covarvar, covarset) = neHd vars
--- denoteSpanString (Done _) (e : es) = throwError $ "not enough indices for the inputs of a transformation"
--- denoteSpanString (Cons _ _) [] = throwError $ "too many indices for the inputs of a transformation"
+denoteSpanString :: NEList (String, SetNF) -> [SpanVar] -> TCS NamedSemTransCtx
+denoteSpanString (Done tvar) [] = return $ DoneB tvar
+denoteSpanString (Cons (contravar, contraset) vars) ((SpanVar spanVar spanE) : es) = do
+  span <- denoteSpan contravar contraset covarvar covarset spanE
+  ConsA (contravar, contraset, spanVar, span) <$> denoteSpanString vars es
+  where (covarvar, covarset) = neHd vars
+denoteSpanString (Done _) (e : es) = throwError $ "not enough indices for the inputs of a transformation"
+denoteSpanString (Cons _ _) [] = throwError $ "too many indices for the inputs of a transformation"
 
--- denoteScopedTrans :: ScopedTransExp -> TCS ScopedSemTrans
--- denoteScopedTrans (ScopedTransExp (TransScope indicesE varsE codE) e) = do
---   indices <- traverse (\tvar -> (,) (_eltvar tvar) <$> denoteSet (_eltvarty tvar)) indicesE
---   ctx <- denoteSpanString indices varsE
---   let ((contravar, contraty), (covarvar, covarty)) = firstAndLast indices
---   cod <- quoteSemSpan <$> denoteSpan contravar contraty covarvar covarty codE
---   f <- denoteTrans ctx cod e
---   return $ ScopedSemTrans (ctxUnName ctx) cod f
+denoteScopedTrans :: ScopedTransExp -> TCS ScopedSemTrans
+denoteScopedTrans (ScopedTransExp (TransScope indicesE varsE codE) e) = do
+  indices <- traverse (\tvar -> (,) (_eltvar tvar) <$> denoteSet (_eltvarty tvar)) indicesE
+  ctx <- denoteSpanString indices varsE
+  let ((contravar, contraty), (covarvar, covarty)) = firstAndLast indices
+  cod <- denoteSpan contravar contraty covarvar covarty codE
+  f <- denoteTrans ctx cod e
+  return $ ScopedSemTrans (ctxUnName ctx) cod f
 
--- -- this will probably have to change to do some inference when we add
--- -- positive types (hom/tensor), though probably not when we add
--- -- negative types like cotensor/products/pullbacks
--- denoteTrans :: NamedSemTransCtx -> SpanNF -> TransExp -> TCS ([TransNF] -> TransNF)
--- denoteTrans ctx codSpan (TransEVar x) = case ctx of
---   ConsA (alphaContra, contraSet, spanVar, domSpan) (DoneB (betaCovar, covarSet)) ->
---     if x == spanVar && codSpan == domSpan
---     then return $ \[t] -> t
---     else throwError $ "wrong var name or ill typed variable usage"
---   DoneB _ -> throwError $ "variable out of scope"
---   ConsA _ (ConsA _ _) -> throwError $ "unused variables"
--- denoteTrans ctx codSpan (TransEApp r subTerms) =
---   resolveRef r >>= \case
---   Decl _ (SemTrans (ScopedSemTrans fCtx fCod transF)) -> do
---     -- first, exhibit the expected output type codSpan as an
---     -- instantiation of the functions type fCod
---     -- I.e. codSpan = quote (unquote fCod contraFun covarFun)
+-- this will probably have to change to do some inference when we add
+-- positive types (hom/tensor), though probably not when we add
+-- negative types like cotensor/products/pullbacks
+denoteTrans :: NamedSemTransCtx -> SpanNF -> TransExp -> TCS ([TransNF] -> TransNF)
+denoteTrans ctx codSpan (TransEVar x) = case ctx of
+  ConsA (alphaContra, contraSet, spanVar, domSpan) (DoneB (betaCovar, covarSet)) ->
+    if x == spanVar && codSpan == domSpan
+    then return $ \[t] -> t
+    else throwError $ "wrong var name or ill typed variable usage"
+  DoneB _ -> throwError $ "variable out of scope"
+  ConsA _ (ConsA _ _) -> throwError $ "unused variables"
+denoteTrans ctx codSpan (TransEApp r subTerms) =
+  resolveRef r >>= \case
+  (SemTrans (ScopedSemTrans fCtx fCod transF)) -> do
+    -- first, exhibit the expected output type codSpan as an
+    -- instantiation of the functions type fCod
+    -- I.e. codSpan = quote (unquote fCod contraFun covarFun)
 
---     -- We need to infer this because even though we are being fairly
---     -- explicit in typing we are actually suppressing some information
---     -- from the term syntax: the most explicit form of the term
---     -- application would be something like (f A1 t1 A2 t2 A3 t3 A4)
---     -- rather than (f t1 t2 t3) here we are inferring A1 and A4. Later
---     -- we will need to infer the rest.
---     (contraFun, covarFun) <- codSpan `spanDecomposesInto` fCod
---     -- now check that the arguments are valid inputs to the
---     -- transformation
---     subst <- denoteTransSubst ctx contraFun covarFun fCtx subTerms
---     return $ transF . subst
---   _ -> throwError $ "expected a previously defined transformation, but got...something else"
+    -- We need to infer this because even though we are being fairly
+    -- explicit in typing we are actually suppressing some information
+    -- from the term syntax: the most explicit form of the term
+    -- application would be something like (f A1 t1 A2 t2 A3 t3 A4)
+    -- rather than (f t1 t2 t3) here we are inferring A1 and A4. Later
+    -- we will need to infer the rest.
+    (contraFun, covarFun) <- codSpan `spanDecomposesInto` fCod
+    -- now check that the arguments are valid inputs to the
+    -- transformation
+    subst <- denoteTransSubst ctx contraFun covarFun fCtx subTerms
+    return $ transF . subst
+  _ -> throwError $ "expected a previously defined transformation, but got...something else"
 
--- denoteTransSubst :: NamedSemTransCtx -> EltNF -> EltNF -> SemTransCtx -> [TransExp] -> TCS ([TransNF] -> [TransNF])
--- denoteTransSubst domCtx contraFun covarFun codCtx es = do
---   (leftoverCtx, covarFun', composableSubst) <- denoteTransSubstComp domCtx contraFun codCtx es
---   case (leftoverCtx, covarFun == covarFun') of
---     (ConsA _ _, _) -> throwError $ "unused variables"
---     (_, False) -> throwError "some kind of mismatch, can this even happen?" -- TODO: write a better error message, when does this happen?
---     (DoneB _, True) -> return $ evalState composableSubst
+denoteTransSubst :: NamedSemTransCtx -> EltNF -> EltNF -> SemTransCtx -> [TransExp] -> TCS ([TransNF] -> [TransNF])
+denoteTransSubst domCtx contraFun covarFun codCtx es = do
+  (leftoverCtx, covarFun', composableSubst) <- denoteTransSubstComp domCtx contraFun codCtx es
+  case (leftoverCtx, covarFun == covarFun') of
+    (ConsA _ _, _) -> throwError $ "unused variables"
+    (_, False) -> throwError "some kind of mismatch, can this even happen?" -- TODO: write a better error message, when does this happen?
+    (DoneB _, True) -> return $ evalState composableSubst
 
--- denoteTransSubstComp :: NamedSemTransCtx -> EltNF -> SemTransCtx -> [TransExp] -> TCS (NamedSemTransCtx,EltNF, State [TransNF] [TransNF])
--- denoteTransSubstComp domCtx contraFun codCtx [] = case codCtx of
---   ConsA _ _ -> throwError $ "transformation applied to too few arguments"
---   DoneB _   -> return (domCtx, contraFun, return [])
--- denoteTransSubstComp domCtx contraFun codCtx (e:es) = case codCtx of
---   DoneB _ -> throwError $ "transformation applied to too many arguments"
---   ConsA (_,cod) codCtx -> do
---     (domCtx, contraFun, prefixEater) <- denoteTransSubstCons domCtx contraFun cod e
---     (domCtx, covarFun, suffixEater) <- denoteTransSubstComp domCtx contraFun codCtx es
---     return $ (domCtx, covarFun, (:) <$> prefixEater <*> suffixEater)
+denoteTransSubstComp :: NamedSemTransCtx -> EltNF -> SemTransCtx -> [TransExp] -> TCS (NamedSemTransCtx,EltNF, State [TransNF] [TransNF])
+denoteTransSubstComp domCtx contraFun codCtx [] = case codCtx of
+  ConsA _ _ -> throwError $ "transformation applied to too few arguments"
+  DoneB _   -> return (domCtx, contraFun, return [])
+denoteTransSubstComp domCtx contraFun codCtx (e:es) = case codCtx of
+  DoneB _ -> throwError $ "transformation applied to too many arguments"
+  ConsA (_,cod) codCtx -> do
+    (domCtx, contraFun, prefixEater) <- denoteTransSubstCons domCtx contraFun cod e
+    (domCtx, covarFun, suffixEater) <- denoteTransSubstComp domCtx contraFun codCtx es
+    return $ (domCtx, covarFun, (:) <$> prefixEater <*> suffixEater)
 
--- -- we are given the input context Phi ctx(a:C,-)
--- -- we know a substitution for the left side A : C => C'
--- -- and output span R span(a':C',=)
+-- we are given the input context Phi ctx(a:C,-)
+-- we know a substitution for the left side A : C => C'
+-- and output span R span(a':C',=)
 
--- -- Given the term t,
--- -- we find the decomposition Phi_t,Phi_r = Phi
--- -- and the (most general?) function B
--- -- so that
--- --     Phi_t |- t : R[A;B]
+-- Given the term t,
+-- we find the decomposition Phi_t,Phi_r = Phi
+-- and the (most general?) function B
+-- so that
+--     Phi_t |- t : R[A;B]
 
--- -- and we return Phi_r, B and a denotation for t that returns both its
--- -- answer and the "leftover" args that it didn't consume
--- denoteTransSubstCons :: NamedSemTransCtx -> EltNF -> SpanNF -> TransExp -> TCS (NamedSemTransCtx,EltNF, State [TransNF] TransNF)
--- -- here we need to solve Phi_t |- x : R[A;B]
--- -- clearly we have Phi_t = alpha : C, x : R[A;B], beta : B
--- denoteTransSubstCons ctx contraFun codSpan (TransEVar x) = case ctx of
---   DoneB _ -> throwError $ "variable used, but none remain in the context"
---   ConsA (_,_,y,ySpan) ctx ->
---     if x /= y
---     then throwError $ "used the wrong variable"
---     else do
---       (contraFun', covarFun) <- codSpan `spanDecomposesInto` ySpan
---       guard $ contraFun == contraFun' -- | TODO: Is this necessary? When will it be wrong? Write an error msg for it
---       return $ (ctx, covarFun, f)
---         where
---           f :: State [TransNF] TransNF
---           f = do
---             (t:ts) <- get
---             put ts
---             return t
+-- and we return Phi_r, B and a denotation for t that returns both its
+-- answer and the "leftover" args that it didn't consume
+denoteTransSubstCons :: NamedSemTransCtx -> EltNF -> SpanNF -> TransExp -> TCS (NamedSemTransCtx,EltNF, State [TransNF] TransNF)
+-- here we need to solve Phi_t |- x : R[A;B]
+-- clearly we have Phi_t = alpha : C, x : R[A;B], beta : B
+denoteTransSubstCons ctx contraFun codSpan (TransEVar x) = case ctx of
+  DoneB _ -> throwError $ "variable used, but none remain in the context"
+  ConsA (_,_,y,ySpan) ctx ->
+    if x /= y
+    then throwError $ "used the wrong variable"
+    else do
+      (contraFun', covarFun) <- codSpan `spanDecomposesInto` ySpan
+      guard $ contraFun == contraFun' -- | TODO: Is this necessary? When will it be wrong? Write an error msg for it
+      return $ (ctx, covarFun, f)
+        where
+          f :: State [TransNF] TransNF
+          f = do
+            (t:ts) <- get
+            put ts
+            return t
 
--- -- here we are solving
--- -- Phi_t |- f(t1,...,tn) : R[A;B]
+-- here we are solving
+-- Phi_t |- f(t1,...,tn) : R[A;B]
 
--- denoteTransSubstCons ctx contraFun cod (TransEApp ref subterms) = resolveRef ref >>= \case
--- -- first we lookup f's type and match it against R[A;B]
---   Decl _ (SemTrans (ScopedSemTrans fCtx fCod transF)) -> do
---     (contraFun', covarFun) <- cod `spanDecomposesInto` fCod
---     guard $ contraFun' == contraFun -- TODO: will this ever error? write an error message if so
---     (ctx, covarFun', semArgs) <- denoteTransSubstComp ctx contraFun fCtx subterms
---     guard $ covarFun' == covarFun -- TODO: will this error either??
---     return (ctx, covarFun, transF <$> semArgs)
---   _ -> throwError $ "expected a previously defined transformation, but got...something else"
+denoteTransSubstCons ctx contraFun cod (TransEApp ref subterms) = resolveRef ref >>= \case
+-- first we lookup f's type and match it against R[A;B]
+  SemTrans (ScopedSemTrans fCtx fCod transF) -> do
+    (contraFun', covarFun) <- cod `spanDecomposesInto` fCod
+    guard $ contraFun' == contraFun -- TODO: will this ever error? write an error message if so
+    (ctx, covarFun', semArgs) <- denoteTransSubstComp ctx contraFun fCtx subterms
+    guard $ covarFun' == covarFun -- TODO: will this error either??
+    return (ctx, covarFun, transF <$> semArgs)
+  _ -> throwError $ "expected a previously defined transformation, but got...something else"
   
 
 -- Unification time
@@ -481,21 +481,19 @@ denoteGenerator = \case
     covar     <- denoteSet $ _spancoty     spanty
     spanName <- nextDB
     return $ SemSpan (ScopedSemSpan contravar covar (SNFSpanApp (DBCurMod spanName) ENFId ENFId))
-  GenTrans transty -> error "NYI: trans"
-
-    -- do
-    -- -- setIndices :: [(String, SetNF)]
-    -- setIndices <- traverse (traverse denoteSet . topair) (_eltVars $ transty)
-    -- transCtx <-
-    --   ctxUnName <$> denoteSpanString setIndices (map (SpanVar "dummy") $ _domSpans transty)
-    -- let len = length . ctxSpans $ transCtx
-    -- let ((x, contraty), (y, covarty)) = firstAndLast setIndices
-    -- codSpan <- quoteSemSpan <$> denoteSpan x contraty y covarty (_codSpan transty)
-    -- name <- nextDB
-    -- return $
-    --   SemTrans (ScopedSemTrans transCtx codSpan
-    --                            (TNFApp (DBCurMod name) . take len))
-    --   where topair x = (_eltvar x, _eltvarty x)
+  GenTrans transty -> do
+    -- setIndices :: [(String, SetNF)]
+    setIndices <- traverse (traverse denoteSet . topair) (_eltVars $ transty)
+    transCtx <-
+      ctxUnName <$> denoteSpanString setIndices (map (SpanVar "dummy") $ _domSpans transty)
+    let len = length . ctxSpans $ transCtx
+    let ((x, contraty), (y, covarty)) = firstAndLast setIndices
+    codSpan <- denoteSpan x contraty y covarty (_codSpan transty)
+    name <- nextDB
+    return $
+      SemTrans (ScopedSemTrans transCtx codSpan
+                               (TNFApp (DBCurMod name) . take len))
+      where topair x = (_eltvar x, _eltvarty x)
             
     -- first validate the type
 -- case _defn declGen of
