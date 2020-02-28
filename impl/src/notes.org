@@ -1,0 +1,23 @@
+A static ctx should be a NEListof (Decl SemVal, Decl Generator) The
+Decl
+
+SemVals are *known* definitions. The Decl Generators are *parameters*
+that can be instantiated.
+
+A DBRef is a reference to a Decl Generator in the static context. When
+the parameters are instantiated with a [SemVal], it is a pointer into
+this dynamic context.
+
+Explicitly a DBRef is either
+- Later DBRef -- a pointer to a "superparameter"
+- Now   Nat   -- a pointer to a parameter 
+
+There needs to be some kind of "instantiate" function for all semantic
+forms.
+
+For instance,
+
+instantiateSet :: SemSet -> [SemVal] -> SemSet
+instantiateSet (Now   n) g = assertSet (g !! n)
+instantiateSet (Later d) g = d
+
