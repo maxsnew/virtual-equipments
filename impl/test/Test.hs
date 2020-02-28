@@ -27,40 +27,44 @@ tcTests = "Type Checking Tests" ~: test [ goodTests
                                         ]
 goodTests = "Successful Type Checks" ~: test
   [ assertTC "empty program" ""
-  , assertTC "world's smallest module" "(def-mod M (mod () (sig)))"
-  , assertTC "sets in params" "(def-mod S (mod ((set X) (set Y)) (sig)))"
+  , assertTC "world's smallest module" "(def-mod M (mod ()))"
+  , assertTC "sets in params" "(def-mod S (mod ((set X) (set Y)) ))"
   , assertTC "definition of a set" "(def-mod M (mod ((set X)) (def-set Y X)))"
-  , assertTC "fun in params"  "(def-mod S (mod ((set X) (fun f X X)) (sig)))"
-  , assertTC "more fun in params" "(def-mod S (mod ((set X) (set Y) (fun f Y X)) (sig)))"
-  , assertTC "id fun sig" "(def-mod ID (mod ((set X)) (sig) ))"
-  , assertTC "id fun" "(def-mod ID (mod ((set X)) (sig) (def-fun id (x X) X x)))"
-  , assertTC "endo-comp" "(def-mod SELFCOMP (mod ((set X) (fun f X X)) (sig) (def-fun g (x X) X (f x))))"
-  , assertTC "many endo-comp" "(def-mod MANYSELFCOMP (mod ((set X) (fun f X X)) (sig) (def-fun g (x X) X (f (f (f (f x)))))))"
-  , assertTC "many endo-comp" "(def-mod COMP (mod ((set X) (set Y) (fun f X Y) (set Z) (fun g Y Z)) (sig) (def-fun h (x X) Z (g (f x))))))"
-  , assertTC "span in params" "(def-mod S (mod ((set X) (set Y) (span R X Y)) (sig)))"
-  , assertTC "span in params" "(def-mod S (mod ((set X) (set Y) (span R X X)) (sig)))"
+  , assertTC "fun in params"  "(def-mod S (mod ((set X) (fun f X X)) ))"
+  , assertTC "more fun in params" "(def-mod S (mod ((set X) (set Y) (fun f Y X)) ))"
+  , assertTC "id fun sig" "(def-mod ID (mod ((set X))  ))"
+  , assertTC "id fun" "(def-mod ID (mod ((set X))  (def-fun id (x X) X x)))"
+  , assertTC "endo-comp" "(def-mod SELFCOMP (mod ((set X) (fun f X X))  (def-fun g (x X) X (f x))))"
+  , assertTC "many endo-comp" "(def-mod MANYSELFCOMP (mod ((set X) (fun f X X))  (def-fun g (x X) X (f (f (f (f x)))))))"
+  , assertTC "many endo-comp" "(def-mod COMP (mod ((set X) (set Y) (fun f X Y) (set Z) (fun g Y Z))  (def-fun h (x X) Z (g (f x))))))"
+  , assertTC "span in params" "(def-mod S (mod ((set X) (set Y) (span R X Y)) ))"
+  , assertTC "span in params" "(def-mod S (mod ((set X) (set Y) (span R X X)) ))"
   , assertTC "span eta" "(def-mod S (mod ((set X) (set Y) (fun f X Y) (span R X Y)) (def-span Q (x X) (y Y) (R x y))))"
   , assertTC "span subst" "(def-mod S (mod ((set X) (set Y) (fun f X Y) (span R X Y)) (def-span Q (x X) (x' X) (R x (f x')))))"
-  , assertTC "cat id param"
-    "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans id ((X Ob)) () (Mor X X))) (sig)))"
-  , assertTC "cat compose params"
-    "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans comp ((X Ob) (Y Ob) (Z Ob)) ((Mor X Y) (Mor Y Z)) (Mor X Z))) (sig)))"
-  , assertTC "cat data params"
-    "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans id ((X Ob)) () (Mor X X)) (trans comp ((X Ob) (Y Ob) (Z Ob)) ((Mor X Y) (Mor Y Z)) (Mor X Z)))))"
-  , assertTC "RUP"
-    "(def-mod S (mod ((set A) (span HomA A A) (set B) (fun G B A) (span M A B) (trans counit ((b B)) () (M (G b) b)) (trans intro ((a A) (b B)) ((M a b)) (HomA a (G b))))))"
-  , assertTC "ID-trans-params"
-    "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) ))"
-  , assertTC "ID-trans"
-    "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) (def-trans id ((a A) (a' A)) ((x (R a a'))) (R a a') x)))"
-  , assertTC "trans eta empty"
-    "(def-mod trans-eta (mod ((set A) (span R A A) (trans foo ((a A)) () (R a a))) (sig) (def-trans bar ((a A)) () (R a a) (foo))))"
-  , assertTC "trans eta one-arg"
-    "(def-mod trans-eta (mod ((set A) (set B) (span Q A B) (span R A B) (trans foo ((a A) (b B)) ((Q a b)) (R a b))) (sig) (def-trans bar ((a A) (b B)) ((x (Q a b))) (R a b) (foo x))))"
-  , assertTC "trans eta inst"
-    "(def-mod trans-eta (mod ((set A) (set B) (fun F A B) (span R B B) (trans foo ((b B)) () (R b b))) (sig) (def-trans bar ((a A)) () (R (F a) (F a)) (foo))))"
-  , assertTC "iterate trans"
-    "(def-mod iter (mod ((set A) (set B) (span R A B) (trans f ((a A) (b B)) ((R a b)) (R a b))) (def-trans fffff ((a A) (b B)) ((x (R a b))) (R a b) (f (f (f (f (f x))))))))"
+  -- , assertTC "cat id param"
+  --   "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans id ((X Ob)) () (Mor X X))) ))"
+  -- , assertTC "cat compose params"
+  --   "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans comp ((X Ob) (Y Ob) (Z Ob)) ((Mor X Y) (Mor Y Z)) (Mor X Z))) ))"
+  -- , assertTC "cat data params"
+  --   "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans id ((X Ob)) () (Mor X X)) (trans comp ((X Ob) (Y Ob) (Z Ob)) ((Mor X Y) (Mor Y Z)) (Mor X Z)))))"
+  -- , assertTC "RUP"
+  --   "(def-mod S (mod ((set A) (span HomA A A) (set B) (fun G B A) (span M A B) (trans counit ((b B)) () (M (G b) b)) (trans intro ((a A) (b B)) ((M a b)) (HomA a (G b))))))"
+  -- , assertTC "ID-trans-params"
+  --   "(def-mod ID-trans (mod ((set A) (span R A A))  ))"
+  -- , assertTC "ID-trans"
+  --   "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id ((a A) (a' A)) ((x (R a a'))) (R a a') x)))"
+  -- , assertTC "trans eta empty"
+  --   "(def-mod trans-eta (mod ((set A) (span R A A) (trans foo ((a A)) () (R a a)))  (def-trans bar ((a A)) () (R a a) (foo))))"
+  -- , assertTC "trans eta one-arg"
+  --   "(def-mod trans-eta (mod ((set A) (set B) (span Q A B) (span R A B) (trans foo ((a A) (b B)) ((Q a b)) (R a b)))  (def-trans bar ((a A) (b B)) ((x (Q a b))) (R a b) (foo x))))"
+  -- , assertTC "trans eta inst"
+  --   "(def-mod trans-eta (mod ((set A) (set B) (fun F A B) (span R B B) (trans foo ((b B)) () (R b b)))  (def-trans bar ((a A)) () (R (F a) (F a)) (foo))))"
+  -- , assertTC "iterate trans"
+  --   "(def-mod iter (mod ((set A) (set B) (span R A B) (trans f ((a A) (b B)) ((R a b)) (R a b))) (def-trans fffff ((a A) (b B)) ((x (R a b))) (R a b) (f (f (f (f (f x))))))))"
+  , assertTC "define submodule"
+  "(def-mod foo (mod ((set X)) (def-mod S (mod () (def-set Y X)))))"
+  , assertTC "use submodule"
+  "(def-mod foo (mod ((set X)) (def-mod S (mod () (def-set Y X))) (def-set Z (. S Y))))" -- woot!
   ]
 --   , typeChecks (Program good2) ~? "functor signature"
 --   , typeChecks (Program good3) ~? "transformation signature"
@@ -79,34 +83,34 @@ goodTests = "Successful Type Checks" ~: test
 badTests = "Type Checking Failures" ~: test
   [ not (typeChecks "()") ~? "empty decl"
   , not (typeChecks "(def-mod _ (mod (set X) (set Y)))") ~? "params are parenthesized"
-  , not (typeChecks "(def-mod S (mod ((fun f X X)) (sig)))") ~? "set out of scope in fun decl"
-  , not (typeChecks "(def-mod S (mod ((set X) (fun f X Y)) (sig)))") ~? "var out of scope"
+  , not (typeChecks "(def-mod S (mod ((fun f X X)) ))") ~? "set out of scope in fun decl"
+  , not (typeChecks "(def-mod S (mod ((set X) (fun f X Y)) ))") ~? "var out of scope"
   -- , not (typeChecks "(def-mod S (((set X) (set Y) (fun f X Y)) (span R X f)))") ~? "more signature"
   , not (typeChecks "(def-mod M (mod ((set X)) (sig ) (def-set Y Y)))") ~? "set out of scope"
-  , not (typeChecks "(def-mod M (mod ((set X) (set Y)) (sig) (def-fun f (x X) Y x)))") ~? "type error in fun def"
-  , not (typeChecks "(def-mod M (mod ((set X) (set Y) (fun f X Y) (fun g X Y)) (sig) (def-fun h (x X) Y (g (f x)))))") ~? "type error in fun comp"
-  , not (typeChecks "(def-mod ID (mod ((set X) (fun g X X)) (sig) (def-fun id (x g) g x)))") ~? "fun used as a set"
-  , not (typeChecks "(def-mod ID (mod ((set X)) (sig) (def-fun id (x X) X (X x))))") ~? "set used as a fun"
-  , not (typeChecks "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans comp ((X Ob) (Y Ob)) () (Mor X X))) (sig)))") ~? "cat id too many indices"
-  , not (typeChecks "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans comp ((X Ob)) ((Mor X X)) (Mor X X))) (sig)))") ~? "cat not enough indices"
-  , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) (def-trans id (a A) ((x (R a a))) (R a a) x)))")
-  ~? "trans indices need to be parenthesized"
-  , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) (def-trans id ((a A)) (x (R a a)) (R a a) x)))")
-  ~? "trans vars need to be parenthesized"
-  , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) (def-trans id ((a A)) ((x (R a a))) (R a a) x)))")
-  ~? "improper duplication of indices"
-  , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A)) (sig) (def-trans id ((a A) (a' A)) ((x (R a a))) (R a a') x)))")
-  ~? "more improper duplication of indices"
-  , not (typeChecks  
-    "(def-mod trans-eta (mod ((set A) (set B) (span Q A B) (span R A B) (trans foo ((a A) (b B)) ((Q a b)) (R a b))) (sig) (def-trans bar ((a A) (b B)) ((x (Q a b))) (R a b) (foo))))")
-    ~? "unused var"
-  , not (typeChecks  
-    "(def-mod trans-eta (mod ((set A) (set B) (span Q A B) (span R A B) (trans foo ((a A) (b B)) ((Q a b)) (R a b))) (sig) (def-trans bar ((a A) (b B)) ((x (Q a b))) (R a b) (foo x x))))")
-    ~? "doubly arity mismatch"
-  , not (typeChecks
-    "(def-mod trans-eta (mod ((set A) (set B) (fun F A B) (span R B B) (trans foo ((a A)) () (R (F a) (F a)))) (sig) (def-trans bar ((b B)) () (R b b) (foo))))")
-   ~? "transformations' type is too specific"
--- , not (typeChecks "(def-mod S (() (set X)))(def-sig T (sig () (fun R X X)))") ~? "locality of scope"
+  , not (typeChecks "(def-mod M (mod ((set X) (set Y))  (def-fun f (x X) Y x)))") ~? "type error in fun def"
+  , not (typeChecks "(def-mod M (mod ((set X) (set Y) (fun f X Y) (fun g X Y))  (def-fun h (x X) Y (g (f x)))))") ~? "type error in fun comp"
+  , not (typeChecks "(def-mod ID (mod ((set X) (fun g X X))  (def-fun id (x g) g x)))") ~? "fun used as a set"
+  , not (typeChecks "(def-mod ID (mod ((set X))  (def-fun id (x X) X (X x))))") ~? "set used as a fun"
+  -- , not (typeChecks "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans comp ((X Ob) (Y Ob)) () (Mor X X))) ))") ~? "cat id too many indices"
+  -- , not (typeChecks "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans comp ((X Ob)) ((Mor X X)) (Mor X X))) ))") ~? "cat not enough indices"
+  -- , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id (a A) ((x (R a a))) (R a a) x)))")
+  -- ~? "trans indices need to be parenthesized"
+  -- , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id ((a A)) (x (R a a)) (R a a) x)))")
+  -- ~? "trans vars need to be parenthesized"
+  -- , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id ((a A)) ((x (R a a))) (R a a) x)))")
+  -- ~? "improper duplication of indices"
+  -- , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id ((a A) (a' A)) ((x (R a a))) (R a a') x)))")
+  -- ~? "more improper duplication of indices"
+  -- , not (typeChecks  
+  --   "(def-mod trans-eta (mod ((set A) (set B) (span Q A B) (span R A B) (trans foo ((a A) (b B)) ((Q a b)) (R a b)))  (def-trans bar ((a A) (b B)) ((x (Q a b))) (R a b) (foo))))")
+  --   ~? "unused var"
+  -- , not (typeChecks  
+  --   "(def-mod trans-eta (mod ((set A) (set B) (span Q A B) (span R A B) (trans foo ((a A) (b B)) ((Q a b)) (R a b)))  (def-trans bar ((a A) (b B)) ((x (Q a b))) (R a b) (foo x x))))")
+  --   ~? "doubly arity mismatch"
+  -- , not (typeChecks
+  --   "(def-mod trans-eta (mod ((set A) (set B) (fun F A B) (span R B B) (trans foo ((a A)) () (R (F a) (F a))))  (def-trans bar ((b B)) () (R b b) (foo))))")
+  --  ~? "transformations' type is too specific"
+-- , not (typeChecks "(def-mod S (() (set X))) (def-sig T (sig () (fun R X X)))") ~? "locality of scope"
 --  , not (typeChecks "(def-mod M (mod ((set X)) (sig ) (def-set Y X)))") ~? "module defines too many things?"
   ]
 --   [ not (typeChecks (Program bad1)) ~? "C should be undefined"

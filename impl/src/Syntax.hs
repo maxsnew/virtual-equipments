@@ -1,8 +1,10 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE TemplateHaskell #-}
 module Syntax where
 
+import Control.Lens
 import qualified Text.Parsec as Parsec
 
 import Util
@@ -16,6 +18,19 @@ data SExp
   | SEList [ParsedSExp]
   deriving (Show)
 
+data Decl name a = Decl { _name :: name , _defn :: a }
+  deriving (Show, Read, Eq, Functor)
+
+$(makeLenses ''Decl)
+
+type SynDecl = Decl String
+
+lookupDecl :: (Eq name) => name -> [Decl name a] -> Maybe a
+lookupDecl s xs = lookup s (map declToPair xs)
+  where
+    declToPair :: Decl name a -> (name, a)
+    declToPair d = (_name d, _defn d)
+
 -- | A Program is just a module body
 type Program = ModuleBody
 
@@ -27,24 +42,13 @@ newtype ModuleBody = ModuleBody { _defs :: [SynDecl ScopedExp] }
 -- assertion of an equality (between transformations?)
 data ScopedExp
   = ScSig SigExp
-  | ScMod ModExp
+  -- | ScMod ScopedModExp
   | ScSet SetExp
   | ScFun ScopedEltExp
   | ScSpan ScopedSpanExp
   | ScTrans ScopedTransExp
   | ScAssert ScopedProofExp
   deriving (Show, Read, Eq)
-
-data Decl name a = Decl { _name :: name , _defn :: a }
-  deriving (Show, Read, Eq, Functor)
-
-type SynDecl = Decl String
-
-lookupDecl :: (Eq name) => name -> [Decl name a] -> Maybe a
-lookupDecl s xs = lookup s (map declToPair xs)
-  where
-    declToPair :: Decl name a -> (name, a)
-    declToPair d = (_name d, _defn d)
 
 -- isSig :: NForGen -> Bool
 -- isSig (DGExp (ScSig _)) = True
@@ -107,6 +111,10 @@ data Generator
   | GenTrans TransTy -- "function symbol"
   | GenEq EqTy -- "axiom"
   deriving (Show, Read, Eq)
+
+data ScopedModExp = ScopedModExp ModScope ModExp
+  deriving (Show, Read, Eq)
+type ModScope = ()
 
 data ModDeref
   = MDCurMod String

@@ -2,6 +2,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE FlexibleContexts #-}
 module TypeCheck where
 
 import Control.Applicative
@@ -36,6 +37,9 @@ $(makeLenses ''Ctx)
 -- The basic process is that we take in an S-expression, produce an
 -- AST for the purposes of parsing but in the context we produce
 -- semantic values for the purposes of simple equality checking
+
+-- TODO: there should really be a separation of parse errors/parse
+-- state and tc errors/tc state here. Right now we're getting them mixed up and it's annoying
 
 -- There are two monads involved
 -- One for parsing a sequence of S-expressions
@@ -79,6 +83,15 @@ localize m = do
   put s
   return x
 
+enter :: TC a -> TC a
+enter m = do
+  modify $ CtxSubMod [] 0
+  x <- m
+  modify ctxTl
+  return x
+  where
+    ctxTl (CtxSubMod _ _ tl) = tl
+
 -- | typecheck the head of the current seq
 tcHd :: TC a -> TCS a
 tcHd p = TCS . StateT $ \(sexps, ctx) ->
@@ -99,7 +112,7 @@ done = fst <$> get >>= \case
 
 single :: TC a -> TCS a
 single p = tcHd p <* done
-  
+
 -- "hanndle" the reader effect using the state effect?
 list :: TCS a -> TC a
 list k = TC . ReaderT $ \sexp -> StateT $ \ctx -> case _sexp sexp of
@@ -108,15 +121,17 @@ list k = TC . ReaderT $ \sexp -> StateT $ \ctx -> case _sexp sexp of
     (x, (leftover, ctx)) <- runStateT (runTCS k) (sexps, ctx)
     guard $ null leftover
     return (x, ctx)
-  
+
+unlist :: TC a -> TCS a
+unlist p = TCS . StateT $ \(exps, ctx) ->
+  fmap ((,) exps) <$>
+  runStateT (runReaderT (runTC p) (ParsedSExp (error "internal error: don't look at me") (SEList exps))) ctx
+
 several :: TC a -> TCS [a]
 several tc = ([] <$ done) <|> ((:) <$> tcHd tc <*> several tc)
 
 atLeastOne :: TC a -> TCS (NEList a)
 atLeastOne p = ((Done <$> tcHd p) <* done) <|> (Cons <$> tcHd p <*> atLeastOne p)
-
--- slurpAll :: TCS ()
--- slurpAll = _2 .= []
 
 -- throwLocErr :: (Monaderror m ErrMsg) => String -> m a
 -- throwLocErr expected = do
@@ -134,11 +149,11 @@ atomEq s = do
   at <- anyAtom
   guard $ at == s
 
-program :: TCS Program
+program :: TCS [SynDecl ScopedVal]
 program = moduleBody
 
-moduleBody :: TCS ModuleBody
-moduleBody = ModuleBody <$> ((several decl) <|> empty)
+moduleBody :: TCS [SynDecl ScopedVal]
+moduleBody = several decl
 
 declare :: SynDecl ScopedVal -> TCS ()
 declare d = (_2 . localBindings) %= (d:)
@@ -149,141 +164,73 @@ sideeffect k m = do
   k x
   return x
 
-resolveRef :: ModDeref -> TCS ScopedVal
-resolveRef (MDSelect _ _) = error "NYI: submodules"
-resolveRef (MDCurMod s) = (resolveBinding s) =<< (get <&> view _2)
-  where
-    resolveBinding :: String -> Ctx -> TCS ScopedVal
-    resolveBinding s c = case c ^. localBindings of
-      []   -> case c ^? restCtx of
-        Nothing -> throwError $ "unbound variable"
-        Just rest -> shiftVal <$> resolveBinding s rest
-      b:bs ->
-        if _name b == s
-        then return $ _defn b
-        else resolveBinding s (c & localBindings .~ bs)
+-- denoteSpanString :: NEList (String, SetNF) -> [SpanVar] -> TCS NamedSemTransCtx
+-- denoteSpanString (Done tvar) [] = return $ DoneB tvar
+-- denoteSpanString (Cons (contravar, contraset) vars) ((SpanVar spanVar spanE) : es) = do
+--   span <- denoteSpan contravar contraset covarvar covarset spanE
+--   ConsA (contravar, contraset, spanVar, span) <$> denoteSpanString vars es
+--   where (covarvar, covarset) = neHd vars
+-- denoteSpanString (Done _) (e : es) = throwError $ "not enough indices for the inputs of a transformation"
+-- denoteSpanString (Cons _ _) [] = throwError $ "too many indices for the inputs of a transformation"
 
-denote :: ScopedExp -> TCS ScopedVal
-denote = \case 
-  (ScMod e) -> SemMod . ScopedSemMod <$> denoteMod e
-  (ScSet e) -> SemSet <$> denoteSet e
-  (ScFun e) -> SemFun <$> denoteScopedFun e
-  (ScSpan e) -> SemSpan <$> denoteScopedSpan e
-  (ScTrans e) -> SemTrans <$> denoteScopedTrans e
+-- denoteScopedTrans :: ScopedTransExp -> TCS ScopedSemTrans
+-- denoteScopedTrans (ScopedTransExp (TransScope indicesE varsE codE) e) = do
+--   indices <- traverse (\tvar -> (,) (_eltvar tvar) <$> denoteSet (_eltvarty tvar)) indicesE
+--   ctx <- denoteSpanString indices varsE
+--   let ((contravar, contraty), (covarvar, covarty)) = firstAndLast indices
+--   cod <- denoteSpan contravar contraty covarvar covarty codE
+--   f <- denoteTrans ctx cod e
+--   return $ ScopedSemTrans (ctxUnName ctx) cod f
 
-denoteMod :: ModExp -> TCS ([ScopedVal] -> [ScopedVal])
-denoteMod (ModBase (GModLam l)) = denoteModLam l
+-- -- this will probably have to change to do some inference when we add
+-- -- positive types (hom/tensor), though probably not when we add
+-- -- negative types like cotensor/products/pullbacks
+-- denoteTrans :: NamedSemTransCtx -> SpanNF -> TransExp -> TCS ([TransNF] -> TransNF)
+-- denoteTrans ctx codSpan (TransEVar x) = case ctx of
+--   ConsA (alphaContra, contraSet, spanVar, domSpan) (DoneB (betaCovar, covarSet)) ->
+--     if x == spanVar && codSpan == domSpan
+--     then return $ \[t] -> t
+--     else throwError $ "wrong var name or ill typed variable usage"
+--   DoneB _ -> throwError $ "variable out of scope"
+--   ConsA _ (ConsA _ _) -> throwError $ "unused variables"
+-- denoteTrans ctx codSpan (TransEApp r subTerms) =
+--   unlist (resolveRef r) >>= \case
+--   (SemTrans (ScopedSemTrans fCtx fCod transF)) -> do
+--     -- first, exhibit the expected output type codSpan as an
+--     -- instantiation of the functions type fCod
+--     -- I.e. codSpan = quote (unquote fCod contraFun covarFun)
 
-denoteModLam :: ModLambda -> TCS ([ScopedVal] -> [ScopedVal])
-denoteModLam (ModLam params _ bod) = return (\x -> error "NYI: module lambda")
+--     -- We need to infer this because even though we are being fairly
+--     -- explicit in typing we are actually suppressing some information
+--     -- from the term syntax: the most explicit form of the term
+--     -- application would be something like (f A1 t1 A2 t2 A3 t3 A4)
+--     -- rather than (f t1 t2 t3) here we are inferring A1 and A4. Later
+--     -- we will need to infer the rest.
+--     (contraFun, covarFun) <- codSpan `spanDecomposesInto` fCod
+--     -- now check that the arguments are valid inputs to the
+--     -- transformation
+--     subst <- denoteTransSubst ctx contraFun covarFun fCtx subTerms
+--     return $ transF . subst
+--   _ -> throwError $ "expected a previously defined transformation, but got...something else"
 
-denoteSet :: SetExp -> TCS SetNF
-denoteSet mdref = resolveRef mdref >>= \case
-  (SemSet dbref) -> return dbref
-  _ -> throwError $ "expected a set but got...something else"
+-- denoteTransSubst :: NamedSemTransCtx -> EltNF -> EltNF -> SemTransCtx -> [TransExp] -> TCS ([TransNF] -> [TransNF])
+-- denoteTransSubst domCtx contraFun covarFun codCtx es = do
+--   (leftoverCtx, covarFun', composableSubst) <- denoteTransSubstComp domCtx contraFun codCtx es
+--   case (leftoverCtx, covarFun == covarFun') of
+--     (ConsA _ _, _) -> throwError $ "unused variables"
+--     (_, False) -> throwError "some kind of mismatch, can this even happen?" -- TODO: write a better error message, when does this happen?
+--     (DoneB _, True) -> return $ evalState composableSubst
 
-denoteScopedFun :: ScopedEltExp -> TCS ScopedSemFun
-denoteScopedFun (ScopedEltExp (EltScope (TypedEltVar x domTyExp) codTyExp) e) = do
-  dom <- denoteSet domTyExp
-  cod <- denoteSet codTyExp
-  f <- denoteFun x dom cod e
-  return (ScopedSemFun dom cod f)
-  where
-
-denoteFun :: String -> SetNF -> SetNF -> EltExp -> TCS EltNF
-denoteFun x dom cod (EEVar y) = do
-      guard $ x == y
-      guard $ dom == cod
-      return ENFId
-denoteFun x dom cod (EEApp ref e) = resolveRef ref >>= \case
-        (SemFun (ScopedSemFun dom' cod' f)) -> do
-          guard $ cod == cod'
-          g <- denoteFun x dom dom' e
-          return $ unquoteSemFun f g
-        _ -> throwError $ "expected a function but got...something else"
-
-denoteScopedSpan :: ScopedSpanExp -> TCS ScopedSemSpan
-denoteScopedSpan (SpanScope (TypedEltVar x contraSetExp) (TypedEltVar y covarSetExp) , e) = do
-  contraSetDom <- denoteSet contraSetExp
-  covarSetDom <- denoteSet covarSetExp
-  semspan <- denoteSpan x contraSetDom y covarSetDom e
-  return $ ScopedSemSpan contraSetDom covarSetDom semspan
-
-denoteSpan :: String -> SetNF -> String -> SetNF -> SpanExp -> TCS SpanNF
-denoteSpan x contraSetDom y covarSetDom (SpanEApp ref a b) = resolveRef ref >>= \case
-    (SemSpan (ScopedSemSpan contraSetCod covarSetCod span)) -> do
-      contraFun <- denoteFun x contraSetDom contraSetCod a
-      covarFun  <- denoteFun y covarSetDom covarSetCod b
-      return $ unquoteSpan span contraFun covarFun
-    _ -> throwError $ "expected a span constructor but got...something else"
-
-denoteSpanString :: NEList (String, SetNF) -> [SpanVar] -> TCS NamedSemTransCtx
-denoteSpanString (Done tvar) [] = return $ DoneB tvar
-denoteSpanString (Cons (contravar, contraset) vars) ((SpanVar spanVar spanE) : es) = do
-  span <- denoteSpan contravar contraset covarvar covarset spanE
-  ConsA (contravar, contraset, spanVar, span) <$> denoteSpanString vars es
-  where (covarvar, covarset) = neHd vars
-denoteSpanString (Done _) (e : es) = throwError $ "not enough indices for the inputs of a transformation"
-denoteSpanString (Cons _ _) [] = throwError $ "too many indices for the inputs of a transformation"
-
-denoteScopedTrans :: ScopedTransExp -> TCS ScopedSemTrans
-denoteScopedTrans (ScopedTransExp (TransScope indicesE varsE codE) e) = do
-  indices <- traverse (\tvar -> (,) (_eltvar tvar) <$> denoteSet (_eltvarty tvar)) indicesE
-  ctx <- denoteSpanString indices varsE
-  let ((contravar, contraty), (covarvar, covarty)) = firstAndLast indices
-  cod <- denoteSpan contravar contraty covarvar covarty codE
-  f <- denoteTrans ctx cod e
-  return $ ScopedSemTrans (ctxUnName ctx) cod f
-
--- this will probably have to change to do some inference when we add
--- positive types (hom/tensor), though probably not when we add
--- negative types like cotensor/products/pullbacks
-denoteTrans :: NamedSemTransCtx -> SpanNF -> TransExp -> TCS ([TransNF] -> TransNF)
-denoteTrans ctx codSpan (TransEVar x) = case ctx of
-  ConsA (alphaContra, contraSet, spanVar, domSpan) (DoneB (betaCovar, covarSet)) ->
-    if x == spanVar && codSpan == domSpan
-    then return $ \[t] -> t
-    else throwError $ "wrong var name or ill typed variable usage"
-  DoneB _ -> throwError $ "variable out of scope"
-  ConsA _ (ConsA _ _) -> throwError $ "unused variables"
-denoteTrans ctx codSpan (TransEApp r subTerms) =
-  resolveRef r >>= \case
-  (SemTrans (ScopedSemTrans fCtx fCod transF)) -> do
-    -- first, exhibit the expected output type codSpan as an
-    -- instantiation of the functions type fCod
-    -- I.e. codSpan = quote (unquote fCod contraFun covarFun)
-
-    -- We need to infer this because even though we are being fairly
-    -- explicit in typing we are actually suppressing some information
-    -- from the term syntax: the most explicit form of the term
-    -- application would be something like (f A1 t1 A2 t2 A3 t3 A4)
-    -- rather than (f t1 t2 t3) here we are inferring A1 and A4. Later
-    -- we will need to infer the rest.
-    (contraFun, covarFun) <- codSpan `spanDecomposesInto` fCod
-    -- now check that the arguments are valid inputs to the
-    -- transformation
-    subst <- denoteTransSubst ctx contraFun covarFun fCtx subTerms
-    return $ transF . subst
-  _ -> throwError $ "expected a previously defined transformation, but got...something else"
-
-denoteTransSubst :: NamedSemTransCtx -> EltNF -> EltNF -> SemTransCtx -> [TransExp] -> TCS ([TransNF] -> [TransNF])
-denoteTransSubst domCtx contraFun covarFun codCtx es = do
-  (leftoverCtx, covarFun', composableSubst) <- denoteTransSubstComp domCtx contraFun codCtx es
-  case (leftoverCtx, covarFun == covarFun') of
-    (ConsA _ _, _) -> throwError $ "unused variables"
-    (_, False) -> throwError "some kind of mismatch, can this even happen?" -- TODO: write a better error message, when does this happen?
-    (DoneB _, True) -> return $ evalState composableSubst
-
-denoteTransSubstComp :: NamedSemTransCtx -> EltNF -> SemTransCtx -> [TransExp] -> TCS (NamedSemTransCtx,EltNF, State [TransNF] [TransNF])
-denoteTransSubstComp domCtx contraFun codCtx [] = case codCtx of
-  ConsA _ _ -> throwError $ "transformation applied to too few arguments"
-  DoneB _   -> return (domCtx, contraFun, return [])
-denoteTransSubstComp domCtx contraFun codCtx (e:es) = case codCtx of
-  DoneB _ -> throwError $ "transformation applied to too many arguments"
-  ConsA (_,cod) codCtx -> do
-    (domCtx, contraFun, prefixEater) <- denoteTransSubstCons domCtx contraFun cod e
-    (domCtx, covarFun, suffixEater) <- denoteTransSubstComp domCtx contraFun codCtx es
-    return $ (domCtx, covarFun, (:) <$> prefixEater <*> suffixEater)
+-- denoteTransSubstComp :: NamedSemTransCtx -> EltNF -> SemTransCtx -> [TransExp] -> TCS (NamedSemTransCtx,EltNF, State [TransNF] [TransNF])
+-- denoteTransSubstComp domCtx contraFun codCtx [] = case codCtx of
+--   ConsA _ _ -> throwError $ "transformation applied to too few arguments"
+--   DoneB _   -> return (domCtx, contraFun, return [])
+-- denoteTransSubstComp domCtx contraFun codCtx (e:es) = case codCtx of
+--   DoneB _ -> throwError $ "transformation applied to too many arguments"
+--   ConsA (_,cod) codCtx -> do
+--     (domCtx, contraFun, prefixEater) <- denoteTransSubstCons domCtx contraFun cod e
+--     (domCtx, covarFun, suffixEater) <- denoteTransSubstComp domCtx contraFun codCtx es
+--     return $ (domCtx, covarFun, (:) <$> prefixEater <*> suffixEater)
 
 -- we are given the input context Phi ctx(a:C,-)
 -- we know a substitution for the left side A : C => C'
@@ -297,37 +244,37 @@ denoteTransSubstComp domCtx contraFun codCtx (e:es) = case codCtx of
 
 -- and we return Phi_r, B and a denotation for t that returns both its
 -- answer and the "leftover" args that it didn't consume
-denoteTransSubstCons :: NamedSemTransCtx -> EltNF -> SpanNF -> TransExp -> TCS (NamedSemTransCtx,EltNF, State [TransNF] TransNF)
--- here we need to solve Phi_t |- x : R[A;B]
--- clearly we have Phi_t = alpha : C, x : R[A;B], beta : B
-denoteTransSubstCons ctx contraFun codSpan (TransEVar x) = case ctx of
-  DoneB _ -> throwError $ "variable used, but none remain in the context"
-  ConsA (_,_,y,ySpan) ctx ->
-    if x /= y
-    then throwError $ "used the wrong variable"
-    else do
-      (contraFun', covarFun) <- codSpan `spanDecomposesInto` ySpan
-      guard $ contraFun == contraFun' -- | TODO: Is this necessary? When will it be wrong? Write an error msg for it
-      return $ (ctx, covarFun, f)
-        where
-          f :: State [TransNF] TransNF
-          f = do
-            (t:ts) <- get
-            put ts
-            return t
+-- denoteTransSubstCons :: NamedSemTransCtx -> EltNF -> SpanNF -> TransExp -> TCS (NamedSemTransCtx,EltNF, State [TransNF] TransNF)
+-- -- here we need to solve Phi_t |- x : R[A;B]
+-- -- clearly we have Phi_t = alpha : C, x : R[A;B], beta : B
+-- denoteTransSubstCons ctx contraFun codSpan (TransEVar x) = case ctx of
+--   DoneB _ -> throwError $ "variable used, but none remain in the context"
+--   ConsA (_,_,y,ySpan) ctx ->
+--     if x /= y
+--     then throwError $ "used the wrong variable"
+--     else do
+--       (contraFun', covarFun) <- codSpan `spanDecomposesInto` ySpan
+--       guard $ contraFun == contraFun' -- | TODO: Is this necessary? When will it be wrong? Write an error msg for it
+--       return $ (ctx, covarFun, f)
+--         where
+--           f :: State [TransNF] TransNF
+--           f = do
+--             (t:ts) <- get
+--             put ts
+--             return t
 
--- here we are solving
--- Phi_t |- f(t1,...,tn) : R[A;B]
+-- -- here we are solving
+-- -- Phi_t |- f(t1,...,tn) : R[A;B]
 
-denoteTransSubstCons ctx contraFun cod (TransEApp ref subterms) = resolveRef ref >>= \case
--- first we lookup f's type and match it against R[A;B]
-  SemTrans (ScopedSemTrans fCtx fCod transF) -> do
-    (contraFun', covarFun) <- cod `spanDecomposesInto` fCod
-    guard $ contraFun' == contraFun -- TODO: will this ever error? write an error message if so
-    (ctx, covarFun', semArgs) <- denoteTransSubstComp ctx contraFun fCtx subterms
-    guard $ covarFun' == covarFun -- TODO: will this error either??
-    return (ctx, covarFun, transF <$> semArgs)
-  _ -> throwError $ "expected a previously defined transformation, but got...something else"
+-- denoteTransSubstCons ctx contraFun cod (TransEApp ref subterms) = unlist (resolveRef ref) >>= \case
+-- -- first we lookup f's type and match it against R[A;B]
+--   SemTrans (ScopedSemTrans fCtx fCod transF) -> do
+--     (contraFun', covarFun) <- cod `spanDecomposesInto` fCod
+--     guard $ contraFun' == contraFun -- TODO: will this ever error? write an error message if so
+--     (ctx, covarFun', semArgs) <- denoteTransSubstComp ctx contraFun fCtx subterms
+--     guard $ covarFun' == covarFun -- TODO: will this error either??
+--     return (ctx, covarFun, transF <$> semArgs)
+--   _ -> throwError $ "expected a previously defined transformation, but got...something else"
   
 
 -- Unification time
@@ -348,31 +295,35 @@ ENFFunApp f e `funDecomposesInto` ENFFunApp f' e' | f /= f' = throwError $ "inst
 ENFFunApp f e `funDecomposesInto` ENFFunApp f' e' = -- | f == f'
   ENFFunApp f <$> (e `funDecomposesInto` e')
   
-denoteAndDeclare :: SynDecl ScopedExp -> TCS ()
-denoteAndDeclare declaration = do
-  v <- denote $ _defn declaration
-  declare (declaration { _defn = v })
+-- denoteAndDeclare :: SynDecl ScopedExp -> TCS ()
+-- denoteAndDeclare declaration = do
+--   v <- denote $ _defn declaration
+--   declare (declaration { _defn = v })
 
-decl :: TC (SynDecl ScopedExp)
-decl = list . sideeffect denoteAndDeclare $
-      -- tcSynDecl "def-sig" (ScSig <$> single sigExp)
-  tcSynDecl "def-mod" (ScMod <$> single modExp)
-  <|> tcSynDecl "def-set" (ScSet <$> single setExp)
-  <|> tcSynDecl "def-fun" (ScFun <$> scopedEltExp)
-  <|> tcSynDecl "def-span" (ScSpan <$> scopedSpanExp)
-  <|> tcSynDecl "def-trans" (ScTrans <$> scopedTransExp)
+decl :: TC (SynDecl ScopedVal)
+decl = list $
+  tcSemDecl "def-mod" (SemMod <$> single modul)
+  <|> tcSemDecl "def-set" (SemSet <$> single setVal)
+  <|> tcSemDecl "def-fun" (SemFun <$> scopedFunVal)
+  <|> tcSemDecl "def-span" (SemSpan <$> scopedSpanVal)
+  -- <|> tcSynDecl "def-trans" (ScTrans <$> scopedTransExp)
   -- (def-trans t (a b c d) (Rab Sbc Qcd) Tad bod)
-  -- TODO: trans, assertion
+  -- TODO: assertion, signature
   where
-    tcSynDecl :: String -> TCS a -> TCS (SynDecl a)
-    tcSynDecl def p = (tcHd (atomEq def) >> Decl <$> tcHd anyAtom <*> p)
+    tcDecl :: String -> TCS a -> TCS (SynDecl a)
+    tcDecl def p = tcHd (atomEq def) *> (Decl <$> tcHd anyAtom <*> p)
+    
+    tcSemDecl :: String -> TCS ScopedVal -> TCS (SynDecl ScopedVal)
+    tcSemDecl def p = sideeffect declare $ tcDecl def p
+    
+    -- tcSynDecl :: String -> TCS ScopedExp -> TCS (SynDecl ScopedVal)
+    -- tcSynDecl def p = tcSemDecl def (denote =<< p)
 
 -- (sig () param ...) -- sig value
 -- (sig (param param ...) param ...) -- sig lambda
 -- or S
 -- or (S ...)
 -- or (. C ...)
-
 sigExp :: TC SigExp
 sigExp = list $ tcHd (atomEq "sig") >> return dummy
   where dummy = SigBase . GSigVar $ "NYI"
@@ -395,105 +346,183 @@ sigExp = list $ tcHd (atomEq "sig") >> return dummy
 -- or C
 -- or (. C ...)
 -- or (M anyExpr ...)
-modExp :: TC ModExp -- | TODO: module lambda
-modExp = ModBase . GModLam <$> modLam -- <|> modApp parse don't check
+modul :: TC ScopedSemMod
+modul = modulVar
+      <|> modulLam
   where
-    -- modBase = ModBase <$>
-    --   ((GModVar . MDCurMod <$> modVar)
-    --    <|> GModLam <$> modLam)
-  --   modVar = do
-  --     var <- anyAtom
-  --     ctx <- get
-  --     case fmap isMod $ lookupSynDecl var ctx of
-  --       Just True -> return var
-  --       _ -> empty
-    modLam = localize $ list $
-      tcHd (atomEq "mod") >> do
-      params      <- tcHd (list params)
-      sigSynDecls <- mayHd sigExp
-      modBod      <- moduleBody
-      return $ ModLam params sigSynDecls modBod 
-  --   modApp = empty
+    modulVar = modDeref >>= \case
+      SemMod m -> return m
+      _ -> empty
 
-setExp :: TC SetExp
-setExp = modDeref -- TODO: add mod deref
+    modulLam = enter . list $
+      tcHd (atomEq "mod") *> do
+      ps <- tcHd (list (several param))
+      sig <- mayHd empty
+      modBod <- moduleBody
+      return $ ScopedSemMod () (ModNFBase ps (map undecl modBod))
+
+    undecl (Decl a b) = (a,b)
+  -- ModBase <$> modBase
+  -- <|> ModApp <$> error ""
+
+-- modExp :: TC ModExp -- | TODO: module lambda
+-- modExp =
+--   ModBase . GModVar <$> modDeref
+--   <|> ModBase . GModLam <$> modLam -- <|> modApp parse don't check
+--   where
+--     -- modBase = ModBase <$>
+--     --   ((GModVar . MDCurMod <$> modVar)
+--     --    <|> GModLam <$> modLam)
+--   --   modVar = do
+--   --     var <- anyAtom
+--   --     ctx <- get
+--   --     case fmap isMod $ lookupSynDecl var ctx of
+--   --       Just True -> return var
+--   --       _ -> empty
+--     modLam = localize $ list $
+--       tcHd (atomEq "mod") >> do
+--       params      <- tcHd (list params)
+--       sigSynDecls <- mayHd sigExp
+--       modBod      <- moduleBody
+--       return $ ModLam params sigSynDecls modBod 
+--   --   modApp = empty
+
+setVal :: TC SetNF
+setVal = modDeref >>= \case
+  SemSet n -> return n
+  _ -> throwError $ "expected a set, but got...something else"
+
+-- setExp :: TC SetExp
+-- setExp = modDeref
 
 -- (x A) B t
-scopedEltExp :: TCS ScopedEltExp
-scopedEltExp = ScopedEltExp <$> eltScope <*> single eltExp
+scopedFunVal :: TCS ScopedSemFun
+scopedFunVal = do
+  (x, dom) <- tcHd eltVar
+  cod <- tcHd setVal
+  t <- single $ elt x dom cod
+  return $ ScopedSemFun dom cod t
+
+eltVar :: TC (String, SetNF)
+eltVar = list $ (,) <$> tcHd anyAtom <*> single setVal
+
+elt :: String -> SetNF -> SetNF -> TC EltNF
+elt x dom cod =
+  (atomEq x *> guard (dom == cod) *> return ENFId)
+  <|> (list $ do
+  f <- tcHd funVar
+  guard $ cod == (f ^. scfunCod)
+  arg <- single $ elt x dom (f ^. scfunDom)
+  return $ unquoteSemFun (f ^. scfun) arg)
   where
-    eltScope    = EltScope <$> tcHd typedEltVar <*> tcHd setExp
-
-eltExp :: TC EltExp
-eltExp = EEVar <$> anyAtom
-         <|> list (EEApp <$> tcHd modDeref <*> tcHd eltExp)
-
-typedEltVar :: TC TypedEltVar
-typedEltVar = list $ TypedEltVar <$> tcHd anyAtom <*> tcHd setExp
-
-spanVar :: TC SpanVar
-spanVar = list $ SpanVar <$> tcHd anyAtom <*> tcHd spanExp
+    funVar = modDeref >>= \case
+      SemFun f -> return f
+      _ -> throwError $ "expected a function but gott...something else"
 
 -- (x A) (y B) t
-scopedSpanExp :: TCS ScopedSpanExp      
-scopedSpanExp = (,) <$> spanScope <*> single spanExp
+scopedSpanVal :: TCS ScopedSemSpan
+scopedSpanVal = do
+  (contraX, contraSet) <- tcHd eltVar
+  (covarX,   covarSet) <- tcHd eltVar
+  s <- single $ spanVal contraX contraSet covarX covarSet
+  return $ ScopedSemSpan contraSet covarSet s
+
+spanVal :: String -> SetNF -> String -> SetNF -> TC SpanNF
+spanVal contraX contraSet covarX covarSet =
+  list $ do
+  r <- tcHd spanVar
+  contraArg <- tcHd $ elt contraX contraSet (r ^. scspContra)
+  covarArg  <- tcHd $ elt covarX  covarSet  (r ^. scspCovar)
+  return $ unquoteSpan (r ^. scspan) contraArg covarArg
+  where spanVar = modDeref >>= \case
+          SemSpan r -> return r
+          _ -> throwError "expected a span but got something else"
+
+-- spanVar :: TC SpanVar
+-- spanVar = list $ SpanVar <$> tcHd anyAtom <*> tcHd spanExp
+
+-- scopedSpanExp :: TCS ScopedSpanExp      
+-- scopedSpanExp = (,) <$> spanScope <*> single spanExp
+--   where
+--     spanScope = SpanScope <$> tcHd typedEltVar <*> tcHd typedEltVar
+
+-- spanExp :: TC SpanExp
+-- spanExp = list $ SpanEApp <$> tcHd modDeref <*> tcHd eltExp <*> tcHd eltExp
+
+-- -- ((a A) ... ((x (R a b)) ...) (S a a') t)
+-- scopedTransExp :: TCS ScopedTransExp
+-- scopedTransExp = ScopedTransExp <$> transScope <*> single transExp
+--   where transScope :: TCS TransScope
+--         transScope = TransScope <$> tcHd (list $ atLeastOne typedEltVar) <*> tcHd (list $ several spanVar) <*> tcHd spanExp
+
+--         transExp :: TC TransExp
+--         transExp = TransEVar <$> anyAtom <|> list (TransEApp <$> tcHd modDeref <*> several transExp)
+
+modDeref :: TC ScopedVal
+modDeref =
+  join (resolveBinding <$> anyAtom <*> get)
+  <|> list (tcHd (atomEq ".") *> join (select <$> tcHd modul <*> atLeastOne anyAtom))
   where
-    spanScope = SpanScope <$> tcHd typedEltVar <*> tcHd typedEltVar
+    resolveBinding :: String -> Ctx -> TC ScopedVal
+    resolveBinding s c = case c ^. localBindings of
+      []   -> case c ^? restCtx of
+        Nothing -> throwError $ "unbound variable"
+        Just rest -> shiftVal <$> resolveBinding s rest
+      b:bs ->
+        if _name b == s
+        then return $ _defn b
+        else resolveBinding s (c & localBindings .~ bs)
 
-spanExp :: TC SpanExp
-spanExp = list $ SpanEApp <$> tcHd modDeref <*> tcHd eltExp <*> tcHd eltExp
+    select :: ScopedSemMod -> NEList String -> TCS ScopedVal
+    select (ScopedSemMod sc mod) (Done s)    = selectOne sc mod s
+    select (ScopedSemMod sc mod) (Cons s ss) = selectOne sc mod s >>= \case
+      SemMod m -> select m ss
 
--- ((a A) ... ((x (R a b)) ...) (S a a') t)
-scopedTransExp :: TCS ScopedTransExp
-scopedTransExp = ScopedTransExp <$> transScope <*> single transExp
-  where transScope :: TCS TransScope
-        transScope = TransScope <$> tcHd (list $ atLeastOne typedEltVar) <*> tcHd (list $ several spanVar) <*> tcHd spanExp
-
-        transExp :: TC TransExp
-        transExp = TransEVar <$> anyAtom <|> list (TransEApp <$> tcHd modDeref <*> several transExp)
-
-modDeref :: TC ModDeref
-modDeref = MDCurMod <$> anyAtom
-           -- <|> selector -- TODO: implement selectors
-
-params :: TCS [SynDecl Generator]
-params = several param
+    selectOne :: Semantics.ModScope -> ModNF -> String -> TCS ScopedVal
+    selectOne sc (ModNFApp db vs)     s = error "NYI: quantification over modules"
+    selectOne sc (ModNFBase (_:_) ds) s = throwError "Tried to select from a parameterized module that is not fully applied"
+    selectOne sc (ModNFBase [] ds) s = case lookup s ds of
+      Nothing -> error "Tried to select a value not in the module"
+      Just x  -> return x
 
 -- | check the generator for validity and then add the declaration to
 -- the context
 
-nextDB :: TCS Int
-nextDB = _2 . numParams <<+= 1
+nextDB :: TCS DBRef
+nextDB = DBCurMod <$> (_2 . numParams <<+= 1)
 
 -- curDB :: TCS Int
 -- curDB = subtract 1 . length <$> ctx
 
-denoteGenerator :: Generator -> TCS ScopedVal
-denoteGenerator = \case
-  GenSet -> SemSet . DBCurMod <$> nextDB
-  GenFun eltty -> do
-    dom <- denoteSet $ _eltdomty eltty
-    cod <- denoteSet $ _eltcodty eltty
-    funName <- nextDB
-    return $ SemFun (ScopedSemFun dom cod (ENFFunApp (DBCurMod funName) ENFId))
-  GenSpan spanty -> do
-    contravar <- denoteSet $ _spancontraty spanty
-    covar     <- denoteSet $ _spancoty     spanty
-    spanName <- nextDB
-    return $ SemSpan (ScopedSemSpan contravar covar (SNFSpanApp (DBCurMod spanName) ENFId ENFId))
-  GenTrans transty -> do
-    -- setIndices :: [(String, SetNF)]
-    setIndices <- traverse (traverse denoteSet . topair) (_eltVars $ transty)
-    transCtx <-
-      ctxUnName <$> denoteSpanString setIndices (map (SpanVar "dummy") $ _domSpans transty)
-    let len = length . ctxSpans $ transCtx
-    let ((x, contraty), (y, covarty)) = firstAndLast setIndices
-    codSpan <- denoteSpan x contraty y covarty (_codSpan transty)
-    name <- nextDB
-    return $
-      SemTrans (ScopedSemTrans transCtx codSpan
-                               (TNFApp (DBCurMod name) . take len))
-      where topair x = (_eltvar x, _eltvarty x)
+denoteGenerator :: Type -> TCS ScopedVal
+denoteGenerator ty = flip dbVal ty <$> nextDB
+
+-- denoteGenerator :: Generator -> TCS ScopedVal
+-- denoteGenerator = \case
+--   GenSet -> SemSet . DBCurMod <$> nextDB
+--   GenFun eltty -> do
+--     dom <- denoteSet $ _eltdomty eltty
+--     cod <- denoteSet $ _eltcodty eltty
+--     funName <- nextDB
+--     return $ SemFun (ScopedSemFun dom cod (ENFFunApp (DBCurMod funName) ENFId))
+--   GenSpan spanty -> do
+--     contravar <- denoteSet $ _spancontraty spanty
+--     covar     <- denoteSet $ _spancoty     spanty
+--     spanName <- nextDB
+--     return $ SemSpan (ScopedSemSpan contravar covar (SNFSpanApp (DBCurMod spanName) ENFId ENFId))
+--   GenTrans transty -> do
+--     -- setIndices :: [(String, SetNF)]
+--     setIndices <- traverse (traverse denoteSet . topair) (_eltVars $ transty)
+--     transCtx <-
+--       ctxUnName <$> denoteSpanString setIndices (map (SpanVar "dummy") $ _domSpans transty)
+--     let len = length . ctxSpans $ transCtx
+--     let ((x, contraty), (y, covarty)) = firstAndLast setIndices
+--     codSpan <- denoteSpan x contraty y covarty (_codSpan transty)
+--     name <- nextDB
+--     return $
+--       SemTrans (ScopedSemTrans transCtx codSpan
+--                                (TNFApp (DBCurMod name) . take len))
+--       where topair x = (_eltvar x, _eltvarty x)
             
     -- first validate the type
 -- case _defn declGen of
@@ -502,22 +531,23 @@ denoteGenerator = \case
 --     return (declGen { _defn = _ })
 --   _      -> _
 
-declareGenerator :: SynDecl Generator -> TCS ()
+declareGenerator :: SynDecl Type -> TCS Type
 declareGenerator declGen = do
-  v <- denoteGenerator (_defn declGen)
-  declare (declGen { _defn = v })
+  declare =<< defn denoteGenerator declGen
+  return $ declGen ^. defn
     
-    
--- | Warning: this has the effect of extending the current context
-param :: TC (SynDecl Generator)
-param = list . sideeffect (declareGenerator) $
-      genName "set" (done $> GenSet)
-  <|> genName "fun"  (GenFun  <$> (EltTy  <$> tcHd setExp <*> tcHd setExp <* done))
-  <|> genName "span" (GenSpan <$> (SpanTy <$> tcHd setExp <*> tcHd setExp <* done))
-  <|> genName "trans" (GenTrans <$> (TransTy <$> tcHd (list (atLeastOne typedEltVar)) <*> tcHd (list (several spanExp)) <*> tcHd spanExp))
+-- | Has the effect of extending the current context
+param :: TC Type
+param = list $
+  (genName "set" (done $> TypeSet))
+  <|> genName "fun"  (TypeFun  <$> tcHd setVal <*> tcHd setVal <* done)
+  <|> genName "span" (TypeSpan <$> tcHd setVal <*> tcHd setVal <* done)
+  -- <|> genName "trans" (TypeTrans)
+  -- <|> genName' "trans" (GenTrans <$> (TransTy <$> tcHd (list (atLeastOne typedEltVar)) <*> tcHd (list (several spanExp)) <*> tcHd spanExp
   -- (def-trans t (a b c d) (Rab Sbc Qcd) Tad bod)
   where
-    genName keyword p = tcHd (atomEq keyword) >> Decl <$> tcHd anyAtom <*> p
+    genName key p = declareGenerator =<< ((tcHd (atomEq key)) *> (Decl <$> tcHd anyAtom <*> p))
+
   -- | GenSet -- "base type"                        (set X)
   -- | GenFun EltScope -- "function symbol"         (fun f A B)
   -- | GenSpan SpanScope -- "base type constructor" (span R A B)
