@@ -6,7 +6,7 @@ import Text.Parsec
 import Text.Parsec.Language
 import qualified Text.Parsec.Token as P
 
-import Grammar
+import Syntax
 
 type Parse = Parsec String ()
 
@@ -24,6 +24,7 @@ sexp_lang = P.LanguageDef
   , P.reservedOpNames = []
   , P.caseSensitive = True }
   where
+    identChar :: (Monad m) => ParsecT String () m Char
     identChar = letter <|> char '-' <|> char '_' <|> char '>' <|> char '<' <|> char '=' <|> char '*' <|> char '~'
 
 lexer :: P.GenTokenParser String () Identity

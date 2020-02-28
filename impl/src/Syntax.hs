@@ -1,9 +1,8 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveTraversable #-}
-module Grammar where
+module Syntax where
 
-import Data.Bifunctor
 import qualified Text.Parsec as Parsec
 
 import Util
@@ -40,66 +39,6 @@ data Decl name a = Decl { _name :: name , _defn :: a }
   deriving (Show, Read, Eq, Functor)
 
 type SynDecl = Decl String
-
-type Ctx = [SynDecl SemVal]
-
--- | 
-data SemVal
-  = SemSet SetNF
-  | SemFun ScopedSemFun
-  | SemSpan ScopedSemSpan
-  | SemTrans ScopedSemTrans
--- | SemProof ??
-  -- | SemSig -- TODO
-  | SemMod -- TODO
-
-data ScopedSemFun = ScopedSemFun { _scfunDom :: SetNF, _scfunCod :: SetNF, _scfun :: EltNF -> EltNF }
-data ScopedSemSpan = ScopedSemSpan { _scspContra :: SetNF, _scspCovar :: SetNF, _scspan :: EltNF -> EltNF -> SpanNF }
-
-type NamedSemTransCtx = ConsStar (String, SetNF, String, SpanNF) (String, SetNF)
-type SemTransCtx = ConsStar (SetNF, SpanNF) SetNF
-
-ctxIndices :: SemTransCtx -> NEList SetNF
-ctxIndices = consStartoNE . first fst
-
-ctxSpans :: SemTransCtx -> [SpanNF]
-ctxSpans = allAs . first snd
-
-ctxUnName :: NamedSemTransCtx -> SemTransCtx
-ctxUnName = bimap (\(_,a,_,r) -> (a,r)) snd
-
-boundary :: SemTransCtx -> (SetNF, SetNF)
-boundary = firstAndLast . ctxIndices
-
-data ScopedSemTrans
-  = ScopedSemTrans { _sctransCtx  :: SemTransCtx
-                   , _sctransCod     :: SpanNF   -- codomain
-                   , _sctrans        ::([TransNF] -> TransNF) }
-
-type SemTransSubst = [TransNF] -> [TransNF]
-
-quoteSemFun :: (EltNF -> EltNF) -> EltNF
-quoteSemFun f = f ENFId
-
-quoteSemSpan :: (EltNF -> EltNF -> SpanNF) -> SpanNF
-quoteSemSpan r = r ENFId ENFId
-
-quoteSemTrans :: ([TransNF] -> TransNF) -> TransNF
-quoteSemTrans t = t (repeat TNFId)
-
-type SetNF = DBRef
-data EltNF
-  = ENFId
-  | ENFFunApp DBRef EltNF
-  deriving (Show, Eq)
-
-data SpanNF = SNFSpanApp { _spanSymb :: DBRef, _contraElt :: EltNF, _covarElt :: EltNF }
-  deriving (Show, Eq)
-
-data TransNF
-  = TNFId
-  | TNFApp DBRef [TransNF]
-  deriving (Show, Eq)
 
 lookupDecl :: (Eq name) => name -> [Decl name a] -> Maybe a
 lookupDecl s xs = lookup s (map declToPair xs)
@@ -173,12 +112,6 @@ data ModDeref
   = MDCurMod String
   | MDSelect ModExp [String]
   deriving (Show, Read, Eq)
-
--- | equivalent to NEListof Int, but more useful for recursion
-data DBRef
-  = DBCurMod { _curMod :: Int }
-  | DBSubMod { _curMod :: Int , _subMod :: DBRef }
-  deriving (Show, Eq)
 
 data AnyExp
   = ERef ModDeref -- after type checking this shouldn't be possible,
