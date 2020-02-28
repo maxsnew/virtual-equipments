@@ -49,7 +49,7 @@ data Type
   = TypeSet
   | TypeFun SetNF SetNF
   | TypeSpan SetNF SetNF
-  -- | TypeTrans []
+  | TypeTrans SemTransCtx SpanNF
 
 substDBRef :: DBRef -> [ScopedVal] -> Either DBRef ScopedVal
 substDBRef (DBCurMod n) g = Right $ g !! n
@@ -59,6 +59,8 @@ typeOf :: ScopedVal -> Type
 typeOf (SemSet _) = TypeSet
 typeOf (SemFun (ScopedSemFun dom cod _)) = TypeFun dom cod
 typeOf (SemSpan (ScopedSemSpan contra covar _)) = TypeSpan contra covar
+typeOf (SemTrans (ScopedSemTrans ctx cod _)) = TypeTrans (ctxUnName ctx) cod
+
 
 dbVal :: DBRef -> Type -> ScopedVal
 dbVal n (TypeSet) = SemSet n
@@ -99,6 +101,9 @@ shiftSpan (SNFSpanApp r contra covar) = SNFSpanApp (DBOutMod r) (shiftElt contra
 type NamedSemTransCtx = ConsStar (String, SetNF, String, SpanNF) (String, SetNF)
 type SemTransCtx = ConsStar (SetNF, SpanNF) SetNF
 
+namedIndices :: NamedSemTransCtx -> NEList (String, SetNF)
+namedIndices = consStartoNE . first (\(x,s,_,_) -> (x,s))
+
 ctxIndices :: SemTransCtx -> NEList SetNF
 ctxIndices = consStartoNE . first fst
 
@@ -112,9 +117,9 @@ boundary :: SemTransCtx -> (SetNF, SetNF)
 boundary = firstAndLast . ctxIndices
 
 data ScopedSemTrans
-  = ScopedSemTrans { _sctransCtx  :: SemTransCtx
-                   , _sctransCod     :: SpanNF   -- codomain
-                   , _sctrans        ::([TransNF] -> TransNF) }
+  = ScopedSemTrans { _sctransCtx  :: NamedSemTransCtx
+                   , _sctransCod  :: SpanNF   -- codomain
+                   , _sctrans     :: TransNF }
 
 type SemTransSubst = [TransNF] -> [TransNF]
 

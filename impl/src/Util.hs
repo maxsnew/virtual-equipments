@@ -1,14 +1,18 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE TemplateHaskell #-}
 module Util where
 
+import Control.Lens
 import Data.Bifunctor
 
 data NEList a
-  = Done a
-  | Cons a (NEList a)
+  = Done { _neHd :: a }
+  | Cons { _neHd :: a, _neTl :: (NEList a) }
   deriving (Show, Read, Eq, Functor, Foldable, Traversable)
+
+$(makeLenses ''NEList)
 
 toNE :: [a] -> Maybe (NEList a)
 toNE = foldr cons Nothing
@@ -19,10 +23,6 @@ toNE = foldr cons Nothing
 neFold :: (a -> b -> b) -> (a -> b) -> NEList a -> b
 neFold cons done (Done x)    = done x
 neFold cons done (Cons x xs) = cons x (neFold cons done xs)
-
-neHd :: NEList a -> a
-neHd (Done x)   = x
-neHd (Cons x _) = x
 
 firstAndLast :: NEList a -> (a, a)
 firstAndLast = neFold cons done

@@ -540,13 +540,25 @@ declareGenerator declGen = do
 param :: TC Type
 param = list $
   (genName "set" (done $> TypeSet))
-  <|> genName "fun"  (TypeFun  <$> tcHd setVal <*> tcHd setVal <* done)
-  <|> genName "span" (TypeSpan <$> tcHd setVal <*> tcHd setVal <* done)
-  -- <|> genName "trans" (TypeTrans)
+  <|> genName "fun"   (TypeFun  <$> tcHd setVal <*> tcHd setVal <* done)
+  <|> genName "span"  (TypeSpan <$> tcHd setVal <*> tcHd setVal <* done)
+  -- (trans t (a b c d) (Rab Sbc Qcd) Tad bod)
+  <|> genName "trans" (do
+      indices <- tcHd (list (atLeastOne eltVar))
+      ctx <- tcHd . list $ spanString indices
+      let ((contraX, contraSet), (covarX, covarSet)) = firstAndLast $ indices
+      cod <- single (spanVal contraX contraSet covarX covarSet)
+      return $ TypeTrans ctx cod)
   -- <|> genName' "trans" (GenTrans <$> (TransTy <$> tcHd (list (atLeastOne typedEltVar)) <*> tcHd (list (several spanExp)) <*> tcHd spanExp
-  -- (def-trans t (a b c d) (Rab Sbc Qcd) Tad bod)
   where
     genName key p = declareGenerator =<< ((tcHd (atomEq key)) *> (Decl <$> tcHd anyAtom <*> p))
+
+spanString :: NEList (String, SetNF) -> TCS SemTransCtx
+spanString (Done x) = done $> DoneB (snd x)
+spanString (Cons (contraVar, contraSet) xs) =
+  let (covarVar, covarSet) = xs ^. neHd in do
+  spn <- tcHd $ spanVal contraVar contraSet covarVar covarSet
+  ConsA (contraSet, spn) <$> spanString xs
 
   -- | GenSet -- "base type"                        (set X)
   -- | GenFun EltScope -- "function symbol"         (fun f A B)
