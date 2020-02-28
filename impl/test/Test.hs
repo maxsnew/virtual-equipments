@@ -51,8 +51,8 @@ goodTests = "Successful Type Checks" ~: test
     "(def-mod S (mod ((set A) (span HomA A A) (set B) (fun G B A) (span M A B) (trans counit ((b B)) () (M (G b) b)) (trans intro ((a A) (b B)) ((M a b)) (HomA a (G b))))))"
   , assertTC "ID-trans-params"
     "(def-mod ID-trans (mod ((set A) (span R A A))  ))"
-  -- , assertTC "ID-trans"
-  --   "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id ((a A) (a' A)) ((x (R a a'))) (R a a') x)))"
+  , assertTC "ID-trans"
+    "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id ((a A) (a' A)) ((x (R a a'))) (R a a') x)))"
   -- , assertTC "trans eta empty"
   --   "(def-mod trans-eta (mod ((set A) (span R A A) (trans foo ((a A)) () (R a a)))  (def-trans bar ((a A)) () (R a a) (foo))))"
   -- , assertTC "trans eta one-arg"
@@ -93,14 +93,14 @@ badTests = "Type Checking Failures" ~: test
   , not (typeChecks "(def-mod ID (mod ((set X))  (def-fun id (x X) X (X x))))") ~? "set used as a fun"
   , not (typeChecks "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans comp ((X Ob) (Y Ob)) () (Mor X X))) ))") ~? "cat id too many indices"
   , not (typeChecks "(def-mod S (mod ((set Ob) (span Mor Ob Ob) (trans comp ((X Ob)) ((Mor X X)) (Mor X X))) ))") ~? "cat not enough indices"
-  -- , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id (a A) ((x (R a a))) (R a a) x)))")
-  -- ~? "trans indices need to be parenthesized"
-  -- , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id ((a A)) (x (R a a)) (R a a) x)))")
-  -- ~? "trans vars need to be parenthesized"
-  -- , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id ((a A)) ((x (R a a))) (R a a) x)))")
-  -- ~? "improper duplication of indices"
-  -- , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id ((a A) (a' A)) ((x (R a a))) (R a a') x)))")
-  -- ~? "more improper duplication of indices"
+  , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id (a A) ((x (R a a))) (R a a) x)))")
+  ~? "trans indices need to be parenthesized"
+  , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id ((a A)) (x (R a a)) (R a a) x)))")
+  ~? "trans vars need to be parenthesized"
+  , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id ((a A)) ((x (R a a))) (R a a) x)))")
+  ~? "improper duplication of indices"
+  , not (typeChecks "(def-mod ID-trans (mod ((set A) (span R A A))  (def-trans id ((a A) (a' A)) ((x (R a a))) (R a a') x)))")
+  ~? "more improper duplication of indices"
   -- , not (typeChecks  
   --   "(def-mod trans-eta (mod ((set A) (set B) (span Q A B) (span R A B) (trans foo ((a A) (b B)) ((Q a b)) (R a b)))  (def-trans bar ((a A) (b B)) ((x (Q a b))) (R a b) (foo))))")
   --   ~? "unused var"

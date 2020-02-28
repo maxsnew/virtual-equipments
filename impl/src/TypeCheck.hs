@@ -303,10 +303,10 @@ ENFFunApp f e `funDecomposesInto` ENFFunApp f' e' = -- | f == f'
 decl :: TC (SynDecl ScopedVal)
 decl = list $
   tcSemDecl "def-mod" (SemMod <$> single modul)
-  <|> tcSemDecl "def-set" (SemSet <$> single setVal)
-  <|> tcSemDecl "def-fun" (SemFun <$> scopedFunVal)
-  <|> tcSemDecl "def-span" (SemSpan <$> scopedSpanVal)
-  -- <|> tcSynDecl "def-trans" (ScTrans <$> scopedTransExp)
+  <|> tcSemDecl "def-set"   (SemSet   <$> single setVal)
+  <|> tcSemDecl "def-fun"   (SemFun   <$> scopedFunVal)
+  <|> tcSemDecl "def-span"  (SemSpan  <$> scopedSpanVal)
+  <|> tcSemDecl "def-trans" (SemTrans <$> scopedTransVal)
   -- (def-trans t (a b c d) (Rab Sbc Qcd) Tad bod)
   -- TODO: assertion, signature
   where
@@ -315,9 +315,6 @@ decl = list $
     
     tcSemDecl :: String -> TCS ScopedVal -> TCS (SynDecl ScopedVal)
     tcSemDecl def p = sideeffect declare $ tcDecl def p
-    
-    -- tcSynDecl :: String -> TCS ScopedExp -> TCS (SynDecl ScopedVal)
-    -- tcSynDecl def p = tcSemDecl def (denote =<< p)
 
 -- (sig () param ...) -- sig value
 -- (sig (param param ...) param ...) -- sig lambda
@@ -438,6 +435,51 @@ spanVal contraX contraSet covarX covarSet =
           SemSpan r -> return r
           _ -> throwError "expected a span but got something else"
 
+-- ((a X) (b Y) (c Z)) ((r (R a b)) (q (Q b c))) (P a c) bod
+scopedTransVal :: TCS ScopedSemTrans
+scopedTransVal = do
+  indices <- tcHd $ spanStringIndices
+  ctx     <- tcHd . list $ transCtx indices
+  let ((contraX, contraSet), (covarX, covarSet)) = firstAndLast $ indices
+  cod     <- tcHd $ spanVal contraX contraSet covarX covarSet
+  ScopedSemTrans ctx cod <$> transValChk ctx cod
+
+transCtx :: NEList (String, SetNF) -> TCS NamedSemTransCtx
+transCtx (Done x)    = done $> DoneB x
+transCtx (Cons (contraX, contraSet) indices) =
+  let (covarX, covarSet) = indices ^. neHd in do
+  (spanX, span) <- tcHd $ spanVarChk contraX contraSet covarX covarSet
+  ConsA (contraX, contraSet, spanX, span) <$> transCtx indices
+
+spanVarChk :: String -> SetNF -> String -> SetNF -> TC (String, SpanNF)
+spanVarChk contraX contraSet covarX covarSet =
+  list $ (,) <$> tcHd anyAtom <*> single (spanVal contraX contraSet covarX covarSet)
+
+transValChk :: NamedSemTransCtx -> SpanNF -> TCS TransNF
+transValChk doms cod = idVal <|> appVal
+  where
+    idVal = do
+      x <- single anyAtom
+      case doms of
+        ConsA (_, _, y, r) (DoneB _) -> do
+          guard $ x == y
+          guard $ r == cod
+          return $ TNFId
+        (DoneB _) -> throwError "unbound transformation variable"
+        (ConsA _ (ConsA _ _)) -> throwError "unused transformation variable(s)"
+    appVal :: TCS TransNF
+    appVal = empty
+
+spanStringIndices :: TC (NEList (String, SetNF))
+spanStringIndices = list (atLeastOne eltVar)
+
+spanString :: NEList (String, SetNF) -> TCS SemTransCtx
+spanString (Done x) = done $> DoneB (snd x)
+spanString (Cons (contraVar, contraSet) xs) =
+  let (covarVar, covarSet) = xs ^. neHd in do
+  spn <- tcHd $ spanVal contraVar contraSet covarVar covarSet
+  ConsA (contraSet, spn) <$> spanString xs
+  
 -- spanVar :: TC SpanVar
 -- spanVar = list $ SpanVar <$> tcHd anyAtom <*> tcHd spanExp
 
@@ -542,23 +584,15 @@ param = list $
   (genName "set" (done $> TypeSet))
   <|> genName "fun"   (TypeFun  <$> tcHd setVal <*> tcHd setVal <* done)
   <|> genName "span"  (TypeSpan <$> tcHd setVal <*> tcHd setVal <* done)
-  -- (trans t (a b c d) (Rab Sbc Qcd) Tad bod)
+  -- (trans t ((a X) (b Y) (c Z) (d W)) ((R a b) (S b c) (Q d c)) (P a d))
   <|> genName "trans" (do
-      indices <- tcHd (list (atLeastOne eltVar))
+      indices <- tcHd spanStringIndices
       ctx <- tcHd . list $ spanString indices
       let ((contraX, contraSet), (covarX, covarSet)) = firstAndLast $ indices
       cod <- single (spanVal contraX contraSet covarX covarSet)
       return $ TypeTrans ctx cod)
-  -- <|> genName' "trans" (GenTrans <$> (TransTy <$> tcHd (list (atLeastOne typedEltVar)) <*> tcHd (list (several spanExp)) <*> tcHd spanExp
   where
     genName key p = declareGenerator =<< ((tcHd (atomEq key)) *> (Decl <$> tcHd anyAtom <*> p))
-
-spanString :: NEList (String, SetNF) -> TCS SemTransCtx
-spanString (Done x) = done $> DoneB (snd x)
-spanString (Cons (contraVar, contraSet) xs) =
-  let (covarVar, covarSet) = xs ^. neHd in do
-  spn <- tcHd $ spanVal contraVar contraSet covarVar covarSet
-  ConsA (contraSet, spn) <$> spanString xs
 
   -- | GenSet -- "base type"                        (set X)
   -- | GenFun EltScope -- "function symbol"         (fun f A B)
