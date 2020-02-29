@@ -279,27 +279,38 @@ sideeffect k m = do
 
 -- Unification time
 
+-- given two spans R[a;b] and R'[a';b']
+-- find most general A,B,A',B'
+-- such that
+-- R[A;B] = R'[A';B']
+unifySpans :: (IsString e, MonadError e m) => SpanNF -> SpanNF -> m ((EltNF, EltNF), (EltNF, EltNF))
+SNFSpanApp r1 f1 g1 `unifySpans` SNFSpanApp r2 f2 g2 =
+  if r1 /= r2
+  then throwError "transformation type error"
+  else (,) <$> (f1 `unifyFuns` f2) <*> (g1 `unifyFuns` g2)
+
+unifyFuns :: (IsString e, MonadError e m) => EltNF -> EltNF -> m (EltNF, EltNF)
+ENFId `unifyFuns` f2 = return (f2, ENFId)
+f1 `unifyFuns` ENFId = return (ENFId, f1)
+ENFFunApp f1 e1 `unifyFuns` ENFFunApp f2 e2 =
+  if f1 /= f2 then throwError "transformation type error"
+  else e1 `unifyFuns` e2
+
 -- special directed case of unification.  want to find an
 -- instantiation of the second arg that makes it equal to the first.
-spanDecomposesInto :: SpanNF -> SpanNF -> TCS (EltNF, EltNF)
-(SNFSpanApp r1 f1 g1) `spanDecomposesInto` (SNFSpanApp r2 f2 g2) | r1 /= r2
-  = throwError $ "transformation has wrong output span"
-SNFSpanApp r1 f1 g1 `spanDecomposesInto` SNFSpanApp r2 f2 g2 -- | r1 == r2
-  = (,) <$> (f1 `funDecomposesInto` f2) <*> (g1 `funDecomposesInto` g2)
+spanDecomposesInto :: (IsString e, MonadError e m) => SpanNF -> SpanNF -> m (EltNF, EltNF)
+s1 `spanDecomposesInto` s2 = do
+  (shouldBeIds, res) <- s1 `unifySpans` s2
+  when (shouldBeIds /= (ENFId, ENFId)) $ throwError "something was not an instantiation of something else"
+  return res
 
 -- f `fdi` g ~> h then f = quote (unquote g h)
-funDecomposesInto :: EltNF -> EltNF -> TCS EltNF
-e `funDecomposesInto` ENFId = return e
-ENFId `funDecomposesInto` ENFFunApp f e = throwError $ "instantiation failure: a transformation was used whose type is too specific"
-ENFFunApp f e `funDecomposesInto` ENFFunApp f' e' | f /= f' = throwError $ "instantiation failure: a transformation's type doesn't match its expected type"
-ENFFunApp f e `funDecomposesInto` ENFFunApp f' e' = -- | f == f'
-  ENFFunApp f <$> (e `funDecomposesInto` e')
+funDecomposesInto :: (IsString e, MonadError e m) => EltNF -> EltNF -> m EltNF
+e1 `funDecomposesInto` e2 = do
+  (shouldBeId, res) <- e1 `unifyFuns` e2
+  when (shouldBeId /= ENFId) $ throwError "something was not an inst of something elsee"
+  return res
   
--- denoteAndDeclare :: SynDecl ScopedExp -> TCS ()
--- denoteAndDeclare declaration = do
---   v <- denote $ _defn declaration
---   declare (declaration { _defn = v })
-
 decl :: TC (SynDecl ScopedVal)
 decl = list $
   tcSemDecl "def-mod" (SemMod <$> single modul)
@@ -442,7 +453,7 @@ scopedTransVal = do
   ctx     <- tcHd . list $ transCtx indices
   let ((contraX, contraSet), (covarX, covarSet)) = firstAndLast $ indices
   cod     <- tcHd $ spanVal contraX contraSet covarX covarSet
-  ScopedSemTrans ctx cod <$> transValChk ctx cod
+  single $ (ScopedSemTrans (ctxUnName ctx) cod <$> transValChk ctx cod)
 
 transCtx :: NEList (String, SetNF) -> TCS NamedSemTransCtx
 transCtx (Done x)    = done $> DoneB x
@@ -455,20 +466,53 @@ spanVarChk :: String -> SetNF -> String -> SetNF -> TC (String, SpanNF)
 spanVarChk contraX contraSet covarX covarSet =
   list $ (,) <$> tcHd anyAtom <*> single (spanVal contraX contraSet covarX covarSet)
 
-transValChk :: NamedSemTransCtx -> SpanNF -> TCS TransNF
-transValChk doms cod = idVal <|> appVal
+transValChk :: NamedSemTransCtx -> SpanNF -> TC TransNF
+transValChk doms cod = transValChkComp doms cod >>= \case
+  (DoneB _, _, t) -> return t
+  (ConsA _ _, _, _) -> throwError "unused variables in transformation"
+
+-- we are given Phi, R
+-- we parse a t and produce a Phi_r and the (unique?, most general?) B such that
+-- Phi = Phi_l,Phi_r
+-- Phi_l |- t : R[Id;B]
+transValChkComp :: NamedSemTransCtx -> SpanNF -> TC (NamedSemTransCtx, EltNF, TransNF)
+transValChkComp doms cod = idVal <|> list appVal
   where
     idVal = do
-      x <- single anyAtom
+      x <- anyAtom
       case doms of
-        ConsA (_, _, y, r) (DoneB _) -> do
-          guard $ x == y
-          guard $ r == cod
-          return $ TNFId
+        ConsA (_, _, y, ySpan) leftovers -> do
+          when (x /= y) $ throwError "used the wrong transformation variable"
+          ((contraCodF,covarCodF), (contraDomF,covarDomF)) <- cod `unifySpans` ySpan
+          when (contraDomF /= ENFId || covarDomF /= ENFId) $ throwError "variable's type is too general"
+          when (contraCodF /= ENFId) $ throwError "transformation type error"
+          return (leftovers, covarCodF, TNFId)
         (DoneB _) -> throwError "unbound transformation variable"
-        (ConsA _ (ConsA _ _)) -> throwError "unused transformation variable(s)"
-    appVal :: TCS TransNF
-    appVal = empty
+    -- (f t1 t2 t3)
+    appVal :: TCS (NamedSemTransCtx, EltNF, TransNF)
+    appVal = tcHd modDeref >>= \case
+
+      -- want to find Phi_l, B
+      -- Phi_l |- f(t,...) : R[id;B]
+      -- we get f : forall ixs... Phi_f => S
+      -- we then need to see that R[id;-] is an instantiation S
+      -- then check that
+      -- Phi_l |- t,... : Phi_f[A';-]
+      SemTrans f -> do
+        -- we have R_exp[A;B] = R_f[A';B']
+        ((contraCodF,covarCodF), (contrafF, covarfF)) <- cod `unifySpans` (f ^. sctransCod)
+        when (contraCodF /= ENFId) $ throwError "transformation type error of some sort"
+        (leftovers, covarResultF, args) <- transSubstChkComp doms contrafF (f ^. sctransCtx)
+        return (leftovers, unquoteSemFun covarCodF covarResultF, unquoteSemTrans (f ^. sctrans) args)
+        -- unquoteSemTrans (f ^. sctrans) <$> transSubstChk (f ^. sctransCtx)
+      _ -> throwError "expected a transformation but got...something else"
+
+transSubstChkComp :: NamedSemTransCtx -> EltNF -> SemTransCtx -> TCS (NamedSemTransCtx, EltNF, [TransNF])
+transSubstChkComp doms contraFun cods = case cods of
+  DoneB _   -> done $> (doms, contraFun, [])
+  ConsA (_, codSpan) cods -> do
+    (leftovers, covarFun , arg) <- tcHd $ transValChkComp doms (unquoteSpan codSpan contraFun ENFId)
+    (_3 %~ (arg:)) <$> transSubstChkComp leftovers covarFun cods
 
 spanStringIndices :: TC (NEList (String, SetNF))
 spanStringIndices = list (atLeastOne eltVar)
@@ -480,17 +524,6 @@ spanString (Cons (contraVar, contraSet) xs) =
   spn <- tcHd $ spanVal contraVar contraSet covarVar covarSet
   ConsA (contraSet, spn) <$> spanString xs
   
--- spanVar :: TC SpanVar
--- spanVar = list $ SpanVar <$> tcHd anyAtom <*> tcHd spanExp
-
--- scopedSpanExp :: TCS ScopedSpanExp      
--- scopedSpanExp = (,) <$> spanScope <*> single spanExp
---   where
---     spanScope = SpanScope <$> tcHd typedEltVar <*> tcHd typedEltVar
-
--- spanExp :: TC SpanExp
--- spanExp = list $ SpanEApp <$> tcHd modDeref <*> tcHd eltExp <*> tcHd eltExp
-
 -- -- ((a A) ... ((x (R a b)) ...) (S a a') t)
 -- scopedTransExp :: TCS ScopedTransExp
 -- scopedTransExp = ScopedTransExp <$> transScope <*> single transExp

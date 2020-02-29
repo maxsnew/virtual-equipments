@@ -2,6 +2,7 @@
 module Semantics where
 
 import Control.Lens
+import Control.Monad.State
 import Data.Bifunctor
 
 import Util
@@ -33,7 +34,14 @@ data TransNF
   | TNFApp DBRef [TransNF]
   deriving (Show, Eq)
 
+type NamedSemTransCtx = ConsStar (String, SetNF, String, SpanNF) (String, SetNF)
+type SemTransCtx = ConsStar (SetNF, SpanNF) SetNF
 
+data ScopedSemTrans
+  = ScopedSemTrans { _sctransCtx  :: SemTransCtx -- domains
+                   , _sctransCod  :: SpanNF      -- codomain
+                   , _sctrans     :: TransNF }
+$(makeLenses ''ScopedSemTrans)
 
 -- | 
 data ScopedVal
@@ -59,13 +67,14 @@ typeOf :: ScopedVal -> Type
 typeOf (SemSet _) = TypeSet
 typeOf (SemFun (ScopedSemFun dom cod _)) = TypeFun dom cod
 typeOf (SemSpan (ScopedSemSpan contra covar _)) = TypeSpan contra covar
-typeOf (SemTrans (ScopedSemTrans ctx cod _)) = TypeTrans (ctxUnName ctx) cod
-
+typeOf (SemTrans (ScopedSemTrans ctx cod _)) = TypeTrans ctx cod
+typeOf (SemMod _) = error "NYI: first class modules"
 
 dbVal :: DBRef -> Type -> ScopedVal
 dbVal n (TypeSet) = SemSet n
 dbVal n (TypeFun dom cod) = SemFun $ ScopedSemFun dom cod (ENFFunApp n ENFId)
 dbVal n (TypeSpan contra covar) = SemSpan $ ScopedSemSpan contra covar (SNFSpanApp n ENFId ENFId)
+dbVal n (TypeTrans doms cod) = SemTrans $ ScopedSemTrans doms cod (TNFApp n (map (const TNFId) . ctxSpans $ doms))
 
 
 -- Push a value under a binder
@@ -79,6 +88,7 @@ shiftVal (SemMod (ScopedSemMod sc m)) = error "NYI" -- SemSpan (ScopedSemSpan (s
 subst :: ScopedVal -> [ScopedVal] -> ScopedVal
 subst (SemSet s) g = SemSet (substSet s g)
 subst (SemFun (ScopedSemFun dom cod f)) g = SemFun (ScopedSemFun (substSet dom g) (substSet cod g) (substElt f g))
+subst _ _ = error "NYI: substitution for spans, transformations, modules, signatures"
 
 shiftSet = DBOutMod
 
@@ -98,14 +108,16 @@ substElt (ENFFunApp f t) g = (\x -> unquoteSemFun x (substElt t g)) $ case (subs
 
 shiftSpan (SNFSpanApp r contra covar) = SNFSpanApp (DBOutMod r) (shiftElt contra) (shiftElt covar)
 
-type NamedSemTransCtx = ConsStar (String, SetNF, String, SpanNF) (String, SetNF)
-type SemTransCtx = ConsStar (SetNF, SpanNF) SetNF
-
 namedIndices :: NamedSemTransCtx -> NEList (String, SetNF)
 namedIndices = consStartoNE . first (\(x,s,_,_) -> (x,s))
 
 ctxIndices :: SemTransCtx -> NEList SetNF
 ctxIndices = consStartoNE . first fst
+
+ctxScopeSpans :: SemTransCtx -> [ScopedSemSpan]
+ctxScopeSpans = snd . foldConsStar cons done
+  where cons (contra, span) (covar, spans) = (contra, ScopedSemSpan contra covar span :spans)
+        done covar = (covar, [])
 
 ctxSpans :: SemTransCtx -> [SpanNF]
 ctxSpans = allAs . first snd
@@ -115,11 +127,6 @@ ctxUnName = bimap (\(_,a,_,r) -> (a,r)) snd
 
 boundary :: SemTransCtx -> (SetNF, SetNF)
 boundary = firstAndLast . ctxIndices
-
-data ScopedSemTrans
-  = ScopedSemTrans { _sctransCtx  :: NamedSemTransCtx
-                   , _sctransCod  :: SpanNF   -- codomain
-                   , _sctrans     :: TransNF }
 
 type SemTransSubst = [TransNF] -> [TransNF]
 
@@ -138,6 +145,25 @@ unquoteSpan (SNFSpanApp r contra covar) contrain covarin = SNFSpanApp r (unquote
 
 quoteSemTrans :: ([TransNF] -> TransNF) -> TransNF
 quoteSemTrans t = t (repeat TNFId)
+
+unquoteSemTrans :: TransNF -> ([TransNF] -> TransNF)
+unquoteSemTrans = evalState . unquoteTransComp
+
+pop :: State [a] a
+pop = do
+  x:xs <- get
+  put xs
+  return x
+
+unquoteTransComp :: TransNF -> State [TransNF] TransNF
+unquoteTransComp TNFId         = pop
+unquoteTransComp (TNFApp f ts) = TNFApp f <$> unquoteTransSubstComp ts
+
+unquoteTransSubst :: [TransNF] -> ([TransNF] -> [TransNF])
+unquoteTransSubst = evalState . unquoteTransSubstComp
+
+unquoteTransSubstComp :: [TransNF] -> State [TransNF] [TransNF]
+unquoteTransSubstComp = traverse unquoteTransComp
 
 data ScopedSemMod = ScopedSemMod ModScope ModNF
 type ModScope = ()

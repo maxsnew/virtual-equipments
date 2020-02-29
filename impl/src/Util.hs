@@ -43,8 +43,10 @@ allAs :: ConsStar a b -> [a]
 allAs (DoneB _)      = []
 allAs (ConsA a rest) = a : allAs rest
 
-
 consStartoNE :: ConsStar a a -> NEList a
 consStartoNE (DoneB a) = Done a
 consStartoNE (ConsA a rest) = Cons a (consStartoNE rest)
 
+foldConsStar :: (a -> c -> c) -> (b -> c) -> ConsStar a b -> c
+foldConsStar cons done (DoneB b)    = done b
+foldConsStar cons done (ConsA a xs) = cons a $ foldConsStar cons done xs
