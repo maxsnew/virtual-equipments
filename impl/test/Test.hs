@@ -67,6 +67,16 @@ goodTests = "Successful Type Checks" ~: test
   "(def-mod foo (mod ((set X)) (def-mod S (mod () (def-set Y X)))))"
   , assertTC "use submodule"
   "(def-mod foo (mod ((set X)) (def-mod S (mod () (def-set Y X))) (def-set Z (. S Y))))" -- woot!
+  , assertTC "simpl sig"
+  "(def-sig Null (sig ()))"
+  , assertTC "cat data0 sig"
+  "(def-sig Cat0 (sig () (set Ob) (span Mor Ob Ob)))"
+  , assertTC "cat data1 sig"
+  "(def-sig Cat0 (sig () (set Ob) (span Mor Ob Ob) (trans id ((a Ob)) () (Mor a a)) (trans comp ((a Ob) (b Ob) (c Ob)) ((Mor a b) (Mor b c)) (Mor a c))))"
+  , assertTC "parameterize over a module"
+  "(def-sig Set (sig () (set X))) (def-mod A (mod ((mod m Set)) ))"
+  , assertTC "use an abstract module"
+  "(def-sig Set (sig () (set X))) (def-mod A (mod ((mod m Set)) (def-set Y (. m X))))"
   ]
 --   , typeChecks (Program good2) ~? "functor signature"
 --   , typeChecks (Program good3) ~? "transformation signature"

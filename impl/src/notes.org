@@ -1,3 +1,4 @@
+* Contexts
 A static ctx should be a NEListof (Decl SemVal, Decl Generator) The
 Decl
 
@@ -21,3 +22,27 @@ instantiateSet :: SemSet -> [SemVal] -> SemSet
 instantiateSet (Now   n) g = assertSet (g !! n)
 instantiateSet (Later d) g = d
 
+
+* Looking Up/Neutral Terms
+
+  Most values can be parameterized over, and so normal forms must
+  include expressions whose value is "dynamically determined": the
+  value isn't known until the parameters are instantiated with
+  values. They can be direct refernces to something in scope, or they
+  can be selected from a dynamically determined module.
+  
+  ```
+  data Lookup
+    = LookRef DBRef
+    | LookSel ModNeu String
+  ```
+
+  A dynamically determined module is a module neutral term, which is
+  one of
+  - a reference to a parameter
+  - Projection of a field from a module neutral term
+  - Application of a module neutral term to a value
+  data ModNeu
+    = MNeuRef DBRef
+    | MNeuApp ModNeu Val
+    | MNeuSel ModNeu String

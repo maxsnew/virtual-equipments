@@ -205,6 +205,7 @@ e1 `funDecomposesInto` e2 = do
 decl :: TC (SynDecl ScopedVal)
 decl = list $
   tcSemDecl "def-mod" (ScMod <$> single modul)
+  <|> tcSemDecl "def-sig" (ScSig <$> single sig)
   <|> tcSemDecl "def-set"   (ScSet   <$> single setVal)
   <|> tcSemDecl "def-fun"   (ScFun   <$> scopedFunVal)
   <|> tcSemDecl "def-span"  (ScSpan  <$> scopedSpanVal)
@@ -258,9 +259,24 @@ modul = modulVar
       ps <- tcHd (list (several param))
       sig <- mayHd empty
       modBod <- moduleBody
-      return $ ScopedMod () (ModNFBase ps (map undecl modBod))
+      return $ ScopedMod ps (ModNFBase (map undecl modBod))
 
     undecl (Decl a b) = (a,b)
+
+-- (sig (param ...) (param ...))
+-- modDeref
+-- (S val ...) ??
+sig :: TC ScopedSig
+sig = sigVar <|> sigLam
+  where
+    sigVar = modDeref >>= \case
+      ScSig s -> return s
+      _ -> empty
+
+    sigLam = enter . list $
+      tcHd (atomEq "sig") *> do
+      ScopedSig <$> tcHd (list (several param)) <*> several namedParam
+      
 
 setVal :: TC SetNF
 setVal = modDeref >>= \case
@@ -273,7 +289,7 @@ scopedFunVal = do
   (x, dom) <- tcHd eltVar
   cod <- tcHd setVal
   t <- single $ elt x dom cod
-  return $ ScopedFun dom cod t
+  return $ ScopedFun (FunTy dom cod) t
 
 eltVar :: TC (String, SetNF)
 eltVar = list $ (,) <$> tcHd anyAtom <*> single setVal
@@ -283,8 +299,8 @@ elt x dom cod =
   (atomEq x *> guard (dom == cod) *> return ENFId)
   <|> (list $ do
   f <- tcHd funVar
-  guard $ cod == (f ^. scfunCod)
-  arg <- single $ elt x dom (f ^. scfunDom)
+  guard $ cod == (f ^. (scfunTy . funCod))
+  arg <- single $ elt x dom (f ^. (scfunTy . funDom))
   return $ unquoteFun (f ^. scfun) arg)
   where
     funVar = modDeref >>= \case
@@ -410,8 +426,8 @@ modDeref =
 
     selectOne :: Semantics.ModScope -> ModNF -> String -> TCS ScopedVal
     selectOne sc (ModNFApp db vs)     s = error "NYI: quantification over modules"
-    selectOne sc (ModNFBase (_:_) ds) s = throwError "Tried to select from a parameterized module that is not fully applied"
-    selectOne sc (ModNFBase [] ds) s = case lookup s ds of
+    selectOne (_:_) _ s = throwError "Tried to select from a parameterized module that is not fully applied"
+    selectOne [] (ModNFBase ds) s = case lookup s ds of
       Nothing -> error "Tried to select a value not in the module"
       Just x  -> return x
 
@@ -424,16 +440,17 @@ nextDB = DBCurMod <$> (_2 . numParams <<+= 1)
 denoteGenerator :: Type -> TCS ScopedVal
 denoteGenerator ty = flip dbVal ty <$> nextDB
 
-declareGenerator :: SynDecl Type -> TCS Type
-declareGenerator declGen = do
-  declare =<< defn denoteGenerator declGen
-  return $ declGen ^. defn
+declareGenerator :: SynDecl Type -> TCS ()
+declareGenerator declGen = declare =<< defn denoteGenerator declGen
     
 -- | Has the effect of extending the current context
 param :: TC Type
-param = list $
+param = snd <$> namedParam
+
+namedParam :: TC (String, Type)
+namedParam = list $
   (genName "set" (done $> TypeSet))
-  <|> genName "fun"   (TypeFun  <$> tcHd setVal <*> tcHd setVal <* done)
+  <|> genName "fun"   (TypeFun  <$> (FunTy <$> tcHd setVal <*> tcHd setVal) <* done)
   <|> genName "span"  (TypeSpan <$> tcHd setVal <*> tcHd setVal <* done)
   -- (trans t ((a X) (b Y) (c Z) (d W)) ((R a b) (S b c) (Q d c)) (P a d))
   <|> genName "trans" (do
@@ -442,5 +459,11 @@ param = list $
       let ((contraX, contraSet), (covarX, covarSet)) = firstAndLast $ indices
       cod <- single (spanVal contraX contraSet covarX covarSet)
       return $ TypeTrans ctx cod)
+  <|> (genName "mod" $ single (TypeMod <$> sig))
   where
-    genName key p = declareGenerator =<< ((tcHd (atomEq key)) *> (Decl <$> tcHd anyAtom <*> p))
+    genName :: String -> TCS Type -> TCS (String, Type)
+    genName key p = do
+      d <- ((tcHd (atomEq key)) *> (Decl <$> tcHd anyAtom <*> p))
+      declareGenerator d
+      return (d ^. name, d ^. defn)
+
