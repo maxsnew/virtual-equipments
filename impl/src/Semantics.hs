@@ -13,29 +13,32 @@ data DBRef
   | DBOutMod DBRef --reference to something in the outer module
   deriving (Show, Eq)
 
-type SetNF = DBRef
+data Lookup
+  = LookRef DBRef -- reference to the val
+  | LookSel ModNeu String -- select from an as-yet undetermined module
+  deriving (Show, Eq)
+type SetNF = Lookup
 
 data EltNF
   = ENFId
-  | ENFFunApp DBRef EltNF
+  | ENFFunApp Lookup EltNF
   deriving (Show, Eq)
 
 data FunTy = FunTy { _funDom :: SetNF, _funCod :: SetNF }
-$(makeLenses ''FunTy)
+  deriving (Show, Eq)
 
 data ScopedFun = ScopedFun { _scfunTy :: FunTy, _scfun :: EltNF }
-$(makeLenses ''ScopedFun)
+  deriving (Show, Eq)
 
-
-data SpanNF = SNFSpanApp { _spanSymb :: DBRef, _contraElt :: EltNF, _covarElt :: EltNF }
+data SpanNF = SNFSpanApp { _spanSymb :: Lookup, _contraElt :: EltNF, _covarElt :: EltNF }
   deriving (Show, Eq)
 
 data ScopedSpan = ScopedSpan { _scspContra :: SetNF, _scspCovar :: SetNF, _scspan :: SpanNF }
-$(makeLenses ''ScopedSpan)
+  deriving (Show, Eq)
 
 data TransNF
   = TNFId
-  | TNFApp DBRef [TransNF]
+  | TNFApp Lookup [TransNF]
   deriving (Show, Eq)
 
 type NamedTransCtx = ConsStar (String, SetNF, String, SpanNF) (String, SetNF)
@@ -45,19 +48,24 @@ data ScopedTrans
   = ScopedTrans { _sctransCtx  :: TransCtx -- domains
                    , _sctransCod  :: SpanNF      -- codomain
                    , _sctrans     :: TransNF }
-$(makeLenses ''ScopedTrans)
-
-data ScopedMod = ScopedMod ModScope ModNF
+  deriving (Show, Eq)
+data ScopedMod = ScopedMod { _modScop :: ModScope, _modNF :: ModNF }
+  deriving (Show, Eq)
 type ModScope =  [Type]
 
 data ModNF
-  = ModNFApp  DBRef [ScopedVal]
+  = ModNFNeu  ModNeu
   | ModNFBase [(String, ScopedVal)]
-
+  deriving (Show, Eq)
 type SigScope = [Type]
 type SigNF = [(String, Type)]
 data ScopedSig = ScopedSig { _scsigScope :: SigScope, _scsig :: SigNF }
-
+  deriving (Show, Eq)
+data ModNeu
+  = MNeuRef DBRef -- direct reference
+  | MNeuApp ModNeu ScopedVal -- application of a module to a value
+  | MNeuSel ModNeu String -- selection of a field from a module
+  deriving (Show, Eq)
 -- | 
 data ScopedVal
   = ScSet SetNF
@@ -67,6 +75,7 @@ data ScopedVal
 -- | SemProof ?? -- TODO
   | ScMod ScopedMod
   | ScSig ScopedSig
+  deriving (Show, Eq)
 
 data Type
   = TypeSet
@@ -75,13 +84,43 @@ data Type
   | TypeTrans TransCtx SpanNF
   -- | TypeAxiom
   | TypeMod ScopedSig
-
+  deriving (Show, Eq)
+$(makeLenses ''FunTy)
+$(makeLenses ''ScopedFun)
+$(makeLenses ''ScopedSpan)
+$(makeLenses ''ScopedTrans)
 $(makeLenses ''ScopedSig)
+$(makeLenses ''ScopedMod)
 
 
 substDBRef :: DBRef -> [ScopedVal] -> Either DBRef ScopedVal
 substDBRef (DBCurMod n) g = Right $ g !! n
 substDBRef (DBOutMod d) g = Left d
+
+substLookup :: Lookup -> [ScopedVal] -> Either Lookup ScopedVal
+substLookup (LookRef db)    g = first LookRef . substDBRef db $ g
+substLookup (LookSel neu s) g = case substModNeu neu g of
+  ModNFNeu neu -> Left $ LookSel neu s
+  ModNFBase ds -> Right $ select ds s
+
+select :: [(String, ScopedVal)] -> String -> ScopedVal
+select ds s = case lookup s ds of
+  Just v -> v
+
+substModNeu :: ModNeu -> [ScopedVal] -> ModNF
+substModNeu (MNeuRef db) g = case substDBRef db g of
+  Left db -> ModNFNeu (MNeuRef db)
+  Right (ScMod m) -> m ^. modNF
+substModNeu (MNeuSel neu s) g = case substModNeu neu g of
+  ModNFNeu neu -> ModNFNeu (MNeuSel neu s)
+  ModNFBase ds -> case select ds s of
+    ScMod m -> m ^. modNF
+substModNeu (MNeuApp neu v) g = error "NYI: first class parameterized modules"
+
+
+-- select :: 
+
+-- select :: [String] -> 
 
 typeOf :: ScopedVal -> Type
 typeOf (ScSet _) = TypeSet
@@ -92,17 +131,19 @@ typeOf (ScMod _) = error "NYI: first class modules"
 
 -- eta expand a dbreference to make it a NF
 dbVal :: DBRef -> Type -> ScopedVal
-dbVal n (TypeSet) = ScSet n
-dbVal n (TypeFun tau) = ScFun $ ScopedFun tau (ENFFunApp n ENFId)
-dbVal n (TypeSpan contra covar) = ScSpan $ ScopedSpan contra covar (SNFSpanApp n ENFId ENFId)
-dbVal n (TypeTrans doms cod) = ScTrans $ ScopedTrans doms cod (TNFApp n (map (const TNFId) . ctxSpans $ doms))
+dbVal = error "TODO"
+
+-- dbVal n (TypeSet) = ScSet n
+-- dbVal n (TypeFun tau) = ScFun $ ScopedFun tau (ENFFunApp n ENFId)
+-- dbVal n (TypeSpan contra covar) = ScSpan $ ScopedSpan contra covar (SNFSpanApp n ENFId ENFId)
+-- dbVal n (TypeTrans doms cod) = ScTrans $ ScopedTrans doms cod (TNFApp n (map (const TNFId) . ctxSpans $ doms))
 -- dbVal n (TypeMod sig) = ScMod $ ScopedMod (sig ^. scsigScope) (ModNFBase $ sig ^. scsig & traversed %@~ mkDeref)
 --   where mkDeref :: Int -> (String, Type) -> (String, ScopedVal)
 --         mkDeref = _
 
 -- Push a value under a binder
 shiftVal :: ScopedVal -> ScopedVal
-shiftVal (ScSet db) = ScSet (shiftSet db)
+shiftVal (ScSet s) = ScSet (shiftSet s)
 shiftVal (ScFun (ScopedFun ty fun)) = ScFun (ScopedFun (shiftFunTy ty) (shiftElt fun))
 shiftVal (ScSpan (ScopedSpan contra covar span)) = ScSpan (ScopedSpan (shiftSet contra) (shiftSet covar) (shiftSpan span))
 shiftVal (ScTrans (ScopedTrans ctx cod f)) = error "NYI: shifting transsss" -- Span (ScopedSpan (shiftSet contra) (shiftSet covar) (shiftSpan span))
@@ -118,10 +159,18 @@ subst g (ScSet s) = ScSet (substSet g s)
 subst g (ScFun (ScopedFun t f)) = ScFun (ScopedFun (substFunTy g t) (substElt g f))
 subst _ _ = error "NYI: substitution for spans, transformations, modules, signatures"
 
-shiftSet = DBOutMod
+shiftLookup :: Lookup -> Lookup
+shiftLookup (LookRef db) = LookRef (DBOutMod db)
+shiftLookup (LookSel neu s) = LookSel (shiftNeu neu) s
+
+shiftNeu :: ModNeu -> ModNeu
+shiftNeu = error "TODO"
+
+shiftSet :: SetNF -> SetNF
+shiftSet = shiftLookup
 
 substSet :: [ScopedVal] -> SetNF -> SetNF
-substSet g s = case substDBRef s g of
+substSet g s = case substLookup s g of
   Left r -> r
   Right (ScSet r) -> r
 
