@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE LambdaCase #-}
 module Semantics where
 
 import Control.Lens
@@ -49,7 +50,12 @@ data ScopedTrans
                    , _sctransCod  :: SpanNF      -- codomain
                    , _sctrans     :: TransNF }
   deriving (Show, Eq)
-data ScopedMod = ScopedMod { _modScop :: ModScope, _modNF :: ModNF }
+data ScopedMod = ScopedMod { _modScop :: ModScope, -- the types of the
+                                                   -- parameters of
+                                                   -- the module (none
+                                                   -- if its not
+                                                   -- parameterized)
+                             _modNF :: ModNF }
   deriving (Show, Eq)
 type ModScope =  [Type]
 
@@ -62,7 +68,7 @@ type SigNF = [(String, Type)]
 data ScopedSig = ScopedSig { _scsigScope :: SigScope, _scsig :: SigNF }
   deriving (Show, Eq)
 data ModNeu
-  = MNeuRef DBRef -- direct reference
+  = MNeuRef DBRef SigNF -- direct reference
   | MNeuApp ModNeu ScopedVal -- application of a module to a value
   | MNeuSel ModNeu String -- selection of a field from a module
   deriving (Show, Eq)
@@ -108,9 +114,10 @@ select ds s = case lookup s ds of
   Just v -> v
 
 substModNeu :: ModNeu -> [ScopedVal] -> ModNF
-substModNeu (MNeuRef db) g = case substDBRef db g of
-  Left db -> ModNFNeu (MNeuRef db)
-  Right (ScMod m) -> m ^. modNF
+substModNeu (MNeuRef db sig) g = error "NYI: subst into mod var"
+  -- case substDBRef db g of
+  -- Left db -> ModNFNeu (MNeuRef db )
+  -- Right (ScMod m) -> m ^. modNF
 substModNeu (MNeuSel neu s) g = case substModNeu neu g of
   ModNFNeu neu -> ModNFNeu (MNeuSel neu s)
   ModNFBase ds -> case select ds s of
@@ -131,7 +138,20 @@ typeOf (ScMod _) = error "NYI: first class modules"
 
 -- eta expand a dbreference to make it a NF
 dbVal :: DBRef -> Type -> ScopedVal
-dbVal = error "TODO"
+dbVal db = etaLookup $ LookRef db
+
+etaLookup :: Lookup -> Type -> ScopedVal
+etaLookup look = \case
+  TypeSet -> ScSet look
+  TypeFun fty -> ScFun $ ScopedFun fty (ENFFunApp look ENFId)
+  TypeSpan contra covar -> ScSpan $ ScopedSpan contra covar $ SNFSpanApp look ENFId ENFId
+  TypeTrans doms cod -> ScTrans $ ScopedTrans doms cod $ TNFApp look $ map (const TNFId) domSpans
+    where domSpans = allAs doms
+  -- -- | TypeAxiom
+  TypeMod scSig -> ScMod $ ScopedMod (scSig ^. scsigScope) (ModNFNeu lookNeu)
+    where lookNeu = case look of
+            LookRef db    -> MNeuRef db (scSig ^. scsig)
+            LookSel neu s -> MNeuSel neu s
 
 -- dbVal n (TypeSet) = ScSet n
 -- dbVal n (TypeFun tau) = ScFun $ ScopedFun tau (ENFFunApp n ENFId)
@@ -177,19 +197,20 @@ substSet g s = case substLookup s g of
 shiftFunTy :: FunTy -> FunTy
 shiftFunTy t = t & funDom %~ shiftSet & funCod %~ shiftSet
 
+shiftElt :: EltNF -> EltNF
 shiftElt ENFId = ENFId
-shiftElt (ENFFunApp f t) = (ENFFunApp (DBOutMod f) (shiftElt t))
+shiftElt (ENFFunApp f t) = ENFFunApp (shiftLookup f) (shiftElt t)
 
 substFunTy :: [ScopedVal] -> FunTy -> FunTy
 substFunTy g t = t & funDom %~ substSet g & funCod %~ substSet g
   
 substElt :: [ScopedVal] -> EltNF -> EltNF
 substElt g ENFId = ENFId
-substElt g (ENFFunApp f t) = (\x -> unquoteFun x (substElt g t)) $ case (substDBRef f g) of
+substElt g (ENFFunApp f t) = (\x -> unquoteFun x (substElt g t)) $ case (substLookup f g) of
   Left r -> (ENFFunApp r ENFId)
   Right (ScFun (ScopedFun _ f)) -> f
 
-shiftSpan (SNFSpanApp r contra covar) = SNFSpanApp (DBOutMod r) (shiftElt contra) (shiftElt covar)
+shiftSpan (SNFSpanApp r contra covar) = SNFSpanApp (shiftLookup r) (shiftElt contra) (shiftElt covar)
 
 namedIndices :: NamedTransCtx -> NEList (String, SetNF)
 namedIndices = consStartoNE . first (\(x,s,_,_) -> (x,s))

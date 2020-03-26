@@ -11,6 +11,7 @@ import Control.Applicative
 import Control.Lens
 import Data.Functor
 import Data.String
+import qualified Data.List as List
 import Control.Monad
 import Control.Monad.Except
 import Control.Monad.Identity
@@ -424,12 +425,20 @@ modDeref =
     select (ScopedMod sc mod) (Cons s ss) = selectOne sc mod s >>= \case
       ScMod m -> select m ss
 
-    selectOne :: Semantics.ModScope -> ModNF -> String -> TCS ScopedVal
-    selectOne sc (ModNFApp db vs)     s = error "NYI: quantification over modules"
+    selectOne :: ModScope -> ModNF -> String -> TCS ScopedVal
     selectOne (_:_) _ s = throwError "Tried to select from a parameterized module that is not fully applied"
+    selectOne [] (ModNFNeu neu) s = selectOneNeu neu s
     selectOne [] (ModNFBase ds) s = case lookup s ds of
       Nothing -> error "Tried to select a value not in the module"
       Just x  -> return x
+
+    selectOneNeu :: ModNeu -> String -> TCS ScopedVal
+    selectOneNeu n s = case n of
+      MNeuRef db sig -> case lookup s sig of
+        Nothing -> throwError "Tried to select a field from a module that doesn't support it"
+        Just ty -> return $ etaLookup (LookSel n s) ty
+      MNeuSel neu s'  -> throwError "Haven't yet implemented multiple selection"
+      MNeuApp neu val -> throwError "First class parameterized modules aren't yet supported"
 
 -- | check the generator for validity and then add the declaration to
 -- the context
