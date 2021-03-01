@@ -36,7 +36,6 @@
 \newcommand{\sig}{\,\,\textrm{sig}}
 \newcommand{\pipe}{\mathrel{|}}
 
-
 \title{Judgment Theory: A Syntax for Virtual Equipments with applications to Internal and Synthetic Category Theory}
 \author{Max S. New}
 
@@ -259,7 +258,7 @@ is behaved on the identity function.
     \inferrule*[right=Hom-Formation]
     {\beta : \cat D \vdash A : \cat C\and
     \gamma : \cat E \vdash A' : \cat C}
-    {A \to_{\cat C} A' \pto(\beta^o : \cat D;\gamma : \cat E)}
+    {A \to_{\cat C} A' \prof(\beta^o : \cat D;\gamma : \cat E)}
 
     (A \to A')[B/\alpha;B'/\beta] = (A[B/\alpha] \to A'[B'/\beta])
 
@@ -307,9 +306,9 @@ Next, let's define the tensor product of profunctors, also known as
 the \emph{composition} of profunctors.
 \begin{mathpar}
   \inferrule*[right=Tensor formation]
-  {Q \pto(\alpha^o : \cat C; \beta : \cat D)
-   \and R \pto(\beta^o : \cat D; \gamma : \cat E)}
-  {\exists \beta.~Q \odot R \pto(\alpha^o : \cat C; \gamma : \cat E)}
+  {Q \prof(\alpha^o : \cat C; \beta : \cat D)
+   \and R \prof(\beta^o : \cat D; \gamma : \cat E)}
+  {\exists \beta.~Q \odot R \prof(\alpha^o : \cat C; \gamma : \cat E)}
 
   \inferrule*[right=Tensor introduction]
   {\Phi \vdash M : Q[A/\alpha;B/\beta] \and \Psi \vdash N : R[B/\beta;\Gamma/\gamma]}
