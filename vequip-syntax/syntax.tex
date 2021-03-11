@@ -31,6 +31,7 @@
 \newcommand{\lett}{\textrm{let}\,}
 \newcommand{\sort}{\,\,\textrm{sort}}
 \newcommand{\ctx}{\,\,\textrm{context}}
+\newcommand{\boundary}{\,\,\textrm{boundary}}
 \newcommand{\prof}{\,\,\textrm{span}}
 \newcommand{\subst}{\,\,\textrm{subst}}
 \newcommand{\sigctx}{\,\,\textrm{sig-ctx}}
@@ -182,6 +183,21 @@ category-theoretic terminology, in which the structure is most
 familiar and we have categories, objects/functors,
 \emph{profunctors}/bimodules and 2-cells/homomorphisms of bimodules.
 
+Figure\ref{fig:formation} introduces the formation rules for the basic
+constructs. Sorts give a syntax for objects of the double
+category. Types have an output sort and a sorted input variable, and
+model vertical arrows. Next, judgments have two sorted variables, one
+contravariant and one covariant, which can be the same
+variable. Judgments model the horizontal arrows. Next are contexts,
+whose formation rule is the same as judgments, and which give a syntax
+for ``compatible strings'' of judgments. Then terms have an input
+context and an output judgment, which must have the same covariant and
+contravaiant variables, modeling ``globular'' 2-cells. Finally, we
+have substitutions for terms, which are typed with respect to an input
+context, an output context and two types, forming a kind of
+square. These model the ``compatible string'' of 2-cells that arise in
+the composition laws.
+
 \begin{figure}
   \begin{mathpar}
     \cat C \sort\\
@@ -189,27 +205,43 @@ familiar and we have categories, objects/functors,
     {\cat C \sort \and \cat D \sort}
     {\alpha : \cat C \vdash A : \cat D}\\
 
+    \inferrule*[right=Boundary formation]
+    {}
+    {\Xi \boundary}
+
     \inferrule*[right=Relation/Judgment/Profunctor-formation]
-    {\cat C \sort \and \cat D \sort}
-    { R \prof(\alpha^{o}:\cat C; \beta : \cat D)}
+    {\Xi \boundary}
+    { R \prof(\Xi)}
 
     \inferrule*[right=Context-formation]
-    {\cat C \sort \and \cat D \sort}
-    {\Phi \ctx(\alpha^o:\cat C;\beta:\cat D)}
+    {\Xi \boundary}
+    {\Phi \ctx(\Xi)}
 
     \inferrule*[right=Element/Term/Arrow-formation]
-    {\Phi \ctx(\alpha^o:\cat C; \beta : \cat D)\and
-      R \prof(\alpha^o:\cat C; \beta : \cat D)}
+    {\Phi \ctx(\Xi)\and R \prof(\Xi)}
     {\Phi \vdash t : R}
 
+    \inferrule*[right=Boundary Map formation]
+    {Z \boundary \and \Xi \boundary}
+    {\xi : Z \to \Xi}
+
     \inferrule*[right=Substitution-formation]
-    {\Phi \ctx(\alpha^o:\cat C;\beta:\cat D) \and \Psi \ctx(\alpha'^o:\cat C';\beta':\cat D')\\\\
-      \alpha:\cat C \vdash A : \cat C' \and \beta : \cat D \vdash B : \cat D'
+    {\Phi \ctx(Z) \and \Psi \ctx(\Xi)\\\\
+      \xi : Z \to \Xi
     }
-    {\psi : \Phi\vdash \Psi \subst(A/\alpha';B/\beta')}
+    {\psi : \Phi\to \Psi \subst(\xi)}
   \end{mathpar}
   \caption{Formation Rules of Judgment Theory}
+  \label{fig:formation}
 \end{figure}
+
+Next, Figure~\ref{fig:basic-rules} gives the basic structural rules of
+judgment theory, which model composition and restrictions in a virtual
+double category. First, we have varialbes and substitution for types,
+modeling identity and composition of vertical arrows. Next, we have
+restriction of a judgment to more specific types, which is given by
+substitution of types for the judgment's parameter variables. Next, we
+have rules for constructing an ``empty'' context, which is just a
 
 \begin{figure}
   \begin{mathpar}
@@ -217,57 +249,81 @@ familiar and we have categories, objects/functors,
     {~}
     {\alpha : \cat C \vdash \alpha : \cat C}
 
-    \inferrule*[right=ObSubst*]
+    \inferrule*[right=ObSubst]
     {\alpha : \cat C \vdash B : \cat D\and
     \beta : \cat D \vdash A : \cat E}
     {\alpha : \cat C \vdash A[B/\beta] : \cat E}\\
 
+    \inferrule*[right=UnaryBoundary]
+    {}
+    {\alpha^\pm : \cat C \boundary}
+
+    \inferrule*[right=BinaryBoundary]
+    {}
+    {\alpha^- : \cat C; \beta^+ : \cat D \boundary}
+
+    \alpha^pm:\cat C, \alpha^\pm : \cat C = \alpha^\pm :\cat C\\
+    \alpha^pm:\cat C, \alpha^- : \cat C;\beta^+:\cat D = \alpha^- :\cat C;\beta^+ : \cat D\\
+    \alpha^- : \cat C;\beta^+:\cat D, \beta^\pm : \cat D = \alpha^- :\cat C;\beta^+ : \cat D\\
+    \alpha^- : \cat C;\beta^+:\cat D, \beta^- : \cat D; \gamma^+: \cat E = \alpha^- :\cat C;\gamma^+ : \cat E\\
+
+    d^+(\alpha^\pm : \cat C) = \alpha:\cat C\\
+    d^+(\alpha^-:\cat C; \beta^+:\cat D) = \beta : \cat D\\
+    d^-(\alpha^\pm : \cat C) = \alpha:\cat C\\
+    d^-(\alpha^-:\cat C; \beta^+:\cat D) = \alpha : \cat D\\
+
+    \inferrule*[right=UnaryBoundaryMap]
+    {\alpha : \cat C \vdash A : \cat D}
+    {\alpha.A/\beta : \alpha^\pm : \cat C \to \beta^\pm : \cat D}
+
+    \inferrule*[right=BinaryBoundaryMap]
+    {d^-(Z) \vdash A : \cat C \and d^+ Z \vdash B : \cat D}
+    {(d^-(Z). A/\alpha, d^+(Z).B/\beta) : Z \to \alpha^-:\cat C; \beta^+ : \cat D}
+
     \inferrule*[right=SpanRestriction*]
-    {R\prof(\alpha^o : \cat C;\beta : \cat D) \and
-      \alpha' : \cat C' \vdash A : \cat C\and
-      \beta' : \cat D' \vdash B : \cat D'}
-    {R[A/\alpha,B/\beta] \prof(\alpha'^o : \cat C';\beta':\cat D')}\\\\
+    {R\prof(\Xi) \and \xi : Z \to \Xi}
+    {R[\xi] \prof(Z)}\\\\
 
     \inferrule*[right=MtCtx]
     {\cat C \sort}
-    {\alpha : \cat C}
+    {\alpha : \cat C \ctx(\alpha^\pm : \cat C)}
 
     \inferrule*[right=CtxExt]
-    {\Phi \ctx(\alpha^o : \cat C; \beta : \cat D)\and
-      R \prof(\beta^o : \cat D; \gamma : \cat E)}
-    {\Phi,x : R, \gamma : \cat E \ctx(\alpha^o : \cat C ; \gamma : \cat E)}
+    {\Phi \ctx(\Xi)\and R \prof(d^+\Xi : \cat C; \beta^+ : \cat D)}
+    {\Phi,x : R, \beta : \cat D \ctx(d^-(\Xi) ; \beta^+ : \cat D)}
 
     \inferrule*[right=CtxTensor*]
-    {\Phi(\alpha^o : \cat C; \beta : \cat D) \and
-    \Psi \ctx(\beta^o : \cat D; \gamma : \cat E)}
-    {\Phi, \Psi\ctx(\alpha^o : \cat C; \gamma : \cat E)}\\\\
+    {\Phi\ctx(\Xi) \and \Psi \ctx(Z) \and d^+ \Xi = d^- Z}
+    {\Phi, \Psi\ctx(\Xi,Z)}\\\\
 
     \inferrule*[right=TransVar]
     {~}
     {\alpha : \cat C, x : R, \beta : \cat D \vdash x : R}
     
     \inferrule*[right=TransSubst*]
-    {\psi : \Phi \vdash \Psi \subst(A/\alpha;B/\beta) \and
+    {\psi : \Phi \vdash \Psi \subst(\xi) \and
     \Psi \vdash t : R}
-    {\Phi \vdash t[\psi] : R[A/\alpha;B/\beta]}\\\\
+    {\Phi \vdash t[\psi] : R(\xi}\\\\
 
     \inferrule*[right=TransSubstMt]
     {\alpha : \cat C \vdash B : \beta}
-    {B : (\alpha : \cat C) \vdash (\beta : \cat D) \subst(B/\beta;B/\beta)}
+    {B/\beta : (\alpha^\pm : \cat C) \to(\beta : \cat D) \subst(\alpha.B/\beta)}
 
     \inferrule*[right=TransSubstExt]
-    {\psi : \Phi \vdash \Psi \subst(A/\alpha;B/\beta) \and
-     \Phi' \vdash t : R[B/\beta;\Gamma/\gamma]}
-    {\psi, t, \Gamma : \Phi,\Phi' \vdash \Psi, x:R, \gamma : \cat E \subst(A/\alpha;\Gamma/\gamma)}
+    {\psi : \Phi \vdash \Psi \subst(\xi) \and
+      \Phi' \vdash t : R[d^+\xi, B/\beta]
+    }
+    {\psi, t/x,B/\beta : \Phi, \Phi' \vdash \Psi, x : R, \beta : \cat D \subst(d^-\xi, B/\beta)}
 
     \inferrule*[right=TransSubstTensor*]
-    {\psi : \Phi \vdash \Psi \subst(A/\alpha;B/\beta)\and
-     \psi' : \Phi' \vdash \Psi' \subst(B/\beta;\Gamma/\gamma)}
-    {\psi,\psi' : \Phi,\Phi' \vdash \Psi,\Psi' \subst(A/\alpha;\Gamma/\gamma)}
+    {\psi : \Phi \vdash \Psi \subst(\xi)\and
+     \psi' : \Phi' \vdash \Psi' \subst(\xi'}
+    {\psi,\psi' : \Phi,\Phi' \vdash \Psi,\Psi' \subst(\xi,\xi')}
     \\\\
   \end{mathpar}
   \caption{Basic Rules of Judgment Theory, starred rules are
     admissible, non-starred are primitive}
+  \label{fig:basic-rules}
 \end{figure}
 
 \begin{figure}
@@ -289,17 +345,19 @@ familiar and we have categories, objects/functors,
     \end{array}
   \end{mathpar}  
   \caption{Algebraic Properties of Basic Rules}
+  \label{fig:equations}
 \end{figure}
 
-\subsection{Multiplicatives}
+\subsection{Hom}
 
 Now that we have established the central judgments and their algebraic
 structure, we can study connectives that internalize this judgmental
 structure. The ``monoidal'' part of the structure here is the
 structure of the term context $\phi$, which includes the empty context
 $\cdot_{\alpha}$ as unit and concatenation as ``product''.  We
-correspondingly can add multiplicative connectives to the syntax that
-internalize $\cdot$ and comma.
+correspondingly can add a positive connective internalizing the unit
+and a trio of connectives, one positive and two negative internalizing
+the comma.
 
 First, to internalize $\cdot_{\alpha : \cat C}$ we can define the
 \emph{hom judgment} $A \to_{\cat C} A'$, which in set-theoretic
@@ -307,17 +365,23 @@ settings we might call the \emph{identity/equality judgment}
 $A \equiv_{\cat C} A'$.
 %
 First the formation rule says given two objects $A,A'$ in the same
-category $\cat C$, we can form the hom-set from $A$ to $A'$.
+category $\cat C$, we can form the hom-set from $A$ to $A'$ $A
+\to_{\cat C} A'$.
 %
 The introduction rule says that given any object $A$, we can define
-the identity arrow from $A$ to itself.
+the identity arrow from $A$ to itself $\id(A) : A \to_{\cat C} A$.
 %
 Without knowing more about the category in question, these are the
 only arrows we know exist.
 %
+The elimination form is trickiest to define in a satisfactory way.
+%
 Next the elimination form says that to define a term whose input is a
 morphism $f : \beta \to_{\cat C} \beta'$, we need only define how it
-is behaved on the identity function.
+behaves on the identity function.
+
+
+\begin{figure}
 \begin{mathpar}
     \inferrule*[right=Hom-Formation]
     {\beta : \cat D \vdash A : \cat C\and
@@ -350,7 +414,9 @@ is behaved on the identity function.
     \inferrule*[right=Hom-$\eta$]
     {...}
     {\beta_1^o : \cat C;\beta_2:\cat C\pipe \Phi \vdash f \equiv \when f = \id_{\alpha} .~ \id_{\alpha} : \beta_1 \to_{\cat C} \beta_2}
-\end{mathpar}
+\end{mathpar}  
+  \caption{Hom}  
+\end{figure}
 
 How did we come up with this?
 %
@@ -362,6 +428,8 @@ rule with a substitution built in (substitutions into an ``empty''
 context are precisely index substitutions).
 %
 For the elim rule I'm still not sure.
+
+\subsection{Tensor}
 
 Next, we can internalize the $,$ in judgment contexts in one of two
 ways: on the left as a tensor product or on the right as a power.
@@ -445,6 +513,8 @@ invariant?
   (\lambda^\triangleright (\alpha,x). M)(A,N)^\triangleright = M[A/\alpha][N/x]\\
   M = \lambda^\triangleright (\alpha, x). M(\alpha,x)^\triangleright
 \end{mathpar}
+
+\subsection{Cotensor}
 
 \subsection{Additives}
 
@@ -1533,6 +1603,22 @@ connectives on objects with the analogous connective on profunctors:
 \[ () \to_1 () \cong () \]
 \[ (\pi_1 \alpha, \pi_2 \alpha) \to_{\cat C \times \cat D} (\pi_1 \beta, \pi_2 \beta) \cong
 ((\pi_1 \alpha) \to_{\cat C} (\pi_1 \beta)) \times ((\pi_2 \alpha) \to_{\cat C} (\pi_2 \beta)) \]
+
+\section{Completeness}
+
+To prove the completeness for our intended models, we need to show
+that the syntax itself (generated from a signature) presents a virtual
+equipment.
+
+The objects are the sorts $\cat C,\ldots$, a vertical arrow from $\cat
+C$ to $\cat D$ is a type $A[\alpha:\cat C] : D$ with
+identity/composition given by variable/substituion, a horizontal arrow
+from $\cat C$ to $\cat D$ is a judgment/span $R \prof(\alpha:\cat C;
+\beta:\cat D)$ and a 2-cell from a compatible string $\vec R$ from
+$\cat C$ to $\cat D$ to a horizontal arrow $S$ from $\cat C'$ to $\cat
+D'$ along vertical arrows $A[\alpha : \cat C] : \cat C'$ and
+$B[\beta:\cat D] : \cat D'$ is given by a term $\Phi_{\vec R} \vdash t
+: S[A;B]$ with identity/composition given by variables/substitution.
 
 \section{Implementation Concerns}
 
