@@ -20,6 +20,7 @@
 \newcommand{\pfrom}{\nleftarrow}
 \newcommand{\vcat}{\mathcal}
 \newcommand{\cat}{\mathbbm}
+\newcommand{\Set}{\textrm{Set}}
 \newcommand{\vtkmnd}{\mathbb{K}\text{Mod} (\vcat{V},T)}
 \newcommand{\rmod}{\text{RMod}}
 \newcommand{\lmod}{\text{LMod}}
@@ -72,16 +73,79 @@ multicategory and polycategory.
 %% study type theories'' and so we call the type theory ``judgment
 %% theory''.
 
+\section{Background on Virtual Double Categories}
+
+A virtual double category generalizes double categories in the same
+way that multicategories generalize monoidal categories. That is, like
+a double category, virtual double categories have a set of objects
+with vertical and horizontal arrows between those objects, and a kind
+of 2-cell. The vertical arrows form a category, but the horizontal
+cells are \emph{not} assumed to form a category, but the 2-cells are
+more general than 2-cells in a double category. Instead of being a
+simple square
+
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQAmclVqMWbAELdeIDNjwEiZYePrNWiEAGE5fJYKKj11TVJ0ARAwv7KhyAIyknGydpAAdL4zQALOm5xGCgAc3giUAAzACcIAFskMhAcCCRRCS02aJBqBjoAIxgGAAV7Yx1YrDD-HFs4xKQXVPTEAGZzDzYwhvikxEy0pE6QAuKyipUqmrq8rMsQAGU+psQU4cQW8ZLyo2mxmGj6ruydACVgriA
+\[\begin{tikzcd}
+A \arrow[dd, "f"'] \arrow[rr, "R"] &        & B \arrow[dd, "g"] \\
+                                   & \alpha &                   \\
+C \arrow[rr, "S"']                 &        & D                
+\end{tikzcd}\]
+
+In a virtual equipment the ``horizontal source'' of a 2-cell can be
+instead a ``compatible string'' of horizontal arrows, something like
+
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEB9YkAX1PSZc+QigAs5KrUYs2XQv0HY8BIgEZSAZin1mrRCADCfASAzKRRTVp0z9IACImlw1SgBMpNbb1sAOn6MaAAWdM5mQiqiyBqU1LqyBlxq4eau0Z5x0r4GqZGWKNZZCfZ8UjBQAObwRKAAZgBOEAC2SGQgOBBIntmJIHUg1Ax0AEYwDAAK+W4gDViVwTjhjS1IGh1diNa99pXLTa2IPZ1I28Njk9Ois-OLgztsAMr7q4jtJ4gArPF2bABKnBSin6ByQ3w2SAAbD8ciAAe4XodoRDEAB2IZYMD2KAQHA4Cr3YIwOhQNiQLGIpDolHrEr-TgKCi8IA
+\begin{tikzcd}
+A_0 \arrow[rddd, "f"'] \arrow[r, "R_1"] & A_1 \arrow[r, "R_2"] & {} \arrow[r, no head, dotted] & {} \arrow[r, "R_n"] & A_n \arrow[lddd, "g"] \\
+                                        &                      & \alpha                        &                     &                       \\
+                                        &                      &                               &                     &                       \\
+                                        & C \arrow[rr, "S"']   &                               & D                   &                      
+\end{tikzcd}\]
+
+Including the special case of an ``empty'' string consisting of a
+single object:
+
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQBBEAX1PU1z5CKcqQBM1Ok1bsAwjz4gM2PASJjxkhizaIQAEQX8VQomWJbpukAB0bTNAAt6PSTCgBzeEVAAzAE4QALZIoiA4EEgaUjrsHkYgAcFIZOGRiNGM9ABGMIwACgKqwiD+WB6OOCA02jJ6AMoJSSGIYREpNVbsvtUgWbkFRaZ6ZRVV3JTcQA
+\begin{tikzcd}
+                   & A \arrow[rdd, "g"] \arrow[ldd, "f"'] &   \\
+                   & \alpha                               &   \\
+C \arrow[rr, "S"'] &                                      & D
+\end{tikzcd}\]
+
+And with composition/identity rules very much like a (non-symmetric)
+multicategory.
+
+The ur-example of a virtual double category consists of categories,
+functors (vertically), profunctors (horizontally) and a kind of
+``multi-argument'' homomorphisms of profunctors as 2-cells. This has
+many universal constructions in it (Hom sets, tensors/cotensors of
+profunctors) but one in particular that is fundamental to our
+syntactic presentation is that of \emph{restrictions}. Restrictions
+generalize the following construction in ordinary category
+theory. Given any profunctor $R : C^o \times D \to \Set$ and any
+functors $F : A \to C$ and $G : B \to D$, we can compose them to get a
+profunctor $R(F,G) : A^o \times B \to \Set$. Furthermore, using this
+restriction idea, any profunctor homomorphism can be equivalently be
+written as a ``globular'' 2-cell like that of a 2-category:
+
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQAmclVqMWbAELdeIDNjwEiARjHV6zVohAAdPYzQALOt3EwoAc3hFQAMwBOEALZIyIHBCTqQDOgBGMAwACvzKQn4w9jggmpI6IABKcSBBYFBIAMzEPA7ObogeXj7U6ZmIALQ51P5BoeGCbI5YVsax8dpsAMoAFPakVgCU5lxAA
+\begin{tikzcd}
+A \arrow[rr, "R", bend left] \arrow[rr, "{S(f,g)}"', bend right] & \alpha & B
+\end{tikzcd}\]
+
+In our syntax, we fully embrace this idea and make restriction
+fundamental to our syntax, only giving syntax to these globular
+cells. What results is a syntax surprisingly similar to informal
+category theoretic reasoning, but rigid enough to apply to any virtual
+double category with restrictions.
+
 \section{Syntax}
 
-\subsection{Judgments}
+\subsection{Judgmental Structure}
+
 The following figures present the basic formation, primitive and
-admissible and equality rules of our type theory, an internal language
-for virtual equipments.
-%
-Note that contra Crutwell-Shulman, we define a virtual equipment to be
-a virtual double category with all restrictions, whereas they
-additionally require the category to have all \emph{units}.
+admissible equality rules of our type theory, an internal language for
+virtual double categories with restrictions.
 %
 The type theory has 4 central concepts, which we will refer to
 sometimes using type theoretic/set theoretic and at other times
