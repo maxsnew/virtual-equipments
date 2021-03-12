@@ -594,20 +594,25 @@ For the elim rule I'm still not sure.
 
 \subsection{Tensor}
 
-Next, we can internalize the $,$ in judgment contexts in one of two
-ways: on the left as a tensor product or on the right as a power.
+Next, we can internalize the $,\alpha,$ as a positive connective as a
+kind of ``existentially quantified tensor product'', abstracting the
+composition of profunctors.
 
 Next, let's define the tensor product of profunctors, also known as
 the \emph{composition} of profunctors.
 \begin{mathpar}
   \inferrule*[right=Tensor formation]
-  {Q \prof(\alpha^o : \cat C; \beta : \cat D)
-   \and R \prof(\beta^o : \cat D; \gamma : \cat E)}
-  {\exists \beta.~Q \odot R \prof(\alpha^o : \cat C; \gamma : \cat E)}
+  {Q \prof(d^-\xi; \beta : \cat D)
+   \and R \prof(\beta^o : \cat D; d^+\xi)}
+  {\exists \beta:\cat D.~Q \odot R \prof(\xi)}
+
+  \inferrule*[right=Tensor intro function]
+  {}
+  {\alpha : \cat C, q : Q, \beta : \cat D, r : R, \gamma : \cat E \vdash (q, \beta,r) : \exists \beta : \cat D. Q \odot R}
 
   \inferrule*[right=Tensor introduction]
-  {\Phi \vdash M : Q[A/\alpha;B/\beta] \and \Psi \vdash N : R[B/\beta;\Gamma/\gamma]}
-  {\Phi,\Psi\vdash (A,M,B,N,\Gamma) : \exists \beta. Q[A/\alpha] \odot R[\Gamma/\gamma]}
+  {\Phi \vdash M : Q[;B/\beta] \and \Psi \vdash N : R[B/\beta;]}
+  {\Phi,\Psi\vdash (M,B,N) : \exists \beta. Q \odot R}
 
   \inferrule*[right=Tensor elimination]
   {\Psi \vdash M : \exists \beta. Q \odot R \and \Phi,x:Q,y:R,\Phi' \vdash N : P}
