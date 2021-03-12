@@ -348,16 +348,109 @@ have rules for constructing an ``empty'' context, which is just a
   \label{fig:equations}
 \end{figure}
 
+Now that we have established a judgmental structure, we move on to the
+multiplicative connectives, starting with the easier negative
+connectives and then the more difficult positives.
+
+\subsection{Cotensor}
+
+First, we study the two ``internal homs'' of judgments. Since the
+``monoidal'' structure of judgments is not in any way symmetric, we
+get two distinct notions internalizing concatenating on the left and
+the right of the context. We write these types as $\forall \gamma. P
+\triangleleft R$ and $\forall \gamma. R \triangleright P$ because they
+act like a combined quantification and internal hom, but note that
+these are not built out of simpler connectives but instead these are
+single connectives in their own right.
+
+\begin{figure}
+  \begin{mathpar}
+      \inferrule*[right=Covariant Cotensor formation]
+      {R \prof(d^+\xi; \gamma : \cat E) \and P \prof(d^-\xi; \gamma : \cat E)}
+      {\forall \gamma.~ P \triangleleft R \prof(\xi)}
+
+      (\forall \gamma. P\triangleleft R)[\xi] = \forall \gamma. P[d^-\xi,\gamma/\gamma] \triangleleft R[d^+\xi,\gamma/\gamma]
+
+      \inferrule*[right=Covariant Cotensor introduction]
+      {\Phi, x : R, \gamma : \cat E \vdash M : P}
+      {\Phi \vdash \lambda^\triangleleft (x : R, \gamma : \cat E). M : \forall \gamma.~ P \triangleleft R}
+
+      (\lambda^\triangleleft (x, \gamma). M)[\phi] = \lambda^\triangleleft (x, \gamma). M[\phi, x/x,\gamma/\gamma]
+
+      \inferrule*[right=Covar Cotensor elim simple]
+      {}
+      {\alpha: \cat C, f:\forall \gamma. P \triangleleft R, \beta : \cat D, x : R, \gamma : \cat E \vdash f\triangleleft (x, \gamma) : P}
+
+      \inferrule*[right=Covariant Cotensor elimination]
+      {\Phi \vdash M : \forall \gamma.P\triangleleft R \and \Psi \vdash N : R[B/\gamma]}
+      {\Phi,\Psi \vdash M\triangleleft(N, B) : P[B/\gamma]}\\
+
+      (\lambda^\triangleleft (x, \gamma). M)\triangleleft (x, \gamma) = M (\beta)
+
+      \inferrule
+      {\Phi, x:R, \gamma : \cat E \vdash M \triangleleft (x, \gamma) = N \triangleleft (x, \gamma) : P}
+      {\Phi \vdash M = N : \forall \gamma. P \triangleleft R}
+
+      \inferrule*[right=Contra Cotensor formation]
+      {R \prof(\alpha:\cat C; d^-\xi) \and P \prof(\alpha : \cat C; d^+\xi)}
+      {\forall \alpha.~ R\triangleright P \prof(\xi)}
+
+      \inferrule*[right=Contra Cotensor introduction]
+      {\alpha:\cat C, x : R, \Phi \vdash M : P}
+      {\Phi \vdash \lambda^\triangleright (\alpha:\cat C, x : R). M : \forall \alpha.~ R \triangleright P}
+
+      (\lambda^\triangleright (\alpha, x). M)[\phi] = \lambda^\triangleright (\alpha, x). M[\alpha/\alpha, x/x,\phi]
+
+      \inferrule*[right=Covar Cotensor elim simple]
+      {}
+      {\alpha: \cat C, x : R, \beta : \cat D, f:\forall \alpha. R \triangleright P, \gamma : \cat E \vdash (\alpha, x) \triangleright f : P}
+
+      \inferrule*[right=Contra Cotensor elimination]
+      {\Phi \vdash N : R[A/\alpha] \and \Psi \vdash M : \forall \alpha. R \triangleright P}
+      {\Phi,\Psi \vdash (A,N) \triangleright M : P[A/\alpha]}\\
+
+      \inferrule*[Right=$\beta$]
+                 {}
+                 {(\alpha, x) \triangleright (\lambda^\triangleright (\alpha, x). M) = M }
+
+      \inferrule*[right=$\eta$]
+      {\alpha:\cat C, x:R, \Phi \vdash (\alpha, x) \triangleright M = (\alpha, x) \triangleright N : P}
+      {\Phi \vdash M = N : \forall \alpha. R \triangleright P}
+  \end{mathpar}
+  \caption{Cotensor Judgments}
+\end{figure}
+
+Cotensor judgments are very useful as they allow a term in any context
+to be represented by a term in an empty context, i.e., a term $\Phi ,
+\alpha : \cat C, \Psi \vdash t : R$ can be instead written as a term
+$\alpha : \cat C \vdash t' : \Phi \triangleright R \triangleleft \Psi$
+where the type on the right is shorthand for a sequence of left and
+right cotensors.
+
+Also, they give us a way to write any substitution as a term. Given
+$\phi : \Psi \to \Phi$ and $\Phi \vdash M : Q$, we can write the
+substitution $M[\phi]$ as a term without inspecting $M$, instead doing
+induction on $\Phi$.
+
+So if $\Phi = \alpha_0:\cat {C_0},x_1:R_1,\ldots,\alpha_{n-1}:\cat C_{n-1}, x_n:R_n,\alpha_n:\cat C_n$, we can define
+
+\[\Phi \triangleright Q = \forall \alpha_{n-1}. R_n \triangleright \cdots \forall \alpha_0. R_1 \triangleright Q\]
+
+or
+
+\[ Q \triangleleft \Phi = \forall \alpha_0. \cdots(\forall \alpha_{n-1}. Q \triangleleft R_n)\cdots \triangleleft R_1\]
+
+and notice that by $\beta$ reduction the following term is equal to $M$:
+\[ (\alpha_0,x_1)\triangleright\cdots(\alpha_{n-1},x_n)\triangleright(\lambda^\triangleright (\alpha_{n-1}, x_n:R_n). \ldots \lambda^\triangleright (\alpha_0, x_1:R_1). M) : \Phi \triangleright Q \]
+Now any substitution for $\Phi$ will simply supply all of these
+arguments, instead of pushing into $M$.
+
 \subsection{Hom}
 
-Now that we have established the central judgments and their algebraic
-structure, we can study connectives that internalize this judgmental
-structure. The ``monoidal'' part of the structure here is the
-structure of the term context $\phi$, which includes the empty context
-$\cdot_{\alpha}$ as unit and concatenation as ``product''.  We
-correspondingly can add a positive connective internalizing the unit
-and a trio of connectives, one positive and two negative internalizing
-the comma.
+While the cotensors of the previous section work quite smoothly since
+they are negative connectives in an intuitionistic-like (many formulas
+on the left of the sequent and only one on the right), the positive
+connectives, the unit and tensor, are trickier.
 
 First, to internalize $\cdot_{\alpha : \cat C}$ we can define the
 \emph{hom judgment} $A \to_{\cat C} A'$, which in set-theoretic
@@ -374,21 +467,76 @@ the identity arrow from $A$ to itself $\id(A) : A \to_{\cat C} A$.
 Without knowing more about the category in question, these are the
 only arrows we know exist.
 %
-The elimination form is trickiest to define in a satisfactory way.
-%
-Next the elimination form says that to define a term whose input is a
-morphism $f : \beta \to_{\cat C} \beta'$, we need only define how it
-behaves on the identity function.
 
+The elimination form is trickiest to define in a natural deduction style.
+%
+First, let's consider the universal property of the Hom. From
+Crutwell-Shulman, we want a 2-cell
+
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQBBEAX1PU1z5CKcqQBM1Ok1bsuvftjwEiY8ZIYs2iTjz4gMioUTLF10rSABOMAGaMekmFADm8IqBuWIAWyRkQOBBIqlKa7AASProeXr6IogFBiP6MWGAWUBDMAEaMbDQAFjD0UOyQ6SA0OPRY9trlbPIgnlHxVUkhqRXamTl5lSBFJWUE+QE1deCjDtxAA
+\begin{tikzcd}
+                    & A \arrow[ldd, no head, Rightarrow] \arrow[rdd, no head, Rightarrow] &   \\
+                    & refl                                                                &   \\
+A \arrow[rr, "Hom"] &                                                                     & A
+\end{tikzcd}\]
+
+That is universal/opcartesian in that for any 2-cell $t$:
+
+\[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRACEQBfU9TXfIRQBGclVqMWbbrxAZseAkQBMY6vWatEIAIIy+CwUQAsaiZrZ6eBgUpQA2Mxqnb2Acn1z+ioclXLxZy0QAGFPeVtfUwD1SWCAEXDvIxQAZlJhQLi2HA8ucRgoAHN4IlAAMwAnCABbJDIQHAgkYWsQKtqW6iakVRAGLDBgqDo4AAtCkGoJuig2SCHPDrrEPp7EdP7B4LgIAbnpmFmkMCYGBmoGOgAjGAYABWS7fphynCnzFxAACU625aQm3Wpi2i20I3Gk0Ox20C1Y-2qKwa6wArAjOogQet7OiVijus1EI5PsEAErcChcIA
+\begin{tikzcd}
+B \arrow[r] \arrow[rrdd] & {} \arrow[r, no head, dashed] & A \arrow[rr, "Hom"] &    & A \arrow[rr, no head, dashed] &  & B' \arrow[lldd] \\
+                         &                               &                     & t' &                               &  &                 \\
+                         &                               & C \arrow[rr, "R"]   &    & D                             &  &                
+\end{tikzcd}\]
+
+there exists a $t'$ which extends $t$ in that the following is equal
+to $t$:
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoAmAXVJADcBDAGwFcYkQAhEAX1PU1z5CKAIwVqdJq3Y8+IDNjwEi5cTQYs2iEAEFZ-RUKIAWNZM3s9vA4OUoAbGY3TtHAOT75ApcOSrjEs5aIADCngq2vqYB6lLBACLh3kYoAMykqYFx7Dge1l6GdsjpxFkW2lZyET5EZKWx5SBJhb5i9eYuTfnVKciO7UEy3clF6SJlnQBOMABmjDwSMFAA5vBEoDOTEAC2SGQgOBBIIvmbO8c0h0iqIIxYYMFQ9HAAFksgNG-0UOyQD55nXaIG5XRDpW73YJwCB3H6fGDfJBgZiMRg0Rj0ABGMEYAAURsJbrMcB8OsEABLnU5bIHg0GmCH-bRPV7veGI7R-NjU86IfaggCsPKBDNB9mFSAFlyOiEcZPYACUATSkAAOaXXdGQ9hQCDMTGMNjsn6cghGg70LDzU3-CWIdUHGXgu5MkC6-WG0lfE3gM2knCW62+21yQFIACcGr5dsjjuO+xdUJhWDhIG9SJRaItVt+frtIn5MrEjKTsK9CJNyNRl0DuZDGxViALUYdiZ1zzeqfTNu5ocbDtBImLbeZHbZaYrdd7Dd5Q6jDJHbr1BvN3eD5oDOZ7C24QA
+\begin{tikzcd}
+{} \arrow[dd] \arrow[r]  & {} \arrow[dd] \arrow[rr, no head, dashed] &                     & A \arrow[ldd, no head, Rightarrow] \arrow[rdd, no head, Rightarrow] \arrow[rrr, no head, dashed] &                               &  & {} \arrow[dd, no head, Rightarrow] \\
+                         &                                           &                     & refl                                                                                             &                               &  &                                    \\
+B \arrow[r] \arrow[rrdd] & {} \arrow[r, no head, dashed]             & A \arrow[rr, "Hom"] &                                                                                                  & A \arrow[rr, no head, dashed] &  & B' \arrow[lldd]                    \\
+                         &                                           &                     & t'                                                                                               &                               &  &                                    \\
+                         &                                           & C \arrow[rr, "R"]   &                                                                                                  & D                             &  &                                   
+\end{tikzcd}\]
+
+Clearly, our introduction rule models this first 2-cell. Furthermore,
+the construction in the second condition is modeled faithfully by the
+following sequent rule in the figure. This is a J-like induction rule:
+to construct a term using an input of the Hom type, it is sufficient
+to consider the case in which the input is the identity morphism.
+%
+However, building in a substitution the usual way we would (pushing
+the substitution into the continuation $N$) doesn't work properly
+because we can't necessarily extract a substitution for the
+continuation from the substitution for the the whole term. A
+substitution for the whole term would be of the form
+\[\phi,D_1/\delta_1,M/f,D_2/\delta_2,\psi\]
+The the candidate for the continuation's substitution would be
+$\phi,?,\psi$ but there is not necessarily something to go in the
+middle here since $D_1,D_2$ do not necessarily have the same
+\emph{input variable}. So instead of having a nice natural deduction
+elimination rule, we simply add a second form, not directly accessible
+as surface syntax, where we build in a substitution to the sequent
+rule, essentially requiring that all eliminations occur on variables.
+
+How do we get away with this cheat? How does a source programmer write
+down induction on something that isn't a variable? We can get away
+with it by requiring cotensors already be in the system. Then we can
+write down a term equivalent to $J(f,\delta.N)[\phi]$ by by
+abstracting over all of the free variables of N
+
+Note the
+similarity to Agda, where pattern matching is only on variables in
+function definitions
 
 \begin{figure}
-\begin{mathpar}
+  \begin{mathpar}
     \inferrule*[right=Hom-Formation]
-    {\beta : \cat D \vdash A : \cat C\and
-    \gamma : \cat E \vdash A' : \cat C}
-    {A \to_{\cat C} A' \prof(\beta^o : \cat D;\gamma : \cat E)}
+    {d^-\xi \vdash A : \cat C\and d^+ \xi \vdash A' : \cat C}
+    {A \to_{\cat C} A' \prof(\xi)}
 
-    (A \to A')[B/\alpha;B'/\beta] = (A[B/\alpha] \to A'[B'/\beta])
+    (A \to A')[\xi] = A[d^-\xi] \to A'[d^+\xi]
 
     \inferrule*[right=Hom-Introduction]
     {\alpha : \cat D \vdash A : \cat C}
@@ -397,24 +545,39 @@ behaves on the identity function.
     \id({A})[B/\alpha] = \id({A[B/\alpha]})
 
     \inferrule*[right=Hom-Left (Sequent Style)]
-    {\alpha^o,\beta|\Phi,\phi : R[\delta/\delta_1], \psi : S[\delta/\delta_2],\Psi \vdash Q }
-    {\alpha^o,\beta|\Phi,\phi : R, \chi : \delta_1 \to \delta_2, \psi : S,\Psi \vdash Q}
-    
-    \inferrule*[right=Hom-Elim]
-    {\beta_1^o;\beta_2\pipe\Psi \vdash f : \beta_1 \to_{C} \beta_2\and
-      \alpha^o;\beta\pipe \Phi\and
-      \beta^o;\gamma\pipe \Phi'\and
-      \Phi,\Phi' \vdash g : R}
-    {\Phi[\cdot;\beta_1/\beta],\Psi,\Phi'[\beta_2/\beta;\cdot]\vdash \when f = \id_{\beta}.~ g : R[\beta_1/\beta;\beta_2/\beta]}
+    {\Phi_1[\delta/\delta_1], \delta:\cat C, \Phi_2[\delta/\delta_2]\vdash N : Q[\delta/\delta_1,\delta/\delta_2]}
+    {\Phi_1, \delta_1 : \cat C, f : \delta_1 \to_{\cat C} \delta_2, \delta_2 : \cat C, \Phi_2\vdash J(f, \delta. N) : Q}
 
-    (\when f = \id_{\beta}. g)[l,m,r] = \when f[m] = \id_{\beta}. g[l,r] \textrm{TODO: dig into this}
-    
-    \when \id_{\alpha} = \id_{\beta}.~ g \equiv g[\alpha/\beta]
 
-    \inferrule*[right=Hom-$\eta$]
-    {...}
-    {\beta_1^o : \cat C;\beta_2:\cat C\pipe \Phi \vdash f \equiv \when f = \id_{\alpha} .~ \id_{\alpha} : \beta_1 \to_{\cat C} \beta_2}
-\end{mathpar}  
+    \inferrule*[right=Hom-Left-subst]
+    {\phi : \Psi \to \Phi_1, \delta_1 : \cat C, f : \delta_1 \to_{\cat C} \delta_2, \delta_2 : \cat C, \Phi_2\and
+     \Phi_1[\delta/\delta_1], \delta:\cat C, \Phi_2[\delta/\delta_2]\vdash N : Q[\delta/\delta_1,\delta/\delta_2]
+    }
+    {\Psi\vdash J(f, \delta. N)[\phi] : Q[\phi]}
+
+    %% \inferrule*[right=Hom-Left (Sequent Style)]
+    %% {\alpha^o,\beta|\Phi,\phi : R[\delta/\delta_1], \psi : S[\delta/\delta_2],\Psi \vdash Q }
+    %% {\alpha^o,\beta|\Phi,\phi : R, \chi : \delta_1 \to \delta_2, \psi : S,\Psi \vdash Q}
+    
+    %% \inferrule*[right=Hom-Elim (Nat. Deduction)]
+    %% {\beta : \cat B \vdash M : D_1 \to_{\cat C} D_2\and
+    %%   \Phi[\delta/\delta_1],\delta:\cat D,\Phi'[\delta/\delta_2] \vdash N : R[\delta/\delta_1,\delta/\delta_2]
+    %% }
+    %% {\Phi,\beta,\Psi \vdash J(M,\beta. N) : R}
+
+    %% \inferrule*
+    %% {\beta_1^o;\beta_2\pipe\Psi \vdash f : \beta_1 \to_{C} \beta_2\and
+    %%   \alpha^o;\beta\pipe \Phi\and
+    %%   \beta^o;\gamma\pipe \Phi'\and
+    %%   \Phi,\Phi' \vdash g : R}
+    %% {\Phi[\cdot;\beta_1/\beta],\Psi,\Phi'[\beta_2/\beta;\cdot]\vdash \when f = \id_{\beta}.~ g : R[\beta_1/\beta;\beta_2/\beta]}
+
+    J(\id(A), \beta.N) = N[A/\beta]
+
+    \inferrule
+    {\Phi[\delta/\delta_1],\delta:\cat D, \Psi[\delta/\delta_2] \vdash M[\delta/\delta_1,\id(\delta)/f,\delta/\delta_2] = N[\delta/\delta_1,\id(\delta)/f,\delta/\delta_2] : Q[\delta/\delta_1,\delta/\delta_2]}
+    {\Phi, \delta_1 : \cat D, f : \delta_1 \to \delta_2, \delta_2 : \cat D, \Psi \vdash M = N: Q}
+  \end{mathpar}  
   \caption{Hom}  
 \end{figure}
 
@@ -513,8 +676,6 @@ invariant?
   (\lambda^\triangleright (\alpha,x). M)(A,N)^\triangleright = M[A/\alpha][N/x]\\
   M = \lambda^\triangleright (\alpha, x). M(\alpha,x)^\triangleright
 \end{mathpar}
-
-\subsection{Cotensor}
 
 \subsection{Additives}
 
