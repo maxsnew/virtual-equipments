@@ -357,17 +357,70 @@ connectives and then the more difficult positives.
 First, we study the two ``internal homs'' of judgments. Since the
 ``monoidal'' structure of judgments is not in any way symmetric, we
 get two distinct notions internalizing concatenating on the left and
-the right of the context. We write these types as $\forall \gamma. P
-\triangleleft R$ and $\forall \gamma. R \triangleright P$ because they
-act like a combined quantification and internal hom, but note that
-these are not built out of simpler connectives but instead these are
-single connectives in their own right.
+the right of the context. In ordinary category theory, these
+profunctors can be constructed using an \emph{end} and the hom of
+functor categories. Given two profunctors $P : C^o \times E \to \Set$
+and $R : D^o \times E \to Set$, the cotensor product is given as
+\[ \int_{e \in E} R(-,e) \Rightarrow P(e,=) \]
+
+We instead right these using a logical notation of $\forall$ in lieu
+of an end, due to our logical/type theoretic bias. We write these
+types as $\forall \gamma. P \triangleleft R$ and $\forall \gamma. R
+\triangleright P$ because they act like a combined quantification and
+internal hom, but note that these are not built out of simpler
+connectives but instead these are single connectives in their own
+right.
+
+The syntax is given in Figure~\ref{fig:cotensor}.
+%
+First, the formation rule for covariant cotensor formation requires
+that the covariant variables for $R,P$ are the same, and the
+contravariant variables match the boundary of the overall
+judgment. Note that we use $d^+\Xi,d^-\Xi$ to allow for the case that
+the boundary is a single variable $\Xi = \alpha:\cat C$.
+%
+Next, the substitution rule is straightforward.
+%
+Then we have the elimination form, first written in a simple form with
+no substitution built in.
+%
+This says that given a variable of the cotensor judgment, and another
+variable of judgment $R$, we can apply these to get a term of judgment
+$P$. As a diagram this is written as follows:
+
+\[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEQBfU9TXfIRQBGclVqMWbACLdeIDNjwEiAJjHV6zVohABROXyWCiZYeK1TdnHkYEqU685sk793cTCgBzeEVAAZgBOEAC2SGQgOBBIohLabAA6iQEQQYwMAATJ3nShoXQAdJkACtmJOEFYdGDeDDD1ATiZAEqGIMFhsdTRSOrxViBtth0h4YgAzD0xiAAsLgm6Je2d45G9k9QMWGBuUBBMAEb1INQAFjB0UGyQu6dRdFgMNwSsI6t900jzIBdXL3ctjs9gdjqweo9nrpbm8KFwgA
+\begin{tikzcd}
+C \arrow[r, "\forall \gamma. P \triangleleft R"] \arrow[d, no head, Rightarrow] & D \arrow[r, "R"] & E \arrow[d, no head, Rightarrow] \\
+C \arrow[rr, "P"]                                                               &                  & E                               
+\end{tikzcd}\]
+
+The universal property of this judgment is that this is the universal
+2-cell of this type, in that any 2-cell
+
+
+\[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEByEAX1PUy58hFACZyVWoxZsAIr34gM2PASIBmCdXrNWiEAFEFAlcKJkAjJJ0z97Y0sGqRyTVe3S9hh8qFqUFlpSumy8kjBQAObwRKAAZgBOEAC2SIEgOBBI4sG2IABKDokpSJoZWYgALB4h+gAKRUmpiGTlpdQMWGBecBCdUCDUABYwdAOIYEwMDNQ4dFgMbJDdjSWIOZlI1SAjY0sErB1dXlAQTABGDIcZ84v6y6x88U1IrZuIAKxPIMXNH7MVdKdFb6KB0OAjAbDUbjcAHMI8IA
+\begin{tikzcd}
+C' \arrow[d] \arrow[r] & {} \arrow[r, no head, dashed] & D \arrow[r, "R"] & E \arrow[d, no head, Rightarrow] \\
+C \arrow[rrr, "P"]     &                               &                  & E                               
+\end{tikzcd}\]
+
+Exhibits a unique factorization:
+
+\[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQBhEAX1PU1z5CKAEwVqdJq3YARHnxAZseAkQDM4mgxZtEIAKLz+yoUTIiJ26Xq69jg1Sg0WtU3QaOKBK4SVLFLN3YOAHJPJQdfcn9AnXZw71NRGNc4vTk7LxNHZA0A1OsPbgkYKABzeCJQADMAJwgAWyRokBwIJDFJNJAAJU86xqQNVvbEABYC9wAFfvqmxDIRoZpGLDB3KAhmACNGNhoACxh6KHZIdZAaHHosRjOCNkyB+c62pAmQI5P7i5W1ja2u32rRudz050eCmeSAArFdRgA2J5zJAI+FIADsfwueig9DgR1Oh2Op3BD1mg0QWKWiBaqxxIE2Oz2l0+JJ+wOutw5FPmcJpxGRlMWb1pk3YAB0JdUILUmIwAARSsr0BoNegAOgVUyVEpwtSw9DAZT2e2qOAVfSF82pooAHOK9FaoSjEA6aZ16QDmcCvqTwOSrqCecVuEA
+\begin{tikzcd}
+C' \arrow[r] \arrow[d]                                                           & {} \arrow[r, no head, dashed] & D \arrow[d, no head, Rightarrow] \arrow[r, "R"] & E \arrow[d, no head, Rightarrow] \\
+C \arrow[d, no head, Rightarrow] \arrow[rr, "\forall \gamma. P \triangleleft R"] &                               & D \arrow[r, "R"]                                & E \arrow[d, no head, Rightarrow] \\
+C \arrow[rrr, "P"]                                                               &                               &                                                 & E                               
+\end{tikzcd}\]
+
+We give elimination rules and introduction rules in a style similar to
+$\lambda$-calculus, with corresponding $\beta\eta$ rules.
 
 \begin{figure}
   \begin{mathpar}
       \inferrule*[right=Covariant Cotensor formation]
-      {R \prof(d^+\xi; \gamma : \cat E) \and P \prof(d^-\xi; \gamma : \cat E)}
-      {\forall \gamma.~ P \triangleleft R \prof(\xi)}
+      {R \prof(d^+\Xi; \gamma : \cat E) \and P \prof(d^-\Xi; \gamma : \cat E)}
+      {\forall \gamma.~ P \triangleleft R \prof(\Xi)}
 
       (\forall \gamma. P\triangleleft R)[\xi] = \forall \gamma. P[d^-\xi,\gamma/\gamma] \triangleleft R[d^+\xi,\gamma/\gamma]
 
@@ -392,7 +445,7 @@ single connectives in their own right.
       {\Phi \vdash M = N : \forall \gamma. P \triangleleft R}
 
       \inferrule*[right=Contra Cotensor formation]
-      {R \prof(\alpha:\cat C; d^-\xi) \and P \prof(\alpha : \cat C; d^+\xi)}
+      {R \prof(\alpha:\cat C; d^-\Xi) \and P \prof(\alpha : \cat C; d^+\Xi)}
       {\forall \alpha.~ R\triangleright P \prof(\xi)}
 
       \inferrule*[right=Contra Cotensor introduction]
@@ -418,7 +471,32 @@ single connectives in their own right.
       {\Phi \vdash M = N : \forall \alpha. R \triangleright P}
   \end{mathpar}
   \caption{Cotensor Judgments}
+  \label{fig:cotensor}
 \end{figure}
+
+Cotensor judgments are useful not just in applications (Kan
+extensions, the Yoneda lemma), but also for purely syntactic
+reasons. In particular, I don't see how to give a sensible, complete
+natural deduction-style syntax for the other multiplicative
+connectives (Unit (Hom) and Tensor) without relying on the presence of
+cotensor judgments. The key property is that they give us a way to
+syntactically write a substitution $M[\phi]$ uniformly in $M$, as
+``$M$ applied to $\phi$''. In fact it gives us many ways since we can
+use a mix of left and right cotensors.
+
+As an example, consider a term $M$ with a single judgment variable
+$\alpha : \cat C, x : R, \beta : \cat D \vdash M : S$. Then a
+substitution for this term is given by:
+\[ A/\alpha, N/x, B/\beta : \Psi \to \alpha : \cat C, x : R, \beta : \cat D \]
+Substitution $M[\phi]$ is syntactically defined by induction on $M$,
+but using cotensors, we can construct an equivalent term that is
+uniform in $M$ by destructuring $\phi$ instead. Specifically, we can
+abstract over the variable $x$ on the left or right, and then supply
+the input term $N$ instead as an \emph{argument}, rather than
+substituting it directly in $M$:
+\[ (\lambda^\triangleleft \alpha, x. M[B/\beta]) \triangleleft (A,N) \]
+The only issue is we still don't have a way to get at that final
+$\beta\ldots$.
 
 Cotensor judgments are very useful as they allow a term in any context
 to be represented by a term in an empty context, i.e., a term $\Phi ,
@@ -598,8 +676,17 @@ Next, we can internalize the $,\alpha,$ as a positive connective as a
 kind of ``existentially quantified tensor product'', abstracting the
 composition of profunctors.
 
-Next, let's define the tensor product of profunctors, also known as
-the \emph{composition} of profunctors.
+The ordinary formula for this is that for profunctors $R : C^o \times
+D \to \Set$ and $S : D^o \times E \to \Set$, the composite is given by
+a coend:
+
+\[ \int^{d \in D} R(-,d) \otimes S(d,=) \]
+
+We will instead use slightly more logical notation, writing the end as
+an existential quantifier, justified by the analogy between the two
+and the structure of the introduction/elimination forms in our syntax
+in particular.
+
 \begin{mathpar}
   \inferrule*[right=Tensor formation]
   {Q \prof(d^-\xi; \beta : \cat D)
@@ -614,13 +701,21 @@ the \emph{composition} of profunctors.
   {\Phi \vdash M : Q[;B/\beta] \and \Psi \vdash N : R[B/\beta;]}
   {\Phi,\Psi\vdash (M,B,N) : \exists \beta. Q \odot R}
 
-  \inferrule*[right=Tensor elimination]
-  {\Psi \vdash M : \exists \beta. Q \odot R \and \Phi,x:Q,y:R,\Phi' \vdash N : P}
-  {\Phi,\Psi,\Phi' \vdash \lett (\beta,x,y) = M.~N : P}
+  \inferrule*[right=Tensor elim Sequent]
+  {\Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Psi \vdash N : S}
+  {\Phi, \alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E,\Psi \vdash J_\odot(x;q.\beta.r. N) : S}
 
-  (\lett (\beta,x,y) = (B,M_l,M_r).~ N) = N[B/\beta][M_l/x][M_r/y]\\
+  \inferrule*[right=Tensor elim Subst]
+  {\Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Phi' \vdash N : S
+  \and
+  \phi : \Psi \to \Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Phi'}
+  {\Psi  \vdash J_\odot(x;q.\beta.r. N)[\phi] : S}
 
-  N = \lett(\beta, x,y) = z.~ N[(\beta, x,y)/z]
+  J_\odot(x;q.\beta.r.N)[\phi,(M,B,M')/x,\phi'] = N[\phi,M/q,B/\beta,M'/r,\phi']
+
+  \inferrule
+  {\Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Psi \vdash M[(q,\beta,r)/x] = N[(q,\beta,r)/x] : S}
+  {\Phi, \alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E,\Psi \vdash M = N : S}
 \end{mathpar}
 First, the syntax for tensor is based on the coend formula that gives
 the definition in $Cat$, but using logical syntax $\exists$ rather
