@@ -55,7 +55,7 @@
   them, such as the equivalence between the definition of adjoint
   functors in terms of hom-set isomorphism and universal
   morphism. Second, we can do \emph{synthetic} category theory by
-  defining synthetic notions of Hom set and tensor/cotensor of
+  defining synthetic notions of unit and tensor/hom of
   profunctors.
 \end{abstract}
 
@@ -352,7 +352,7 @@ Now that we have established a judgmental structure, we move on to the
 multiplicative connectives, starting with the easier negative
 connectives and then the more difficult positives.
 
-\subsection{Cotensor}
+\subsection{Left and Right Hom of Profunctors}
 
 First, we study the two ``internal homs'' of judgments. Since the
 ``monoidal'' structure of judgments is not in any way symmetric, we
@@ -360,7 +360,7 @@ get two distinct notions internalizing concatenating on the left and
 the right of the context. In ordinary category theory, these
 profunctors can be constructed using an \emph{end} and the hom of
 functor categories. Given two profunctors $P : C^o \times E \to \Set$
-and $R : D^o \times E \to Set$, the cotensor product is given as
+and $R : D^o \times E \to Set$, their hom is given as
 \[ \int_{e \in E} R(-,e) \Rightarrow P(e,=) \]
 
 We instead right these using a logical notation of $\forall$ in lieu
@@ -418,23 +418,23 @@ $\lambda$-calculus, with corresponding $\beta\eta$ rules.
 
 \begin{figure}
   \begin{mathpar}
-      \inferrule*[right=Covariant Cotensor formation]
+      \inferrule*[right=Covariant Hom formation]
       {R \prof(d^+\Xi; \gamma : \cat E) \and P \prof(d^-\Xi; \gamma : \cat E)}
       {\forall \gamma.~ P \triangleleft R \prof(\Xi)}
 
       (\forall \gamma. P\triangleleft R)[\xi] = \forall \gamma. P[d^-\xi,\gamma/\gamma] \triangleleft R[d^+\xi,\gamma/\gamma]
 
-      \inferrule*[right=Covariant Cotensor introduction]
+      \inferrule*[right=Covariant Hom introduction]
       {\Phi, x : R, \gamma : \cat E \vdash M : P}
       {\Phi \vdash \lambda^\triangleleft (x : R, \gamma : \cat E). M : \forall \gamma.~ P \triangleleft R}
 
       (\lambda^\triangleleft (x, \gamma). M)[\phi] = \lambda^\triangleleft (x, \gamma). M[\phi, x/x,\gamma/\gamma]
 
-      \inferrule*[right=Covar Cotensor elim simple]
+      \inferrule*[right=Covar Hom elim simple]
       {}
       {\alpha: \cat C, f:\forall \gamma. P \triangleleft R, \beta : \cat D, x : R, \gamma : \cat E \vdash f\triangleleft (x, \gamma) : P}
 
-      \inferrule*[right=Covariant Cotensor elimination]
+      \inferrule*[right=Covariant Hom elimination]
       {\Phi \vdash M : \forall \gamma.P\triangleleft R \and \Psi \vdash N : R[B/\gamma]}
       {\Phi,\Psi \vdash M\triangleleft(N, B) : P[B/\gamma]}\\
 
@@ -444,21 +444,21 @@ $\lambda$-calculus, with corresponding $\beta\eta$ rules.
       {\Phi, x:R, \gamma : \cat E \vdash M \triangleleft (x, \gamma) = N \triangleleft (x, \gamma) : P}
       {\Phi \vdash M = N : \forall \gamma. P \triangleleft R}
 
-      \inferrule*[right=Contra Cotensor formation]
+      \inferrule*[right=Contra Hom formation]
       {R \prof(\alpha:\cat C; d^-\Xi) \and P \prof(\alpha : \cat C; d^+\Xi)}
       {\forall \alpha.~ R\triangleright P \prof(\xi)}
 
-      \inferrule*[right=Contra Cotensor introduction]
+      \inferrule*[right=Contra Hom introduction]
       {\alpha:\cat C, x : R, \Phi \vdash M : P}
       {\Phi \vdash \lambda^\triangleright (\alpha:\cat C, x : R). M : \forall \alpha.~ R \triangleright P}
 
       (\lambda^\triangleright (\alpha, x). M)[\phi] = \lambda^\triangleright (\alpha, x). M[\alpha/\alpha, x/x,\phi]
 
-      \inferrule*[right=Covar Cotensor elim simple]
+      \inferrule*[right=Covar Hom elim simple]
       {}
       {\alpha: \cat C, x : R, \beta : \cat D, f:\forall \alpha. R \triangleright P, \gamma : \cat E \vdash (\alpha, x) \triangleright f : P}
 
-      \inferrule*[right=Contra Cotensor elimination]
+      \inferrule*[right=Contra Hom elimination]
       {\Phi \vdash N : R[A/\alpha] \and \Psi \vdash M : \forall \alpha. R \triangleright P}
       {\Phi,\Psi \vdash (A,N) \triangleright M : P[A/\alpha]}\\
 
@@ -470,19 +470,46 @@ $\lambda$-calculus, with corresponding $\beta\eta$ rules.
       {\alpha:\cat C, x:R, \Phi \vdash (\alpha, x) \triangleright M = (\alpha, x) \triangleright N : P}
       {\Phi \vdash M = N : \forall \alpha. R \triangleright P}
   \end{mathpar}
-  \caption{Cotensor Judgments}
-  \label{fig:cotensor}
+  \caption{Hom Judgments}
+  \label{fig:hom}
 \end{figure}
 
-Cotensor judgments are useful not just in applications (Kan
-extensions, the Yoneda lemma), but also for purely syntactic
-reasons. In particular, I don't see how to give a sensible, complete
-natural deduction-style syntax for the other multiplicative
-connectives (Unit (Hom) and Tensor) without relying on the presence of
-cotensor judgments. The key property is that they give us a way to
-syntactically write a substitution $M[\phi]$ uniformly in $M$, as
-``$M$ applied to $\phi$''. In fact it gives us many ways since we can
-use a mix of left and right cotensors.
+Hom judgments are useful not just in applications (Kan extensions, the
+Yoneda lemma), but also for purely syntactic reasons. In particular, I
+don't see how to give a sensible, complete natural deduction-style
+syntax for the other multiplicative connectives (Unit (i.e., the hom
+profunctor) and Tensor (profunctor composition) without relying on the
+presence of cotensor judgments. The key property that Hom judgments
+allow is that given any variable in context of a term
+$\Phi,\alpha,x,\beta,\Psi \vdash M : Q$ we can represent this term as
+a ``single-variable term''
+
+\[ \alpha, x, \beta \vdash \lambda \Phi. \lambda \Psi M. : \Phi \triangleright Q \triangleleft \Psi \]
+
+This allows us to describe restricted positive eliminations that only
+work on single variable contexts.
+
+\begin{figure}
+  \begin{mathpar}
+      \inferrule*[right=Covariant Hom formation]
+      {\Phi \ctx(d^+\Xi; \gamma : \cat E) \and P \prof(d^-\Xi; \gamma : \cat E)}
+      {P \triangleleft \Phi \prof(\Xi)}
+
+      P \triangleleft \gamma = P\\
+      P \triangleleft \Phi,x:R, \gamma:\cat E = \forall \gamma:\cat E. (P \triangleleft \Phi) \triangleleft E\\
+
+      \inferrule*[right=Contra Hom formation]
+      {\Phi \ctx(\alpha:\cat C; d^-\Xi) \and P \prof(\alpha : \cat C; d^+\Xi)}
+      {\Phi \triangleright P \prof(\xi)}
+
+      \alpha \triangleright P = P\\
+      \alpha:\cat C, x:R, \Phi \triangleright P = \forall \alpha. R \triangleright \Phi \triangleright P\\
+  \end{mathpar}
+  \caption{Multi-Hom}
+\end{figure}
+
+\[ \alpha \triangleright Q = Q \]
+\[ \Phi,x:R,\beta:\cat D \triangleright Q =  \]
 
 As an example, consider a term $M$ with a single judgment variable
 $\alpha : \cat C, x : R, \beta : \cat D \vdash M : S$. Then a
@@ -523,7 +550,7 @@ and notice that by $\beta$ reduction the following term is equal to $M$:
 Now any substitution for $\Phi$ will simply supply all of these
 arguments, instead of pushing into $M$.
 
-\subsection{Hom}
+\subsection{Unit and Tensor Profunctors}
 
 While the cotensors of the previous section work quite smoothly since
 they are negative connectives in an intuitionistic-like (many formulas
@@ -531,9 +558,9 @@ on the left of the sequent and only one on the right), the positive
 connectives, the unit and tensor, are trickier.
 
 First, to internalize $\cdot_{\alpha : \cat C}$ we can define the
-\emph{hom judgment} $A \to_{\cat C} A'$, which in set-theoretic
-settings we might call the \emph{identity/equality judgment}
-$A \equiv_{\cat C} A'$.
+\emph{unit} $A \to_{\cat C} A'$, which in set-theoretic settings we
+might call the \emph{identity/equality judgment} $A \equiv_{\cat C}
+A'$.
 %
 First the formation rule says given two objects $A,A'$ in the same
 category $\cat C$, we can form the hom-set from $A$ to $A'$ $A
@@ -593,26 +620,81 @@ substitution for the whole term would be of the form
 The the candidate for the continuation's substitution would be
 $\phi,?,\psi$ but there is not necessarily something to go in the
 middle here since $D_1,D_2$ do not necessarily have the same
-\emph{input variable}. So instead of having a nice natural deduction
-elimination rule, we simply add a second form, not directly accessible
-as surface syntax, where we build in a substitution to the sequent
-rule, essentially requiring that all eliminations occur on variables.
+\emph{input variable}. However, if we assume the existence already of
+the cotensor products the problem can be simplified. Instead of
+allowing for a general elimination of a hom term anywhere in the
+context, we can instead make a remarkably restricted rule: we can only
+eliminate a Hom term when it is the \emph{sole} input in the context:
 
-How do we get away with this cheat? How does a source programmer write
-down induction on something that isn't a variable? We can get away
-with it by requiring cotensors already be in the system. Then we can
-write down a term equivalent to $J(f,\delta.N)[\phi]$ by by
-abstracting over all of the free variables of N
+\[ \inferrule*[right=Hom Elim Very Simple]{\alpha:\cat C \vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]}{\alpha_1:\cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2:\cat C \vdash J(\alpha_1.\alpha_2. Q, \alpha. N, \alpha_1, f, \alpha_2) : Q}\]
 
-Note the
-similarity to Agda, where pattern matching is only on variables in
-function definitions
+While this rule looks very impoverished at first sight, it has the
+virtue of easily supporting a built-in cut:
+
+\[ \inferrule*[right=Hom Elim VSimple Subst]{
+  Q \prof(\alpha_1:\cat C; \alpha_2:\cat C)\and
+  \Phi \vdash M : A_1 \to_{\cat C} A_2\and
+  \alpha:\cat C \vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]}{\Phi \vdash J(\alpha_1.\alpha_2. Q, \alpha. N, A_1, M, A_2) : Q[A_1/\alpha_1, A_2/\alpha_2]}\]
+
+However, this rule on its own clearly is not enough to support our
+desired universal property shown above diagrammatically. To prove our
+completeness theorem, we will need to show that this rule is enough to
+give us the desired universal property \emph{assuming the presence of
+  left and right cotensors}.
+
+So first, we must show that the ``proper'' sequent rule
+
+\[ \inferrule*[right=Hom-Left (Sequent Style)]
+    {\Phi_1[\alpha/\alpha_1], \alpha:\cat C, \Phi_2[\alpha/\alpha_2]\vdash Q[\alpha/\alpha_1,\alpha/\alpha_2]}
+    {\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2\vdash : Q}
+\]
+
+is admissible.
+
+Which we can sketch as follows:
+
+\[
+\inferrule*
+    {\inferrule*{\inferrule*{\Phi_1[\alpha/\alpha_1],\alpha:\cat C, \Phi_2[\alpha/\alpha_1] \vdash Q[\alpha/\alpha_1;\alpha/\alpha_2]}{\alpha:\cat C \vdash \Phi_1[\alpha/\alpha_1] \triangleright Q[\alpha/\alpha_1;\alpha/\alpha_2] \triangleleft \Phi_2[\alpha/\alpha_2]}}{\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C\vdash \Phi_1 \triangleright Q \triangleleft \Phi_2}}
+    {\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2\vdash Q}
+\]
+
+Which using our syntax sugar is given by the term:
+\begin{mathpar}
+  \inferrule*
+    {\inferrule*
+      {\inferrule*
+        {\Phi_1[\alpha/\alpha_1],\alpha:\cat C, \Phi_2[\alpha/\alpha_1] \vdash N : Q[\alpha/\alpha_1;\alpha/\alpha_2]}
+        {\alpha:\cat C \vdash \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N : \Phi_1[\alpha/\alpha_1] \triangleright Q[\alpha/\alpha_1;\alpha/\alpha_2] \triangleleft \Phi_2[\alpha/\alpha_2]}}
+      {\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C\vdash J(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, \alpha_1,f,\alpha_2) : \Phi_1 \triangleright Q \triangleleft \Phi_2}}
+    {\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2\vdash
+      \Phi_1 \triangleright (J(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, \alpha_1,f,\alpha_2)) \triangleleft \Phi_2 : Q}
+\end{mathpar}
+
+We need to show $\beta$ and $\eta$ hold.
+
+First, $\beta$.
+
+\[
+\begin{align*}
+  &(\Phi_1 \triangleright (J(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, \alpha_1,f,\alpha_2)) \triangleleft \Phi_2) [\Phi_1[A/\alpha_1],A/\alpha_1,\id(A),A/\alpha_2,\Phi_2[A/\alpha_2]] \\
+  &=
+  \Phi_1[A/\alpha_1] \triangleright (J(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, A,\id(A), A)) \triangleleft \Phi_2[A/\alpha_2]\\
+  &=
+  \Phi_1[A/\alpha_1] \triangleright (\lambda^\triangleright \Phi_1[A/\alpha_1]. \lambda^\triangleleft \Phi_2[A/\alpha_2]. N[A/\alpha]) \triangleleft \Phi_2[A/\alpha_2]\\
+  &=  (\lambda^\triangleleft \Phi_2[A/\alpha_2]. N[A/\alpha]) \triangleleft \Phi_2[A/\alpha_2]\\
+  &=  N[A/\alpha]
+\end{align*}
+\]
+
+
+
 
 \begin{figure}
   \begin{mathpar}
     \inferrule*[right=Hom-Formation]
-    {d^-\xi \vdash A : \cat C\and d^+ \xi \vdash A' : \cat C}
-    {A \to_{\cat C} A' \prof(\xi)}
+    {d^-\Xi \vdash A : \cat C\and d^+ \Xi \vdash A' : \cat C}
+    {A \to_{\cat C} A' \prof(\Xi)}
 
     (A \to A')[\xi] = A[d^-\xi] \to A'[d^+\xi]
 
@@ -622,42 +704,57 @@ function definitions
 
     \id({A})[B/\alpha] = \id({A[B/\alpha]})
 
-    \inferrule*[right=Hom-Left (Sequent Style)]
-    {\Phi_1[\delta/\delta_1], \delta:\cat C, \Phi_2[\delta/\delta_2]\vdash N : Q[\delta/\delta_1,\delta/\delta_2]}
-    {\Phi_1, \delta_1 : \cat C, f : \delta_1 \to_{\cat C} \delta_2, \delta_2 : \cat C, \Phi_2\vdash J(f, \delta. N) : Q}
+    \inferrule*[right=Hom Elim]{
+      Q \prof(\alpha_1:\cat C; \alpha_2:\cat C)\and
+      \Phi \vdash M : A_1 \to_{\cat C} A_2\and
+      \alpha:\cat C \vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]}{\Phi \vdash J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1, M, A_2) : Q[A_1/\alpha_1, A_2/\alpha_2]}
 
+    J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1, M, A_2)[\phi] = J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1[d^-\phi], M[\phi], A_2[d^+\phi])
 
-    \inferrule*[right=Hom-Left-subst]
-    {\phi : \Psi \to \Phi_1, \delta_1 : \cat C, f : \delta_1 \to_{\cat C} \delta_2, \delta_2 : \cat C, \Phi_2\and
-     \Phi_1[\delta/\delta_1], \delta:\cat C, \Phi_2[\delta/\delta_2]\vdash N : Q[\delta/\delta_1,\delta/\delta_2]
-    }
-    {\Psi\vdash J(f, \delta. N)[\phi] : Q[\phi]}
+    \inferrule*[right=Hom$\beta$]{\beta:\cat D \vdash A : \cat C\and
+      \alpha:\cat C \vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]
+    }{\beta : \cat D \vdash J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A, \id(A), A) = N[A/\alpha] : Q[A/\alpha_1,A/\alpha_2]}
 
-    %% \inferrule*[right=Hom-Left (Sequent Style)]
-    %% {\alpha^o,\beta|\Phi,\phi : R[\delta/\delta_1], \psi : S[\delta/\delta_2],\Psi \vdash Q }
-    %% {\alpha^o,\beta|\Phi,\phi : R, \chi : \delta_1 \to \delta_2, \psi : S,\Psi \vdash Q}
-    
-    %% \inferrule*[right=Hom-Elim (Nat. Deduction)]
-    %% {\beta : \cat B \vdash M : D_1 \to_{\cat C} D_2\and
-    %%   \Phi[\delta/\delta_1],\delta:\cat D,\Phi'[\delta/\delta_2] \vdash N : R[\delta/\delta_1,\delta/\delta_2]
-    %% }
-    %% {\Phi,\beta,\Psi \vdash J(M,\beta. N) : R}
-
-    %% \inferrule*
-    %% {\beta_1^o;\beta_2\pipe\Psi \vdash f : \beta_1 \to_{C} \beta_2\and
-    %%   \alpha^o;\beta\pipe \Phi\and
-    %%   \beta^o;\gamma\pipe \Phi'\and
-    %%   \Phi,\Phi' \vdash g : R}
-    %% {\Phi[\cdot;\beta_1/\beta],\Psi,\Phi'[\beta_2/\beta;\cdot]\vdash \when f = \id_{\beta}.~ g : R[\beta_1/\beta;\beta_2/\beta]}
-
-    J(\id(A), \beta.N) = N[A/\beta]
-
-    \inferrule
-    {\Phi[\delta/\delta_1],\delta:\cat D, \Psi[\delta/\delta_2] \vdash M[\delta/\delta_1,\id(\delta)/f,\delta/\delta_2] = N[\delta/\delta_1,\id(\delta)/f,\delta/\delta_2] : Q[\delta/\delta_1,\delta/\delta_2]}
-    {\Phi, \delta_1 : \cat D, f : \delta_1 \to \delta_2, \delta_2 : \cat D, \Psi \vdash M = N: Q}
+    \inferrule*[right=Hom$\eta$]
+    {\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2:\cat C \vdash M : Q}
+    {\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2:\cat C \vdash M = J(\alpha_1.\alpha_2.Q, \alpha. M[\alpha/\alpha_1, \id(\alpha)/f,\alpha/\alpha_2], \alpha_1, f, \alpha_2) : Q}
   \end{mathpar}  
-  \caption{Hom}  
+  \caption{Hom Primitive Rules}
 \end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule*[right=Hom-Formation]
+    {d^-\Xi \vdash A : \cat C\and d^+ \Xi \vdash A' : \cat C}
+    {A \to_{\cat C} A' \prof(\Xi)}
+
+    (A \to A')[\xi] = A[d^-\xi] \to A'[d^+\xi]
+
+    \inferrule*[right=Hom-Introduction]
+    {\alpha : \cat D \vdash A : \cat C}
+    {\alpha : \cat D \vdash \id(A) : A \to_{\cat C} A}
+
+    \id({A})[B/\alpha] = \id({A[B/\alpha]})
+
+    \inferrule*[right=Hom Elim]{
+      Q \prof(\alpha_1:\cat C; \alpha_2:\cat C)\and
+      \Phi \vdash M : A_1 \to_{\cat C} A_2\and
+      \alpha:\cat C \vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]}{\Phi \vdash J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1, M, A_2) : Q[A_1/\alpha_1, A_2/\alpha_2]}
+
+    J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1, M, A_2)[\phi] = J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1[d^-\phi], M[\phi], A_2[d^+\phi])
+
+    \inferrule*[right=Hom$\beta$]{\beta:\cat D \vdash A : \cat C\and
+      \alpha:\cat C \vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]
+    }{\beta : \cat D \vdash J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A, \id(A), A) = N[A/\alpha] : Q[A/\alpha_1,A/\alpha_2]}
+
+    \inferrule*[right=Hom$\eta$]
+    {\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2:\cat C \vdash M : Q}
+    {\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2:\cat C \vdash M = J(\alpha_1.\alpha_2.Q, \alpha. M[\alpha/\alpha_1, \id(\alpha)/f,\alpha/\alpha_2], \alpha_1, f, \alpha_2) : Q}
+  \end{mathpar}  
+  \caption{Hom ``UP'' Rules}
+\end{figure}
+
+
 
 How did we come up with this?
 %
@@ -669,8 +766,6 @@ rule with a substitution built in (substitutions into an ``empty''
 context are precisely index substitutions).
 %
 For the elim rule I'm still not sure.
-
-\subsection{Tensor}
 
 Next, we can internalize the $,\alpha,$ as a positive connective as a
 kind of ``existentially quantified tensor product'', abstracting the
@@ -735,47 +830,22 @@ we have is a transformation
 And the introduction rule is just building in a substitution to this
 transformation.
 %
-For the elim rule I'm not sure what it should be.
 
-Finally, we can define \emph{cotensor} products of profunctors, which
-is the internal-hom to tensor products product. Since we are in an
-ordered setting, this splits into two connectives: a right-cotensor
-and a left cotensor. NOTE/TODO: one of these cotensor elimination
-rules breaks the syntactic invariant that all variable occurrences go
-from left to right syntactically. Should we fix or abandon that
-invariant?
-\begin{mathpar}
-  \inferrule*[right=Covariant Cotensor formation]
-  {\beta^o : \cat D; \gamma : \cat E \pipe R \and \alpha^o : \cat C; \gamma : \cat E \pipe P}
-  {\alpha^o : \cat C; \beta : \cat D \pipe \forall \gamma.~ P \triangleleft R}
+For the elim rule we can pull a similar trick as with the Hom
+type. First, the rule where there's only one variable.
+\[ \inferrule*[right=Tensor elim Simple]
+  {\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E \vdash N : S}
+  {\alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E \vdash J_\odot(x, q.\beta.r. N) : S}
+\]
 
-  \inferrule*[right=Covariant Cotensor introduction]
-  {\Phi , x : R \vdash M : P}
-  {\Phi \vdash \lambda^\triangleleft (\gamma,x). M : \forall \gamma.~ P \triangleleft R}
+Then we can easily build in a substitution:
 
-  \inferrule*[right=Covariant Cotensor elimination]
-  {\Phi \vdash M : \forall \gamma.~P\triangleleft R \and \Psi \vdash N : R[B/\gamma]}
-  {\Phi, \Psi \vdash M(B,N)^{\triangleleft} : P[B/\gamma]}
-
-  (\lambda (\gamma,x). M)(B,N) = M[B/\gamma][N/x]\\
-  M = \lambda^\triangleleft (\gamma,x). M(\gamma,x)\\
-
-  \inferrule*[right=Contravariant Cotensor formation]
-  {\alpha^o : \cat C; \beta : \cat D \pipe Q \and \alpha^o : \cat C; \gamma : \cat E \pipe P}
-  {\beta^o : \cat D; \gamma : \cat E \pipe \forall \alpha.~ Q \triangleright P}
-
-  \inferrule*[right=Contravariant Cotensor introduction]
-  {x:Q,\Phi \vdash M : P}
-  {\Phi \vdash \lambda^\triangleright(\alpha,x). M : \forall \alpha.~Q\triangleright P}
-
-  \inferrule*[right=Contravariant Cotensor elimination]
-  {\Phi \vdash M : \forall \alpha. Q \triangleright P \and \Psi \vdash N : Q[A/\alpha]
-  }
-  {\Psi,\Phi \vdash M(A,N)^\triangleright : P[A/\alpha]}
-
-  (\lambda^\triangleright (\alpha,x). M)(A,N)^\triangleright = M[A/\alpha][N/x]\\
-  M = \lambda^\triangleright (\alpha, x). M(\alpha,x)^\triangleright
-\end{mathpar}
+\[ \inferrule*[right=Tensor elim Simple]
+  { S \prof(\alpha:\cat C; \gamma : \cat E)\and
+    \Phi \vdash M : \exists \beta. Q[A/\alpha] \odot R[G/\gamma]\and
+    \alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E \vdash N : S}
+  {\Phi \vdash J(\alpha. \gamma. S, q.\beta.r.N, A, M, G) : S[A/\alpha, G/\gamma]}
+\]
 
 \subsection{Additives}
 
