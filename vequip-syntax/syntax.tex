@@ -713,7 +713,7 @@ First, $\beta$.
   \begin{mathpar}
     \inferrule*[right=Full Unit Elim*]
     {\Phi_1[\alpha/\alpha_1], \alpha:\cat C, \Phi_2[\alpha/\alpha_2]\vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]}
-    {\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2f\vdash J_\to'(\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2, Q, \alpha. N) : Q}
+    {\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2\vdash J_\to'(\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2, Q, \alpha. N) : Q}
 
     J_\to'(\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2, Q, \alpha. N) =
     \Phi_1 \triangleright (J(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, \alpha_1,f,\alpha_2)) \triangleleft \Phi_2
@@ -837,7 +837,49 @@ type. First, the rule where there's only one variable.
   {\alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E \vdash J_\odot(x, q.\beta.r. N) : S}
 \]
 
-Then we can easily build in a substitution:
+\begin{figure}
+\begin{mathpar}
+    \inferrule*[right=Full Tensor Elim*]
+    {\Phi_1, \alpha:\cat C, q:Q, \beta:\cat D, r:R, \gamma:\cat E \Phi_2\vdash N : S}
+    {\Phi_1, \alpha : \cat C, x : \exists \beta:\cat D. Q \odot R, \gamma : \cat E, \Phi_2
+      \vdash J_\odot'(\Phi_1, \alpha : \cat C, x : \exists \beta:\cat D. Q \odot R, \gamma : \cat E, \Phi_2; S;q.\beta.r.N) : S}
+
+    J_\odot'(\Phi_1, \alpha : \cat C, x : \exists \beta:\cat D. Q \odot R, \gamma : \cat E, \Phi_2;S; q.\beta.r.N)
+    = \Phi_1 \triangleright J_\odot(\alpha.\gamma.\Phi_1 \triangleright S \triangleleft \Phi_2, \alpha.q.\beta.r.\gamma. \lambda^\triangleleft \Phi_1. \lambda^\triangleright\Phi_2. N, \alpha, x, \gamma) \triangleleft \Phi_2
+
+    J_\odot'(\Phi_1, \alpha : \cat C, x : \exists \beta:\cat D. Q \odot R, \gamma : \cat E, \Phi_2; q.\beta.r.N)[\Phi_1,\alpha/\alpha,(q,\beta,r)/x,\gamma/\gamma,\Phi_2] = N
+    
+
+  \inferrule*[right=Full Tensor elim*]{ S \prof(\alpha:\cat C; \gamma : \cat E)\and
+    \Phi \vdash M : \exists \beta. Q[A/\alpha] \odot R[G/\gamma]\and
+    \alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E \vdash N : S}
+  {\Phi \vdash J_\odot(\alpha. \gamma. S, \alpha.q.\beta.r.\gamma.N, A, M, G) : S[A/\alpha, G/\gamma]}
+
+  J_\odot(\alpha. \gamma. S, \alpha.q.\beta.r.\gamma.N, A, M, G)[\phi] =
+  J_\odot(\alpha. \gamma. S, \alpha.q.\beta.r.\gamma.N, A[d^-\phi], M[\phi], G[d^+\phi])
+
+  %% \inferrule*[right=Tensor elim Sequent]
+  %% {\Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Psi \vdash N : S}
+  %% {\Phi, \alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E,\Psi \vdash J_\odot(x;q.\beta.r. N) : S}
+
+  %% \inferrule*[right=Tensor elim Subst]
+  %% {\Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Phi' \vdash N : S
+  %% \and
+  %% \phi : \Psi \to \Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Phi'}
+  %% {\Psi  \vdash J_\odot(x;q.\beta.r. N)[\phi] : S}
+
+  \inferrule*[right=Tensor $\beta$]
+  {}{J_\odot(\alpha.\gamma.S, \alpha.q.\beta.r.\gamma.N,A,(M,B,N),G) = N[A/\alpha,M/q,B/\beta,N/r,G/\gamma]}
+
+  \inferrule*[right=Tensor$\eta$]
+  {\alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E \vdash M : S}
+  {\alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E \vdash M =
+    J(\alpha.\gamma.S, \alpha.q.\beta.r.\gamma. M[\alpha/\alpha,(q,\beta,r)/x,\gamma/\gamma])
+    : S}
+\end{mathpar}
+\caption{Tensor Admissible Universal Property Rules}
+\label{fig:tensor}
+\end{figure}
 
 \subsection{Additives}
 
