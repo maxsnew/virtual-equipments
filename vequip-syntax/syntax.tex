@@ -527,7 +527,7 @@ sugar'' in Figure~\ref{fig:multi-hom}.
       TODO: M = \lambda^\triangleleft \Phi. M\triangleleft \Phi
 
       TODO: contravariant by duality
-      %% \inferrule*[right=Contra Multi-Hom formation]
+e      %% \inferrule*[right=Contra Multi-Hom formation]
       %% {\Phi \ctx(\alpha:\cat C; d^-\Xi) \and P \prof(\alpha : \cat C; d^+\Xi)}
       %% {\Phi \triangleright P \prof(\xi)}
 
@@ -667,7 +667,6 @@ We need to show $\beta$ and $\eta$ hold.
 
 First, $\beta$.
 
-\[
 \begin{align*}
   &(\Phi_1 \triangleright (J(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, \alpha_1,f,\alpha_2)) \triangleleft \Phi_2) [\Phi_1[A/\alpha_1],A/\alpha_1,\id(A),A/\alpha_2,\Phi_2[A/\alpha_2]] \\
   &=
@@ -677,73 +676,77 @@ First, $\beta$.
   &=  (\lambda^\triangleleft \Phi_2[A/\alpha_2]. N[A/\alpha]) \triangleleft \Phi_2[A/\alpha_2]\\
   &=  N[A/\alpha]
 \end{align*}
-\]
-
-
-
 
 \begin{figure}
   \begin{mathpar}
-    \inferrule*[right=Hom-Formation]
+    \inferrule*[right=Unit-Formation]
     {d^-\Xi \vdash A : \cat C\and d^+ \Xi \vdash A' : \cat C}
     {A \to_{\cat C} A' \prof(\Xi)}
 
     (A \to A')[\xi] = A[d^-\xi] \to A'[d^+\xi]
 
-    \inferrule*[right=Hom-Introduction]
+    \inferrule*[right=Unit-Introduction]
     {\alpha : \cat D \vdash A : \cat C}
     {\alpha : \cat D \vdash \id(A) : A \to_{\cat C} A}
 
     \id({A})[B/\alpha] = \id({A[B/\alpha]})
 
-    \inferrule*[right=Hom Elim]{
+    \inferrule*[right=Unit Elim]{
       Q \prof(\alpha_1:\cat C; \alpha_2:\cat C)\and
       \Phi \vdash M : A_1 \to_{\cat C} A_2\and
       \alpha:\cat C \vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]}{\Phi \vdash J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1, M, A_2) : Q[A_1/\alpha_1, A_2/\alpha_2]}
 
     J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1, M, A_2)[\phi] = J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1[d^-\phi], M[\phi], A_2[d^+\phi])
 
-    \inferrule*[right=Hom$\beta$]{\beta:\cat D \vdash A : \cat C\and
+    \inferrule*[right=Unit$\beta$]{\beta:\cat D \vdash A : \cat C\and
       \alpha:\cat C \vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]
     }{\beta : \cat D \vdash J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A, \id(A), A) = N[A/\alpha] : Q[A/\alpha_1,A/\alpha_2]}
 
-    \inferrule*[right=Hom$\eta$]
+    \inferrule*[right=Unit$\eta$]
     {\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2:\cat C \vdash M : Q}
     {\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2:\cat C \vdash M = J(\alpha_1.\alpha_2.Q, \alpha. M[\alpha/\alpha_1, \id(\alpha)/f,\alpha/\alpha_2], \alpha_1, f, \alpha_2) : Q}
   \end{mathpar}  
-  \caption{Hom Primitive Rules}
+  \caption{Unit Primitive Rules}
 \end{figure}
 
 \begin{figure}
   \begin{mathpar}
-    \inferrule*[right=Hom-Formation]
-    {d^-\Xi \vdash A : \cat C\and d^+ \Xi \vdash A' : \cat C}
-    {A \to_{\cat C} A' \prof(\Xi)}
+    \inferrule*[right=Full Unit Elim*]
+    {\Phi_1[\alpha/\alpha_1], \alpha:\cat C, \Phi_2[\alpha/\alpha_2]\vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]}
+    {\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2f\vdash J_\to'(\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2, Q, \alpha. N) : Q}
 
-    (A \to A')[\xi] = A[d^-\xi] \to A'[d^+\xi]
+    J_\to'(\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2, Q, \alpha. N) =
+    \Phi_1 \triangleright (J(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, \alpha_1,f,\alpha_2)) \triangleleft \Phi_2
 
-    \inferrule*[right=Hom-Introduction]
-    {\alpha : \cat D \vdash A : \cat C}
-    {\alpha : \cat D \vdash \id(A) : A \to_{\cat C} A}
+    \inferrule*[right=Full Unit $\beta$*]
+    {}
+    {J_\to'(\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2, Q, \alpha. N)[\Phi_1[\alpha/\alpha_1],\alpha/\alpha_1, \id(\alpha)/f, \alpha/\alpha_2, \Phi_2[\alpha/\alpha_2]]
+    = N}
 
-    \id({A})[B/\alpha] = \id({A[B/\alpha]})
+    (\Phi_1 \triangleright J(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, \alpha_1,f,\alpha_2) \triangleleft \Phi_2)[\Phi_1[\alpha/\alpha_1],\alpha/\alpha_1, \id(\alpha)/f, \alpha/\alpha_2, \Phi_2[\alpha/\alpha_2]]\\
+    = \Phi_1[\alpha/\alpha_1] \triangleright J(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, \alpha,\id(\alpha),\alpha) \triangleleft \Phi_2[\alpha/\alpha_2]\\
+    = \Phi_1[\alpha/\alpha_1] \triangleright
+    (\lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N)
+    \triangleleft \Phi_2[\alpha/\alpha_2]\\
+    = N
 
-    \inferrule*[right=Hom Elim]{
-      Q \prof(\alpha_1:\cat C; \alpha_2:\cat C)\and
-      \Phi \vdash M : A_1 \to_{\cat C} A_2\and
-      \alpha:\cat C \vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]}{\Phi \vdash J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1, M, A_2) : Q[A_1/\alpha_1, A_2/\alpha_2]}
+    \inferrule*[right=Unit$\eta$]
+    {\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2 \vdash M : Q}
+    {M =
+      J_\to'(\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2, Q, \alpha. M[\Phi_1[\alpha/\alpha_1],\alpha/\alpha_1,\id(\alpha), \alpha/\alpha_2,\Phi_2[\alpha/\alpha_2]])
 
-    J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1, M, A_2)[\phi] = J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1[d^-\phi], M[\phi], A_2[d^+\phi])
-
-    \inferrule*[right=Hom$\beta$]{\beta:\cat D \vdash A : \cat C\and
-      \alpha:\cat C \vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]
-    }{\beta : \cat D \vdash J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A, \id(A), A) = N[A/\alpha] : Q[A/\alpha_1,A/\alpha_2]}
-
-    \inferrule*[right=Hom$\eta$]
-    {\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2:\cat C \vdash M : Q}
-    {\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2:\cat C \vdash M = J(\alpha_1.\alpha_2.Q, \alpha. M[\alpha/\alpha_1, \id(\alpha)/f,\alpha/\alpha_2], \alpha_1, f, \alpha_2) : Q}
+    M
+    =(\triangleleft\beta\triangleright\beta)
+    \Phi_1 \triangleright
+    (\lambda^\triangleright \Phi_1. \lambda^\triangleleft \Phi_2. M)
+    \triangleleft \Phi_2
+    = \Phi_1 \triangleright
+    J_\to(\alpha_1.\alpha_2.Q, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. M[\alpha/\alpha_1, \id(\alpha)/f,\alpha/\alpha_2], \alpha_1, f, \alpha_2)
+    \triangleleft \Phi_2
+    =
+    J_\to'(\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2, Q, \alpha. N)
   \end{mathpar}  
-  \caption{Hom ``UP'' Rules}
+  \caption{Admissible Unit Universal Property Rules}
 \end{figure}
 
 
