@@ -479,74 +479,66 @@ Yoneda lemma), but also for purely syntactic reasons. In particular, I
 don't see how to give a sensible, complete natural deduction-style
 syntax for the other multiplicative connectives (Unit (i.e., the hom
 profunctor) and Tensor (profunctor composition) without relying on the
-presence of cotensor judgments. The key property that Hom judgments
-allow is that given any variable in context of a term
-$\Phi,\alpha,x,\beta,\Psi \vdash M : Q$ we can represent this term as
-a ``single-variable term''
+presence of homs. The key property that the hom allows is that given
+any variable in context of a term $\Phi,\alpha,x,\beta,\Psi \vdash M :
+Q$ we can represent this term as a ``single-variable term'' by moving
+$\Phi$ and $\Psi$ to the right of the turnstile:
 
 \[ \alpha, x, \beta \vdash \lambda \Phi. \lambda \Psi M. : \Phi \triangleright Q \triangleleft \Psi \]
 
 This allows us to describe restricted positive eliminations that only
-work on single variable contexts.
+work on single variable contexts. We give an admissible ``syntax
+sugar'' in Figure~\ref{fig:multi-hom}.
 
 \begin{figure}
   \begin{mathpar}
-      \inferrule*[right=Covariant Hom formation]
+      \inferrule*[right=Covariant Multi-Hom formation]
       {\Phi \ctx(d^+\Xi; \gamma : \cat E) \and P \prof(d^-\Xi; \gamma : \cat E)}
       {P \triangleleft \Phi \prof(\Xi)}
 
       P \triangleleft \gamma = P\\
-      P \triangleleft \Phi,x:R, \gamma:\cat E = \forall \gamma:\cat E. (P \triangleleft \Phi) \triangleleft E\\
+      P \triangleleft \Phi,x:R, \gamma:\cat E = (\forall \gamma:\cat E. P \triangleleft R) \triangleleft \Phi
 
-      \inferrule*[right=Contra Hom formation]
-      {\Phi \ctx(\alpha:\cat C; d^-\Xi) \and P \prof(\alpha : \cat C; d^+\Xi)}
-      {\Phi \triangleright P \prof(\xi)}
+      \inferrule*[right=Covariant Multi-Hom introduction]
+      {\Phi, \Psi \vdash M : P}
+      {\Phi,\Psi \vdash \lambda^\triangleleft \Psi. M : P \triangleleft \Psi}
 
-      \alpha \triangleright P = P\\
-      \alpha:\cat C, x:R, \Phi \triangleright P = \forall \alpha. R \triangleright \Phi \triangleright P\\
+      (\lambda^\triangleleft \Psi. M)[\phi] = \lambda^\triangleleft \Psi. M[\phi,\Psi]\\
+      \lambda^\triangleleft \gamma. M = M\\
+      \lambda^\triangleleft (\Psi,x:R,\gamma:\cat E). M = \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M\\
+
+      (\lambda^\triangleleft \gamma. M)[\phi] = M[\phi] = \lambda^\triangleleft \gamma. M[\phi]\\
+      (\lambda^\triangleleft (\Psi,x:r,\gamma:\cat E). M)[\phi] =
+      (\lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M)[\phi]
+      = \lambda^\triangleleft \Psi. (\lambda^\triangleleft (x:R,\gamma:\cat E). M)[\phi, \Psi]
+      = \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M[\phi,\Psi,x:R,\gamma]      
+
+      \inferrule*[right=Covariant Multi-Hom elimination]
+      {\Phi_1 \vdash M : P\triangleleft \Phi_2 \and \phi_2 : \Psi \vdash \Phi_2 \subst(\xi)}
+      {\Phi_1,\Psi \vdash M\triangleleft \phi_2 : P[d^+\xi]}\\
+
+      M \triangleleft (A/\gamma) = M[A/\gamma]\\
+      M \triangleleft (\phi, N/x,A/\gamma) =  M \triangleleft (N, A) \triangleleft \phi
+
+      (M \triangleleft \phi_2)[\phi_1,\psi] = M[\phi_1] \triangleleft [\phi_2[\psi]]\\
+      TODO: prove
+
+      TODO: (\lambda^\triangleleft \Phi. M) \triangleleft \phi = M[\phi]
+      TODO: M = \lambda^\triangleleft \Phi. M\triangleleft \Phi
+
+      TODO: contravariant by duality
+      %% \inferrule*[right=Contra Multi-Hom formation]
+      %% {\Phi \ctx(\alpha:\cat C; d^-\Xi) \and P \prof(\alpha : \cat C; d^+\Xi)}
+      %% {\Phi \triangleright P \prof(\xi)}
+
+      %% \alpha \triangleright P = P\\
+      %% \alpha:\cat C, x:R, \Phi \triangleright P = \forall \alpha. R \triangleright \Phi \triangleright P\\
   \end{mathpar}
   \caption{Multi-Hom}
 \end{figure}
 
 \[ \alpha \triangleright Q = Q \]
 \[ \Phi,x:R,\beta:\cat D \triangleright Q =  \]
-
-As an example, consider a term $M$ with a single judgment variable
-$\alpha : \cat C, x : R, \beta : \cat D \vdash M : S$. Then a
-substitution for this term is given by:
-\[ A/\alpha, N/x, B/\beta : \Psi \to \alpha : \cat C, x : R, \beta : \cat D \]
-Substitution $M[\phi]$ is syntactically defined by induction on $M$,
-but using cotensors, we can construct an equivalent term that is
-uniform in $M$ by destructuring $\phi$ instead. Specifically, we can
-abstract over the variable $x$ on the left or right, and then supply
-the input term $N$ instead as an \emph{argument}, rather than
-substituting it directly in $M$:
-\[ (\lambda^\triangleleft \alpha, x. M[B/\beta]) \triangleleft (A,N) \]
-The only issue is we still don't have a way to get at that final
-$\beta\ldots$.
-
-Cotensor judgments are very useful as they allow a term in any context
-to be represented by a term in an empty context, i.e., a term $\Phi ,
-\alpha : \cat C, \Psi \vdash t : R$ can be instead written as a term
-$\alpha : \cat C \vdash t' : \Phi \triangleright R \triangleleft \Psi$
-where the type on the right is shorthand for a sequence of left and
-right cotensors.
-
-Also, they give us a way to write any substitution as a term. Given
-$\phi : \Psi \to \Phi$ and $\Phi \vdash M : Q$, we can write the
-substitution $M[\phi]$ as a term without inspecting $M$, instead doing
-induction on $\Phi$.
-
-So if $\Phi = \alpha_0:\cat {C_0},x_1:R_1,\ldots,\alpha_{n-1}:\cat C_{n-1}, x_n:R_n,\alpha_n:\cat C_n$, we can define
-
-\[\Phi \triangleright Q = \forall \alpha_{n-1}. R_n \triangleright \cdots \forall \alpha_0. R_1 \triangleright Q\]
-
-or
-
-\[ Q \triangleleft \Phi = \forall \alpha_0. \cdots(\forall \alpha_{n-1}. Q \triangleleft R_n)\cdots \triangleleft R_1\]
-
-and notice that by $\beta$ reduction the following term is equal to $M$:
-\[ (\alpha_0,x_1)\triangleright\cdots(\alpha_{n-1},x_n)\triangleright(\lambda^\triangleright (\alpha_{n-1}, x_n:R_n). \ldots \lambda^\triangleright (\alpha_0, x_1:R_1). M) : \Phi \triangleright Q \]
 Now any substitution for $\Phi$ will simply supply all of these
 arguments, instead of pushing into $M$.
 
