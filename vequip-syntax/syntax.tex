@@ -930,6 +930,32 @@ type. First, the rule where there's only one variable.
 Next, we cover the basic dependent type theory structure: $\Pi,\Sigma$
 and identity types.
 
+\begin{figure}
+  \begin{mathpar}
+  \inferrule
+  {\Gamma \pipe\cdot \vdash S \Set\and \Gamma \pipe\cdot \vdash T \Set}
+  {\Gamma\pipe\cdot \vdash \prod_{x:S} T \Set}
+
+  \inferrule
+  {\Gamma \pipe \cdot \vdash M : \prod_{x:S} T\and
+    \Gamma \pipe \cdot \vdash N : S}
+  {\Gamma \pipe \cdot \vdash M N : T[N/x]}
+
+  \inferrule
+  {\Gamma,x:S \pipe \cdot \vdash M : T}
+  {\Gamma \pipe \cdot \vdash \lambda x:S. M : \prod_{x:S} T}
+
+  \inferrule
+  {\Gamma \pipe\cdot \vdash S \Set\and \Gamma \pipe\cdot \vdash T \Set}
+  {\Gamma\pipe\cdot \vdash \sum_{x:S} T \Set}
+  
+  \inferrule
+  {~}
+  {\Gamma\pipe\cdot \vdash \top \Set}
+  \end{mathpar}
+  \caption{Ordinary Dependent Type Structure}
+\end{figure}
+
 
 
 \subsection{Internalizing Virtual Equipment Structure}
