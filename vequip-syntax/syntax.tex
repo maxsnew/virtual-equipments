@@ -20,23 +20,31 @@
 \newcommand{\pfrom}{\nleftarrow}
 \newcommand{\vcat}{\mathcal}
 \newcommand{\cat}{\mathbbm}
-\newcommand{\Set}{\textrm{Set}}
+\newcommand{\Set}{\,\,\textrm{Set}}
 \newcommand{\vtkmnd}{\mathbb{K}\text{Mod} (\vcat{V},T)}
 \newcommand{\rmod}{\text{RMod}}
 \newcommand{\lmod}{\text{LMod}}
+\newcommand{\varr}[2]{\text{Fun}{#1}{#2}}
+\newcommand{\harr}[2]{\text{Rel}{#1}{#2}}
 
 \newcommand{\id}{\textrm{id}}
 \newcommand{\for}{\textrm{for}\,}
 \newcommand{\when}{\textrm{when}\,}
 \newcommand{\lett}{\textrm{let}\,}
 \newcommand{\sort}{\,\,\textrm{sort}}
-\newcommand{\ctx}{\,\,\textrm{context}}
+\newcommand{\Sort}{\,\,\textrm{Sort}}
+\newcommand{\dtctx}{\,\,\textrm{type context}}
+\newcommand{\vectx}{\,\,\textrm{cat context}}
+%% \newcommand{\obctx}{\,\,\textrm{object context}}
 \newcommand{\boundary}{\,\,\textrm{boundary}}
 \newcommand{\prof}{\,\,\textrm{span}}
 \newcommand{\subst}{\,\,\textrm{subst}}
 \newcommand{\sigctx}{\,\,\textrm{sig-ctx}}
 \newcommand{\sig}{\,\,\textrm{sig}}
 \newcommand{\pipe}{\mathrel{|}}
+
+\newcommand{\quoth}[1]{\lceil#1\rceil}
+\newcommand{\unquoth}[1]{\lfloor#1\rfloor}
 
 \title{Judgment Theory: A Syntax for Virtual Equipments with applications to Internal and Synthetic Category Theory}
 \author{Max S. New}
@@ -200,38 +208,51 @@ the composition laws.
 
 \begin{figure}
   \begin{mathpar}
-    \cat C \sort\\
+    \inferrule
+        {}
+        {\Gamma \dtctx}
+
+    \inferrule
+    {\Gamma \dtctx}
+    {\Gamma \vdash \Xi \boundary}
+
+    \inferrule
+    {\Gamma \dtctx \and \Gamma \vdash \Xi \boundary}
+    {\Gamma \pipe \Xi \vdash S \Set}
+
+    \inferrule{\Gamma \dtctx}{\Gamma \vdash \cat C \sort}
+
     \inferrule*[right=Object/Type-formation]
-    {\cat C \sort \and \cat D \sort}
-    {\alpha : \cat C \vdash A : \cat D}\\
-
-    \inferrule*[right=Boundary formation]
-    {}
-    {\Xi \boundary}
-
-    \inferrule*[right=Relation/Judgment/Profunctor-formation]
-    {\Xi \boundary}
-    { R \prof(\Xi)}
+    {\Gamma \vdash \cat C \sort \and \Gamma \vdash \cat D \sort}
+    {\Gamma \pipe \alpha : \cat C \vdash A : \cat D}\\
 
     \inferrule*[right=Context-formation]
-    {\Xi \boundary}
-    {\Phi \ctx(\Xi)}
+    {\Gamma \vdash \Xi \boundary}
+    {\Gamma \pipe \Xi \vdash \Phi \vectx}
 
-    \inferrule*[right=Element/Term/Arrow-formation]
-    {\Phi \ctx(\Xi)\and R \prof(\Xi)}
-    {\Phi \vdash t : R}
+    \inferrule*[right=Term formation]
+    {\Gamma \pipe \Xi \vdash \Phi \vectx
+     \Gamma \pipe \Xi \vdash R \Set}
+    {\Gamma \pipe \Xi \pipe \Phi \vdash t : R}
 
+    \inferrule
+    {\Delta \dtctx \and \Gamma \dtctx}
+    {\gamma : \Delta \to \Gamma}
+    
     \inferrule*[right=Boundary Map formation]
-    {Z \boundary \and \Xi \boundary}
-    {\xi : Z \to \Xi}
+    {\Delta \vdash Z \boundary \and \Gamma \vdash \Xi \boundary
+    \and
+    \gamma : \Delta \to \Gamma}
+    {\gamma,\xi : \Delta \pipe Z \to \Gamma \pipe \Xi}
 
-    \inferrule*[right=Substitution-formation]
-    {\Phi \ctx(Z) \and \Psi \ctx(\Xi)\\\\
-      \xi : Z \to \Xi
-    }
-    {\psi : \Phi\to \Psi \subst(\xi)}
+    \inferrule
+        {\gamma,\xi : \Delta \pipe Z \to \Gamma\pipe \Xi\and
+          \Delta \pipe Z \vdash \Psi \vectx \and
+          \Gamma \pipe \Xi \vdash \Phi \vectx
+        }
+        {\gamma,\xi,\phi : \Delta\pipe Z \pipe \Psi \to \Gamma\pipe\Xi\pipe \Phi}
   \end{mathpar}
-  \caption{Formation Rules of Judgment Theory}
+  \caption{Formation Rules}
   \label{fig:formation}
 \end{figure}
 
@@ -245,6 +266,29 @@ have rules for constructing an ``empty'' context, which is just a
 
 \begin{figure}
   \begin{mathpar}
+    \inferrule{}{\cdot \dtctx}
+
+    \inferrule{}{\Gamma \vdash \cdot \boundary}
+    
+    \inferrule
+    {\Gamma \dtctx \and \Gamma\pipe \cdot \vdash A \Set}
+    {\Gamma , x : A \dtctx}
+    
+  \end{mathpar}
+  \caption{Basic Rules Part 1}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule
+    {\Gamma \vdash \cat C \sort}
+    {\Gamma \pipe \alpha:\cat C \vdash \alpha : \cat C}
+
+    \inferrule{\Gamma \vdash \cat C \sort}{\Gamma \vdash \alpha:\cat C \boundary}
+
+    \inferrule{\Gamma \vdash \cat C \sort}{\Gamma \vdash \alpha:\cat C \boundary}
+    
+    
     \inferrule*[right=ObVar]
     {~}
     {\alpha : \cat C \vdash \alpha : \cat C}
@@ -286,15 +330,15 @@ have rules for constructing an ``empty'' context, which is just a
 
     \inferrule*[right=MtCtx]
     {\cat C \sort}
-    {\alpha : \cat C \ctx(\alpha^\pm : \cat C)}
+    {\alpha : \cat C \vectx(\alpha^\pm : \cat C)}
 
     \inferrule*[right=CtxExt]
-    {\Phi \ctx(\Xi)\and R \prof(d^+\Xi : \cat C; \beta^+ : \cat D)}
-    {\Phi,x : R, \beta : \cat D \ctx(d^-(\Xi) ; \beta^+ : \cat D)}
+    {\Phi \vectx(\Xi)\and R \prof(d^+\Xi : \cat C; \beta^+ : \cat D)}
+    {\Phi,x : R, \beta : \cat D \vectx(d^-(\Xi) ; \beta^+ : \cat D)}
 
     \inferrule*[right=CtxTensor*]
-    {\Phi\ctx(\Xi) \and \Psi \ctx(Z) \and d^+ \Xi = d^- Z}
-    {\Phi, \Psi\ctx(\Xi,Z)}\\\\
+    {\Phi\vectx(\Xi) \and \Psi \vectx(Z) \and d^+ \Xi = d^- Z}
+    {\Phi, \Psi\vectx(\Xi,Z)}\\\\
 
     \inferrule*[right=TransVar]
     {~}
@@ -493,7 +537,7 @@ sugar'' in Figure~\ref{fig:multi-hom}.
 \begin{figure}
   \begin{mathpar}
       \inferrule*[right=Covariant Multi-Hom formation]
-      {\Phi \ctx(d^+\Xi; \gamma : \cat E) \and P \prof(d^-\Xi; \gamma : \cat E)}
+      {\Phi \vectx(d^+\Xi; \gamma : \cat E) \and P \prof(d^-\Xi; \gamma : \cat E)}
       {P \triangleleft \Phi \prof(\Xi)}
 
       P \triangleleft \gamma = P\\
@@ -527,8 +571,8 @@ sugar'' in Figure~\ref{fig:multi-hom}.
       TODO: M = \lambda^\triangleleft \Phi. M\triangleleft \Phi
 
       TODO: contravariant by duality
-e      %% \inferrule*[right=Contra Multi-Hom formation]
-      %% {\Phi \ctx(\alpha:\cat C; d^-\Xi) \and P \prof(\alpha : \cat C; d^+\Xi)}
+      %% \inferrule*[right=Contra Multi-Hom formation]
+      %% {\Phi \vectx(\alpha:\cat C; d^-\Xi) \and P \prof(\alpha : \cat C; d^+\Xi)}
       %% {\Phi \triangleright P \prof(\xi)}
 
       %% \alpha \triangleright P = P\\
@@ -881,6 +925,76 @@ type. First, the rule where there's only one variable.
 \label{fig:tensor}
 \end{figure}
 
+\subsection{Dependent Types}
+
+Next, we cover the basic dependent type theory structure: $\Pi,\Sigma$
+and identity types.
+
+
+
+\subsection{Internalizing Virtual Equipment Structure}
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule{\Gamma \dtctx}{\Gamma\pipe\cdot \vdash \Sort \Set}
+    
+    \inferrule
+    {\Gamma \vdash \cat C \sort}
+    {\Gamma \vdash \quoth {\cat C} : \Sort}
+
+    \inferrule
+    {\Gamma \vdash C : \Sort}
+    {\Gamma \vdash \unquoth C \sort}
+
+    TODO: equations\\
+
+    \inferrule
+    {\Gamma \vdash \cat C \sort \and\Gamma \vdash \cat D \sort}
+    {\Gamma\pipe\cdot \vdash \varr{\cat C}{\cat D} \Set}
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C \vdash A : \cat D}
+    {\Gamma \vdash \lambda \alpha:\cat C. A : \varr{\cat C}{\cat D}}
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C \vdash A : \cat D\and
+      \Gamma \vdash M : \varr{\cat D}{\cat E}}
+    {\Gamma\pipe \alpha:\cat C \vdash M A : \cat E}
+
+    TODO: equations\\
+
+    \inferrule
+    {\Gamma \vdash \cat C \sort \and\Gamma \vdash \cat D \sort}
+    {\Gamma\pipe\cdot \vdash \harr{\cat C}{\cat D} \Set}
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R \,\Set}
+    {\Gamma \vdash \lambda \alpha:\cat C;\beta:\cat D. R : \harr{\cat C}{\cat D}}
+
+    \inferrule
+    {\Gamma \vdash M : \harr{\cat C}{\cat D}\and
+     \Gamma \pipe d^- \Xi \vdash A : \cat C\and
+     \Gamma \pipe d^+ \Xi \vdash B : \cat C}
+    {\Gamma \pipe \Xi \vdash M A; B \Set}
+
+    TODO: equations\\
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C. R \Set}
+    {\Gamma \pipe \cdot \vdash \forall \alpha:\cat C. R \Set}
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C\vdash M : R}
+    {\Gamma \pipe \cdot \vdash \lambda \alpha. M : \forall \alpha. R}
+
+    \inferrule
+    {\Gamma \pipe \cdot \vdash M : \forall \alpha:\cat C. R\and
+      \Gamma \pipe \beta:\cat D \vdash A : \cat C}
+    {\Gamma \pipe \beta:\cat D \vdash M A : R[A/\alpha]}
+  \end{mathpar}
+  \caption{Internalizing VE Structure}
+\end{figure}
+
 \subsection{Additives}
 
 Next, we consider what we need to do to add additive connectives.
@@ -1015,31 +1129,104 @@ The benefits of our syntax become clear when we define internal
 categories, functors, profunctors and transformations: the definitions
 read exactly as the classical definitions.
 \begin{definition}[Internal Category]
-  An \emph{(internal) category} consists of
+  An \emph{(internal) category} consists of\footnote{the following is
+    easily interpreted as a $\Sigma$ type}:
   \begin{enumerate}
-  \item A sort $\cat C_0$
-  \item A span $\alpha^o:C_0;\alpha' : C_0 \pipe \alpha^o \to_{\cat C} \alpha'$
-  \item Identity arrows $\alpha^o : C_0; \alpha : C_0 \pipe \cdot
-    \vdash \id_{\alpha} : \alpha \to_{\cat C} \alpha$.
-  \item Composition $\alpha_0^o:C_0;\alpha_2:C_0\pipe \phi_0 :
-    \alpha_0 \to \alpha_1, \phi_1 : \alpha_1 \to \alpha_2 \vdash
-    \phi_1 \circ \phi_0 : \alpha_0 \to \alpha_2$
-  \item Satisfying Unitality:
-    \[ \id_{\alpha} \circ \phi = \phi = \phi \circ \id_{\alpha'}\]
-  \item And Associativity:
-    \[ (\phi \circ \psi) \circ \theta = \phi \circ (\psi \circ \theta) \]
+  \item A sort $C_0 : \Sort$
+  \item A span $C_1 : \harr{\unquoth C_0}{\unquoth C_0}$
+  \item Identity arrows
+    $C_r : \forall \alpha : \unquoth C. H \alpha \alpha$
+  \item Composition, which we can express several different ways using
+    a mix of covariant/contravariant homs and tensors.
+    \[ C_t^\triangleright : \forall \alpha : \unquoth C. \forall \beta. (H \beta \alpha) \triangleright \forall \gamma. (H \gamma \beta) \triangleright H \gamma \alpha \]
+
+    or
+
+    \[ C_t^\triangleleft : \forall \alpha. \forall \beta. (\forall \gamma. H \alpha \gamma \triangleleft H \beta \gamma) \triangleleft H \alpha \beta
+    \]
+
+    or using tensors and covariant homs
+
+    \[ C_t^\odot : \forall \alpha. \forall \gamma. (\exists \beta. H\alpha\beta\odot H\beta\gamma)\triangleright H\alpha \gamma \]
+
+    or using tensors and contravariant homs
+
+    \[ C_t^\odot : \forall \gamma. \forall \alpha. H\alpha\gamma \triangleleft (\exists \beta. H\alpha\beta\odot H\beta\gamma)\]
+  \item Satisfying Unitality, i.e., for any $\Phi \vdash f : H A B$,
+    we'd like $f \circ r(A) = f$. We can formalize this using an
+    equality of two profunctor transformations of type $\forall
+    \beta. \forall \alpha. H \alpha \beta \triangleright H \alpha
+    \beta$ (or $\forall \alpha. \forall \beta. H \alpha \beta
+    \triangleleft H \alpha \beta$), one of which is the identity and
+    the other of which composes with a reflexivity morphism.
+
+    \[ (\lambda \beta. \lambda^\triangleright \alpha. f:H \alpha \beta. f)
+    =  (\lambda \beta. \lambda^\triangleright \alpha. f:H \alpha \beta. (\alpha, f)\triangleright (\beta, r\beta) \triangleright (C_t^\triangleright \beta))
+    \]
+
+    or expressed using $\triangleleft$, 
+    \[
+    (\lambda \alpha. \lambda^\triangleleft \beta. f:H\alpha\beta. f)
+    =
+    (\lambda \alpha. \lambda^\triangleleft \beta. f:H\alpha\beta. C_t^\triangleleft \alpha \triangleleft (\beta, f) \triangleleft (\beta, r \beta)) \]
+
+    or expressed using $\odot$
+
+    \[
+    (\lambda \alpha. \lambda^\triangleleft \beta. f:H\alpha\beta.
+    C_t^\odot \beta \triangleleft (\alpha, (r\alpha, \alpha, f))
+    )
+    \]
+  \item And Associativity, which we can express in several ways, but
+    closest to informal category theory would be an equality between
+    two terms of type
+    \[ \forall \delta. \forall \alpha. (\exists \beta. H\alpha \beta \odot (\exists \gamma. H\beta\gamma \odot H \gamma \delta))\triangleright H\alpha\delta\]
+    or
+    \[ \forall \alpha. \forall \delta. H\alpha\delta\triangleleft (\exists \beta. H\alpha \beta \odot (\exists \gamma. H\beta\gamma \odot H \gamma \delta)) \]
+
+    The equality would be between the terms
+    \[ \lambda \alpha. \lambda \delta, fgh.
+    \textrm{ind}(fgh, f : H \alpha\beta. \beta. gh. C_t^\odot \delta \triangleleft (\alpha, (f, \beta, C_t^\odot \gamma \triangleleft (\beta, gh))) )
+    \]
+    and
+    \[ \lambda \alpha. \lambda \delta, fgh.
+    \textrm{ind}(fgh, f:H \alpha\beta. \beta. gh.
+    \textrm{ind}(gh, g:H\beta\gamma. \gamma. h:H\gamma\delta.
+    C_t^\odot \delta \triangleleft (\alpha, (C_t^\odot \gamma\triangleleft (\alpha, (f,\beta,g)), \gamma, h))
+    ))
+    \]
   \end{enumerate}
+
 \end{definition}
 
+
+
 \begin{definition}[Internal Functor]
-  A functor $F$ between internal categories $\cat C$ and $\cat D$ consists of
+  A functor $F$ between internal categories $C$ and $D$ consists of
   \begin{enumerate}
-  \item a function on objects $\alpha : \cat C_0 \vdash F_0 : \cat D_0$
-  \item a function on arrows $\alpha_0^o : \cat C_0; \alpha_1 : \cat C_0\pipe \phi:\alpha_0 \to_{\cat C} \alpha_1 \vdash F_1(\phi) : F_0(\alpha_0) \to_{\cat D} F_0(\alpha_1)$
-  \item that preserves identity:
-    \[ F_1(\id_{\alpha}) = \id_{F_0(\alpha)}\]
-  \item and composition:
-    \[ F_1(\psi \circ \phi) = F_1(\psi) \circ F_1(\phi) \]
+  \item a function on objects $F_0 : \varr {C_0} {D_0}$
+  \item a function on arrows
+    $F_1 : \forall \alpha:\unquoth {C_0}. \forall \beta:\unquoth{C_0}. D_1 {(F_0 \alpha)}{(F_0 \beta)} \triangleleft C_1 \alpha \beta$
+  \item That preserves identity. This is given by equality between the
+    following terms of type $\forall \alpha:{\unquoth {C_0}}. D_1 {F_0
+      \alpha}{F_0\alpha}$:
+    \[ \lambda \alpha. D_r(F_0\alpha)\]
+    and
+    \[ \lambda \alpha. F_1 \alpha \triangleleft (\alpha, C_r \alpha) \]
+  \item And preserves composition. This is given by an equality between the following terms of type
+    \[ \forall \alpha. \forall \gamma. (D_1 {(F_0 \alpha)}{(F_0 \gamma)})\triangleleft (\exists \beta. C_1 {\alpha}{\beta} \odot C_1 {\beta}{\gamma}) \]
+
+    First, we can compose in $C$, and then map using $F$:
+    \[ \lambda \alpha. \lambda \gamma, fg.
+    \textrm{ind}(fg, f:C_1{\alpha}{\beta}. \beta. g:C_1{\beta}{\gamma}.
+    F_1 {F_0 \alpha} \triangleleft (C_t^\odot \alpha \triangleleft ((f,\beta,g), \gamma), F_0 \gamma)
+    )\]
+    or we can map the morphisms with $F$, and then compose them in $D$:
+    \[
+    \lambda \alpha. \lambda\gamma, fg.
+    \textrm{ind}(fg, f.\beta.g.
+    D_t^\odot {(F_0 \alpha)} \triangleleft ((F_1 \alpha \triangleleft(f, \beta), F_0 \beta, F_1 \beta \triangleleft (g, \gamma)), F_0 \gamma)
+    ) \]
   \end{enumerate}
 \end{definition}
 
