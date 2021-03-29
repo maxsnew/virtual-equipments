@@ -227,30 +227,25 @@ the composition laws.
     {\Gamma \pipe \alpha : \cat C \vdash A : \cat D}\\
 
     \inferrule*[right=Context-formation]
-    {\Gamma \vdash \Xi \boundary}
-    {\Gamma \pipe \Xi \vdash \Phi \vectx}
+    {\Gamma \dtctx}
+    {\Gamma \vdash \Phi \vectx}
 
     \inferrule*[right=Term formation]
-    {\Gamma \pipe \Xi \vdash \Phi \vectx
-     \Gamma \pipe \Xi \vdash R \Set}
-    {\Gamma \pipe \Xi \pipe \Phi \vdash t : R}
+    {\Gamma \vdash \Phi \vectx
+     \Gamma\pipe \underline \Phi \vdash R \Set}
+    {\Gamma \pipe \Phi \vdash t : R}
 
     \inferrule
     {\Delta \dtctx \and \Gamma \dtctx}
     {\gamma : \Delta \to \Gamma}
     
     \inferrule*[right=Boundary Map formation]
-    {\Delta \vdash Z \boundary \and \Gamma \vdash \Xi \boundary
-    \and
-    \gamma : \Delta \to \Gamma}
-    {\gamma,\xi : \Delta \pipe Z \to \Gamma \pipe \Xi}
+    {\Gamma \vdash Z \boundary \and \Gamma \vdash \Xi \boundary}
+    {\Gamma \vdash \xi : Z \to \Xi}
 
-    \inferrule
-        {\gamma,\xi : \Delta \pipe Z \to \Gamma\pipe \Xi\and
-          \Delta \pipe Z \vdash \Psi \vectx \and
-          \Gamma \pipe \Xi \vdash \Phi \vectx
-        }
-        {\gamma,\xi,\phi : \Delta\pipe Z \pipe \Psi \to \Gamma\pipe\Xi\pipe \Phi}
+    \inferrule*[right=Boundary Map formation]
+    {\Gamma \vdash \Psi \vectx \and \Gamma \vdash \Phi \vectx}
+    {\Gamma \vdash \phi : \Psi \to \Phi}
   \end{mathpar}
   \caption{Formation Rules}
   \label{fig:formation}
@@ -269,29 +264,48 @@ have rules for constructing an ``empty'' context, which is just a
     \inferrule{}{\cdot \dtctx}
 
     \inferrule{}{\Gamma \vdash \cdot \boundary}
+    \inferrule{}{\Gamma \vdash \cdot \vectx}
+
+    \underline \cdot = \cdot
+
+    \inferrule{\Gamma \vdash C : \Sort}{\Gamma \vdash \alpha: C \boundary}
+
+    \inferrule{\Gamma \vdash C : \Sort}{\Gamma \vdash \alpha: C \vectx}
+
+    \underline {\alpha:C} = \alpha:C
+
+    \inferrule{\Gamma \vdash C : \Sort\and\Gamma\vdash D : \Sort}{\Gamma \vdash \alpha: C;\beta:D \boundary}
+
+    \inferrule
+    {\Gamma \vdash \Phi \vectx\and
+    \Gamma \vdash \Psi \vectx \and
+    \Gamma \pipe d^+\Phi, d^- \Psi \vdash R \Set}
+    {\Gamma \vdash \Phi, x:R, \Psi \vectx}
+
+    (\Phi,x:R,\Psi),y:S,\Sigma = \Phi,(x:R,\Psi,y:S,\Sigma)
+    
+    \underline{\Phi,x:R,\Psi} = d^-\Phi; d^+{\Psi}
+
+    d^{\pm}(\alpha:C) = \alpha : C\\
+    d^{-}(\Phi,x:R,\Psi) = d^-\Phi\\
+    d^{+}(\Phi,x:R,\Psi) = d^-\Psi\\
     
     \inferrule
     {\Gamma \dtctx \and \Gamma\pipe \cdot \vdash A \Set}
     {\Gamma , x : A \dtctx}
-    
   \end{mathpar}
-  \caption{Basic Rules Part 1}
+  \caption{Basic Rules for Contexts}
 \end{figure}
 
 \begin{figure}
   \begin{mathpar}
     \inferrule
-    {\Gamma \vdash \cat C \sort}
+    {}
+    {\Gamma\pipe \cdot \vdash \Sort \Set}
+
+    \inferrule
+    {\Gamma\pipe\cdot \vdash C : \Sort}
     {\Gamma \pipe \alpha:\cat C \vdash \alpha : \cat C}
-
-    \inferrule{\Gamma \vdash \cat C \sort}{\Gamma \vdash \alpha:\cat C \boundary}
-
-    \inferrule{\Gamma \vdash \cat C \sort}{\Gamma \vdash \alpha:\cat C \boundary}
-    
-    
-    \inferrule*[right=ObVar]
-    {~}
-    {\alpha : \cat C \vdash \alpha : \cat C}
 
     \inferrule*[right=ObSubst]
     {\alpha : \cat C \vdash B : \cat D\and
@@ -972,7 +986,9 @@ and identity types.
     {\Gamma \vdash C : \Sort}
     {\Gamma \vdash \unquoth C \sort}
 
-    TODO: equations\\
+    TODO: equations
+    TODO: maybe eliminate?
+    \\
 
     \inferrule
     {\Gamma \vdash \cat C \sort \and\Gamma \vdash \cat D \sort}
@@ -1006,7 +1022,7 @@ and identity types.
     TODO: equations\\
 
     \inferrule
-    {\Gamma \pipe \alpha:\cat C. R \Set}
+    {\Gamma \pipe \alpha:\cat C\vdash R \Set}
     {\Gamma \pipe \cdot \vdash \forall \alpha:\cat C. R \Set}
 
     \inferrule
@@ -1014,9 +1030,9 @@ and identity types.
     {\Gamma \pipe \cdot \vdash \lambda \alpha. M : \forall \alpha. R}
 
     \inferrule
-    {\Gamma \pipe \cdot \vdash M : \forall \alpha:\cat C. R\and
+    {\Gamma\pipe\cdot \pipe \cdot \vdash M : \forall \alpha:\cat C. R\and
       \Gamma \pipe \beta:\cat D \vdash A : \cat C}
-    {\Gamma \pipe \beta:\cat D \vdash M A : R[A/\alpha]}
+    {\Gamma \pipe \beta:\cat D\pipe\beta:\cat D \vdash M A : R[A/\alpha]}
   \end{mathpar}
   \caption{Internalizing VE Structure}
 \end{figure}
