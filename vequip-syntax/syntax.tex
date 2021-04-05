@@ -5,6 +5,7 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{amsthm}
+\usepackage{stmaryrd}
 \usepackage{mathpartir}
 \usepackage{bbm}
 
@@ -20,21 +21,24 @@
 \newcommand{\pfrom}{\nleftarrow}
 \newcommand{\vcat}{\mathcal}
 \newcommand{\cat}{\mathbbm}
-\newcommand{\Set}{\,\,\textrm{Set}}
+\newcommand{\isaSet}{\,\,\textrm{Set}}
+\newcommand{\Set}{\textrm{Set}}
 \newcommand{\vtkmnd}{\mathbb{K}\text{Mod} (\vcat{V},T)}
 \newcommand{\rmod}{\text{RMod}}
 \newcommand{\lmod}{\text{LMod}}
 \newcommand{\varr}[2]{\text{Fun}{#1}{#2}}
 \newcommand{\harr}[2]{\text{Rel}{#1}{#2}}
 
+\newcommand{\jnctx}{\curlyveedownarrow}
+
 \newcommand{\id}{\textrm{id}}
 \newcommand{\for}{\textrm{for}\,}
 \newcommand{\when}{\textrm{when}\,}
 \newcommand{\lett}{\textrm{let}\,}
-\newcommand{\sort}{\,\,\textrm{sort}}
-\newcommand{\Sort}{\,\,\textrm{Sort}}
-\newcommand{\dtctx}{\,\,\textrm{type context}}
-\newcommand{\vectx}{\,\,\textrm{cat context}}
+%% \newcommand{\sort}{\,\,\textrm{sort}}
+\newcommand{\Sort}{\textrm{Sort}}
+\newcommand{\isadtctx}{\,\,\textrm{type context}}
+\newcommand{\isavectx}{\,\,\textrm{cat context}}
 %% \newcommand{\obctx}{\,\,\textrm{object context}}
 \newcommand{\boundary}{\,\,\textrm{boundary}}
 \newcommand{\prof}{\,\,\textrm{span}}
@@ -42,9 +46,6 @@
 \newcommand{\sigctx}{\,\,\textrm{sig-ctx}}
 \newcommand{\sig}{\,\,\textrm{sig}}
 \newcommand{\pipe}{\mathrel{|}}
-
-\newcommand{\quoth}[1]{\lceil#1\rceil}
-\newcommand{\unquoth}[1]{\lfloor#1\rfloor}
 
 \title{Judgment Theory: A Syntax for Virtual Equipments with applications to Internal and Synthetic Category Theory}
 \author{Max S. New}
@@ -210,41 +211,39 @@ the composition laws.
   \begin{mathpar}
     \inferrule
         {}
-        {\Gamma \dtctx}
+        {\Gamma \isadtctx}
 
     \inferrule
-    {\Gamma \dtctx}
+    {\Gamma \isadtctx}
     {\Gamma \vdash \Xi \boundary}
 
     \inferrule
-    {\Gamma \dtctx \and \Gamma \vdash \Xi \boundary}
-    {\Gamma \pipe \Xi \vdash S \Set}
-
-    \inferrule{\Gamma \dtctx}{\Gamma \vdash \cat C \sort}
+    {\Gamma \isadtctx \and \Gamma \vdash \Xi \boundary}
+    {\Gamma \pipe \Xi \vdash S \isaSet}
 
     \inferrule*[right=Object/Type-formation]
-    {\Gamma \vdash \cat C \sort \and \Gamma \vdash \cat D \sort}
+    {\Gamma \vdash \cat C : \Sort \and \Gamma \vdash \cat D : \Sort}
     {\Gamma \pipe \alpha : \cat C \vdash A : \cat D}\\
 
     \inferrule*[right=Context-formation]
-    {\Gamma \dtctx}
-    {\Gamma \vdash \Phi \vectx}
+    {\Gamma \isadtctx}
+    {\Gamma \vdash \Phi \isavectx}
 
     \inferrule*[right=Term formation]
-    {\Gamma \vdash \Phi \vectx
-     \Gamma\pipe \underline \Phi \vdash R \Set}
-    {\Gamma \pipe \Phi \vdash t : R}
+    {\Gamma \vdash \Phi \isavectx\and
+     \Gamma\pipe \underline \Phi \vdash R \isaSet}
+    {\Gamma \pipe \Phi \vdash M : R}
 
     \inferrule
-    {\Delta \dtctx \and \Gamma \dtctx}
+    {\Delta \isadtctx \and \Gamma \isadtctx}
     {\gamma : \Delta \to \Gamma}
     
     \inferrule*[right=Boundary Map formation]
     {\Gamma \vdash Z \boundary \and \Gamma \vdash \Xi \boundary}
     {\Gamma \vdash \xi : Z \to \Xi}
 
-    \inferrule*[right=Boundary Map formation]
-    {\Gamma \vdash \Psi \vectx \and \Gamma \vdash \Phi \vectx}
+    \inferrule*[right=Cat Subst formation]
+    {\Gamma \vdash \Psi \isavectx \and \Gamma \vdash \Phi \isavectx}
     {\Gamma \vdash \phi : \Psi \to \Phi}
   \end{mathpar}
   \caption{Formation Rules}
@@ -261,39 +260,41 @@ have rules for constructing an ``empty'' context, which is just a
 
 \begin{figure}
   \begin{mathpar}
-    \inferrule{}{\cdot \dtctx}
+    \inferrule{}{\cdot \isadtctx}
+
+    \inferrule
+    {\Gamma \isadtctx \and \Gamma\pipe \cdot \vdash A \isaSet}
+    {\Gamma , x : A \isadtctx}\\
 
     \inferrule{}{\Gamma \vdash \cdot \boundary}
-    \inferrule{}{\Gamma \vdash \cdot \vectx}
-
-    \underline \cdot = \cdot
 
     \inferrule{\Gamma \vdash C : \Sort}{\Gamma \vdash \alpha: C \boundary}
 
-    \inferrule{\Gamma \vdash C : \Sort}{\Gamma \vdash \alpha: C \vectx}
+    \inferrule{\Gamma \vdash C : \Sort\and\Gamma\vdash D : \Sort}{\Gamma \vdash \alpha: C;\beta:D \boundary}\\
 
-    \underline {\alpha:C} = \alpha:C
+    \inferrule{}{\Gamma \vdash \cdot \isavectx}
 
-    \inferrule{\Gamma \vdash C : \Sort\and\Gamma\vdash D : \Sort}{\Gamma \vdash \alpha: C;\beta:D \boundary}
+    \inferrule{\Gamma \vdash C : \Sort}{\Gamma \vdash \alpha: C \isavectx}
 
     \inferrule
-    {\Gamma \vdash \Phi \vectx\and
-    \Gamma \vdash \Psi \vectx \and
-    \Gamma \pipe d^+\Phi, d^- \Psi \vdash R \Set}
-    {\Gamma \vdash \Phi, x:R, \Psi \vectx}
+    {\Gamma \vdash \Phi \isavectx\and
+    \Gamma \vdash \Psi \isavectx \and
+    \Gamma \pipe d^+\Phi, d^- \Psi \vdash R \isaSet}
+    {\Gamma \vdash \Phi, x:R, \Psi \isavectx}
 
     (\Phi,x:R,\Psi),y:S,\Sigma = \Phi,(x:R,\Psi,y:S,\Sigma)
-    
-    \underline{\Phi,x:R,\Psi} = d^-\Phi; d^+{\Psi}
-
-    d^{\pm}(\alpha:C) = \alpha : C\\
-    d^{-}(\Phi,x:R,\Psi) = d^-\Phi\\
-    d^{+}(\Phi,x:R,\Psi) = d^-\Psi\\
-    
-    \inferrule
-    {\Gamma \dtctx \and \Gamma\pipe \cdot \vdash A \Set}
-    {\Gamma , x : A \dtctx}
   \end{mathpar}
+  \begin{align*}
+    \underline \cdot &= \cdot\\
+    \underline {\alpha:C} &= \alpha:C\\
+    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
+  \end{align*}
+  \begin{align*}
+    d^{\pm}(\cdot) &\quad\text{undefined}\\
+    d^{\pm}(\alpha:C) &= \alpha : C\\
+    d^{-}(\Phi,x:R,\Psi) &= d^-\Phi\\
+    d^{+}(\Phi,x:R,\Psi) &= d^-\Psi
+  \end{align*}
   \caption{Basic Rules for Contexts}
 \end{figure}
 
@@ -301,108 +302,121 @@ have rules for constructing an ``empty'' context, which is just a
   \begin{mathpar}
     \inferrule
     {}
-    {\Gamma\pipe \cdot \vdash \Sort \Set}
+    {\Gamma\pipe \cdot \vdash \Sort \isaSet}
+
+    \inferrule
+    {x:S \in \Gamma}
+    {\Gamma \pipe \cdot \vdash x : S}
 
     \inferrule
     {\Gamma\pipe\cdot \vdash C : \Sort}
     {\Gamma \pipe \alpha:\cat C \vdash \alpha : \cat C}
+
+    \inferrule
+    {\Gamma \pipe \alpha:C,\beta:D \vdash R \isaSet}
+    {\Gamma\pipe \alpha:C, x:R, \beta: D \vdash x : R}
+
+    \inferrule{\forall x:A \in \Gamma. \Delta \vdash \gamma(x) : A}{\gamma : \Delta \to \Gamma}\\
+
+    \inferrule*%% [right=NullaryBoundaryMap]
+               {\Gamma \isadtctx}{\Gamma \vdash \cdot : \cdot \to \cdot}\and
+    \inferrule*{\Gamma \pipe \alpha':C' \vdash A : C}{\Gamma \vdash A/\alpha : \alpha':C' \to \alpha:C}
+
+    \inferrule*
+    {\Gamma \pipe \alpha':C' \vdash A : C\and
+      \Gamma \pipe \beta':D' \vdash B : D
+    }
+    {\Gamma \vdash (A/\alpha;B/\beta) : (\alpha':C';\beta':D') \to (\alpha:C;\beta':D')}\\
+
+    \inferrule*%% [right=NullCtxMap]
+               {\Gamma \isadtctx}{\Gamma \vdash \cdot : \cdot \to \cdot}
+
+    \inferrule*{\Gamma \pipe \alpha':C' \vdash A : C}{\Gamma \vdash A/\alpha : \alpha':C' \to \alpha:C}
+
+    \inferrule
+    {\Psi = \Psi_1 \jnctx \Psi_M \jnctx \Psi_2\and
+      \Gamma \vdash \phi_1 : \Psi_1 \to \Phi_1\and
+      \Gamma \pipe \Psi_M \vdash M : R[d^+\phi_1;d^-\phi_2] \and
+      \Gamma \vdash \phi_2 : \Psi_2 \to \Phi_2
+      }
+    {\Gamma \vdash \phi_1,M/x,\phi_2 : \Psi \to \Phi_1,x:R,\Phi_2}
+  \end{mathpar}
+  \caption{Basic Rules of Judgment Theory}
+  \label{fig:basic-rules}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule
+    {\Gamma \vdash \Phi \isavectx \and
+    \Gamma \vdash \Psi \isavectx \and
+    d^+\Phi = d^- \Psi}
+    {\Gamma \vdash \Phi \jnctx \Psi \isavectx}
+
+    \inferrule
+    {\Gamma \vdash \phi : \Phi' \to \Phi \and
+     \Gamma \vdash \psi : \Psi' \to \Psi\and
+     d^+\phi = d^- \psi}
+    {\Gamma \vdash \phi \jnctx \psi : \Phi' \jnctx \Psi' \to \Phi \jnctx \Psi}
 
     \inferrule*[right=ObSubst]
     {\alpha : \cat C \vdash B : \cat D\and
     \beta : \cat D \vdash A : \cat E}
     {\alpha : \cat C \vdash A[B/\beta] : \cat E}\\
 
-    \inferrule*[right=UnaryBoundary]
-    {}
-    {\alpha^\pm : \cat C \boundary}
+    \inferrule*[right=Everything Subst]{\gamma : \Delta \to \Gamma \and \Gamma J}{\Delta J}
 
-    \inferrule*[right=BinaryBoundary]
-    {}
-    {\alpha^- : \cat C; \beta^+ : \cat D \boundary}
+    \inferrule{\Gamma \vdash \xi : Z \to \Xi\and \Gamma \pipe \Xi \vdash R \isaSet}{\Gamma \pipe Z \vdash R[\xi] \isaSet}
 
-    \alpha^pm:\cat C, \alpha^\pm : \cat C = \alpha^\pm :\cat C\\
-    \alpha^pm:\cat C, \alpha^- : \cat C;\beta^+:\cat D = \alpha^- :\cat C;\beta^+ : \cat D\\
-    \alpha^- : \cat C;\beta^+:\cat D, \beta^\pm : \cat D = \alpha^- :\cat C;\beta^+ : \cat D\\
-    \alpha^- : \cat C;\beta^+:\cat D, \beta^- : \cat D; \gamma^+: \cat E = \alpha^- :\cat C;\gamma^+ : \cat E\\
-
-    d^+(\alpha^\pm : \cat C) = \alpha:\cat C\\
-    d^+(\alpha^-:\cat C; \beta^+:\cat D) = \beta : \cat D\\
-    d^-(\alpha^\pm : \cat C) = \alpha:\cat C\\
-    d^-(\alpha^-:\cat C; \beta^+:\cat D) = \alpha : \cat D\\
-
-    \inferrule*[right=UnaryBoundaryMap]
-    {\alpha : \cat C \vdash A : \cat D}
-    {\alpha.A/\beta : \alpha^\pm : \cat C \to \beta^\pm : \cat D}
-
-    \inferrule*[right=BinaryBoundaryMap]
-    {d^-(Z) \vdash A : \cat C \and d^+ Z \vdash B : \cat D}
-    {(d^-(Z). A/\alpha, d^+(Z).B/\beta) : Z \to \alpha^-:\cat C; \beta^+ : \cat D}
-
-    \inferrule*[right=SpanRestriction*]
-    {R\prof(\Xi) \and \xi : Z \to \Xi}
-    {R[\xi] \prof(Z)}\\\\
-
-    \inferrule*[right=MtCtx]
-    {\cat C \sort}
-    {\alpha : \cat C \vectx(\alpha^\pm : \cat C)}
-
-    \inferrule*[right=CtxExt]
-    {\Phi \vectx(\Xi)\and R \prof(d^+\Xi : \cat C; \beta^+ : \cat D)}
-    {\Phi,x : R, \beta : \cat D \vectx(d^-(\Xi) ; \beta^+ : \cat D)}
-
-    \inferrule*[right=CtxTensor*]
-    {\Phi\vectx(\Xi) \and \Psi \vectx(Z) \and d^+ \Xi = d^- Z}
-    {\Phi, \Psi\vectx(\Xi,Z)}\\\\
-
-    \inferrule*[right=TransVar]
-    {~}
-    {\alpha : \cat C, x : R, \beta : \cat D \vdash x : R}
-    
-    \inferrule*[right=TransSubst*]
-    {\psi : \Phi \vdash \Psi \subst(\xi) \and
-    \Psi \vdash t : R}
-    {\Phi \vdash t[\psi] : R(\xi}\\\\
-
-    \inferrule*[right=TransSubstMt]
-    {\alpha : \cat C \vdash B : \beta}
-    {B/\beta : (\alpha^\pm : \cat C) \to(\beta : \cat D) \subst(\alpha.B/\beta)}
-
-    \inferrule*[right=TransSubstExt]
-    {\psi : \Phi \vdash \Psi \subst(\xi) \and
-      \Phi' \vdash t : R[d^+\xi, B/\beta]
-    }
-    {\psi, t/x,B/\beta : \Phi, \Phi' \vdash \Psi, x : R, \beta : \cat D \subst(d^-\xi, B/\beta)}
-
-    \inferrule*[right=TransSubstTensor*]
-    {\psi : \Phi \vdash \Psi \subst(\xi)\and
-     \psi' : \Phi' \vdash \Psi' \subst(\xi'}
-    {\psi,\psi' : \Phi,\Phi' \vdash \Psi,\Psi' \subst(\xi,\xi')}
-    \\\\
+    \inferrule{\Gamma \vdash \phi : \Psi \to \Phi\and \Gamma \pipe \Phi \vdash M : R}{\Gamma \pipe \Psi \vdash M[\phi] : R[\underline \phi]}
   \end{mathpar}
-  \caption{Basic Rules of Judgment Theory, starred rules are
-    admissible, non-starred are primitive}
-  \label{fig:basic-rules}
+  \begin{align*}
+    (\Phi \jnctx \Psi) \jnctx \Sigma &= \Phi \jnctx (\Psi \jnctx \Sigma)\\
+    \Phi \jnctx \alpha:C &= \Phi\\
+    \alpha:C \jnctx \Psi &= \Psi\\\\
+    d^\pm(A/\alpha) &= A/\alpha\\
+    d^+(\phi_1,M/x,\phi_2) &= d^+ \phi_2\\
+    d^-(\phi_1,M/x,\phi_2) &= d^- \phi_1\\\\
+    \underline \cdot &= \cdot\\
+    \underline {A/\alpha} &= A/\alpha\\
+    \underline {\phi_1,M/x,\phi_2} &= d^-\phi_1;d^+\phi_2
+  \end{align*}
+  \caption{Admissible Rules}
 \end{figure}
 
 \begin{figure}
   \begin{mathpar}
     \begin{array}{rcl}
-      A[\alpha/\alpha] &=& A\\
-      A[B/\beta][C/\gamma] & = & A[B[C/\gamma]/\beta]\\\\
+      x[\gamma] &=& \gamma(x)\\
+      J[\gamma][\delta] & = & J[\gamma[\delta]]\\
+      \gamma[\delta](x) &=& \gamma(x)[\delta]\\
       
-      R[\alpha/\alpha,\beta/\beta] &=& R\\
-      R[\alpha'.A/\alpha,\beta'.B/\beta][A'/\alpha',B'/\beta'] & = &
-      R[A[A'/\alpha']/\alpha,B[B'/\beta']/\beta]\\\\
-      \Phi,\cdot &=& \Phi\\
-      \cdot,\Phi &=& \Phi\\
-      (\Phi,\Psi),\Theta &=& \Phi,(\Psi,\Theta)\\\\
-      (\phi,\chi),\psi &=& \phi, (\chi, \psi)\\\\
-      t[\alpha_0,x_0,\ldots,\alpha_n] &=& t\\
-      TODO: associativity
-      %% t[\Psi_1.s_1/\phi_1,\ldots,\Psi_n.s_n/\phi_n][\vec u_1/\Psi_1,\ldots,\vec u_n/\Psi_n] &=& t[s_1[\vec u_1/\Psi_1]/\phi_1,\ldots,s_n[\vec u_n/\Psi_n]/\phi_n]\\
+      A[\alpha/\alpha] &=& A\\
+      \alpha[A/\alpha] &=& A\\
+      A[B/\beta][C/\gamma] & = & A[B[C/\gamma]/\beta]\\
+      A[B/\beta][\gamma] &=& A[\gamma][B[\gamma]/\beta]\\\\
+      
+      R[\cdot] &=& R\\
+      R[\alpha/\alpha] &=& R\\
+      R[\alpha/\alpha,\beta/\beta] &=& R\\\\
+      R[\xi][\xi'] & = & R[\xi[\xi']]\\
+      R[\xi][\gamma] &=& R[\gamma][\xi[\gamma]]\\\\
+
+      \cdot[\xi] &=& \cdot\\
+      (A/\alpha)[B/\beta] &=& A[B/\beta]/\alpha\\
+      (A/\alpha;B/\beta)[\xi] &=& A[d^-\xi]/\alpha,B[d^+\xi]/\beta\\
+      \cdot[\gamma] &=& \cdot\\
+      (A/\alpha)[\gamma] &=& A[\gamma]/\alpha\\
+      (A/\alpha;B/\beta)[\gamma] &=& A[\gamma]/\alpha;B[\gamma]/\beta\\\\
+
+      \cdot[\gamma] &=& \cdot\\
+      (A/\alpha)[\gamma] &=& A[\gamma]/\alpha\\
+      (\phi_1,M/x,\phi_2)[\gamma] &=& \phi_1[\gamma],M[\gamma]/x,\phi_2[\gamma]
+
+      TODO: cat substitution id/assoc
     \end{array}
   \end{mathpar}  
-  \caption{Algebraic Properties of Basic Rules}
+  \caption{Algebraic Properties}
   \label{fig:equations}
 \end{figure}
 
@@ -477,58 +491,59 @@ $\lambda$-calculus, with corresponding $\beta\eta$ rules.
 \begin{figure}
   \begin{mathpar}
       \inferrule*[right=Covariant Hom formation]
-      {R \prof(d^+\Xi; \gamma : \cat E) \and P \prof(d^-\Xi; \gamma : \cat E)}
-      {\forall \gamma.~ P \triangleleft R \prof(\Xi)}
+      {\Gamma \pipe d^+\Xi; \gamma : \cat E \vdash  R \and \Gamma \pipe  d^-\Xi; \gamma : \cat E \vdash P}
+      {\Gamma \pipe \Xi \vdash \forall \gamma.~ P \triangleleft R}
 
       (\forall \gamma. P\triangleleft R)[\xi] = \forall \gamma. P[d^-\xi,\gamma/\gamma] \triangleleft R[d^+\xi,\gamma/\gamma]
 
       \inferrule*[right=Covariant Hom introduction]
-      {\Phi, x : R, \gamma : \cat E \vdash M : P}
-      {\Phi \vdash \lambda^\triangleleft (x : R, \gamma : \cat E). M : \forall \gamma.~ P \triangleleft R}
+      {\Gamma \pipe \Phi, x : R, \gamma : \cat E \vdash M : P}
+      {\Gamma \pipe \Phi \vdash \lambda^\triangleleft (x : R, \gamma : \cat E). M : \forall \gamma.~ P \triangleleft R}
 
       (\lambda^\triangleleft (x, \gamma). M)[\phi] = \lambda^\triangleleft (x, \gamma). M[\phi, x/x,\gamma/\gamma]
 
-      \inferrule*[right=Covar Hom elim simple]
-      {}
-      {\alpha: \cat C, f:\forall \gamma. P \triangleleft R, \beta : \cat D, x : R, \gamma : \cat E \vdash f\triangleleft (x, \gamma) : P}
+      %% \inferrule*[right=Covar Hom elim simple]
+      %% {}
+      %% {\alpha: \cat C, f:\forall \gamma. P \triangleleft R, \beta : \cat D, x : R, \gamma : \cat E \vdash f\triangleleft (x, \gamma) : P}
 
       \inferrule*[right=Covariant Hom elimination]
-      {\Phi \vdash M : \forall \gamma.P\triangleleft R \and \Psi \vdash N : R[B/\gamma]}
-      {\Phi,\Psi \vdash M\triangleleft(N, B) : P[B/\gamma]}\\
+      {\Gamma\pipe\Phi_M \vdash M : \forall \gamma.P\triangleleft R \and \Phi_N \vdash N : R[B/\gamma]\and
+        \Phi = \Phi_M \jnctx \Phi_N}
+      {\Gamma\pipe \Phi \vdash M\triangleleft(N, B) : P[B/\gamma]}\\
 
       (\lambda^\triangleleft (x, \gamma). M)\triangleleft (x, \gamma) = M (\beta)
 
       \inferrule
-      {\Phi, x:R, \gamma : \cat E \vdash M \triangleleft (x, \gamma) = N \triangleleft (x, \gamma) : P}
-      {\Phi \vdash M = N : \forall \gamma. P \triangleleft R}
+      {\Gamma\pipe\Phi, x:R, \gamma : \cat E \vdash M \triangleleft (x, \gamma) = N \triangleleft (x, \gamma) : P}
+      {\Gamma\pipe\Phi \vdash M = N : \forall \gamma. P \triangleleft R}
 
       \inferrule*[right=Contra Hom formation]
-      {R \prof(\alpha:\cat C; d^-\Xi) \and P \prof(\alpha : \cat C; d^+\Xi)}
-      {\forall \alpha.~ R\triangleright P \prof(\xi)}
+      {\Gamma \pipe \alpha:\cat C; d^-\Xi\vdash R \and \Gamma \pipe \alpha : \cat C; d^+\Xi\vdash P}
+      {\Gamma \pipe \Xi \vdash \forall \alpha.~ R\triangleright P}
 
       \inferrule*[right=Contra Hom introduction]
-      {\alpha:\cat C, x : R, \Phi \vdash M : P}
-      {\Phi \vdash \lambda^\triangleright (\alpha:\cat C, x : R). M : \forall \alpha.~ R \triangleright P}
+      {\Gamma\pipe\alpha:\cat C, x : R, \Phi \vdash M : P}
+      {\Gamma\pipe\Phi \vdash \lambda^\triangleright (\alpha:\cat C, x : R). M : \forall \alpha.~ R \triangleright P}
 
       (\lambda^\triangleright (\alpha, x). M)[\phi] = \lambda^\triangleright (\alpha, x). M[\alpha/\alpha, x/x,\phi]
 
-      \inferrule*[right=Covar Hom elim simple]
-      {}
-      {\alpha: \cat C, x : R, \beta : \cat D, f:\forall \alpha. R \triangleright P, \gamma : \cat E \vdash (\alpha, x) \triangleright f : P}
+      %% \inferrule*[right=Covar Hom elim simple]
+      %% {}
+      %% {\alpha: \cat C, x : R, \beta : \cat D, f:\forall \alpha. R \triangleright P, \gamma : \cat E \vdash (\alpha, x) \triangleright f : P}
 
       \inferrule*[right=Contra Hom elimination]
-      {\Phi \vdash N : R[A/\alpha] \and \Psi \vdash M : \forall \alpha. R \triangleright P}
-      {\Phi,\Psi \vdash (A,N) \triangleright M : P[A/\alpha]}\\
+      {\Gamma \pipe \Phi_N \vdash N : R[A/\alpha] \and \Gamma \pipe \Phi_M \vdash M : \forall \alpha. R \triangleright P\and \Phi = \Phi_N \jnctx \Phi_M}
+      {\Gamma \pipe \Phi \vdash (A,N) \triangleright M : P[A/\alpha]}\\
 
       \inferrule*[Right=$\beta$]
                  {}
                  {(\alpha, x) \triangleright (\lambda^\triangleright (\alpha, x). M) = M }
 
       \inferrule*[right=$\eta$]
-      {\alpha:\cat C, x:R, \Phi \vdash (\alpha, x) \triangleright M = (\alpha, x) \triangleright N : P}
-      {\Phi \vdash M = N : \forall \alpha. R \triangleright P}
+      {\Gamma \pipe \alpha:\cat C, x:R, \Phi \vdash (\alpha, x) \triangleright M = (\alpha, x) \triangleright N : P}
+      {\Gamma \pipe \Phi \vdash M = N : \forall \alpha. R \triangleright P}
   \end{mathpar}
-  \caption{Hom Judgments}
+  \caption{Hom of Relations/Profunctors}
   \label{fig:hom}
 \end{figure}
 
@@ -548,57 +563,98 @@ This allows us to describe restricted positive eliminations that only
 work on single variable contexts. We give an admissible ``syntax
 sugar'' in Figure~\ref{fig:multi-hom}.
 
+
+Any $\Phi_l,\beta:C,\Phi_r \vdash M : R$ can be represented as a term
+$\beta:C \vdash M' : \Phi_r \triangleright_{\beta:C} R \triangleleft_{\beta:C} $
+
+
+Say we have a term in context
+\[ \alpha,x:P,\beta,y:Q,\gamma \vdash M : R \]
+Using $\triangleright\triangleleft$, we can produce an equivalent term
+of a different output type whose context is one of the single
+variables $\alpha,\beta$ or $\gamma$ in the context.
+
+We can make it $\alpha$ by using $\triangleleft$ twice:
+\[ \alpha \vdash \lambda^\triangleleft (x:P,\beta). \lambda^\triangleleft (y:Q, \gamma). M : \forall \beta. (\forall \gamma. R \triangleleft Q) \triangleleft P \]
+
+Or $\gamma$ by using $\triangleright$ twice:
+\[ \gamma \vdash\lambda^\triangleright (\beta, y:Q).  \lambda^\triangleright (\alpha, x:P). M : \forall \gamma. Q \triangleright \forall \alpha. P \triangleright R \]
+
+And we have two different ways to make the context $\beta$, either we use $\triangleright$ and then $\triangleleft$:
+\[ \beta \vdash\lambda^\triangleright (\alpha, x:P).  \lambda^\triangleleft (y:Q, \gamma). M : \forall \alpha. P \triangleright (\forall \gamma. R \triangleleft Q) \]
+or we do the opposite order:
+\[ \beta \vdash \lambda^\triangleleft (y:Q, \gamma). \lambda^\triangleright (\alpha, x:P). M : \forall \gamma. (\forall \alpha. P \triangleright R) \triangleleft Q \]
+
+In general we can iterate this process. That is given any $\Phi,\Psi$
+with $d^+\Phi = d^-\Psi = \beta:D$, we can take a term $\Phi \jnctx
+\Psi \vdash M : R$ and produce an equivalent term $\beta:D \vdash M :
+\Phi \triangleright R \triangleleft \Psi$. To formalize this, we show
+how we can create ``multi-hom'' jumbo connectives $\Phi \triangleright
+R$ and $R \triangleleft \Psi$, where the boundary conditions on
+$\Phi,\Psi$ are analogous to the ordinary case. These are given in
+Figure\ref{multi-hom}.
+
 \begin{figure}
+  \begin{align*}
+    P \triangleleft \gamma:E &= P\\
+    P \triangleleft (\Psi,x:R,\gamma:E) &= (\forall \gamma: E. P \triangleleft R) \triangleleft \Psi\\
+    %% \cdot \triangleright_{\alpha : C} P &= P\\
+    %% (x:R,\beta:D,\Phi_r)\triangleright_{\alpha:C} P  &= \Phi_R \triangleright_{\beta:D} \forall \beta. R \triangleright P
+  \end{align*}
   \begin{mathpar}
-      \inferrule*[right=Covariant Multi-Hom formation]
-      {\Phi \vectx(d^+\Xi; \gamma : \cat E) \and P \prof(d^-\Xi; \gamma : \cat E)}
-      {P \triangleleft \Phi \prof(\Xi)}
+    \inferrule
+    {\Gamma \pipe d^+\Xi; \gamma: E \vdash P \isaSet\and
+     \Gamma \pipe d^-\Xi; \gamma:E \vdash \Psi \isavectx}
+    {\Gamma \pipe \Xi \vdash P \triangleleft \Psi}
 
-      P \triangleleft \gamma = P\\
-      P \triangleleft \Phi,x:R, \gamma:\cat E = (\forall \gamma:\cat E. P \triangleleft R) \triangleleft \Phi
+    \inferrule*[right=Covariant Multi-Hom introduction]
+    {\Gamma\pipe\Phi\jnctx \Psi \vdash M : P}
+    {\Gamma\pipe\Phi \vdash \lambda^\triangleleft \Psi. M : P \triangleleft \Psi}\and
 
-      \inferrule*[right=Covariant Multi-Hom introduction]
-      {\Phi, \Psi \vdash M : P}
-      {\Phi,\Psi \vdash \lambda^\triangleleft \Psi. M : P \triangleleft \Psi}
+    \inferrule*[right=Covar Multi-Hom elim]
+    {~}
+    {\Gamma \pipe f:P\triangleleft \Psi,\Psi \vdash \textrm{app}\triangleleft_\Psi : P}
 
-      (\lambda^\triangleleft \Psi. M)[\phi] = \lambda^\triangleleft \Psi. M[\phi,\Psi]\\
-      \lambda^\triangleleft \gamma. M = M\\
-      \lambda^\triangleleft (\Psi,x:R,\gamma:\cat E). M = \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M\\
+    %%   (\lambda^\triangleleft \Psi. M)[\phi] = \lambda^\triangleleft \Psi. M[\phi,\Psi]\\
+    %%   \lambda^\triangleleft \gamma. M = M\\
+    %%   \lambda^\triangleleft (\Psi,x:R,\gamma:\cat E). M = \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M\\
 
-      (\lambda^\triangleleft \gamma. M)[\phi] = M[\phi] = \lambda^\triangleleft \gamma. M[\phi]\\
-      (\lambda^\triangleleft (\Psi,x:r,\gamma:\cat E). M)[\phi] =
-      (\lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M)[\phi]
-      = \lambda^\triangleleft \Psi. (\lambda^\triangleleft (x:R,\gamma:\cat E). M)[\phi, \Psi]
-      = \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M[\phi,\Psi,x:R,\gamma]      
+    %%   (\lambda^\triangleleft \gamma. M)[\phi] = M[\phi] = \lambda^\triangleleft \gamma. M[\phi]\\
+    %%   (\lambda^\triangleleft (\Psi,x:r,\gamma:\cat E). M)[\phi] =
+    %%   (\lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M)[\phi]
+    %%   = \lambda^\triangleleft \Psi. (\lambda^\triangleleft (x:R,\gamma:\cat E). M)[\phi, \Psi]
+    %%   = \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M[\phi,\Psi,x:R,\gamma]      
 
-      \inferrule*[right=Covariant Multi-Hom elimination]
-      {\Phi_1 \vdash M : P\triangleleft \Phi_2 \and \phi_2 : \Psi \vdash \Phi_2 \subst(\xi)}
-      {\Phi_1,\Psi \vdash M\triangleleft \phi_2 : P[d^+\xi]}\\
+    %%   \inferrule*[right=Covariant Multi-Hom elimination]
+    %%   {\Phi_1 \vdash M : P\triangleleft \Phi_2 \and \phi_2 : \Psi \vdash \Phi_2 \subst(\xi)}
+    %%   {\Phi_1,\Psi \vdash M\triangleleft \phi_2 : P[d^+\xi]}\\
 
-      M \triangleleft (A/\gamma) = M[A/\gamma]\\
-      M \triangleleft (\phi, N/x,A/\gamma) =  M \triangleleft (N, A) \triangleleft \phi
+    %%   M \triangleleft (A/\gamma) = M[A/\gamma]\\
+    %%   M \triangleleft (\phi, N/x,A/\gamma) =  M \triangleleft (N, A) \triangleleft \phi
 
-      (M \triangleleft \phi_2)[\phi_1,\psi] = M[\phi_1] \triangleleft [\phi_2[\psi]]\\
-      TODO: prove
+    %%   (M \triangleleft \phi_2)[\phi_1,\psi] = M[\phi_1] \triangleleft [\phi_2[\psi]]\\
+    %%   TODO: prove
 
-      TODO: (\lambda^\triangleleft \Phi. M) \triangleleft \phi = M[\phi]
-      TODO: M = \lambda^\triangleleft \Phi. M\triangleleft \Phi
+    %%   TODO: (\lambda^\triangleleft \Phi. M) \triangleleft \phi = M[\phi]
+    %%   TODO: M = \lambda^\triangleleft \Phi. M\triangleleft \Phi
 
-      TODO: contravariant by duality
-      %% \inferrule*[right=Contra Multi-Hom formation]
-      %% {\Phi \vectx(\alpha:\cat C; d^-\Xi) \and P \prof(\alpha : \cat C; d^+\Xi)}
-      %% {\Phi \triangleright P \prof(\xi)}
+    %%   TODO: contravariant by duality
+    %%   %% \inferrule*[right=Contra Multi-Hom formation]
+    %%   %% {\Phi \isavectx(\alpha:\cat C; d^-\Xi) \and P \prof(\alpha : \cat C; d^+\Xi)}
+    %%   %% {\Phi \triangleright P \prof(\xi)}
 
-      %% \alpha \triangleright P = P\\
-      %% \alpha:\cat C, x:R, \Phi \triangleright P = \forall \alpha. R \triangleright \Phi \triangleright P\\
+    %%   %% \alpha \triangleright P = P\\
+    %%   %% \alpha:\cat C, x:R, \Phi \triangleright P = \forall \alpha. R \triangleright \Phi \triangleright P\\
   \end{mathpar}
+  \begin{align*}
+    \lambda^\triangleleft \gamma:E. M &= M\\
+    \lambda^\triangleleft (\Psi,x:R,\gamma:E). M &= \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:E). M\\\\
+    \textrm{app}\triangleleft_{\gamma:E} &= f\\
+    \textrm{app}\triangleleft_{\Psi,x:R\gamma:E} &= \textrm{app}\triangleleft_\Psi \triangleleft (x,\gamma) \\
+  \end{align*}
   \caption{Multi-Hom}
+  \label{multi-hom}
 \end{figure}
-
-\[ \alpha \triangleright Q = Q \]
-\[ \Phi,x:R,\beta:\cat D \triangleright Q =  \]
-Now any substitution for $\Phi$ will simply supply all of these
-arguments, instead of pushing into $M$.
 
 \subsection{Unit and Tensor Profunctors}
 
@@ -947,8 +1003,8 @@ and identity types.
 \begin{figure}
   \begin{mathpar}
   \inferrule
-  {\Gamma \pipe\cdot \vdash S \Set\and \Gamma \pipe\cdot \vdash T \Set}
-  {\Gamma\pipe\cdot \vdash \prod_{x:S} T \Set}
+  {\Gamma \pipe\cdot \vdash S \isaSet\and \Gamma \pipe\cdot \vdash T \isaSet}
+  {\Gamma\pipe\cdot \vdash \prod_{x:S} T \isaSet}
 
   \inferrule
   {\Gamma \pipe \cdot \vdash M : \prod_{x:S} T\and
@@ -960,39 +1016,23 @@ and identity types.
   {\Gamma \pipe \cdot \vdash \lambda x:S. M : \prod_{x:S} T}
 
   \inferrule
-  {\Gamma \pipe\cdot \vdash S \Set\and \Gamma \pipe\cdot \vdash T \Set}
-  {\Gamma\pipe\cdot \vdash \sum_{x:S} T \Set}
+  {\Gamma \pipe\cdot \vdash S \isaSet\and \Gamma \pipe\cdot \vdash T \isaSet}
+  {\Gamma\pipe\cdot \vdash \sum_{x:S} T \isaSet}
   
   \inferrule
   {~}
-  {\Gamma\pipe\cdot \vdash \top \Set}
+  {\Gamma\pipe\cdot \vdash \top \isaSet}
   \end{mathpar}
   \caption{Ordinary Dependent Type Structure}
 \end{figure}
-
-
 
 \subsection{Internalizing Virtual Equipment Structure}
 
 \begin{figure}
   \begin{mathpar}
-    \inferrule{\Gamma \dtctx}{\Gamma\pipe\cdot \vdash \Sort \Set}
-    
     \inferrule
-    {\Gamma \vdash \cat C \sort}
-    {\Gamma \vdash \quoth {\cat C} : \Sort}
-
-    \inferrule
-    {\Gamma \vdash C : \Sort}
-    {\Gamma \vdash \unquoth C \sort}
-
-    TODO: equations
-    TODO: maybe eliminate?
-    \\
-
-    \inferrule
-    {\Gamma \vdash \cat C \sort \and\Gamma \vdash \cat D \sort}
-    {\Gamma\pipe\cdot \vdash \varr{\cat C}{\cat D} \Set}
+    {\Gamma \vdash \cat C : \Sort \and\Gamma \vdash \cat D : \Sort}
+    {\Gamma\pipe\cdot \vdash \varr{\cat C}{\cat D} \isaSet}
 
     \inferrule
     {\Gamma \pipe \alpha:\cat C \vdash A : \cat D}
@@ -1000,30 +1040,39 @@ and identity types.
 
     \inferrule
     {\Gamma \pipe \alpha:\cat C \vdash A : \cat D\and
-      \Gamma \vdash M : \varr{\cat D}{\cat E}}
+      \Gamma\pipe\cdot \vdash M : \varr{\cat D}{\cat E}}
     {\Gamma\pipe \alpha:\cat C \vdash M A : \cat E}
 
-    TODO: equations\\
+    (\lambda\alpha:C. A) B = A[B/\alpha]
+
+    \inferrule*[right=VArr $\eta$]
+    {\Gamma \pipe\cdot \vdash M : \varr C D}
+    {\Gamma \pipe\cdot \vdash M = (\lambda \alpha:C. M \alpha) : \varr C D}
+    \\
 
     \inferrule
-    {\Gamma \vdash \cat C \sort \and\Gamma \vdash \cat D \sort}
-    {\Gamma\pipe\cdot \vdash \harr{\cat C}{\cat D} \Set}
+    {\Gamma \vdash \cat C : \Sort \and\Gamma \vdash \cat D \Sort}
+    {\Gamma\pipe\cdot \vdash \harr{\cat C}{\cat D} \isaSet}
 
     \inferrule
-    {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R \,\Set}
+    {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R \,\isaSet}
     {\Gamma \vdash \lambda \alpha:\cat C;\beta:\cat D. R : \harr{\cat C}{\cat D}}
 
     \inferrule
     {\Gamma \vdash M : \harr{\cat C}{\cat D}\and
      \Gamma \pipe d^- \Xi \vdash A : \cat C\and
      \Gamma \pipe d^+ \Xi \vdash B : \cat C}
-    {\Gamma \pipe \Xi \vdash M A; B \Set}
+    {\Gamma \pipe \Xi \vdash M A; B \isaSet}
 
-    TODO: equations\\
+    (\lambda \alpha:C;\beta:D. R)A;B = R[A/\alpha;B/\beta]
+
+    \inferrule*[right=HArr $\eta$]
+    {\Gamma \pipe \cdot \vdash M : \harr C D}
+    {\Gamma \pipe \cdot \vdash M = (\lambda \alpha;\beta. M \alpha;\beta) : \harr C D}\\
 
     \inferrule
-    {\Gamma \pipe \alpha:\cat C\vdash R \Set}
-    {\Gamma \pipe \cdot \vdash \forall \alpha:\cat C. R \Set}
+    {\Gamma \pipe \alpha:\cat C\vdash R \isaSet}
+    {\Gamma \pipe \cdot \vdash \forall \alpha:\cat C. R \isaSet}
 
     \inferrule
     {\Gamma \pipe \alpha:\cat C\vdash M : R}
@@ -1033,132 +1082,137 @@ and identity types.
     {\Gamma\pipe\cdot \pipe \cdot \vdash M : \forall \alpha:\cat C. R\and
       \Gamma \pipe \beta:\cat D \vdash A : \cat C}
     {\Gamma \pipe \beta:\cat D\pipe\beta:\cat D \vdash M A : R[A/\alpha]}
+
+    (\lambda \alpha.M) A = M[A/\alpha]
+
+    \inferrule*[right=2Cell$\eta$]
+    {\Gamma \pipe \cdot \vdash M : \forall \alpha. R }
+    {\Gamma \pipe \cdot \vdash M = (\lambda \alpha. M \alpha) : \forall \alpha. R }
   \end{mathpar}
   \caption{Internalizing VE Structure}
 \end{figure}
 
-\subsection{Additives}
+%% \subsection{Additives}
 
-Next, we consider what we need to do to add additive connectives.
-%
-Since we have two category-like structures (types/functors and
-terms/transformations) we can define additive connectives for each of
-their objects: sorts and judgments.
-%
-These seem to be entirely independent constructions: we can define the
-product of sorts and we can separately define the product of judgments
-and neither relies on the other existing.
+%% Next, we consider what we need to do to add additive connectives.
+%% %
+%% Since we have two category-like structures (types/functors and
+%% terms/transformations) we can define additive connectives for each of
+%% their objects: sorts and judgments.
+%% %
+%% These seem to be entirely independent constructions: we can define the
+%% product of sorts and we can separately define the product of judgments
+%% and neither relies on the other existing.
 
-\begin{figure}
-  \begin{mathpar}
-    \inferrule{~}{1 \sort}
+%% \begin{figure}
+%%   \begin{mathpar}
+%%     \inferrule{~}{1 \sort}
 
-    \inferrule*[right=1-Ty-Intro]{~}{\alpha : C \vdash () : 1}
+%%     \inferrule*[right=1-Ty-Intro]{~}{\alpha : C \vdash () : 1}
 
-    \inferrule*[right=1-Ty-$\eta$]{\alpha : C \vdash A : 1}{\alpha : C \vdash A = () : 1}\\
+%%     \inferrule*[right=1-Ty-$\eta$]{\alpha : C \vdash A : 1}{\alpha : C \vdash A = () : 1}\\
 
-    \inferrule{~}{\alpha^o:C;\beta:D \pipe 1}
+%%     \inferrule{~}{\alpha^o:C;\beta:D \pipe 1}
 
-    \inferrule*[right=1-Tm-Intro]{~}{\Phi \vdash () : 1}
+%%     \inferrule*[right=1-Tm-Intro]{~}{\Phi \vdash () : 1}
     
-    \inferrule*[right=1-Tm-$\eta$]{\Phi \vdash t : 1}{\Phi \vdash t = () : 1}\\
+%%     \inferrule*[right=1-Tm-$\eta$]{\Phi \vdash t : 1}{\Phi \vdash t = () : 1}\\
 
-    ()[\gamma] = ()\and 1[A/\alpha;B/\beta] = 1 \and ()[\phi] = ()
-  \end{mathpar}
-  \caption{Terminal Sort, Judgment}
-\end{figure}
+%%     ()[\gamma] = ()\and 1[A/\alpha;B/\beta] = 1 \and ()[\phi] = ()
+%%   \end{mathpar}
+%%   \caption{Terminal Sort, Judgment}
+%% \end{figure}
 
-\begin{figure}
-  \begin{mathpar}
-    
-    \inferrule{C \sort \and D\sort}{C \times D \sort}
+%% \begin{figure}
+%%   \begin{mathpar}
+%%     \inferrule{C \sort \and D\sort}{C \times D \sort}
 
-    \inferrule
-    {\alpha : C \vdash A_1 : D_1 \and \alpha : C \vdash A_2 : D_2}
-    {\alpha : C \vdash (A_1,A_2) : D_1 \times D_2}
+%%     \inferrule
+%%     {\alpha : C \vdash A_1 : D_1 \and \alpha : C \vdash A_2 : D_2}
+%%     {\alpha : C \vdash (A_1,A_2) : D_1 \times D_2}
 
-    (A_1,A_2)[B/\alpha] = (A_1[B/\alpha], A_2[B/\alpha])
+%%     (A_1,A_2)[B/\alpha] = (A_1[B/\alpha], A_2[B/\alpha])
      
-    (\pi_i A)[B/\alpha] = \pi_i A[B/\alpha]
+%%     (\pi_i A)[B/\alpha] = \pi_i A[B/\alpha]
 
-    \inferrule{\alpha : C \vdash A : D_1 \times D_2}{\alpha : C \vdash \pi_i A : D_i}
+%%     \inferrule{\alpha : C \vdash A : D_1 \times D_2}{\alpha : C \vdash \pi_i A : D_i}
 
-    \inferrule*[right=$\times-\beta$]{~}{\pi_i(A_1,A_2) = A_i}
+%%     \inferrule*[right=$\times-\beta$]{~}{\pi_i(A_1,A_2) = A_i}
 
-    \inferrule*{\alpha : C \vdash A : D_1 \times D_2}{\alpha : C \vdash A = (\pi_1 A, \pi_2 A) : D_1\times D_2}\\
+%%     \inferrule*{\alpha : C \vdash A : D_1 \times D_2}{\alpha : C \vdash A = (\pi_1 A, \pi_2 A) : D_1\times D_2}\\
 
-    \inferrule
-    {\alpha^o: C;\beta : D \pipe R_1 \and \alpha^o: C;\beta : D \pipe R_2}
-    {\alpha^o: C;\beta : D \pipe R_1 \times R_2}
+%%     \inferrule
+%%     {\alpha^o: C;\beta : D \pipe R_1 \and \alpha^o: C;\beta : D \pipe R_2}
+%%     {\alpha^o: C;\beta : D \pipe R_1 \times R_2}
 
-    (R_1 \times R_2)[A/\alpha;B/\beta] = (R_1[A/\alpha;B/\beta] \times R_2[A/\alpha;B/\beta])
+%%     (R_1 \times R_2)[A/\alpha;B/\beta] = (R_1[A/\alpha;B/\beta] \times R_2[A/\alpha;B/\beta])
 
-    \inferrule
-    {\Phi \vdash t_1 : R_1 \and \Phi \vdash t_2 : R_2}
-    {\Phi \vdash (t_1,t_2) : R_1 \times R_2}
+%%     \inferrule
+%%     {\Phi \vdash t_1 : R_1 \and \Phi \vdash t_2 : R_2}
+%%     {\Phi \vdash (t_1,t_2) : R_1 \times R_2}
 
-    (t_1,t_2)[\phi] = (t_1[\phi], t_2[\phi])
+%%     (t_1,t_2)[\phi] = (t_1[\phi], t_2[\phi])
 
-    \inferrule
-    {\Phi \vdash u : R_1 \times R_2}
-    {\Phi \vdash \pi_i u : R_i}
+%%     \inferrule
+%%     {\Phi \vdash u : R_1 \times R_2}
+%%     {\Phi \vdash \pi_i u : R_i}
 
-    (\pi_i u)[\phi] = \pi_i u[\phi] 
+%%     (\pi_i u)[\phi] = \pi_i u[\phi] 
 
-    \inferrule{~}{\pi_i (t_1,t_2) = t_i}
+%%     \inferrule{~}{\pi_i (t_1,t_2) = t_i}
 
-    \inferrule{\Phi \vdash t : R_1 \times R_2}{t = (\pi_1 t, \pi_2 t)}
-  \end{mathpar}
-  \caption{Product Sort, Judgment}
-\end{figure}
+%%     \inferrule{\Phi \vdash t : R_1 \times R_2}{t = (\pi_1 t, \pi_2 t)}
+%%   \end{mathpar}
+%%   \caption{Product Sort, Judgment}
+%% \end{figure}
 
-To define internal ends and coends, we need to go beyond the usual
-simple types and add equalizers (a form of subsets) and co-equalizers
-(a form of quotients) of judgments. Here's a sketch of the syntax for
-each. These make type checking very difficult as they result in
-obligations for proving equality of certain terms, which may or may
-not be decidable.
+%% To define internal ends and coends, we need to go beyond the usual
+%% simple types and add equalizers (a form of subsets) and co-equalizers
+%% (a form of quotients) of judgments. Here's a sketch of the syntax for
+%% each. These make type checking very difficult as they result in
+%% obligations for proving equality of certain terms, which may or may
+%% not be decidable.
 
-\begin{mathpar}
-  \inferrule*[right=Equalizer Formation]
-  {\alpha;\beta\,|\, R \and
-  x : R \vdash t : S x:R \vdash u : S}
-  {\alpha;\beta\,|\,\{ x : R \,|\, t = u \}}
+%% \begin{mathpar}
+%%   \inferrule*[right=Equalizer Formation]
+%%   {\alpha;\beta\,|\, R \and
+%%   x : R \vdash t : S x:R \vdash u : S}
+%%   {\alpha;\beta\,|\,\{ x : R \,|\, t = u \}}
 
-  \inferrule*[right=Equalizer Intro]
-  {\Phi \vdash r : R \and t[r/x] = u[r/x]}
-  {\Phi \vdash \textrm{assert}(x.t = u)(r) : \{ x : R \,|\, t = u \}}
+%%   \inferrule*[right=Equalizer Intro]
+%%   {\Phi \vdash r : R \and t[r/x] = u[r/x]}
+%%   {\Phi \vdash \textrm{assert}(x.t = u)(r) : \{ x : R \,|\, t = u \}}
 
-  \inferrule*[right=Equalizer Elim]
-  {\Phi \vdash r : \{ x : R \,|\, t = u \}}
-  {\Phi \vdash \textrm{forget}(r) : R}
+%%   \inferrule*[right=Equalizer Elim]
+%%   {\Phi \vdash r : \{ x : R \,|\, t = u \}}
+%%   {\Phi \vdash \textrm{forget}(r) : R}
 
-  t[\textrm{forget}(r)/x] = u[\textrm{forget(r)}/x]
+%%   t[\textrm{forget}(r)/x] = u[\textrm{forget(r)}/x]
 
-  \textrm{assert}(x.t = u)(\textrm{forget}(r)) = r
-  \textrm{forget}(\textrm{assert}(x.t = u)(r)) = r
-\end{mathpar}
+%%   \textrm{assert}(x.t = u)(\textrm{forget}(r)) = r
+%%   \textrm{forget}(\textrm{assert}(x.t = u)(r)) = r
+%% \end{mathpar}
 
-\begin{mathpar}
-  \inferrule*[right=Co-equalizer Formation]
-  {\alpha;\beta\,|\, R \and
-  x : S \vdash t : R x:S \vdash u : R}
-  {\alpha;\beta\,|\,R/(\forall x:S. t = u)}
+%% \begin{mathpar}
+%%   \inferrule*[right=Co-equalizer Formation]
+%%   {\alpha;\beta\,|\, R \and
+%%   x : S \vdash t : R x:S \vdash u : R}
+%%   {\alpha;\beta\,|\,R/(\forall x:S. t = u)}
 
-  \inferrule*[right=Coequalizer Intro]
-  {\Phi \vdash r : R}
-  {\Phi \vdash \textrm{equate}(x:S.t=u)(r) : R/(\forall x.t=u)}
+%%   \inferrule*[right=Coequalizer Intro]
+%%   {\Phi \vdash r : R}
+%%   {\Phi \vdash \textrm{equate}(x:S.t=u)(r) : R/(\forall x.t=u)}
 
-  \inferrule*[right=Coequalizer Elim]
-  {\Psi \vdash r : R/(x.t = u) \and
-    \Phi,y:R,\Phi' \vdash s : S \and
-    s[t/y] = s[u/y]}
-  {\Phi,\Psi,\Phi' \vdash \textrm{lett} \textrm{equate}(y) = r.~s : S}
+%%   \inferrule*[right=Coequalizer Elim]
+%%   {\Psi \vdash r : R/(x.t = u) \and
+%%     \Phi,y:R,\Phi' \vdash s : S \and
+%%     s[t/y] = s[u/y]}
+%%   {\Phi,\Psi,\Phi' \vdash \textrm{lett} \textrm{equate}(y) = r.~s : S}
 
-  \textrm{equate}(x:S.t = u)(t[\gamma]) = \textrm{equate}(x:S.t = u)(u[\gamma])
+%%   \textrm{equate}(x:S.t = u)(t[\gamma]) = \textrm{equate}(x:S.t = u)(u[\gamma])
 
-  \cdots
-\end{mathpar}
+%%   \cdots
+%% \end{mathpar}
 
 \section{Internal Category Theory}
 
@@ -1175,12 +1229,12 @@ read exactly as the classical definitions.
     easily interpreted as a $\Sigma$ type}:
   \begin{enumerate}
   \item A sort $C_0 : \Sort$
-  \item A span $C_1 : \harr{\unquoth C_0}{\unquoth C_0}$
+  \item A span $C_1 : \harr{ C_0}{ C_0}$
   \item Identity arrows
-    $C_r : \forall \alpha : \unquoth C. H \alpha \alpha$
+    $C_r : \forall \alpha :  C. H \alpha \alpha$
   \item Composition, which we can express several different ways using
     a mix of covariant/contravariant homs and tensors.
-    \[ C_t^\triangleright : \forall \alpha : \unquoth C. \forall \beta. (H \beta \alpha) \triangleright \forall \gamma. (H \gamma \beta) \triangleright H \gamma \alpha \]
+    \[ C_t^\triangleright : \forall \alpha :  C. \forall \beta. (H \beta \alpha) \triangleright \forall \gamma. (H \gamma \beta) \triangleright H \gamma \alpha \]
 
     or
 
@@ -1248,9 +1302,9 @@ read exactly as the classical definitions.
   \begin{enumerate}
   \item a function on objects $F_0 : \varr {C_0} {D_0}$
   \item a function on arrows
-    $F_1 : \forall \alpha:\unquoth {C_0}. \forall \beta:\unquoth{C_0}. D_1 {(F_0 \alpha)}{(F_0 \beta)} \triangleleft C_1 \alpha \beta$
+    $F_1 : \forall \alpha: {C_0}. \forall \beta:{C_0}. D_1 {(F_0 \alpha)}{(F_0 \beta)} \triangleleft C_1 \alpha \beta$
   \item That preserves identity. This is given by equality between the
-    following terms of type $\forall \alpha:{\unquoth {C_0}}. D_1 {F_0
+    following terms of type $\forall \alpha:{{C_0}}. D_1 {F_0
       \alpha}{F_0\alpha}$:
     \[ \lambda \alpha. D_r(F_0\alpha)\]
     and
@@ -1406,62 +1460,66 @@ t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha')$.
 
 \subsection{Universal Properties, Internally}
 
-In a sense, the very purpose of category theory is to study universal
-properties and so it is essential that our syntax provide a nice
-presentation of universal properties.
+Since we have profunctors as a primitive notion, we can most easily
+discuss universal properties stated in terms of profunctors and
+representability as a functor, rather than other formulations (adjoint
+functors, representable presheaves, kan extensions).
 
-Fortunately, the central placement of spans/profunctors in our syntax
-makes the definition of a functor satisfying a universal property very
-natural (should I introduce the unit category earlier?).
-
-This is closest to the definition of adjoint functors by natural
-isomorphism of hom-sets.
+First, we have the ``algebraic'' notion of a functor representing a
+profunctor, i.e., when a profunctor $R : C\to D$ is equivalent to
+$Hom_D(-,G=)$.
 \begin{definition}[Right Representability]
   Let $\cat C, \cat D$ be categories and $\alpha^o : \cat C;\beta :
   \cat D \pipe \alpha \to_{Q} \beta$ be a profunctor between them. Then a \emph{right
     representation} of $Q$ consists of
   \begin{enumerate}
-  \item A functor $\beta : \cat D \vdash G[\beta] : \cat C$
-  \item An ``introduction rule'' homomorphism $\phi: \alpha \to_{Q}
-    \beta \vdash I_G[\phi] : \alpha \to_{\cat C} G[\beta]$.
-  \item An inverse homomorphism $\psi: \alpha \to_{\cat C} G[\beta]
-    \vdash I_G^{-1}[\psi] : \alpha \to_{Q} \beta$. That is, it satisfies
-    \begin{align*}
-      I_G[I_G^{-1}[\psi]/\phi] &= \psi\\
-      I_G^{-1}[I_G[\phi]/\psi] &= \phi
-    \end{align*}
+  \item A functor $G : \varr C D$
+  \item An ``introduction rule'' $I : \forall \alpha. \forall
+    \beta. (Q \alpha \beta) \triangleright (\alpha \to_{D} G \beta)$
+    that is a homomorphism of internal profunctors.
+  \item A homomorphism $I^{-1} : \forall \alpha. \forall
+    \beta. (\alpha \to_{D} G \beta) \triangleright (Q \alpha \beta)$.
+  \item Such that $I, I^{-1}$ are inverses in that:
+
+    \[\lambda \alpha. \lambda(\beta, f). f = \lambda \alpha. \lambda(\beta, f). I \alpha \triangleleft (\beta, I^{\-1} \alpha \triangleleft (\beta, f))\]
+    and similarly the opposite composition is the identity.
   \end{enumerate}
 \end{definition}
 
-While this is a fairly standard definition, it is likely unfamiliar to
-type theorists, who may be surprised that Right Representability is
-essentially the same as the definition of a negative type, which has
-an introduction rule, but instead of an inverse, there is an
-elimination rule, and the functoriality of the type is not primitive.
-Fortunately, we can prove the equivalence between these notions
-entirely syntactically.
+This is a nice definition for applications, but a lot of the structure
+(homomorphism, functoriality of G) is determined by other components
+of the structure. This can be simplified to the notion of a
+``universal morphism''.
 
-\begin{definition}[Negative Type]
-  A negative type (connective) $N$ between categories $\cat C$,$\cat D$ consists of
+\begin{definition}[Universal Morphism]
+  A profunctor $Q : \harr C D$ is representable when there exists
   \begin{enumerate}
-  \item A judgment it represents $\alpha^o : \cat C;\beta : \cat D
-    \pipe \alpha \to_{Q} \beta$
-  \item A type $\beta : \cat D \vdash N[\beta] : \cat C$
-  \item An ``introduction rule'' $\phi : \alpha \to_{Q} \beta \vdash
-    I_N[\phi] : \alpha \to_{\cat C} N[\beta]$ that is a homomorphism
-    \emph{on the left}:
-    \[ \psi : \alpha' \to_{\cat C} \alpha, \phi : \alpha \to_{Q} \beta \vdash I_N[\phi] \circ_{\cat C} \psi \equiv I_N[\phi \circ_{Q} \psi] : \alpha' \to_{\cat C} N[\beta]\]
-  \item An ``elimination rule'' $\beta^o:\cat D;\beta : \cat D \pipe
-    \cdot \vdash \epsilon_{N}[\beta] : N[\beta] \to_{Q} \beta$
-  \item Such that $\psi : \alpha \to_{\cat C} N[\beta] \vdash \epsilon_N[\beta]
-    \circ_{Q} \psi : \alpha \to_{Q} \beta$ is an inverse to
-    $I_{N}[\phi]$ in that
-    \begin{align*}
-       I_n[\epsilon_N[\beta] \circ \psi/\phi] &= \psi \tag{$\eta$}\\
-      \epsilon_N[\beta] \circ I_n[\phi] &= \phi \tag{$\beta$}
-    \end{align*}
+  \item A function on objects $G : \varr C D$
+  \item An ``introduction rule'' $I : \forall \alpha. \forall
+    \beta. (Q \alpha \beta) \triangleright (\alpha \to_{D} G \beta)$
+    (with no homomorphism conditions).
+  \item An universal morphism $\epsilon : \forall \beta:D. Q(G \beta)
+    \beta$.
+  \item Such that composition with $\epsilon$ is an inverse to $I$.
   \end{enumerate}
 \end{definition}
+
+These two notions turn out to be equivalent because the ``extra''
+information in the hom isomorphism is in fact fully determined by the
+data of a universal morphism: the functoriality of $G$ and the
+naturality of $I,I^{-1}$.
+%
+The proof can be broken up into 3 conceptual steps:
+\begin{enumerate}
+\item First, $I^{-1}$ is, by a version of the Yoneda lemma, completely
+  determined by its behavior on the identity, which is precisely
+  $\epsilon$.
+\item Next, the functoriality of $G$ is derivable from $I,\epsilon$.
+\item Next, $I^{-1}$ is a homomorphism automatically since composition
+  with a morphism is automatically natural.
+\item Finally, $I$ is a homomorphism because the inverse of a natural
+  transformation is always natural.
+\end{enumerate}
 
 Part of this equivalence is the \emph{Yoneda Lemma}, which we state
 now in its internal, parameterized form.
@@ -2022,11 +2080,13 @@ terms whose type is $(F \alpha \to G \alpha')$.
 There are two common definitions of adjoint functors, one in terms of
 Hom-sets and one in terms of units and counits.
 
-\begin{definition}
+\begin{definition}[Hom Iso Adjunction]
   A functor $\alpha : \cat C \vdash L : \cat D$ is left adjoint to a
   functor $\beta : \cat D \vdash R : \cat C$ if there is an isomorphism
   \[ (L[\alpha] \to_{\cat D} \beta) \cong (\alpha \to_{\cat C} R[\beta]) \]
+\end{definition}
 
+\begin{definition}[Unit/Counit Adjunction]
   Alternatively, $L$ is left adjoint to $R$ if there exist
   transformations
   \[ \eta : \alpha \to_{\cat C} R[L[\alpha]/\beta] \] % unit of the monad 1 -> RL 
@@ -2034,6 +2094,10 @@ Hom-sets and one in terms of units and counits.
   satisfying the triangle/zig-zag identities
   \[ \id_{R[\beta]} = R[\epsilon_{\beta}] \circ \eta_{R[\beta]} \]
   \[ \id_{L[\alpha]} = \epsilon_{L[\alpha]} \circ L[\eta_{\alpha}] \]
+\end{definition}
+
+\begin{definition}[Universal Morphism Adjunction]
+  A functor $\alpha: C \vdash L : D$ is a left adjoint if there exists a 
 \end{definition}
 
 We should be able to synthetically prove these are equivalent.
@@ -2190,140 +2254,79 @@ Let's prove that classic theorem!
   TODO.
 \end{proof}
 
-\subsection{Additive Facts}
+%% \subsection{Additive Facts}
 
-I think the following isomorphisms should hold, which connect additive
-connectives on objects with the analogous connective on profunctors:
-\[ () \to_1 () \cong () \]
-\[ (\pi_1 \alpha, \pi_2 \alpha) \to_{\cat C \times \cat D} (\pi_1 \beta, \pi_2 \beta) \cong
-((\pi_1 \alpha) \to_{\cat C} (\pi_1 \beta)) \times ((\pi_2 \alpha) \to_{\cat C} (\pi_2 \beta)) \]
+%% I think the following isomorphisms should hold, which connect additive
+%% connectives on objects with the analogous connective on profunctors:
+%% \[ () \to_1 () \cong () \]
+%% \[ (\pi_1 \alpha, \pi_2 \alpha) \to_{\cat C \times \cat D} (\pi_1 \beta, \pi_2 \beta) \cong
+%% ((\pi_1 \alpha) \to_{\cat C} (\pi_1 \beta)) \times ((\pi_2 \alpha) \to_{\cat C} (\pi_2 \beta)) \]
 
-\section{Completeness}
+\section{Semantics}
 
-To prove the completeness for our intended models, we need to show
-that the syntax itself (generated from a signature) presents a virtual
-equipment.
+A model of our theory is given by a virtual double category with
+restrictions, units, tensors and homs. We informally describe the
+semantics of each judgment now.
 
-The objects are the sorts $\cat C,\ldots$, a vertical arrow from $\cat
-C$ to $\cat D$ is a type $A[\alpha:\cat C] : D$ with
-identity/composition given by variable/substituion, a horizontal arrow
-from $\cat C$ to $\cat D$ is a judgment/span $R \prof(\alpha:\cat C;
-\beta:\cat D)$ and a 2-cell from a compatible string $\vec R$ from
-$\cat C$ to $\cat D$ to a horizontal arrow $S$ from $\cat C'$ to $\cat
-D'$ along vertical arrows $A[\alpha : \cat C] : \cat C'$ and
-$B[\beta:\cat D] : \cat D'$ is given by a term $\Phi_{\vec R} \vdash t
-: S[A;B]$ with identity/composition given by variables/substitution.
-
-\section{Implementation Concerns}
-
-So far all of the theorems we have presented are \emph{metatheorems},
-constructing some terms in our theory given some other terms we've
-alread constructed. For instance, for any collection of terms that
-defines an internal category, we can define another collection of
-terms that defines the identity functor from that category to
-itself. We would prefer to make this process a formal syntactic
-construction so that we can take advantage of an automatic type
-checker for our syntax. There are two obvious choices for this: first,
-we can formalize the syntax of judgment theory using a proof assistant
-such as Coq or Agda and define these as metatheorems essentially as we
-have done so far. Alternatively, we can define a \emph{domain
-  specific} proof assistant that extends judgment theory with a kind
-of \emph{module system} that enables us to define theorems and
-constructions fully formally. Such a module system could itself be
-defined in a proof assistant and its theorems internalized there. An
-advantage of the syntactic approach is that we should get out more
-than we put in: modules should be automatically \emph{homomorphisms}
-in some sense with respect to models (though I'm not sure yet how).
-This should be closely related to the initiality theorem for the
-syntax.
-
-In programming language terminology, we have defined an
-\emph{expression language} and we now want to define on top of that a
-\emph{definition language} or \emph{module system}.
+A context $\Gamma \isadtctx$ denotes a set.
 %
-First, we define a signature context $\Gamma$. In programming terms,
-we should think of this as the context of top-level definitions.
+A set with empty boundary $\Gamma \pipe \cdot \vdash S \isaSet$ denotes a
+set for every $\gamma:\Gamma$.
 %
-And we need to extend our expression language syntax as well to
-include references to the current signature context.
+The type $\Gamma \pipe \cdot \vdash \Sort \isaSet$ denotes the set of
+objects of the virtual equipment (for any $\gamma:\Gamma$).
+%
+A term $\Gamma \pipe \alpha:C \vdash A : D$ denotes a vertical arrow
+from $C \gamma$ to $D \gamma$ for every $\gamma:\Gamma$.
+%
+A term $\Gamma \pipe \alpha:C; \beta : D \vdash R \isaSet$ denotes for
+each $\gamma:\Gamma$ a horizontal arrow from $C\gamma$ to $D\gamma$.
+%
+A term $\Gamma \pipe \alpha:C \vdash R \isaSet$ denotes for each
+$\gamma$, a horizontal arrow from $C\gamma$ to itself.
+%
+A non-$\cdot$ context $\Gamma \vdash \Phi\isavectx$ denotes a
+``composable string'' of horizontal arrows from $d^-\Phi \gamma$ to
+$d^+ \Phi \gamma$.
+%
+A term $\Gamma \pipe \cdot \vdash M : S$ denotes a function from
+$\gamma :\Gamma$ to $S \gamma$ (section of the bundle blah blah).
+%
+A term $\Gamma \pipe \Phi \vdash M : R$ for non-empty $\Phi$ denotes a
+``globular'' 2-cell in the virtual equipment for every
+$\gamma:\Gamma$.
 
-To a first approximation, we can define signature contexts as
-follows. This is likely how we will define signatures in the
-initiality theorem.
-\begin{mathpar}
-  \inferrule*[right=Signature Ctx Formation]
-  {}
-  {\Gamma \sigctx}
+Next, substitutions model the forms of composition in the system.
+Substitution $A[B/\alpha]$ denotes composition of vertical arrows
+(with variable being the identity). Substitution $R[A/\alpha;B/\beta]$
+denotes restriction of a horizontal arrow $R$ along the vertical
+arrows $A,B$. And substitution $M[\phi]$ denotes composition of
+2-cells, where some restrictions are of course involved, and again a
+variable is the identity (globular) 2-cell.
 
-  \inferrule*[right=SigCtx Base Sort]
-  {\Gamma \sigctx}
-  {\Gamma , X \sigctx}
+Next, we would also like to prove some kind of \emph{completeness}
+theorem for our calculus, at least the part relevant to virtual
+equipments. One way to do this would be to prove a kind of
+parameterized completeness theorem, where we treat the $\Gamma$ like a
+signature, and show that the syntax is complete for every fixed
+$\Gamma$. This amounts to proving that for any fixed $\Gamma$, the
+judgments above present a virtual equipment with a trivial model
+(i.e., each judgment is interpreted as itself). This shows that the
+syntax is closed under all constructions that are present in every
+model.
 
-  \inferrule*[right=Sort Base]
-  {\Gamma \ni X}
-  {\Gamma \vdash X \sort}
-
-  \inferrule*[right=SigCtx Function Symbol]
-  {\Gamma \sigctx \and
-    \Gamma \vdash \cat C\sort\and
-    \Gamma \vdash \cat D \sort    
-  }
-  {\Gamma , f : \cat C \to \cat D \sigctx}
-
-  \inferrule*[right=Type Function Symbol]
-  {\Gamma \ni f : \cat D \to \cat E
-  \and x : \cat C \vdash A : \cat D}
-  {\Gamma \pipe x:\cat C \vdash f(A) : \cat E}
-
-  \inferrule
-  {\Gamma \sigctx \and \Gamma \vdash \cat C \sort \and \Gamma \vdash \cat D \sort}
-  {\Gamma, R : \cat C \nrightarrow \cat D \sigctx}
-
-  \inferrule
-  {\Gamma \ni R : \cat C \nrightarrow \cat D \and
-    \Gamma \pipe \alpha' :\cat C' \vdash A : \cat C\and
-    \Gamma \pipe \beta' :\cat D' \vdash B : \cat D}
-  {\Gamma\pipe \alpha'^o:\cat C';\beta'^o:\cat D' \pipe R(A,B) }
-
-  \cdots
-\end{mathpar}
-
-But in our implementation we will also include \emph{named modules}
-and \emph{named signatures}, in which case we will have record
-selectors to refer to assumptions, not just names.
-
-Maybe $\Gamma$s include signature and module definitions, but
-$\Delta$s include only ``primitive'' definitions?
-\begin{mathpar}
-  % Signatures should be either parameterized signatures (possibly empty parameter set)
-  % or Signature references (for aliasing purposes)
-  \inferrule
-  {\Gamma, \Delta, \Delta' \sig}
-  {\Gamma , S = \textrm{signature} (\Delta) \{ \Delta' \} \sigctx}
-
-  % modules should either be parameterized modules or module
-  % references.
-  \inferrule
-  {}
-  {\Gamma , M = \textrm{module}(\Delta) \{ \Xi \}}
-
-  % the top level of a program is a module
-\end{mathpar}
-
-%% \subsection{Module System}
-
-%% Currently, the theorems presented in \ref{internal} were all
-%% metatheorems, we can give them a \emph{formal} status by incorporating
-%% a simple module system on top of span theory.
-%% %
-%% This serves as the basis for a \emph{domain specific proof assistant}
-%% for category theory that we plan to use to teach category theory.
-
-%% \subsection{Semantics of Judgment Theory}
-
-%% We should have soundness and completeness theorems for the
-%% interpretation of Judgment Theory in virtual equipments (with the
-%% corresponding UPs of Hom/Tensor/cotensor/products etc).
+Here is the outline of how we expect we should be able to prove
+this. For any fixed $\Gamma$, the objects of our double category are
+the terms $\Gamma \vdash C : \Sort$. A vertical arrow from $C$ to $D$
+is a term $\Gamma\pipe \alpha:C \vdash A : D$. A horizontal arrow from
+$C$ to $D$ is a term $\Gamma \pipe \alpha:C;\beta:D \vdash R
+\isaSet$. From any composable string of such $R$s we can construct a
+context $\Gamma \vdash \Phi \isavectx$ and then a 2-cell from $\Phi$ to
+$R$ along $A,B$ is given by a term $\Gamma \pipe \Phi \vdash
+R[A/\alpha;B/\beta]$. Compositions and restriction are modeled by the
+appropriate notion of substitution and units/tensors/homs are modeled
+by the corresponding type formers. There are a lot of details to be
+verified, especially the equations.
 
 \end{document}
 
