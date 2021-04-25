@@ -1144,6 +1144,18 @@ of the two kinds of products we have above:
   R_1[\pi_1\alpha/\alpha;\pi_1\beta/\beta] \times R_2[\pi_2\alpha/\alpha;\pi_2\beta/\beta]\isaSet}
 \]
 
+The empty products give us access now to several traditional notions
+of category theory that we couldn't before define, such as objects and
+presheaves of either variance:
+
+$$\textrm{Object}\,C = \varr 1 C$$
+$$\textrm{Presheaf}\,C = \harr 1 C$$
+$$\textrm{coPresheaf}\,C = \harr C 1$$
+
+However, we find that in practice we don't have much use for these
+concepts as most theorems about them easily generalize to more general
+theorems about arbitrary functors or profunctors.
+
 %% To define internal ends and coends, we need to go beyond the usual
 %% simple types and add equalizers (a form of subsets) and co-equalizers
 %% (a form of quotients) of judgments. Here's a sketch of the syntax for
@@ -1359,111 +1371,133 @@ Next, we show that Profunctors can be restricted by functors.
   \end{enumerate}
 \end{definition}
 
-This last definition is probably unfamiliar to the reader that is not
-experienced with profunctors.
-%
-However, we can show that the traditional definition is equivalent to
-a natural transformation $\alpha : \cat C_0 \pipe \cdot \vdash
-t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha')$.
+Additionally, we can define natural transformations between functors,
+but more generally, we can define a natural element of any
+endo-profunctor, where natural transformations from $F$ to $G$ are the
+same as natural elements of $\text{Hom}(F-,G=)$.
 
-\begin{definition}[Traditional Natural Transformation]
-  A traditional natural transformation from $\alpha : \cat C_0 \vdash
-  F(\alpha) : \cat D_0$ to $\alpha : \cat \vdash G(\alpha') : \cat
-  D_0$ consists of
-  \begin{enumerate}
-  \item A term $\cdot \vdash t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha)$
-  \item Such that
-    \[ \phi : \alpha \to_{\cat C} \alpha' \vdash t_{\alpha'} \circ F_1(\phi) \equiv G_1(\phi) \circ t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha')
-    \]
-  \end{enumerate}
+\begin{definition}[Natural Element]
+  A natural element $\phi$ of a profunctor $R : \text{Prof}\,C C$ is a term
+  \[ \phi : \forall \alpha. R \alpha \alpha \]
+  that is natural in that
+  \[ \lambda \alpha. \lambda (\alpha', f : C_1 \alpha \alpha'). R_r(\phi \alpha,f) = R_l(f,\phi \alpha') \]
 \end{definition}
 
-\begin{theorem}[Equivalent Presentations of Natural Transformations]
-  There is a bijection between traditional natural transformations $t
-  : F \to G$ and profunctor homomorphisms $h : \alpha \to_{\cat C}
-  \alpha' \vdash F(\alpha) \to_{\cat D} G(\alpha')$ given by
-  \begin{enumerate}
-  \item From a natural transformation $t$ we define a homomorphism
-    $h(t)$ by composing on the $F$ side. The choice of this side is
-    arbitrary and we could just as easily have used $G$ since they are
-    equal by naturality.
-    \[ \phi : \alpha \to_{\cat C} \alpha' \vdash t_{\alpha'} \circ F_1(\phi) : F(\alpha) \to_{\cat D} G_1(\alpha') \]
-  \item From a homomorphism $\phi.h$, we define a natural transformation $t(h)$ as
-    \[ \alpha \pipe \cdot \vdash h[{\id_{\alpha}}/\phi] \]
-  \end{enumerate}
+Composition of natural transformations is then given by $C_t$.
+
+Natural elements are closely related to homomorphisms: a natural
+element equivalent to a homomorphism out of a Hom profunctor.
+
+\begin{theorem}
+  Natural elements of $R : \text{Prof}\, C C$ are equivalent to
+  homomorphisms from $\text{Hom}_C$ to $R$.
 \end{theorem}
-\begin{proof}
-  First we show that the maps $h(\cdot),t(\cdot)$ actually produce
-  homomorphisms and natural transformations.
-  \begin{enumerate}
-  \item On the left, we need to show $h(t)_{\phi} \circ F_1(\psi) =
-    h(t)_{|phi \circ \psi}$. Expanding the definition, we just need
-    associativity and functoriality of $F_1$:
-    \begin{align*}
-      h(t)_{\phi} \circ F_1(\psi) &\equiv (t_{\alpha'} \circ F_1(\phi)) \circ F_1(\psi)\\
-      &\equiv t_{\alpha'} \circ F_1(\phi \circ \psi)\\
-      &\equiv h(t)_{\phi \circ \psi}
-    \end{align*}
-    on the right, we use naturality:
-    \begin{align*}
-      G_1(\theta) \circ h(t)_{\phi} &\equiv G_1(\theta) \circ (t_{\alpha'} \circ F_1(\phi))\\
-      &\equiv (t_{\alpha''} \circ F_1(\theta)) \circ F_1(\phi)\\
-      &\equiv t_{\alpha''} \circ F_1(\theta \circ \phi)\\
-      &\equiv t_{\theta \circ \phi}
-    \end{align*}
-  \item In the other direction, to prove naturality:
-    \begin{align*}
-      h[\id_\alpha/\phi] \circ F_1(\psi) &\equiv h[\id_\alpha \circ \psi/\phi]\\
-      &\equiv h[\psi/\phi]\\
-      &\equiv h[\psi \circ \id_{\alpha'}/\phi]\\
-      &\equiv G_1(\psi) \circ h[\id_{\alpha}/\phi]
-    \end{align*}
-  \end{enumerate}
-  Next we seek to prove that the functions are mutually inverse.
-  \begin{enumerate}
-  \item Round trip for homomorphisms:
-    \begin{align*}
-      h(t(h))_{\phi} &= t(h)_{\alpha} \circ F_1[\phi]\\
-      &= h[\id_{\alpha}] \circ F_1[\phi]\\
-      &= h[\id \circ \phi]\\
-      &= h[\phi]
-    \end{align*}
-  \item Round trip for natural transformations uses the fact that
-    functors preserve identity.
-    \begin{align*}
-      t(h(t))_{\alpha} &= h(t)_{\id_{\alpha}}\\
-      &= t_{\alpha} \circ F_1[\id_{\alpha}]\\
-      &= t_{\alpha} \circ \id_{F_0\alpha}\\
-      &= t_{\alpha}
-    \end{align*}
-  \end{enumerate}
-\end{proof}
+\begin{enumerate}
+\item Given a natural element $\phi$ of $R$, define
+  \[ m(\phi) = \lambda \alpha. \lambda f : C_1 \alpha \alpha',\alpha'.
+  R_r(\phi \alpha, f) \]
+  (or equivalently $R_l(f, \phi \alpha')$).
 
-\subsection{Universal Properties, Internally}
+  TODO:
+\item Given a homomorphism $m$ from $\text{Hom}_C$ to $R$, define the element as
+  \[ \lambda \alpha. m_f(C_r\alpha) \]
+\end{enumerate}
 
-Since we have profunctors as a primitive notion, we can most easily
-discuss universal properties stated in terms of profunctors and
-representability as a functor, rather than other formulations (adjoint
-functors, representable presheaves, kan extensions).
+%% This last definition is probably unfamiliar to the reader that is not
+%% experienced with profunctors.
+%% %
+%% However, we can show that the traditional definition is equivalent to
+%% a natural transformation $\alpha : \cat C_0 \pipe \cdot \vdash
+%% t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha')$.
+
+%% \begin{definition}[Traditional Natural Transformation]
+%%   A traditional natural transformation from $\alpha : \cat C_0 \vdash
+%%   F(\alpha) : \cat D_0$ to $\alpha : \cat \vdash G(\alpha') : \cat
+%%   D_0$ consists of
+%%   \begin{enumerate}
+%%   \item A term $\cdot \vdash t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha)$
+%%   \item Such that
+%%     \[ \phi : \alpha \to_{\cat C} \alpha' \vdash t_{\alpha'} \circ F_1(\phi) \equiv G_1(\phi) \circ t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha')
+%%     \]
+%%   \end{enumerate}
+%% \end{definition}
+
+%% \begin{theorem}[Equivalent Presentations of Natural Transformations]
+%%   There is a bijection between traditional natural transformations $t
+%%   : F \to G$ and profunctor homomorphisms $h : \alpha \to_{\cat C}
+%%   \alpha' \vdash F(\alpha) \to_{\cat D} G(\alpha')$ given by
+%%   \begin{enumerate}
+%%   \item From a natural transformation $t$ we define a homomorphism
+%%     $h(t)$ by composing on the $F$ side. The choice of this side is
+%%     arbitrary and we could just as easily have used $G$ since they are
+%%     equal by naturality.
+%%     \[ \phi : \alpha \to_{\cat C} \alpha' \vdash t_{\alpha'} \circ F_1(\phi) : F(\alpha) \to_{\cat D} G_1(\alpha') \]
+%%   \item From a homomorphism $\phi.h$, we define a natural transformation $t(h)$ as
+%%     \[ \alpha \pipe \cdot \vdash h[{\id_{\alpha}}/\phi] \]
+%%   \end{enumerate}
+%% \end{theorem}
+%% \begin{proof}
+%%   First we show that the maps $h(\cdot),t(\cdot)$ actually produce
+%%   homomorphisms and natural transformations.
+%%   \begin{enumerate}
+%%   \item On the left, we need to show $h(t)_{\phi} \circ F_1(\psi) =
+%%     h(t)_{|phi \circ \psi}$. Expanding the definition, we just need
+%%     associativity and functoriality of $F_1$:
+%%     \begin{align*}
+%%       h(t)_{\phi} \circ F_1(\psi) &\equiv (t_{\alpha'} \circ F_1(\phi)) \circ F_1(\psi)\\
+%%       &\equiv t_{\alpha'} \circ F_1(\phi \circ \psi)\\
+%%       &\equiv h(t)_{\phi \circ \psi}
+%%     \end{align*}
+%%     on the right, we use naturality:
+%%     \begin{align*}
+%%       G_1(\theta) \circ h(t)_{\phi} &\equiv G_1(\theta) \circ (t_{\alpha'} \circ F_1(\phi))\\
+%%       &\equiv (t_{\alpha''} \circ F_1(\theta)) \circ F_1(\phi)\\
+%%       &\equiv t_{\alpha''} \circ F_1(\theta \circ \phi)\\
+%%       &\equiv t_{\theta \circ \phi}
+%%     \end{align*}
+%%   \item In the other direction, to prove naturality:
+%%     \begin{align*}
+%%       h[\id_\alpha/\phi] \circ F_1(\psi) &\equiv h[\id_\alpha \circ \psi/\phi]\\
+%%       &\equiv h[\psi/\phi]\\
+%%       &\equiv h[\psi \circ \id_{\alpha'}/\phi]\\
+%%       &\equiv G_1(\psi) \circ h[\id_{\alpha}/\phi]
+%%     \end{align*}
+%%   \end{enumerate}
+%%   Next we seek to prove that the functions are mutually inverse.
+%%   \begin{enumerate}
+%%   \item Round trip for homomorphisms:
+%%     \begin{align*}
+%%       h(t(h))_{\phi} &= t(h)_{\alpha} \circ F_1[\phi]\\
+%%       &= h[\id_{\alpha}] \circ F_1[\phi]\\
+%%       &= h[\id \circ \phi]\\
+%%       &= h[\phi]
+%%     \end{align*}
+%%   \item Round trip for natural transformations uses the fact that
+%%     functors preserve identity.
+%%     \begin{align*}
+%%       t(h(t))_{\alpha} &= h(t)_{\id_{\alpha}}\\
+%%       &= t_{\alpha} \circ F_1[\id_{\alpha}]\\
+%%       &= t_{\alpha} \circ \id_{F_0\alpha}\\
+%%       &= t_{\alpha}
+%%     \end{align*}
+%%   \end{enumerate}
+%% \end{proof}
+
+\subsection{Universal Properties}
+
+Since we have profunctors as a primitive notion, the most natural
+presentation of universal properties is given by the notion of a
+functor representing a profunctor.
 
 First, we have the ``algebraic'' notion of a functor representing a
-profunctor, i.e., when a profunctor $R : C\to D$ is equivalent to
+profunctor, i.e., when a profunctor $R : C\pto D$ is equivalent to
 $Hom_D(-,G=)$.
 \begin{definition}[Right Representability]
-  Let $\cat C, \cat D$ be categories and $\alpha^o : \cat C;\beta :
-  \cat D \pipe \alpha \to_{Q} \beta$ be a profunctor between them. Then a \emph{right
-    representation} of $Q$ consists of
+  Let $C, D : \text{Cat}$ and $Q : \textrm{Prof}\,C D$ be a profunctor
+  between them. Then a \emph{right representation} of $Q$ consists of
   \begin{enumerate}
-  \item A functor $G : \varr C D$
-  \item An ``introduction rule'' $I : \forall \alpha. \forall
-    \beta. (Q \alpha \beta) \triangleright (\alpha \to_{D} G \beta)$
-    that is a homomorphism of internal profunctors.
-  \item A homomorphism $I^{-1} : \forall \alpha. \forall
-    \beta. (\alpha \to_{D} G \beta) \triangleright (Q \alpha \beta)$.
-  \item Such that $I, I^{-1}$ are inverses in that:
-
-    \[\lambda \alpha. \lambda(\beta, f). f = \lambda \alpha. \lambda(\beta, f). I \alpha \triangleleft (\beta, I^{\-1} \alpha \triangleleft (\beta, f))\]
-    and similarly the opposite composition is the identity.
+  \item A functor $G : \textrm{Functor}\, D C$
+  \item An isomorphism $I,I^-$ between $Q$ and $\text{Hom}_C(Id,G)$
   \end{enumerate}
 \end{definition}
 
@@ -1473,15 +1507,20 @@ of the structure. This can be simplified to the notion of a
 ``universal morphism''.
 
 \begin{definition}[Universal Morphism]
-  A profunctor $Q : \harr C D$ is representable when there exists
+  A profunctor $Q : \textrm{Prof}\, C D$ is right representable when
+  there exists
   \begin{enumerate}
-  \item A function on objects $G : \varr C D$
-  \item An ``introduction rule'' $I : \forall \alpha. \forall
-    \beta. (Q \alpha \beta) \triangleright (\alpha \to_{D} G \beta)$
+  \item A function on objects $G_0 : \varr {D_0} {C_0}$
+  \item An ``introduction rule'', i.e., a term
+    $I : \forall \alpha. \forall \beta. (C_1 \alpha (G \beta))\triangleleft (Q_s \alpha \beta)$
     (with no homomorphism conditions).
-  \item An universal morphism $\epsilon : \forall \beta:D. Q(G \beta)
-    \beta$.
-  \item Such that composition with $\epsilon$ is an inverse to $I$.
+  \item An ``universal morphism'', i.e., a term $\epsilon : \forall
+    \beta:D. Q(G \beta) \beta$.
+  \item Such that composition with $\epsilon$ is an inverse to $I$, i.e.,
+
+    \[
+    Q_r(\epsilon \beta, I(q)) = q
+    \]
   \end{enumerate}
 \end{definition}
 
@@ -1812,11 +1851,11 @@ Next, the terminal sort trivially has a category structure using the
 trivial judgment as its hom set:
 
 \begin{definition}[Terminal Category]
-  The terminal category $\cat 1$ consists of
+  The terminal category $\cat 1$ is defined as having
   \begin{enumerate}
-  \item Its object sort is $1$
-  \item Its arrow judgment is $\alpha^o:1;\alpha:1 \pipe 1$
-  \item Its identity arrow is given by $\alpha^o;\alpha \pipe \cdot \vdash () : 1$
+  \item Its object sort as $1$
+  \item Its hom set as $\lambda \alpha:1;\beta:1. 1 : \harr 1 1$
+  \item Its identity arrow is given by $\lambda \alpha: 1. () : 1$
   \item Composition is defined by $\phi : 1, \psi : 1 \vdash () : 1$
   \item Associativity and unitality are trivial by \textsc{1-$\eta$}
   \end{enumerate}
