@@ -1022,6 +1022,19 @@ and identity types.
   \inferrule
   {~}
   {\Gamma\pipe\cdot \vdash \top \isaSet}
+
+  \inferrule
+  {\Gamma \pipe \cdot \vdash M : S\and \Gamma \pipe \cdot \vdash N : S}
+  {\Gamma \pipe \cdot \vdash \textrm{Id}_S M N \isaSet}
+
+  \inferrule
+  {\Gamma \pipe \cdot \vdash M : S}
+  {\Gamma \pipe \cdot \vdash \textrm{refl}(M) : \textrm{Id}_S M M}
+
+  \inferrule
+  {\Gamma,x:S,y:S,p:\textrm{Id}_S x y \pipe \cdot \vdash C \isaSet\and
+   \Gamma \pipe \cdot \vdash M_k : \prod_{x:S} C[x/y,\textrm{refl}(x)/p]}
+  {\Gamma \pipe \cdot \vdash \textrm{J}(x,y,p.C,M) : \prod_{x:S,y:S,p:\textrm{Id}_S x y} C}
   \end{mathpar}
   \caption{Ordinary Dependent Type Structure}
 \end{figure}
@@ -1219,65 +1232,65 @@ read exactly as the classical definitions.
     easily interpreted as a $\Sigma$ type}:
   \begin{enumerate}
   \item A sort $C_0 : \Sort$
-  \item A span $C_1 : \harr{ C_0}{ C_0}$
+  \item A span $C_1 : \harr{C_0}{ C_0}$
   \item Identity arrows
-    $C_r : \forall \alpha :  C. H \alpha \alpha$
+    $C_r : \forall \alpha :  C_0. {C_1} \alpha \alpha$
   \item Composition, which we can express several different ways using
     a mix of covariant/contravariant homs and tensors.
-    \[ C_t^\triangleright : \forall \alpha :  C. \forall \beta. (H \beta \alpha) \triangleright \forall \gamma. (H \gamma \beta) \triangleright H \gamma \alpha \]
+    \[ C_t^\triangleright : \forall \alpha :  C_0. \forall \beta. ({C_1} \beta \alpha) \triangleright \forall \gamma. ({C_1} \gamma \beta) \triangleright {C_1} \gamma \alpha \]
 
     or
 
-    \[ C_t^\triangleleft : \forall \alpha. \forall \beta. (\forall \gamma. H \alpha \gamma \triangleleft H \beta \gamma) \triangleleft H \alpha \beta
+    \[ C_t^\triangleleft : \forall \alpha. \forall \beta. (\forall \gamma. {C_1} \alpha \gamma \triangleleft {C_1} \beta \gamma) \triangleleft {C_1} \alpha \beta
     \]
 
     or using tensors and covariant homs
 
-    \[ C_t^\odot : \forall \alpha. \forall \gamma. (\exists \beta. H\alpha\beta\odot H\beta\gamma)\triangleright H\alpha \gamma \]
+    \[ C_t^\odot : \forall \alpha. \forall \gamma. (\exists \beta. {C_1}\alpha\beta\odot {C_1}\beta\gamma)\triangleright {C_1}\alpha \gamma \]
 
     or using tensors and contravariant homs
 
-    \[ C_t^\odot : \forall \gamma. \forall \alpha. H\alpha\gamma \triangleleft (\exists \beta. H\alpha\beta\odot H\beta\gamma)\]
-  \item Satisfying Unitality, i.e., for any $\Phi \vdash f : H A B$,
+    \[ C_t^\odot : \forall \gamma. \forall \alpha. {C_1}\alpha\gamma \triangleleft (\exists \beta. {C_1}\alpha\beta\odot {C_1}\beta\gamma)\]
+  \item Satisfying Unitality, i.e., for any $\Phi \vdash f : {C_1} A B$,
     we'd like $f \circ r(A) = f$. We can formalize this using an
     equality of two profunctor transformations of type $\forall
-    \beta. \forall \alpha. H \alpha \beta \triangleright H \alpha
-    \beta$ (or $\forall \alpha. \forall \beta. H \alpha \beta
-    \triangleleft H \alpha \beta$), one of which is the identity and
+    \beta. \forall \alpha. {C_1} \alpha \beta \triangleright {C_1} \alpha
+    \beta$ (or $\forall \alpha. \forall \beta. {C_1} \alpha \beta
+    \triangleleft {C_1} \alpha \beta$), one of which is the identity and
     the other of which composes with a reflexivity morphism.
 
-    \[ (\lambda \beta. \lambda^\triangleright \alpha. f:H \alpha \beta. f)
-    =  (\lambda \beta. \lambda^\triangleright \alpha. f:H \alpha \beta. (\alpha, f)\triangleright (\beta, r\beta) \triangleright (C_t^\triangleright \beta))
+    \[ (\lambda \beta. \lambda^\triangleright \alpha. f:{C_1} \alpha \beta. f)
+    =  (\lambda \beta. \lambda^\triangleright \alpha. f:{C_1} \alpha \beta. (\alpha, f)\triangleright (\beta, r\beta) \triangleright (C_t^\triangleright \beta))
     \]
 
     or expressed using $\triangleleft$, 
     \[
-    (\lambda \alpha. \lambda^\triangleleft \beta. f:H\alpha\beta. f)
+    (\lambda \alpha. \lambda^\triangleleft \beta. f:{C_1}\alpha\beta. f)
     =
-    (\lambda \alpha. \lambda^\triangleleft \beta. f:H\alpha\beta. C_t^\triangleleft \alpha \triangleleft (\beta, f) \triangleleft (\beta, r \beta)) \]
+    (\lambda \alpha. \lambda^\triangleleft \beta. f:{C_1}\alpha\beta. C_t^\triangleleft \alpha \triangleleft (\beta, f) \triangleleft (\beta, r \beta)) \]
 
     or expressed using $\odot$
 
     \[
-    (\lambda \alpha. \lambda^\triangleleft \beta. f:H\alpha\beta.
+    (\lambda \alpha. \lambda^\triangleleft \beta. f:{C_1}\alpha\beta.
     C_t^\odot \beta \triangleleft (\alpha, (r\alpha, \alpha, f))
     )
     \]
   \item And Associativity, which we can express in several ways, but
     closest to informal category theory would be an equality between
     two terms of type
-    \[ \forall \delta. \forall \alpha. (\exists \beta. H\alpha \beta \odot (\exists \gamma. H\beta\gamma \odot H \gamma \delta))\triangleright H\alpha\delta\]
+    \[ \forall \delta. \forall \alpha. (\exists \beta. {C_1}\alpha \beta \odot (\exists \gamma. {C_1}\beta\gamma \odot {C_1} \gamma \delta))\triangleright {C_1}\alpha\delta\]
     or
-    \[ \forall \alpha. \forall \delta. H\alpha\delta\triangleleft (\exists \beta. H\alpha \beta \odot (\exists \gamma. H\beta\gamma \odot H \gamma \delta)) \]
+    \[ \forall \alpha. \forall \delta. {C_1}\alpha\delta\triangleleft (\exists \beta. {C_1}\alpha \beta \odot (\exists \gamma. {C_1}\beta\gamma \odot {C_1} \gamma \delta)) \]
 
     The equality would be between the terms
     \[ \lambda \alpha. \lambda \delta, fgh.
-    \textrm{ind}(fgh, f : H \alpha\beta. \beta. gh. C_t^\odot \delta \triangleleft (\alpha, (f, \beta, C_t^\odot \gamma \triangleleft (\beta, gh))) )
+    \textrm{ind}(fgh, f : {C_1} \alpha\beta. \beta. gh. C_t^\odot \delta \triangleleft (\alpha, (f, \beta, C_t^\odot \gamma \triangleleft (\beta, gh))) )
     \]
     and
     \[ \lambda \alpha. \lambda \delta, fgh.
-    \textrm{ind}(fgh, f:H \alpha\beta. \beta. gh.
-    \textrm{ind}(gh, g:H\beta\gamma. \gamma. h:H\gamma\delta.
+    \textrm{ind}(fgh, f:{C_1} \alpha\beta. \beta. gh.
+    \textrm{ind}(gh, g:{C_1}\beta\gamma. \gamma. h:{C_1}\gamma\delta.
     C_t^\odot \delta \triangleleft (\alpha, (C_t^\odot \gamma\triangleleft (\alpha, (f,\beta,g)), \gamma, h))
     ))
     \]
@@ -1294,29 +1307,83 @@ read exactly as the classical definitions.
   \item a function on arrows
     $F_1 : \forall \alpha: {C_0}. \forall \beta:{C_0}. D_1 {(F_0 \alpha)}{(F_0 \beta)} \triangleleft C_1 \alpha \beta$
   \item That preserves identity. This is given by equality between the
-    following terms of type $\forall \alpha:{{C_0}}. D_1 {F_0
-      \alpha}{F_0\alpha}$:
+    following terms of type $\forall \alpha:{{C_0}}. D_1 {(F_0
+      \alpha)}{(F_0\alpha)}$:
     \[ \lambda \alpha. D_r(F_0\alpha)\]
     and
-    \[ \lambda \alpha. F_1 \alpha \triangleleft (\alpha, C_r \alpha) \]
+    \[ \lambda \alpha. F_1 \alpha \triangleleft (C_r \alpha, \alpha) \]
   \item And preserves composition. This is given by an equality between the following terms of type
     \[ \forall \alpha. \forall \gamma. (D_1 {(F_0 \alpha)}{(F_0 \gamma)})\triangleleft (\exists \beta. C_1 {\alpha}{\beta} \odot C_1 {\beta}{\gamma}) \]
 
     First, we can compose in $C$, and then map using $F$:
-    \[ \lambda \alpha. \lambda \gamma, fg.
-    \textrm{ind}(fg, f:C_1{\alpha}{\beta}. \beta. g:C_1{\beta}{\gamma}.
-    F_1 {F_0 \alpha} \triangleleft (C_t^\odot \alpha \triangleleft ((f,\beta,g), \gamma), F_0 \gamma)
+    \[ \lambda \alpha. \lambda \gamma, p.
+    \textrm{ind}_\odot(p, f:C_1{\alpha}{\beta}. \beta. g:C_1{\beta}{\gamma}.
+    F_1 {\alpha} \triangleleft (C_t^\odot \alpha \triangleleft ((f,\beta,g), \gamma), \gamma)
     )\]
     or we can map the morphisms with $F$, and then compose them in $D$:
     \[
-    \lambda \alpha. \lambda\gamma, fg.
-    \textrm{ind}(fg, f.\beta.g.
+    \lambda \alpha. \lambda\gamma, p.
+    \textrm{ind}(p, f.\beta.g.
     D_t^\odot {(F_0 \alpha)} \triangleleft ((F_1 \alpha \triangleleft(f, \beta), F_0 \beta, F_1 \beta \triangleleft (g, \gamma)), F_0 \gamma)
     ) \]
   \end{enumerate}
 \end{definition}
 
 We can immediately define identity and composition of functors.
+
+\begin{definition}
+  For any $C : \textrm{Cat}$, we can define an identity functor
+  $\textrm{Id}_C : \textrm{Functor} C C$ by
+  \begin{enumerate}
+  \item $\textrm{Id}_0 = \lambda \alpha:C_0. \alpha$
+  \item $\textrm{Id}_1 = \lambda \alpha. \lambda (f : C_1 \alpha \alpha', \alpha'). f$
+  \item Preservation of identity requires proving
+    \[ \lambda \alpha. C_r(\textrm{Id}_1(\alpha)) \]
+    is equal to
+    \[ \lambda \alpha. \textrm{Id}_1 \alpha \triangleleft (C_r\alpha, \alpha) \]
+    Both sides simply $\beta$ reduce to $ \lambda \alpha. C_r \alpha$
+    and the result follows by reflexivity.
+  \item Preservation of composition requires proving
+    \[ \lambda \alpha. \lambda \gamma, fg.
+    \textrm{ind}(fg, f:C_1{\alpha}{\beta}. \beta. g:C_1{\beta}{\gamma}.
+    \textrm{Id}_1 {\textrm{Id}_0 \alpha} \triangleleft (C_t \alpha \triangleleft ((f,\beta,g), \gamma), \textrm{Id}_0 \gamma)
+    )\]
+    is equal to 
+    \[
+    \lambda \alpha. \lambda\gamma, fg.
+    \textrm{ind}(fg, f.\beta.g.
+    C_t {(\textrm{Id}_0 \alpha)} \triangleleft ((\textrm{Id}_1 \alpha \triangleleft(f, \beta), F_0 \beta, F_1 \beta \triangleleft (g, \gamma)), \textrm{Id}_0 \gamma)
+    ) \]
+
+    Both sides $\beta$ reduce to
+
+    \[
+    \lambda \alpha. \lambda \gamma, fg.  \textrm{ind}(fg,
+    f:C_1{\alpha}{\beta}. \beta. g:C_1{\beta}{\gamma}. C_t \alpha
+    \triangleleft ((f,\beta,g), \gamma)) \] and the result follows by
+    reflexivity.
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}
+  Given categories $C,D,E$ and functors $F : \textrm{Functor} C D$ and
+  $G : \textrm{Functor} D E$, we can define the composition $G \circ F
+  : \textrm{Functor} C E$ as
+  \begin{enumerate}
+  \item $(G \circ F)_0 = \lambda \alpha. G_0 (F_0 \alpha)$
+  \item $(G \circ F)_1 = \lambda \alpha. \lambda (f,\beta). G_1 (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (f, \beta)), F_0 \beta)$
+  \item Preservation of identity requires proving
+    \[ \lambda \alpha. E_r((G \circ F)_1(\alpha)) \]
+    is equal to
+    \[ \lambda \alpha. (G \circ F)_1 \alpha \triangleleft (C_r\alpha, \alpha) \]
+
+    The right side expands to
+
+    \[ \lambda \alpha. G_1 (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (f, \alpha)), F_0 \alpha) \]
+
+    
+  \end{enumerate}
+\end{definition}
 
 \begin{definition}[Internal Profunctor]
   A profunctor $R$ between internal categories $\cat C$ and $\cat D$
