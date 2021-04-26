@@ -1338,7 +1338,7 @@ We can immediately define identity and composition of functors.
   \item $\textrm{Id}_0 = \lambda \alpha:C_0. \alpha$
   \item $\textrm{Id}_1 = \lambda \alpha. \lambda (f : C_1 \alpha \alpha', \alpha'). f$
   \item Preservation of identity requires proving
-    \[ \lambda \alpha. C_r(\textrm{Id}_1(\alpha)) \]
+    \[ \lambda \alpha. C_r(\textrm{Id}_0(\alpha)) \]
     is equal to
     \[ \lambda \alpha. \textrm{Id}_1 \alpha \triangleleft (C_r\alpha, \alpha) \]
     Both sides simply $\beta$ reduce to $ \lambda \alpha. C_r \alpha$
@@ -1352,7 +1352,7 @@ We can immediately define identity and composition of functors.
     \[
     \lambda \alpha. \lambda\gamma, fg.
     \textrm{ind}(fg, f.\beta.g.
-    C_t {(\textrm{Id}_0 \alpha)} \triangleleft ((\textrm{Id}_1 \alpha \triangleleft(f, \beta), F_0 \beta, F_1 \beta \triangleleft (g, \gamma)), \textrm{Id}_0 \gamma)
+    C_t {(\textrm{Id}_0 \alpha)} \triangleleft ((\textrm{Id}_1 \alpha \triangleleft(f, \beta), \textrm{Id}_0 \beta, \textrm{Id}_1 \beta \triangleleft (g, \gamma)), \textrm{Id}_0 \gamma)
     ) \]
 
     Both sides $\beta$ reduce to
@@ -1373,13 +1373,13 @@ We can immediately define identity and composition of functors.
   \item $(G \circ F)_0 = \lambda \alpha. G_0 (F_0 \alpha)$
   \item $(G \circ F)_1 = \lambda \alpha. \lambda (f,\beta). G_1 (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (f, \beta)), F_0 \beta)$
   \item Preservation of identity requires proving
-    \[ \lambda \alpha. E_r((G \circ F)_1(\alpha)) \]
+    \[ \lambda \alpha. E_r((G \circ F)_0(\alpha)) \]
     is equal to
     \[ \lambda \alpha. (G \circ F)_1 \alpha \triangleleft (C_r\alpha, \alpha) \]
 
     The right side expands to
 
-    \[ \lambda \alpha. G_1 (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (f, \alpha)), F_0 \alpha) \]
+    \[ \lambda \alpha. G_1 (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (C_r\alpha, \alpha)), F_0 \alpha) \]
 
     
   \end{enumerate}
