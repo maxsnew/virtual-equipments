@@ -5,6 +5,7 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{amsthm}
+\usepackage{mathtools}
 \usepackage{stmaryrd}
 \usepackage{mathpartir}
 \usepackage{bbm}
@@ -46,6 +47,26 @@
 \newcommand{\sigctx}{\,\,\textrm{sig-ctx}}
 \newcommand{\sig}{\,\,\textrm{sig}}
 \newcommand{\pipe}{\mathrel{|}}
+
+\newcommand{\tensorexistsXwithYandZ}[3]{\exists {#1}. #2 \odot #3}
+\newcommand{\homleftallXfromYtoZ}[3]{\forall {#1}. #3 \triangleleft #2}
+\newcommand{\homrightallXfromYtoZ}[3]{\forall {#1}. #2 \triangleright #3}
+
+\newcommand{\odotexists}[1]{\mathop{\overset{\exists #1}\odot}}
+\newcommand{\tensorexistsXwithYandZpr}[3]{#2 \odotexists{#1} #3}
+\newcommand{\tlwith}[1]{\mathop{\triangleleft^{#1}}}
+\newcommand{\tlforall}[1]{\tlwith{\forall #1}}
+\newcommand{\trwith}[1]{\mathop{\prescript{#1}{}{\triangleright}}}
+\newcommand{\trforall}[1]{\trwith {\forall #1}}
+\newcommand{\homleftallXfromYtoZpr}[3]{#3 \tlforall {#1} #2}
+\newcommand{\homrightallXfromYtoZpr}[3]{#2 \trforall #1 #3}
+
+\newcommand{\homleftlambdaXatYdotZ}[3]{\lambda^\triangleleft (#1, #2). #3}
+\newcommand{\homrightlambdaXatYdotZ}[3]{\lambda^\triangleright (#1, #2). #3}
+
+\newcommand{\homleftappXtoYatZ}[3]{#1 \tlwith{#3} #2}
+\newcommand{\homrightappXtoYatZ}[3]{#1 \trwith{#3} #2}
+
 
 \title{Judgment Theory: A Syntax for Virtual Equipments with applications to Internal and Synthetic Category Theory}
 \author{Max S. New}
@@ -1490,12 +1511,43 @@ We can immediately define identity and composition of functors.
   consists of
   \begin{enumerate}
   \item A span $R_s : \harr {C_0} {D_0}$.
-  \item A $C$-composition action:
-    $R_l : \forall \alpha. \forall \beta. R_s \alpha \beta \triangleleft (\exists \alpha'. C_1 \alpha \alpha' \odot R_s \alpha' \beta)$
-  \item $D$-composition:
-    $R_r : \forall \alpha. \forall \beta. R_s \alpha \beta \triangleleft (\exists \beta'. R_s \alpha \beta' \odot D_1 \beta' \beta)$
-  \item Satisfying $\cat C$ unitality:
-    $R_l (C_r(\alpha), r) = r$
+  \item A composition action:
+    $R_t : \forall \alpha. \homleftallXfromYtoZpr {\beta} {(\tensorexistsXwithYandZpr {\alpha'} {C_1 \alpha {\alpha'}}{(\tensorexistsXwithYandZpr {\beta'} {R_s {\alpha'}{\beta'}}{D_1 \beta' \beta})})} {R_s \alpha {\beta}} $
+
+    (equivalently, $\forall \beta. \homrightallXfromYtoZpr {\alpha} {(\tensorexistsXwithYandZpr {\alpha'} {C_1 \alpha {\alpha'}}{(\tensorexistsXwithYandZpr {\beta'} {R_s {\alpha'}{\beta'}}{D_1 \beta' \beta})})} {R_s \alpha \beta}$)
+  \item Satisfying unitality:
+    \[
+    \lambda \alpha.
+    \homleftlambdaXatYdotZ f \beta {f}
+    =
+    \lambda \alpha.
+    \homleftlambdaXatYdotZ f \beta
+    \homleftappXtoYatZ{R_t \alpha} {(C_r \alpha,\alpha,(f,\beta,D_r \beta))} {\beta}
+    \]
+    
+  \item And associativity (both with a large implicit
+    $\lambda \alpha. \homleftlambdaXatYdotZ g \beta \homleftlambdaXatYdotZ {g'} {\beta'}
+    \homleftlambdaXatYdotZ {r} {\beta''}\homleftlambdaXatYdotZ {f'} {\alpha''}\homleftlambdaXatYdotZ {f} {\alpha'}$)
+
+    % f : a -> a'
+    % f' : a' -> a''
+    % r : a'' -> b''
+    % g' : b'' -> b'
+    % g : b' -> b
+    %%
+    %
+    % f o (f' o r o g') o g
+    %% and
+    % (f o f') o r o (g' o g)
+    
+
+    \[ \homleftappXtoYatZ {R_t \alpha} {(\homleftappXtoYatZ {C_t\alpha} {(f,\alpha',f')} {\alpha''},\alpha'',(r,\beta'',\homleftappXtoYatZ {D_t\beta''}{(g',\beta',g)}{\beta}))} {\beta} \]
+    is equal to
+    \[
+    \homleftappXtoYatZ {R_t \alpha} {(f,\alpha',(\homleftappXtoYatZ {R_t {\alpha'}}{(f',\alpha'',(r,\beta'',g'))}{\beta'},\beta',g))} {\beta}
+    \]
+
+
   \item Satisfying $\cat C$ associativity:
     $R_l(C_t(f,g),r) = R_l(f, R_l(g,r))$
   \item Satisfying $\cat D$ unitality:
