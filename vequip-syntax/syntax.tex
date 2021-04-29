@@ -1377,10 +1377,110 @@ We can immediately define identity and composition of functors.
     is equal to
     \[ \lambda \alpha. (G \circ F)_1 \alpha \triangleleft (C_r\alpha, \alpha) \]
 
-    The right side expands to
+    Expanding definitions and $\beta$ reducing we need to show
 
-    \[ \lambda \alpha. G_1 (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (C_r\alpha, \alpha)), F_0 \alpha) \]
+    \[ \lambda \alpha. E_r(G_0 (F_0 \alpha)) \]
+    is equal to
+    \[ \lambda \alpha. G_1 (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (C_r\alpha, \alpha)), F_0 \alpha) \].
 
+    Proceeding from right to left applying transitivity:
+    \begin{align*}
+      \lambda& \alpha. G_1 (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (C_r\alpha, \alpha)), F_0 \alpha)
+      \\
+      &= \lambda \alpha. G_1 (F_0 \alpha)\triangleleft ((\lambda \alpha. (F_1 \alpha \triangleleft (C_r\alpha, \alpha))) \alpha, F_0 \alpha)\\
+      &= \lambda \alpha. G_1 (F_0 \alpha)\triangleleft ((\lambda \alpha. D_r (F_0 \alpha)) \alpha, F_0 \alpha)\tag{$F$ assumption}\\
+      &= \lambda \alpha. G_1 (F_0 \alpha)\triangleleft (D_r (F_0 \alpha), F_0 \alpha)\\
+      &= \lambda \alpha. (\lambda \beta. G_1 \beta \triangleleft (D_r \beta, \beta)) (F_0 \alpha) \\
+      &= \lambda \alpha. (\lambda \beta. E_r (G_0 \beta)) (F_0 \alpha)\tag{$G$ assumption}\\
+      &= \lambda \alpha. E_r (G_0 (F_0 \alpha))
+    \end{align*}
+
+    Where the two marked lines follow from congruence using the
+    assumptions about $F,G$.
+
+  \item Preservation of Composition.
+    
+    \[ \lambda \alpha. \lambda \gamma, p.
+    \textrm{ind}_\odot(p, f. \beta. g.
+    {(G \circ F)_1} {\alpha} \triangleleft (C_t^\odot \alpha \triangleleft ((f,\beta,g), \gamma), \gamma)
+    )\]
+
+    \[
+    \lambda \alpha. \lambda\gamma, p.
+    \textrm{ind}(p, f.\beta.g.
+    E_t {((G \circ F)_0 \alpha)} \triangleleft (({(G \circ F)}_1 \alpha \triangleleft(f, \beta), {(G \circ F)}_0 \beta, {(G \circ F)}_1 \beta \triangleleft (g, \gamma)), {(G \circ F)}_0 \gamma)
+    ) \]
+
+    Reducing, we need to show
+    \[ \lambda \alpha. \lambda \gamma, p.
+    \textrm{ind}_\odot(p, f. \beta. g.
+    G_1(F_0 \alpha) \triangleleft (F_1 \alpha \triangleleft (C_t^\odot \alpha \triangleleft ((f,\beta,g), \gamma), \gamma), (F_0 \gamma)))\]
+
+    Is equal to
+    \[
+    \lambda \alpha. \lambda\gamma, p.
+    \textrm{ind}(p, f.\beta.g.
+    E_t {(G_0(F_0\alpha))} \triangleleft (
+    (
+    (G_1 (F_0 \alpha) \triangleleft (F_1 \alpha \triangleleft (f, \beta), F_0 \beta)),
+    G_0(F_0 \beta),
+    (G_1 (F_0 \beta) \triangleleft (F_1 \beta \triangleleft (g, \gamma), F_0 \gamma))),
+    G_0(F_0 \gamma))
+    ) \]
+
+    \begin{align*}
+      &\lambda \alpha. \lambda \gamma, p.
+    \textrm{ind}_\odot(p, f. \beta. g.
+    G_1(F_0 \alpha) \triangleleft (F_1 \alpha \triangleleft (C_t^\odot \alpha \triangleleft ((f,\beta,g), \gamma), \gamma))\\
+    &=
+    \lambda \alpha. \lambda \gamma, p.
+    \textrm{ind}_\odot(p, f. \beta. g.
+    G_1(F_0 \alpha) \triangleleft
+    (\lambda \alpha. \lambda (p, \gamma). \textrm{ind}_\odot(p, f.\beta.g.
+    (F_1 \alpha \triangleleft (C_t^\odot \alpha \triangleleft ((f,\beta,g), \gamma), \gamma)))
+    ) \alpha \triangleleft ((f,\beta,g), \gamma)\\
+    &=
+    \lambda \alpha. \lambda \gamma, p.
+    \textrm{ind}_\odot(p, f. \beta. g.
+    G_1(F_0 \alpha) \triangleleft
+    ((\lambda \alpha. \lambda (p, \gamma). \textrm{ind}_\odot(p, f.\beta.g.\\
+    & \quad\quad
+    D_t (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (f, \beta), F_0 \beta, F_1 \beta \triangleleft (g, \gamma)), F_0 \gamma))
+    ) \alpha \triangleleft ((f,\beta,g), \gamma), F_0 \gamma)\\
+    &=
+    \lambda \alpha. \lambda \gamma, p. \textrm{ind}_\odot(p, f. \beta. g.\\
+    &\quad\quad
+    G_1(F_0 \alpha) \triangleleft
+    (
+    D_t (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (f, \beta), F_0 \beta, F_1 \beta \triangleleft (g, \gamma)), F_0 \gamma))
+    , F_0 \gamma)\\
+    &=
+    \lambda \alpha. \lambda \gamma, p. \textrm{ind}_\odot(p, f. \beta. g.\\
+    &\quad\quad
+    (\lambda \alpha'. \lambda \gamma', p'.
+    \textrm{ind}_\odot(p', f'. \beta'. g'.
+    G_1 {\alpha'} \triangleleft (D_t {\alpha'} \triangleleft ((f',\beta',g'), \gamma'), \gamma')
+    )) (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (f,\beta),F_0 \beta,F_1 \beta \triangleleft (g,\gamma)), F_0 \gamma)
+    )\\
+    &= \lambda \alpha. \lambda \gamma, p. \textrm{ind}_\odot(p, f. \beta. g.
+    (\lambda \alpha'. \lambda \gamma', p'. \textrm{ind}_\odot(p', f'. \beta'. g'.\\
+    &\quad\quad
+    E_t {(G_0 \alpha')} \triangleleft (
+    (G_1 \alpha' \triangleleft (f', \beta'),
+    G_0 \beta',
+    G_1 \beta' \triangleleft (g', \gamma'))
+    , G_0 \gamma')
+    )) (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (f,\beta),F_0 \beta,F_1 \beta \triangleleft (g,\gamma)), F_0 \gamma)
+    )\\
+    &= \lambda \alpha. \lambda \gamma, p. \textrm{ind}_\odot(p, f. \beta. g.\\
+    &\quad\quad
+    E_t {(G_0 (F_0 \alpha))} \triangleleft (
+    (G_1 (F_0 \alpha) \triangleleft (F_1 \alpha \triangleleft (f,\beta), (F_0 \beta)),
+    G_0 (F_0 \beta),
+    G_1 (F_0 \beta) \triangleleft (F_1 \beta \triangleleft (g,\gamma), (F_0 \gamma)))
+    , G_0 (F_0 \gamma))
+    )\\
+    \end{align*}
     
   \end{enumerate}
 \end{definition}
