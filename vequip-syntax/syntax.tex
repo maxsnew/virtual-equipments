@@ -48,24 +48,24 @@
 \newcommand{\sig}{\,\,\textrm{sig}}
 \newcommand{\pipe}{\mathrel{|}}
 
-\newcommand{\tensorexistsXwithYandZ}[3]{\exists {#1}. #2 \odot #3}
-\newcommand{\homleftallXfromYtoZ}[3]{\forall {#1}. #3 \triangleleft #2}
-\newcommand{\homrightallXfromYtoZ}[3]{\forall {#1}. #2 \triangleright #3}
-
 \newcommand{\odotexists}[1]{\mathop{\overset{\exists #1}\odot}}
-\newcommand{\tensorexistsXwithYandZpr}[3]{#2 \odotexists{#1} #3}
-\newcommand{\tlwith}[1]{\mathop{\triangleleft^{#1}}}
+\newcommand{\tensorexistsXwithYandZ}[3]{#2 \odotexists{#1} #3}
+
+\newcommand{\tlwith}[1]{\mathop{\prescript{#1}{}\triangleleft}}
 \newcommand{\tlforall}[1]{\tlwith{\forall #1}}
-\newcommand{\trwith}[1]{\mathop{\prescript{#1}{}{\triangleright}}}
+
+\newcommand{\trwith}[1]{\mathop{\triangleright^{#1}}}
 \newcommand{\trforall}[1]{\trwith {\forall #1}}
-\newcommand{\homleftallXfromYtoZpr}[3]{#3 \tlforall {#1} #2}
-\newcommand{\homrightallXfromYtoZpr}[3]{#2 \trforall #1 #3}
 
-\newcommand{\homleftlambdaXatYdotZ}[3]{\lambda^\triangleleft (#1, #2). #3}
-\newcommand{\homrightlambdaXatYdotZ}[3]{\lambda^\triangleright (#1, #2). #3}
+\newcommand{\homrallXYtoZ}[3]{#2 \trforall {#1} #3}
 
-\newcommand{\homleftappXtoYatZ}[3]{#1 \tlwith{#3} #2}
-\newcommand{\homrightappXtoYatZ}[3]{#1 \trwith{#3} #2}
+\newcommand{\homlallXYtoZ}[3]{#2 \tlforall #1 #3}
+
+\newcommand{\homrlambdaXatYdotZ}[3]{\lambda^\triangleright (#1, #2). #3}
+\newcommand{\homllambdaXatYdotZ}[3]{\lambda^\triangleleft (#2, #1). #3}
+
+\newcommand{\homrappXtoYatZ}[3]{#1 \trwith{#3} #2}
+\newcommand{\homlappXtoYatZ}[3]{#2 \tlwith{#3} #1}
 
 
 \title{Judgment Theory: A Syntax for Virtual Equipments with applications to Internal and Synthetic Category Theory}
@@ -448,21 +448,19 @@ connectives and then the more difficult positives.
 \subsection{Left and Right Hom of Profunctors}
 
 First, we study the two ``internal homs'' of judgments. Since the
-``monoidal'' structure of judgments is not in any way symmetric, we
-get two distinct notions internalizing concatenating on the left and
-the right of the context. In ordinary category theory, these
-profunctors can be constructed using an \emph{end} and the hom of
-functor categories. Given two profunctors $P : C^o \times E \to \Set$
-and $R : D^o \times E \to Set$, their hom is given as
+``monoidal'' structure of judgments is not symmetric, we get two
+distinct notions internalizing concatenating on the left and the right
+of the context. In ordinary category theory, these profunctors can be
+constructed using an \emph{end} and the hom of functor
+categories. Given two profunctors $P : C^o \times E \to \Set$ and $R :
+D^o \times E \to Set$, their hom is given as
 \[ \int_{e \in E} R(-,e) \Rightarrow P(e,=) \]
 
-We instead right these using a logical notation of $\forall$ in lieu
-of an end, due to our logical/type theoretic bias. We write these
-types as $\forall \gamma. P \triangleleft R$ and $\forall \gamma. R
-\triangleright P$ because they act like a combined quantification and
-internal hom, but note that these are not built out of simpler
-connectives but instead these are single connectives in their own
-right.
+Type theoretically this is a kind of multi-hom where we are
+quantifying both over an indexing sort variable $e$ and a profunctor
+variable of type $R$. We write the covariant and contravariant
+versions of these connectives as $\homrallXYtoZ \gamma R S$ and
+$\homlallXYtoZ \alpha R S$.
 
 The syntax is given in Figure~\ref{fig:cotensor}.
 %
@@ -512,57 +510,61 @@ $\lambda$-calculus, with corresponding $\beta\eta$ rules.
 \begin{figure}
   \begin{mathpar}
       \inferrule*[right=Covariant Hom formation]
-      {\Gamma \pipe d^+\Xi; \gamma : \cat E \vdash  R \and \Gamma \pipe  d^-\Xi; \gamma : \cat E \vdash P}
-      {\Gamma \pipe \Xi \vdash \forall \gamma.~ P \triangleleft R}
+      {\Gamma \pipe d^+\Xi; \alpha : \cat C \vdash  R \and \Gamma \pipe  d^-\Xi; \alpha : \cat C \vdash P}
+      {\Gamma \pipe \Xi \vdash \homrallXYtoZ \alpha R P}
 
-      (\forall \gamma. P\triangleleft R)[\xi] = \forall \gamma. P[d^-\xi,\gamma/\gamma] \triangleleft R[d^+\xi,\gamma/\gamma]
+      (\homrallXYtoZ \alpha R P)[\xi] = \homrallXYtoZ \alpha {R[d^+\xi;\alpha/\alpha]} {P[\alpha/\alpha;d^-\xi]}
 
       \inferrule*[right=Covariant Hom introduction]
-      {\Gamma \pipe \Phi, x : R, \gamma : \cat E \vdash M : P}
-      {\Gamma \pipe \Phi \vdash \lambda^\triangleleft (x : R, \gamma : \cat E). M : \forall \gamma.~ P \triangleleft R}
+      {\Gamma \pipe \Phi, x : R, \alpha : \cat C \vdash M : P}
+      {\Gamma \pipe \Phi \vdash
+        \homrlambdaXatYdotZ {x : R} {\alpha : \cat C} M : \homrallXYtoZ \alpha R P}
 
-      (\lambda^\triangleleft (x, \gamma). M)[\phi] = \lambda^\triangleleft (x, \gamma). M[\phi, x/x,\gamma/\gamma]
+     (\homrlambdaXatYdotZ {x} {\alpha} M)[\phi]
+      = \homrlambdaXatYdotZ {x} {\alpha} M[\phi,x/x,\gamma/\gamma]
 
       %% \inferrule*[right=Covar Hom elim simple]
       %% {}
       %% {\alpha: \cat C, f:\forall \gamma. P \triangleleft R, \beta : \cat D, x : R, \gamma : \cat E \vdash f\triangleleft (x, \gamma) : P}
 
       \inferrule*[right=Covariant Hom elimination]
-      {\Gamma\pipe\Phi_M \vdash M : \forall \gamma.P\triangleleft R \and \Phi_N \vdash N : R[B/\gamma]\and
-        \Phi = \Phi_M \jnctx \Phi_N}
-      {\Gamma\pipe \Phi \vdash M\triangleleft(N, B) : P[B/\gamma]}\\
+      {\Phi = \Phi_f \jnctx \Phi_a\and
+       \Gamma\pipe\Phi_f \vdash M : \homrallXYtoZ \alpha R P \and
+       \Phi_a \vdash N : R[A/\alpha]
+        }
+      {\Gamma\pipe \Phi \vdash \homrappXtoYatZ M N A : P[A/\alpha]}\\
 
-      (\lambda^\triangleleft (x, \gamma). M)\triangleleft (x, \gamma) = M (\beta)
+      \homrappXtoYatZ {(\homrlambdaXatYdotZ x \alpha M)} N A = M[N/x,A/\alpha] (\beta)
+      %% (\lambda^\triangleleft (x, \gamma). M)\triangleleft (x, \gamma) = M (\beta)
 
       \inferrule
-      {\Gamma\pipe\Phi, x:R, \gamma : \cat E \vdash M \triangleleft (x, \gamma) = N \triangleleft (x, \gamma) : P}
-      {\Gamma\pipe\Phi \vdash M = N : \forall \gamma. P \triangleleft R}
+      {\Gamma\pipe\Phi, x:R, \alpha : \cat C \vdash \homrappXtoYatZ M x \alpha = \homrappXtoYatZ N x \alpha : P}
+      {\Gamma\pipe\Phi \vdash M = N : \homrallXYtoZ \alpha R P}
 
       \inferrule*[right=Contra Hom formation]
       {\Gamma \pipe \alpha:\cat C; d^-\Xi\vdash R \and \Gamma \pipe \alpha : \cat C; d^+\Xi\vdash P}
-      {\Gamma \pipe \Xi \vdash \forall \alpha.~ R\triangleright P}
+      {\Gamma \pipe \Xi \vdash \homlallXYtoZ \alpha R P}
 
       \inferrule*[right=Contra Hom introduction]
       {\Gamma\pipe\alpha:\cat C, x : R, \Phi \vdash M : P}
-      {\Gamma\pipe\Phi \vdash \lambda^\triangleright (\alpha:\cat C, x : R). M : \forall \alpha.~ R \triangleright P}
+      {\Gamma\pipe\Phi \vdash \homllambdaXatYdotZ {x : R} {\alpha : \cat C} M : \homlallXYtoZ \alpha R P}
 
-      (\lambda^\triangleright (\alpha, x). M)[\phi] = \lambda^\triangleright (\alpha, x). M[\alpha/\alpha, x/x,\phi]
-
-      %% \inferrule*[right=Covar Hom elim simple]
-      %% {}
-      %% {\alpha: \cat C, x : R, \beta : \cat D, f:\forall \alpha. R \triangleright P, \gamma : \cat E \vdash (\alpha, x) \triangleright f : P}
+     (\homllambdaXatYdotZ {x} {\alpha} M)[\phi]
+      = \homllambdaXatYdotZ {x} {\alpha} M[\phi,x/x,\gamma/\gamma]
 
       \inferrule*[right=Contra Hom elimination]
-      {\Gamma \pipe \Phi_N \vdash N : R[A/\alpha] \and \Gamma \pipe \Phi_M \vdash M : \forall \alpha. R \triangleright P\and \Phi = \Phi_N \jnctx \Phi_M}
-      {\Gamma \pipe \Phi \vdash (A,N) \triangleright M : P[A/\alpha]}\\
+      {\Phi = \Phi_a \jnctx \Phi_f\and
+       \Gamma \pipe \Phi_a \vdash N : R[A/\alpha] \and
+       \Gamma \pipe \Phi_f \vdash M : \homlallXYtoZ \alpha R P}
+      {\Gamma \pipe \Phi \vdash \homlappXtoYatZ M N A : P[A/\alpha]}\\
 
       \inferrule*[Right=$\beta$]
                  {}
-                 {(\alpha, x) \triangleright (\lambda^\triangleright (\alpha, x). M) = M }
+                 {\homlappXtoYatZ {(\homllambdaXatYdotZ x \alpha M)} N A = M[A/\alpha,N/x]}
 
       \inferrule*[right=$\eta$]
-      {\Gamma \pipe \alpha:\cat C, x:R, \Phi \vdash (\alpha, x) \triangleright M = (\alpha, x) \triangleright N : P}
-      {\Gamma \pipe \Phi \vdash M = N : \forall \alpha. R \triangleright P}
+      {\Gamma \pipe \alpha:\cat C, x:R, \Phi \vdash \homlappXtoYatZ M x \alpha = \homlappXtoYatZ N x \alpha : P}
+      {\Gamma \pipe \Phi \vdash M = N : \homlallXYtoZ \alpha R P}
   \end{mathpar}
   \caption{Hom of Relations/Profunctors}
   \label{fig:hom}
@@ -1258,65 +1260,44 @@ read exactly as the classical definitions.
     $C_r : \forall \alpha :  C_0. {C_1} \alpha \alpha$
   \item Composition, which we can express several different ways using
     a mix of covariant/contravariant homs and tensors.
-    \[ C_t^\triangleright : \forall \alpha :  C_0. \forall \beta. ({C_1} \beta \alpha) \triangleright \forall \gamma. ({C_1} \gamma \beta) \triangleright {C_1} \gamma \alpha \]
+    \[ C_t : \forall \alpha. \homrallXYtoZ \beta {C_1 \alpha \beta} {\homrallXYtoZ \gamma {C_1 \beta \gamma} {C_1 \alpha \gamma}}\]
+    
+    %% \[ C_t^\triangleright : \forall \alpha :  C_0. \forall \beta. ({C_1} \beta \alpha) \triangleright \forall \gamma. ({C_1} \gamma \beta) \triangleright {C_1} \gamma \alpha \]
 
-    or
+    %% or
 
-    \[ C_t^\triangleleft : \forall \alpha. \forall \beta. (\forall \gamma. {C_1} \alpha \gamma \triangleleft {C_1} \beta \gamma) \triangleleft {C_1} \alpha \beta
-    \]
+    %% \[ C_t^\triangleleft : \forall \alpha. \forall \beta. (\forall \gamma. {C_1} \alpha \gamma \triangleleft {C_1} \beta \gamma) \triangleleft {C_1} \alpha \beta
+    %% \]
 
-    or using tensors and covariant homs
+    %% or using tensors and covariant homs
 
-    \[ C_t^\odot : \forall \alpha. \forall \gamma. (\exists \beta. {C_1}\alpha\beta\odot {C_1}\beta\gamma)\triangleright {C_1}\alpha \gamma \]
+    %% \[ C_t^\odot : \forall \alpha. \forall \gamma. (\exists \beta. {C_1}\alpha\beta\odot {C_1}\beta\gamma)\triangleright {C_1}\alpha \gamma \]
 
-    or using tensors and contravariant homs
+    %% or using tensors and contravariant homs
 
-    \[ C_t^\odot : \forall \gamma. \forall \alpha. {C_1}\alpha\gamma \triangleleft (\exists \beta. {C_1}\alpha\beta\odot {C_1}\beta\gamma)\]
-  \item Satisfying Unitality, i.e., for any $\Phi \vdash f : {C_1} A B$,
-    we'd like $f \circ r(A) = f$. We can formalize this using an
-    equality of two profunctor transformations of type $\forall
-    \beta. \forall \alpha. {C_1} \alpha \beta \triangleright {C_1} \alpha
-    \beta$ (or $\forall \alpha. \forall \beta. {C_1} \alpha \beta
-    \triangleleft {C_1} \alpha \beta$), one of which is the identity and
-    the other of which composes with a reflexivity morphism.
+    %% \[ C_t^\odot : \forall \gamma. \forall \alpha. {C_1}\alpha\gamma \triangleleft (\exists \beta. {C_1}\alpha\beta\odot {C_1}\beta\gamma)\]
+  \item Satisfying right unitality, i.e., for any $\Phi \vdash f :
+    {C_1} A B$, we'd like $f; r(B) = f$. We can formalize this
+    using an equality of two transformations of type $\forall
+    \alpha. \homrallXYtoZ \beta {C_1 \alpha \beta} {C_1 \alpha \beta}$
 
-    \[ (\lambda \beta. \lambda^\triangleright \alpha. f:{C_1} \alpha \beta. f)
-    =  (\lambda \beta. \lambda^\triangleright \alpha. f:{C_1} \alpha \beta. (\alpha, f)\triangleright (\beta, r\beta) \triangleright (C_t^\triangleright \beta))
-    \]
+    \[ \lambda \alpha. \homrlambdaXatYdotZ f \beta {\homrappXtoYatZ {\homrappXtoYatZ {C_t \alpha} {f} \beta} {C_r \beta} \beta}    
+    = \lambda \alpha. \homrlambdaXatYdotZ f \beta f \]
 
-    or expressed using $\triangleleft$, 
-    \[
-    (\lambda \alpha. \lambda^\triangleleft \beta. f:{C_1}\alpha\beta. f)
+    These kinds of equalities between 2-cells are very common in
+    internal category theory, so to save space we will suppress the
+    sequence of $\lambda$s that start such equalities.
+
+  \item and left unitality (an equality of the same type as right unitality):
+
+    \[ f = \homrappXtoYatZ {\homrappXtoYatZ {C_t \alpha} {C_r \alpha} \alpha} f \beta \]
+  \item and associativity, which is an equality at type
+    \[ \forall \alpha. \homrallXYtoZ \beta {C_1 \alpha \beta} {\homrallXYtoZ \gamma {C_1 \beta \gamma} {\homrallXYtoZ \delta {C_1 \gamma \delta} {C_1 \alpha \delta}}}\]
+
+    \[ \homrappXtoYatZ {\homrappXtoYatZ {C_t \alpha} f \beta} {(\homrappXtoYatZ {\homrappXtoYatZ {C_t \beta} g \gamma} h \delta)} \delta
     =
-    (\lambda \alpha. \lambda^\triangleleft \beta. f:{C_1}\alpha\beta. C_t^\triangleleft \alpha \triangleleft (\beta, f) \triangleleft (\beta, r \beta)) \]
-
-    or expressed using $\odot$
-
-    \[
-    (\lambda \alpha. \lambda^\triangleleft \beta. f:{C_1}\alpha\beta.
-    C_t^\odot \beta \triangleleft (\alpha, (r\alpha, \alpha, f))
-    )
-    \]
-  \item And Associativity, which we can express in several ways, but
-    closest to informal category theory would be an equality between
-    two terms of type
-    \[ \forall \delta. \forall \alpha. (\exists \beta. {C_1}\alpha \beta \odot (\exists \gamma. {C_1}\beta\gamma \odot {C_1} \gamma \delta))\triangleright {C_1}\alpha\delta\]
-    or
-    \[ \forall \alpha. \forall \delta. {C_1}\alpha\delta\triangleleft (\exists \beta. {C_1}\alpha \beta \odot (\exists \gamma. {C_1}\beta\gamma \odot {C_1} \gamma \delta)) \]
-
-    The equality would be between the terms
-    \[ \lambda \alpha. \lambda \delta, fgh.
-    \textrm{ind}(fgh, f : {C_1} \alpha\beta. \beta. gh. C_t^\odot \delta \triangleleft (\alpha, (f, \beta, C_t^\odot \gamma \triangleleft (\beta, gh))) )
-    \]
-    and
-    \[ \lambda \alpha. \lambda \delta, fgh.
-    \textrm{ind}(fgh, f:{C_1} \alpha\beta. \beta. gh.
-    \textrm{ind}(gh, g:{C_1}\beta\gamma. \gamma. h:{C_1}\gamma\delta.
-    C_t^\odot \delta \triangleleft (\alpha, (C_t^\odot \gamma\triangleleft (\alpha, (f,\beta,g)), \gamma, h))
-    ))
-    \]
+    \homrappXtoYatZ {\homrappXtoYatZ {C_t \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {C_t \alpha} f \beta} g \gamma)} \gamma} h \delta \]
   \end{enumerate}
-
 \end{definition}
 
 
@@ -1324,29 +1305,25 @@ read exactly as the classical definitions.
 \begin{definition}[Internal Functor]
   A functor $F$ between internal categories $C$ and $D$ consists of
   \begin{enumerate}
-  \item a function on objects $F_0 : \varr {C_0} {D_0}$
-  \item a function on arrows
-    $F_1 : \forall \alpha: {C_0}. \forall \beta:{C_0}. D_1 {(F_0 \alpha)}{(F_0 \beta)} \triangleleft C_1 \alpha \beta$
+  \item a map of objects $F_0 : \varr {C_0} {D_0}$
+  \item a map of arrows
+    $F_1 : \forall \alpha: {C_0}.
+    \homrallXYtoZ \beta {C_0 \alpha \beta} {D_0 {(F_1 \alpha)}{(F_1 \beta)}}$
   \item That preserves identity. This is given by equality between the
-    following terms of type $\forall \alpha:{{C_0}}. D_1 {(F_0
-      \alpha)}{(F_0\alpha)}$:
-    \[ \lambda \alpha. D_r(F_0\alpha)\]
-    and
-    \[ \lambda \alpha. F_1 \alpha \triangleleft (C_r \alpha, \alpha) \]
-  \item And preserves composition. This is given by an equality between the following terms of type
-    \[ \forall \alpha. \forall \gamma. (D_1 {(F_0 \alpha)}{(F_0 \gamma)})\triangleleft (\exists \beta. C_1 {\alpha}{\beta} \odot C_1 {\beta}{\gamma}) \]
+    following terms of type $\forall \alpha:{{C_0}}. D_1 {(F_0 \alpha)}{(F_0\alpha)}$:
+    \[ D_r(F_0\alpha) = \homrappXtoYatZ {F_1\alpha} {C_r \alpha} \alpha\]
+  \item And preserves composition.
+    This is given by an equality between the following terms of type
+
+    \[ \forall \alpha.
+    \homrallXYtoZ {\beta} {C_1 \alpha \beta} {\homrallXYtoZ \gamma {C_1 \beta \gamma} {D_1 {(F_0 \alpha)} {(F_0 \gamma)}}}\]
 
     First, we can compose in $C$, and then map using $F$:
-    \[ \lambda \alpha. \lambda \gamma, p.
-    \textrm{ind}_\odot(p, f:C_1{\alpha}{\beta}. \beta. g:C_1{\beta}{\gamma}.
-    F_1 {\alpha} \triangleleft (C_t^\odot \alpha \triangleleft ((f,\beta,g), \gamma), \gamma)
-    )\]
+    \[ \homrappXtoYatZ {F_1 \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {C_t \alpha} f \beta} g \gamma)}\gamma\]
+
+    
     or we can map the morphisms with $F$, and then compose them in $D$:
-    \[
-    \lambda \alpha. \lambda\gamma, p.
-    \textrm{ind}(p, f.\beta.g.
-    D_t^\odot {(F_0 \alpha)} \triangleleft ((F_1 \alpha \triangleleft(f, \beta), F_0 \beta, F_1 \beta \triangleleft (g, \gamma)), F_0 \gamma)
-    ) \]
+    \[ \homrappXtoYatZ {\homrappXtoYatZ {D_t {(F_0 \alpha)}} {(\homrappXtoYatZ {F_1 \alpha} f \beta)} {(F_0 \beta)}} {(\homrappXtoYatZ {F_1 \beta} g \gamma)} {F_0 \gamma}\]
   \end{enumerate}
 \end{definition}
 
@@ -1357,25 +1334,22 @@ We can immediately define identity and composition of functors.
   $\textrm{Id}_C : \textrm{Functor} C C$ by
   \begin{enumerate}
   \item $\textrm{Id}_0 = \lambda \alpha:C_0. \alpha$
-  \item $\textrm{Id}_1 = \lambda \alpha. \lambda (f : C_1 \alpha \alpha', \alpha'). f$
+  \item $\textrm{Id}_1 = \lambda \alpha.
+    \homrlambdaXatYdotZ f {\alpha'} f$
   \item Preservation of identity requires proving
-    \[ \lambda \alpha. C_r(\textrm{Id}_0(\alpha)) \]
+    \[
+    \lambda \alpha. C_r(\textrm{Id}_0(\alpha)) \]
     is equal to
-    \[ \lambda \alpha. \textrm{Id}_1 \alpha \triangleleft (C_r\alpha, \alpha) \]
+    \[ \lambda \alpha.
+    \homrappXtoYatZ {\textrm{Id}_1 \alpha} {(C_r\alpha)} \alpha\]
     Both sides simply $\beta$ reduce to $ \lambda \alpha. C_r \alpha$
     and the result follows by reflexivity.
   \item Preservation of composition requires proving
-    \[ \lambda \alpha. \lambda \gamma, fg.
-    \textrm{ind}(fg, f:C_1{\alpha}{\beta}. \beta. g:C_1{\beta}{\gamma}.
-    \textrm{Id}_1 {\textrm{Id}_0 \alpha} \triangleleft (C_t \alpha \triangleleft ((f,\beta,g), \gamma), \textrm{Id}_0 \gamma)
-    )\]
-    is equal to 
     \[
-    \lambda \alpha. \lambda\gamma, fg.
-    \textrm{ind}(fg, f.\beta.g.
-    C_t {(\textrm{Id}_0 \alpha)} \triangleleft ((\textrm{Id}_1 \alpha \triangleleft(f, \beta), \textrm{Id}_0 \beta, \textrm{Id}_1 \beta \triangleleft (g, \gamma)), \textrm{Id}_0 \gamma)
-    ) \]
-
+    \lambda \alpha. \homrlambdaXatYdotZ f \beta \homrlambdaXatYdotZ g \gamma
+    \homrappXtoYatZ {{\textrm{Id}}_1 \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {C_t \alpha} f \beta} g \gamma)}\gamma
+    =     \lambda \alpha. \homrlambdaXatYdotZ f \beta \homrlambdaXatYdotZ g \gamma
+\homrappXtoYatZ {\homrappXtoYatZ {D_t {({\textrm{Id}}_0 \alpha)}} {(\homrappXtoYatZ {{\textrm{Id}}_1 \alpha} f \beta)} {({\textrm{Id}}_0 \beta)}} {(\homrappXtoYatZ {{\textrm{Id}}_1 \beta} g \gamma)} {{\textrm{Id}}_0 \gamma}\]
     Both sides $\beta$ reduce to
 
     \[
@@ -1392,28 +1366,37 @@ We can immediately define identity and composition of functors.
   : \textrm{Functor} C E$ as
   \begin{enumerate}
   \item $(G \circ F)_0 = \lambda \alpha. G_0 (F_0 \alpha)$
-  \item $(G \circ F)_1 = \lambda \alpha. \lambda (f,\beta). G_1 (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (f, \beta)), F_0 \beta)$
+  \item $(G \circ F)_1 =
+    \lambda \alpha.
+    \homrlambdaXatYdotZ f \beta
+    {\homrappXtoYatZ {G_1 (F_0 \alpha)} {\homrappXtoYatZ {F_1 \alpha} f \beta} {F_0 \beta}}$
   \item Preservation of identity requires proving
     \[ \lambda \alpha. E_r((G \circ F)_0(\alpha)) \]
     is equal to
-    \[ \lambda \alpha. (G \circ F)_1 \alpha \triangleleft (C_r\alpha, \alpha) \]
+    \[ \lambda \alpha.
+    \homrappXtoYatZ {(G \circ F)_1 \alpha} {C_r\alpha} \alpha \]
 
     Expanding definitions and $\beta$ reducing we need to show
 
     \[ \lambda \alpha. E_r(G_0 (F_0 \alpha)) \]
     is equal to
-    \[ \lambda \alpha. G_1 (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (C_r\alpha, \alpha)), F_0 \alpha) \].
+    \[ \lambda \alpha.
+    \homrappXtoYatZ {G_1 (F_0 \alpha)} {(\homrappXtoYatZ {F_1 \alpha} {C_r \alpha} \alpha)} {F_0 \alpha}\]
 
     Proceeding from right to left applying transitivity:
     \begin{align*}
-      \lambda& \alpha. G_1 (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (C_r\alpha, \alpha)), F_0 \alpha)
-      \\
-      &= \lambda \alpha. G_1 (F_0 \alpha)\triangleleft ((\lambda \alpha. (F_1 \alpha \triangleleft (C_r\alpha, \alpha))) \alpha, F_0 \alpha)\\
-      &= \lambda \alpha. G_1 (F_0 \alpha)\triangleleft ((\lambda \alpha. D_r (F_0 \alpha)) \alpha, F_0 \alpha)\tag{$F$ assumption}\\
-      &= \lambda \alpha. G_1 (F_0 \alpha)\triangleleft (D_r (F_0 \alpha), F_0 \alpha)\\
-      &= \lambda \alpha. (\lambda \beta. G_1 \beta \triangleleft (D_r \beta, \beta)) (F_0 \alpha) \\
-      &= \lambda \alpha. (\lambda \beta. E_r (G_0 \beta)) (F_0 \alpha)\tag{$G$ assumption}\\
-      &= \lambda \alpha. E_r (G_0 (F_0 \alpha))
+      &\lambda \alpha.
+      \homrappXtoYatZ {G_1 (F_0 \alpha)} {(\homrappXtoYatZ {F_1 \alpha} {C_r \alpha} \alpha)} {F_0 \alpha}\\
+      &=\lambda \alpha.
+      \homrappXtoYatZ {G_1 (F_0 \alpha)} {((\lambda \alpha. \homrappXtoYatZ {F_1 \alpha} {C_r \alpha} \alpha)\alpha)} {F_0 \alpha}\\
+      &=\lambda \alpha.
+      \homrappXtoYatZ {G_1 (F_0 \alpha)} {((\lambda \alpha. {D_r {(F_0 \alpha)}})\alpha)} {F_0 \alpha}\\
+      &=\lambda \alpha.
+      \homrappXtoYatZ {G_1 (F_0 \alpha)} {({D_r {(F_0 \alpha)}})} {F_0 \alpha}\\
+      &=\lambda \alpha.
+      (\lambda \beta. \homrappXtoYatZ {G_1 \beta} {({D_r {\beta}})} \beta)({F_0 \alpha})\\
+      &=\lambda \alpha. (\lambda \beta. E_r {G_0 \beta})({F_0 \alpha})\\
+      &=\lambda \alpha. E_r {G_0 (F_0 \alpha)})\\
     \end{align*}
 
     Where the two marked lines follow from congruence using the
@@ -1512,22 +1495,22 @@ We can immediately define identity and composition of functors.
   \begin{enumerate}
   \item A span $R_s : \harr {C_0} {D_0}$.
   \item A composition action:
-    $R_t : \forall \alpha. \homleftallXfromYtoZpr {\beta} {(\tensorexistsXwithYandZpr {\alpha'} {C_1 \alpha {\alpha'}}{(\tensorexistsXwithYandZpr {\beta'} {R_s {\alpha'}{\beta'}}{D_1 \beta' \beta})})} {R_s \alpha {\beta}} $
+    $R_t : \forall \alpha. \homrallXYtoZ {\beta} {(\tensorexistsXwithYandZ {\alpha'} {C_1 \alpha {\alpha'}}{(\tensorexistsXwithYandZ {\beta'} {R_s {\alpha'}{\beta'}}{D_1 \beta' \beta})})} {R_s \alpha {\beta}} $
 
-    (equivalently, $\forall \beta. \homrightallXfromYtoZpr {\alpha} {(\tensorexistsXwithYandZpr {\alpha'} {C_1 \alpha {\alpha'}}{(\tensorexistsXwithYandZpr {\beta'} {R_s {\alpha'}{\beta'}}{D_1 \beta' \beta})})} {R_s \alpha \beta}$)
+    (equivalently, $\forall \beta. \homlallXYtoZ {\alpha} {(\tensorexistsXwithYandZ {\alpha'} {C_1 \alpha {\alpha'}}{(\tensorexistsXwithYandZ {\beta'} {R_s {\alpha'}{\beta'}}{D_1 \beta' \beta})})} {R_s \alpha \beta}$)
   \item Satisfying unitality:
     \[
     \lambda \alpha.
-    \homleftlambdaXatYdotZ f \beta {f}
+    \homrlambdaXatYdotZ f \beta {f}
     =
     \lambda \alpha.
-    \homleftlambdaXatYdotZ f \beta
-    \homleftappXtoYatZ{R_t \alpha} {(C_r \alpha,\alpha,(f,\beta,D_r \beta))} {\beta}
+    \homrlambdaXatYdotZ f \beta
+    \homrappXtoYatZ{R_t \alpha} {(C_r \alpha,\alpha,(f,\beta,D_r \beta))} {\beta}
     \]
     
   \item And associativity (both with a large implicit
-    $\lambda \alpha. \homleftlambdaXatYdotZ g \beta \homleftlambdaXatYdotZ {g'} {\beta'}
-    \homleftlambdaXatYdotZ {r} {\beta''}\homleftlambdaXatYdotZ {f'} {\alpha''}\homleftlambdaXatYdotZ {f} {\alpha'}$)
+    $\lambda \alpha. \homrlambdaXatYdotZ g \beta \homrlambdaXatYdotZ {g'} {\beta'}
+    \homrlambdaXatYdotZ {r} {\beta''}\homrlambdaXatYdotZ {f'} {\alpha''}\homrlambdaXatYdotZ {f} {\alpha'}$)
 
     % f : a -> a'
     % f' : a' -> a''
@@ -1541,21 +1524,11 @@ We can immediately define identity and composition of functors.
     % (f o f') o r o (g' o g)
     
 
-    \[ \homleftappXtoYatZ {R_t \alpha} {(\homleftappXtoYatZ {C_t\alpha} {(f,\alpha',f')} {\alpha''},\alpha'',(r,\beta'',\homleftappXtoYatZ {D_t\beta''}{(g',\beta',g)}{\beta}))} {\beta} \]
+    \[ \homrappXtoYatZ {R_t \alpha} {(\homrappXtoYatZ {C_t\alpha} {(f,\alpha',f')} {\alpha''},\alpha'',(r,\beta'',\homrappXtoYatZ {D_t\beta''}{(g',\beta',g)}{\beta}))} {\beta} \]
     is equal to
     \[
-    \homleftappXtoYatZ {R_t \alpha} {(f,\alpha',(\homleftappXtoYatZ {R_t {\alpha'}}{(f',\alpha'',(r,\beta'',g'))}{\beta'},\beta',g))} {\beta}
+    \homrappXtoYatZ {R_t \alpha} {(f,\alpha',(\homrappXtoYatZ {R_t {\alpha'}}{(f',\alpha'',(r,\beta'',g'))}{\beta'},\beta',g))} {\beta}
     \]
-
-
-  \item Satisfying $\cat C$ associativity:
-    $R_l(C_t(f,g),r) = R_l(f, R_l(g,r))$
-  \item Satisfying $\cat D$ unitality:
-    $R_r(r, D_r(\beta)) = r$
-  \item Satisfying $\cat D$ associativity:
-    $R_r(r,D_t(h,k)) = R_r(R_r(r,h), k)$
-  \item Satisfying mixed associativity:
-    $R_l(f,R_r(r,h)) = R_r(R_l(f,r), h)$
   \end{enumerate}
 \end{definition}
 
@@ -1569,12 +1542,15 @@ Next, we show that Profunctors can be restricted by functors.
   $R : \text{Prof} C' D'$, then we can define a profunctor $R[F;G] : \text{Prof} C D$ by
   \begin{enumerate}
   \item $R[F;G]_s = \lambda (\alpha:C,\beta:D). R_s (F_0 \alpha) (G_0 \beta)$
-  \item $\cat C'$ composition:
-    \[ \lambda \alpha. \lambda^\triangleleft (\beta, (f : C_1 \alpha \alpha',\alpha',\alpha', r : R_s \alpha' \beta)). R_l(F_1 f, r) \]
-  \item $\cat D'$ composition:
-    \[ \lambda \alpha. \lambda^\triangleleft ('\beta, (r : R_s \alpha \alpha',\alpha', \beta',h : D_1 \beta' \beta)). R_r(r, G_1 h) \]
+  \item Composition action given by
+
+    \[ R[F;G]_t = \lambda \alpha. \ldots \]
+  %% \item $\cat C'$ composition:
+  %%   \[ \lambda \alpha. \lambda^\triangleleft (\beta, (f : C_1 \alpha \alpha',\alpha',\alpha', r : R_s \alpha' \beta)). R_l(F_1 f, r) \]
+  %% \item $\cat D'$ composition:
+  %%   \[ \lambda \alpha. \lambda^\triangleleft ('\beta, (r : R_s \alpha \alpha',\alpha', \beta',h : D_1 \beta' \beta)). R_r(r, G_1 h) \]
   \end{enumerate}
-  Identity and associativity properties should follow.
+  Identity and associativity properties should follow. TODO
 \end{definition}
 
 
