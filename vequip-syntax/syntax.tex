@@ -1501,23 +1501,17 @@ We can immediately define identity and composition of functors.
   consists of
   \begin{enumerate}
   \item A span $R_s : \harr {C_0} {D_0}$.
-  \item A composition action:
-    $R_t : \forall \alpha. \homrallXYtoZ {\beta} {(\tensorexistsXwithYandZ {\alpha'} {C_1 \alpha {\alpha'}}{(\tensorexistsXwithYandZ {\beta'} {R_s {\alpha'}{\beta'}}{D_1 \beta' \beta})})} {R_s \alpha {\beta}} $
+  \item A ternary ``mixed composition'' action:
+    $R_t :\pendallXdotY \alpha {\homrallXYtoZ {\alpha'} {\harrapp {C_1} {\alpha}{\alpha'}} {\homrallXYtoZ {\beta'} {\harrapp {R_s} {\alpha'}{\beta'}} {\homrallXYtoZ {\beta} {\harrapp {D_1} {\beta'} {\beta}} {\harrapp {R_s} {\alpha}{\beta}}}}}$
 
-    (equivalently, $\forall \beta. \homlallXYtoZ {\alpha} {(\tensorexistsXwithYandZ {\alpha'} {C_1 \alpha {\alpha'}}{(\tensorexistsXwithYandZ {\beta'} {R_s {\alpha'}{\beta'}}{D_1 \beta' \beta})})} {R_s \alpha \beta}$)
-  \item Satisfying unitality:
+  \item Satisfying unitality (under a $\pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f \beta {}}$):
     \[
-    \lambda \alpha.
-    \homrlambdaXatYdotZ f \beta {f}
-    =
-    \lambda \alpha.
-    \homrlambdaXatYdotZ f \beta
-    \homrappXtoYatZ{R_t \alpha} {(C_r \alpha,\alpha,(f,\beta,D_r \beta))} {\beta}
+    f = \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} \alpha} {\pendappXtoY {C_r} \alpha} \alpha}f \beta} {\pendappXtoY {D_r} \beta} \beta
     \]
     
   \item And associativity (both with a large implicit
-    $\lambda \alpha. \homrlambdaXatYdotZ g \beta \homrlambdaXatYdotZ {g'} {\beta'}
-    \homrlambdaXatYdotZ {r} {\beta''}\homrlambdaXatYdotZ {f'} {\alpha''}\homrlambdaXatYdotZ {f} {\alpha'}$)
+    $\pendlambdaXdotY \alpha {\homrlambdaXatYdotZ g \beta \homrlambdaXatYdotZ {g'} {\beta'}
+    \homrlambdaXatYdotZ {r} {\beta''}\homrlambdaXatYdotZ {f'} {\alpha''}\homrlambdaXatYdotZ {f} {\alpha'}}$)
 
     % f : a -> a'
     % f' : a' -> a''
@@ -1529,13 +1523,12 @@ We can immediately define identity and composition of functors.
     % f o (f' o r o g') o g
     %% and
     % (f o f') o r o (g' o g)
-    
 
-    \[ \homrappXtoYatZ {R_t \alpha} {(\homrappXtoYatZ {C_t\alpha} {(f,\alpha',f')} {\alpha''},\alpha'',(r,\beta'',\homrappXtoYatZ {D_t\beta''}{(g',\beta',g)}{\beta}))} {\beta} \]
+    \[ \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} {\alpha}} {f} {\alpha'}}{({\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} {\alpha'}} {f'} {\alpha''}}r {\beta''}} {g'} {\beta'}})} {\beta'}} {g} {\beta}\]
     is equal to
-    \[
-    \homrappXtoYatZ {R_t \alpha} {(f,\alpha',(\homrappXtoYatZ {R_t {\alpha'}}{(f',\alpha'',(r,\beta'',g'))}{\beta'},\beta',g))} {\beta}
-    \]
+    \[ \homrappXtoYatZ
+       {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} {\alpha}} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} {\alpha}} {f} {\alpha'}} {f'} {\alpha''})} {\alpha''}} r {\beta''}}
+       {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {\beta''}} {g'} {\beta'}} g {\beta})} {\beta}\]
   \end{enumerate}
 \end{definition}
 
@@ -1549,9 +1542,11 @@ Next, we show that Profunctors can be restricted by functors.
   $R : \text{Prof} C' D'$, then we can define a profunctor $R[F;G] : \text{Prof} C D$ by
   \begin{enumerate}
   \item $R[F;G]_s = \lambda (\alpha:C,\beta:D). R_s (F_0 \alpha) (G_0 \beta)$
-  \item Composition action given by
+  \item with composition action given by
 
-    \[ R[F;G]_t = \lambda \alpha. \ldots \]
+    \[ R[F;G]_t =
+    \pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f {\alpha'} {\homrlambdaXatYdotZ r {\beta'} {\homrlambdaXatYdotZ g {\beta} {\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} {\alpha}} f {\alpha'})} {F_0 \alpha'}} r {G_0 \beta'}} {(\homrappXtoYatZ {\pendappXtoY {G_1} {\beta'}} g \beta)} {G_0 \beta}}}} }
+ \]
   %% \item $\cat C'$ composition:
   %%   \[ \lambda \alpha. \lambda^\triangleleft (\beta, (f : C_1 \alpha \alpha',\alpha',\alpha', r : R_s \alpha' \beta)). R_l(F_1 f, r) \]
   %% \item $\cat D'$ composition:
@@ -1565,11 +1560,15 @@ Next, we show that Profunctors can be restricted by functors.
   Given $R : \text{Prof} C D$ and $S : \text{Prof} C D$, a
   homomorphism $m$ from $R$ to $S$ consists of
   \begin{enumerate}
-  \item A term $m_f : \forall \alpha. \forall \beta. S \alpha \beta \triangleleft R \alpha \beta$
-  \item Satisfying left naturality:
-    \[ m_f(R_l(f,r)) = S_l(f, m_f r) \]
-  \item And right naturality
-    \[ m_f(R_r(r,h)) = S_r(m_f r, h) \]
+  \item $m_f : \pendallXdotY \alpha {\homrallXYtoZ \beta {\harrapp R \alpha \beta}{\harrapp S \alpha \beta}}$
+    % m_f (R_t f r g) = S_t f (m_f r) g
+  \item Satisfying naturality (under a $\ldots$)
+
+    \[
+    \homrappXtoYatZ {\pendappXtoY{m_f} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} \alpha} f {\alpha'}} r {\beta'}} g \beta)} \beta
+    =
+    \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {S_t} \alpha} {f} {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY {m_f}{\alpha'}} r {\beta'})} {\beta'}} g \beta
+    \]
   \end{enumerate}
 \end{definition}
 
@@ -1580,9 +1579,12 @@ same as natural elements of $\text{Hom}(F-,G=)$.
 
 \begin{definition}[Natural Element]
   A natural element $\phi$ of a profunctor $R : \text{Prof}\,C C$ is a term
-  \[ \phi : \forall \alpha. R \alpha \alpha \]
+  \[ \phi : \pendallXdotY \alpha {\harrapp R \alpha \alpha} \]
   that is natural in that
-  \[ \lambda \alpha. \lambda (\alpha', f : C_1 \alpha \alpha'). R_r(\phi \alpha,f) = R_l(f,\phi \alpha') \]
+  \[
+  \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} {\pendappXtoY \phi \alpha} \alpha} f {\alpha'}
+  = \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t } \alpha} f {\alpha'}} {\pendappXtoY \phi {\alpha'}}{\alpha'}
+  \]
 \end{definition}
 
 Composition of natural transformations is then given by $C_t$.
