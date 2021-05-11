@@ -1,9 +1,6 @@
 \documentclass{article}
 
 % TODO:
-% 1. make coend application a superscript
-% 2. make span application more readable either C_1 (alpha; beta) or C_1 \,\alpha\,\beta
-% 3. tensor subsection is out of date
 % 3. coherence issues? soundness & completeness are hard actually bc of defined substitution?
 % 4. make an explicit substitution/db version of the calculus for the sound/completeness proof
 
@@ -1392,69 +1389,60 @@ We can immediately define identity and composition of functors.
   $\textrm{Id}_C : \textrm{Functor} C C$ by
   \begin{enumerate}
   \item $\textrm{Id}_0 = \lambda \alpha:C_0. \alpha$
-  \item $\textrm{Id}_1 = \lambda \alpha.
-    \homrlambdaXatYdotZ f {\alpha'} f$
+  \item $\textrm{Id}_1 = \pendlambdaXdotY \alpha
+    {\homrlambdaXatYdotZ f {\alpha'} f}$
   \item Preservation of identity requires proving
     \[
-    \lambda \alpha. C_r(\textrm{Id}_0(\alpha)) \]
+    \lambda \alpha. \pendappXtoY {C_r}{\textrm{Id}_0\alpha} \]
     is equal to
     \[ \lambda \alpha.
-    \homrappXtoYatZ {\textrm{Id}_1 \alpha} {(C_r\alpha)} \alpha\]
-    Both sides simply $\beta$ reduce to $ \lambda \alpha. C_r \alpha$
+    \homrappXtoYatZ {\pendappXtoY {\textrm{Id}_1} \alpha} {(\pendappXtoY {C_r}\alpha)} \alpha\]
+    Both sides simply $\beta$ reduce to $ \lambda \alpha. \pendappXtoY {C_r} \alpha$
     and the result follows by reflexivity.
-  \item Preservation of composition requires proving
+  \item Preservation of composition requires proving (under a $\lambda \alpha. \homrlambdaXatYdotZ f \beta \homrlambdaXatYdotZ g \gamma$)
     \[
-    \lambda \alpha. \homrlambdaXatYdotZ f \beta \homrlambdaXatYdotZ g \gamma
-    \homrappXtoYatZ {{\textrm{Id}}_1 \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {C_t \alpha} f \beta} g \gamma)}\gamma
-    =     \lambda \alpha. \homrlambdaXatYdotZ f \beta \homrlambdaXatYdotZ g \gamma
-\homrappXtoYatZ {\homrappXtoYatZ {D_t {({\textrm{Id}}_0 \alpha)}} {(\homrappXtoYatZ {{\textrm{Id}}_1 \alpha} f \beta)} {({\textrm{Id}}_0 \beta)}} {(\homrappXtoYatZ {{\textrm{Id}}_1 \beta} g \gamma)} {{\textrm{Id}}_0 \gamma}\]
+    \homrappXtoYatZ {\pendappXtoY {{\textrm{Id}}_1} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} f \beta} g \gamma)}\gamma
+    = \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} {{\textrm{Id}}_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {{\textrm{Id}}_1} \alpha} f \beta)} {{\textrm{Id}}_0 \beta}} {(\homrappXtoYatZ {\pendappXtoY{{\textrm{Id}}_1} \beta} g \gamma)} {{\textrm{Id}}_0 \gamma}\]
     Both sides $\beta$ reduce to
 
-    \[
-    \lambda \alpha. \lambda \gamma, fg.  \textrm{ind}(fg,
-    f:C_1{\alpha}{\beta}. \beta. g:C_1{\beta}{\gamma}. C_t \alpha
-    \triangleleft ((f,\beta,g), \gamma)) \] and the result follows by
-    reflexivity.
+    \[ \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} f \beta} g \gamma\]
+    so the result holds by reflexivity.
   \end{enumerate}
 \end{definition}
 
 \begin{definition}
   Given categories $C,D,E$ and functors $F : \textrm{Functor} C D$ and
-  $G : \textrm{Functor} D E$, we can define the composition $G \circ F
-  : \textrm{Functor} C E$ as
+  $G : \textrm{Functor} D E$, we define the composition $G \circ F :
+  \textrm{Functor} C E$ as
   \begin{enumerate}
-  \item $(G \circ F)_0 = \lambda \alpha. G_0 (F_0 \alpha)$
+  \item $(G \circ F)_0 = \lambda \alpha. {G_0 ({F_0} \alpha)}$
   \item $(G \circ F)_1 =
-    \lambda \alpha.
+    \pendlambdaXdotY \alpha {
     \homrlambdaXatYdotZ f \beta
-    {\homrappXtoYatZ {G_1 (F_0 \alpha)} {\homrappXtoYatZ {F_1 \alpha} f \beta} {F_0 \beta}}$
+    {\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta} {F_0 \beta}}}$
   \item Preservation of identity requires proving
-    \[ \lambda \alpha. E_r((G \circ F)_0(\alpha)) \]
+    \[ \lambda \alpha. \pendappXtoY {E_r} {(G \circ F)_0\alpha} \]
     is equal to
     \[ \lambda \alpha.
-    \homrappXtoYatZ {(G \circ F)_1 \alpha} {C_r\alpha} \alpha \]
+    \homrappXtoYatZ {\pendappXtoY {(G \circ F)_1} \alpha} {\pendappXtoY {C_r}\alpha} \alpha \]
 
     Expanding definitions and $\beta$ reducing we need to show
 
-    \[ \lambda \alpha. E_r(G_0 (F_0 \alpha)) \]
+    \[ \pendlambdaXdotY\alpha {\pendappXtoY {E_r}{G_0 (F_0 \alpha)}} \]
     is equal to
-    \[ \lambda \alpha.
-    \homrappXtoYatZ {G_1 (F_0 \alpha)} {(\homrappXtoYatZ {F_1 \alpha} {C_r \alpha} \alpha)} {F_0 \alpha}\]
+    \[ \pendlambdaXdotY \alpha {\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} {\pendappXtoY {C_r} \alpha} \alpha)} {F_0 \alpha}}\]
 
     Proceeding from right to left applying transitivity:
     \begin{align*}
-      &\lambda \alpha.
-      \homrappXtoYatZ {G_1 (F_0 \alpha)} {(\homrappXtoYatZ {F_1 \alpha} {C_r \alpha} \alpha)} {F_0 \alpha}\\
-      &=\lambda \alpha.
-      \homrappXtoYatZ {G_1 (F_0 \alpha)} {((\lambda \alpha. \homrappXtoYatZ {F_1 \alpha} {C_r \alpha} \alpha)\alpha)} {F_0 \alpha}\\
-      &=\lambda \alpha.
-      \homrappXtoYatZ {G_1 (F_0 \alpha)} {((\lambda \alpha. {D_r {(F_0 \alpha)}})\alpha)} {F_0 \alpha}\\
-      &=\lambda \alpha.
-      \homrappXtoYatZ {G_1 (F_0 \alpha)} {({D_r {(F_0 \alpha)}})} {F_0 \alpha}\\
-      &=\lambda \alpha.
-      (\lambda \beta. \homrappXtoYatZ {G_1 \beta} {({D_r {\beta}})} \beta)({F_0 \alpha})\\
-      &=\lambda \alpha. (\lambda \beta. E_r {G_0 \beta})({F_0 \alpha})\\
-      &=\lambda \alpha. E_r {G_0 (F_0 \alpha)})\\
+      &\pendlambdaXdotY \alpha {\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} {\pendappXtoY {C_r} \alpha} \alpha)} {F_0 \alpha}}\\
+      &=\pendlambdaXdotY \alpha {\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {(\pendappXtoY{(\pendlambdaXdotY \alpha {\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} {\pendappXtoY {C_r} \alpha} \alpha})}\alpha)}} {F_0 \alpha}\\
+      &=\pendlambdaXdotY \alpha {\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {(\pendappXtoY{(\pendlambdaXdotY \alpha {{\pendappXtoY {D_r} {F_0 \alpha}}})}\alpha)}} {F_0 \alpha}\tag{*}\\
+      &=\pendlambdaXdotY \alpha {\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {\pendappXtoY {D_r} {F_0 \alpha}}} {F_0 \alpha}\\
+      &= \pendlambdaXdotY \alpha
+      \pendappXtoY {(\pendlambdaXdotY \beta {{\homrappXtoYatZ {\pendappXtoY {G_1} \beta} {\pendappXtoY {D_r} \beta} \beta}})} {F_0 \alpha}\\
+      &= \pendlambdaXdotY \alpha
+      \pendappXtoY {(\pendlambdaXdotY \beta \pendappXtoY {E_r} {G_0 \beta})} {F_0 \alpha}\tag{*}\\
+      &= \pendlambdaXdotY \alpha \pendappXtoY {E_r} {G_0 (F_0 \beta)}\\
     \end{align*}
 
     Where the two marked lines follow from congruence using the
@@ -1462,88 +1450,49 @@ We can immediately define identity and composition of functors.
 
   \item Preservation of Composition.
     
-    \[ \lambda \alpha. \lambda \gamma, p.
-    \textrm{ind}_\odot(p, f. \beta. g.
-    {(G \circ F)_1} {\alpha} \triangleleft (C_t^\odot \alpha \triangleleft ((f,\beta,g), \gamma), \gamma)
-    )\]
+    \[ \homrappXtoYatZ {\pendappXtoY{(G \circ F)_1} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} f \beta} g \gamma)}\gamma\]
+    equals
 
-    \[
-    \lambda \alpha. \lambda\gamma, p.
-    \textrm{ind}(p, f.\beta.g.
-    E_t {((G \circ F)_0 \alpha)} \triangleleft (({(G \circ F)}_1 \alpha \triangleleft(f, \beta), {(G \circ F)}_0 \beta, {(G \circ F)}_1 \beta \triangleleft (g, \gamma)), {(G \circ F)}_0 \gamma)
-    ) \]
+    \[ \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {E_t} {(G \circ F)_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {(G\circ F)_1} \alpha} f \beta)} {(G\circ F)_0 \beta}} {(\homrappXtoYatZ {\pendappXtoY {(G\circ F)_1} \beta} g \gamma)} {{F_0} \gamma}\]
 
     Reducing, we need to show
-    \[ \lambda \alpha. \lambda \gamma, p.
-    \textrm{ind}_\odot(p, f. \beta. g.
-    G_1(F_0 \alpha) \triangleleft (F_1 \alpha \triangleleft (C_t^\odot \alpha \triangleleft ((f,\beta,g), \gamma), \gamma), (F_0 \gamma)))\]
+    \[ \homrappXtoYatZ {\pendappXtoY{G_1} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t}\alpha} f {\beta}} g {\gamma})} \gamma)} {F_0 \gamma} \]
 
-    Is equal to
-    \[
-    \lambda \alpha. \lambda\gamma, p.
-    \textrm{ind}(p, f.\beta.g.
-    E_t {(G_0(F_0\alpha))} \triangleleft (
-    (
-    (G_1 (F_0 \alpha) \triangleleft (F_1 \alpha \triangleleft (f, \beta), F_0 \beta)),
-    G_0(F_0 \beta),
-    (G_1 (F_0 \beta) \triangleleft (F_1 \beta \triangleleft (g, \gamma), F_0 \gamma))),
-    G_0(F_0 \gamma))
-    ) \]
+    is equal to
+    \[ \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {E_t} {G_0(F_0\alpha)}}
+      {({\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {F_0 \beta}})}
+      {G_0(F_0\beta)}}
+       {({\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \beta}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {F_0 \gamma}})}
+       {{F_0} \gamma}\]
 
+    Going from left to right:
     \begin{align*}
-      &\lambda \alpha. \lambda \gamma, p.
-    \textrm{ind}_\odot(p, f. \beta. g.
-    G_1(F_0 \alpha) \triangleleft (F_1 \alpha \triangleleft (C_t^\odot \alpha \triangleleft ((f,\beta,g), \gamma), \gamma))\\
-    &=
-    \lambda \alpha. \lambda \gamma, p.
-    \textrm{ind}_\odot(p, f. \beta. g.
-    G_1(F_0 \alpha) \triangleleft
-    (\lambda \alpha. \lambda (p, \gamma). \textrm{ind}_\odot(p, f.\beta.g.
-    (F_1 \alpha \triangleleft (C_t^\odot \alpha \triangleleft ((f,\beta,g), \gamma), \gamma)))
-    ) \alpha \triangleleft ((f,\beta,g), \gamma)\\
-    &=
-    \lambda \alpha. \lambda \gamma, p.
-    \textrm{ind}_\odot(p, f. \beta. g.
-    G_1(F_0 \alpha) \triangleleft
-    ((\lambda \alpha. \lambda (p, \gamma). \textrm{ind}_\odot(p, f.\beta.g.\\
-    & \quad\quad
-    D_t (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (f, \beta), F_0 \beta, F_1 \beta \triangleleft (g, \gamma)), F_0 \gamma))
-    ) \alpha \triangleleft ((f,\beta,g), \gamma), F_0 \gamma)\\
-    &=
-    \lambda \alpha. \lambda \gamma, p. \textrm{ind}_\odot(p, f. \beta. g.\\
-    &\quad\quad
-    G_1(F_0 \alpha) \triangleleft
-    (
-    D_t (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (f, \beta), F_0 \beta, F_1 \beta \triangleleft (g, \gamma)), F_0 \gamma))
-    , F_0 \gamma)\\
-    &=
-    \lambda \alpha. \lambda \gamma, p. \textrm{ind}_\odot(p, f. \beta. g.\\
-    &\quad\quad
-    (\lambda \alpha'. \lambda \gamma', p'.
-    \textrm{ind}_\odot(p', f'. \beta'. g'.
-    G_1 {\alpha'} \triangleleft (D_t {\alpha'} \triangleleft ((f',\beta',g'), \gamma'), \gamma')
-    )) (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (f,\beta),F_0 \beta,F_1 \beta \triangleleft (g,\gamma)), F_0 \gamma)
-    )\\
-    &= \lambda \alpha. \lambda \gamma, p. \textrm{ind}_\odot(p, f. \beta. g.
-    (\lambda \alpha'. \lambda \gamma', p'. \textrm{ind}_\odot(p', f'. \beta'. g'.\\
-    &\quad\quad
-    E_t {(G_0 \alpha')} \triangleleft (
-    (G_1 \alpha' \triangleleft (f', \beta'),
-    G_0 \beta',
-    G_1 \beta' \triangleleft (g', \gamma'))
-    , G_0 \gamma')
-    )) (F_0 \alpha)\triangleleft ((F_1 \alpha \triangleleft (f,\beta),F_0 \beta,F_1 \beta \triangleleft (g,\gamma)), F_0 \gamma)
-    )\\
-    &= \lambda \alpha. \lambda \gamma, p. \textrm{ind}_\odot(p, f. \beta. g.\\
-    &\quad\quad
-    E_t {(G_0 (F_0 \alpha))} \triangleleft (
-    (G_1 (F_0 \alpha) \triangleleft (F_1 \alpha \triangleleft (f,\beta), (F_0 \beta)),
-    G_0 (F_0 \beta),
-    G_1 (F_0 \beta) \triangleleft (F_1 \beta \triangleleft (g,\gamma), (F_0 \gamma)))
-    , G_0 (F_0 \gamma))
-    )\\
+      &\homrappXtoYatZ {\pendappXtoY{G_1} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t}\alpha} f {\beta}} g {\gamma})} \gamma)} {F_0 \gamma}\\
+      &=
+      \homrappXtoYatZ
+      {\pendappXtoY{G_1} {F_0 \alpha}}
+      {(({\homrappXtoYatZ {\homrappXtoYatZ{\pendappXtoY{(\pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f \beta {\homrlambdaXatYdotZ g \gamma {\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t}\alpha} f {\beta}} g {\gamma})} \gamma}}})}\alpha} f \beta} g \gamma}))}
+      {F_0 \gamma}\\
+      &=
+      \homrappXtoYatZ
+      {\pendappXtoY{G_1} {F_0 \alpha}}
+      {(({\homrappXtoYatZ {\homrappXtoYatZ{\pendappXtoY{(\pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f \beta {\homrlambdaXatYdotZ g \gamma {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {(F_0 \alpha)}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {(F_0 \beta)}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {{F_0} \gamma}}}})}\alpha} f \beta} g \gamma}))}
+      {F_0 \gamma}\tag{*}\\
+      &=
+      \homrappXtoYatZ
+      {\pendappXtoY{G_1} {F_0 \alpha}}
+      {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {(F_0 \alpha)}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {(F_0 \beta)}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {{F_0} \gamma}}      
+      {F_0 \gamma}\\
+      &=
+      {(({\homrappXtoYatZ {\homrappXtoYatZ{\pendappXtoY{(\pendlambdaXdotY {\alpha'} {\homrlambdaXatYdotZ {f'} {\beta'} {\homrlambdaXatYdotZ {g'} {\gamma'} {{\homrappXtoYatZ {\pendappXtoY {G_1} {\alpha'}} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t}{\alpha'}} {f'} {\beta'}} {g'} {\gamma'})} {\gamma'}}}}})}{F_0\alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {F_0\beta}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {F_0\gamma}}))}\\
+      &=
+      {(({\homrappXtoYatZ {\homrappXtoYatZ{\pendappXtoY{(\pendlambdaXdotY {\alpha'} {\homrlambdaXatYdotZ {f'} {\beta'} {\homrlambdaXatYdotZ {g'} {\gamma'} {{\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {E_t} {(G_0 \alpha')}} {(\homrappXtoYatZ {\pendappXtoY {G_1} \alpha'} {f'} {\beta'})} {(G_0 \beta')}} {(\homrappXtoYatZ {\pendappXtoY {G_1} \beta'} {g'} {\gamma'})} {{G_0} \gamma'}}}}})}{F_0\alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {F_0\beta}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {F_0\gamma}}))}\\
+      &= \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {E_t} {G_0(F_0\alpha)}}
+      {({\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {F_0 \beta}})}
+      {G_0(F_0\beta)}}
+       {({\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \beta}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {F_0 \gamma}})}
+       {{F_0} \gamma}
     \end{align*}
-    
   \end{enumerate}
 \end{definition}
 
