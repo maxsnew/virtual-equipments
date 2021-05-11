@@ -57,8 +57,8 @@
 \newcommand{\pipe}{\mathrel{|}}
 
 \newcommand{\punitinXfromYtoZ}[3]{#2 \mathop{\to_{#1}} #3}
-\newcommand{\punitrefl}[1]{\textrm{id}(#1)}
-\newcommand{\punitelimXtoYwithkontZ}[3]{\textrm{ind}_{\to}(#1,#2,#3)}
+\newcommand{\punitrefl}[1]{\textrm{id}_{#1}}
+\newcommand{\punitelimtoYwithkontZ}[2]{\textrm{ind}_{\to}(#1,#2)}
 
 \newcommand{\odotexists}[1]{\mathop{\overset{\exists #1}\odot}}
 \newcommand{\tensorexistsXwithYandZ}[3]{#2 \odotexists{#1} #3}
@@ -82,9 +82,9 @@
 \newcommand{\homrappXtoYatZ}[3]{#1 \trwith{#3} #2}
 \newcommand{\homlappXtoYatZ}[3]{#2 \tlwith{#3} #1}
 
-\newcommand{\coendallXdotY}[2]{\forall #1. #2}
-\newcommand{\coendlambdaXdotY}[2]{\lambda #1. #2}
-\newcommand{\coendappXtoY}[2]{#1^{#2}}
+\newcommand{\pendallXdotY}[2]{\forall #1. #2}
+\newcommand{\pendlambdaXdotY}[2]{\lambda #1. #2}
+\newcommand{\pendappXtoY}[2]{#1^{#2}}
 
 
 
@@ -845,31 +845,30 @@ First, $\beta$.
     %% (A \to A')[\xi] = A[d^-\xi] \to A'[d^+\xi]
 
     \inferrule*[right=Unit-Introduction]
-    {\Gamma\pipe\alpha : \cat D \vdash A : \cat C}
-    {\Gamma \pipe\alpha : \cat D \vdash \punitrefl{A} : \punitinXfromYtoZ C A {A}}
-    \punitrefl A [B/\alpha] = \punitrefl{A[B/\alpha]}
+    {\Gamma\pipe\cdot\vdash C : \Sort}
+    {\Gamma \pipe\cdot \vdash \punitrefl C : \pendallXdotY {\alpha:C} \punitinXfromYtoZ C \alpha {\alpha}}
 
     \inferrule*[right=Unit Elim]{
       \Gamma\pipe\cdot \vdash Q : \harr C C\and
-      \Phi \vdash M : \punitinXfromYtoZ C {A} {A'}\and
-      \Gamma\pipe\cdot\vdash N : \coendallXdotY {\alpha:C} {\harrapp Q \alpha \alpha}}
-    {\Gamma\pipe\Phi \vdash \punitelimXtoYwithkontZ Q M N : \harrapp Q {A} {A'}}
-
-    \textrm{TODO: do we need to include $A,A'$ in the elim form?}
+      \Gamma\pipe\cdot\vdash N : \pendallXdotY {\alpha:C} {\harrapp Q \alpha \alpha}}
+    {\Gamma\pipe\cdot \vdash \punitelimtoYwithkontZ Q N :
+      \pendallXdotY {\alpha} {\homrallXYtoZ {\alpha'} {\punitinXfromYtoZ C {\alpha}{\alpha'}} {\harrapp Q {\alpha}{\alpha'}}}
+      }
 
     %% J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1, M, A_2)[\phi] = J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1[d^-\phi], M[\phi], A_2[d^+\phi])
-
-    \inferrule*[right=Unit$\beta$]{}{\punitelimXtoYwithkontZ Q {\punitrefl A} N = \coendappXtoY N A}
 
     %% \inferrule*[right=Unit$\beta$]{\beta:\cat D \vdash A : \cat C\and
     %%   \alpha:\cat C \vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]
     %% }{\beta : \cat D \vdash J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A, \id(A), A) = N[A/\alpha] : Q[A/\alpha_1,A/\alpha_2]}
+    %%
+
+    \homrappXtoYatZ {\pendappXtoY {\punitelimtoYwithkontZ Q N} A} {\pendappXtoY {\punitrefl C} A} A = \pendappXtoY N A
 
     \inferrule*[right=Unit$\eta$]
     {\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2:\cat C \vdash M : \harrapp Q {\alpha_1} {\alpha_2}}
     {\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2:\cat C \vdash M =
-    \punitelimXtoYwithkontZ Q f {\coendlambdaXdotY {\alpha}{M[\alpha/\alpha_1,\punitrefl \alpha, \alpha/\alpha_2]}}  
-    : \harr Q {\alpha_1}{\alpha_2}}
+      \homrappXtoYatZ {\pendappXtoY {\punitelimtoYwithkontZ Q {\pendlambdaXdotY \alpha M[\alpha/\alpha_1,\pendappXtoY {\punitrefl C} \alpha/f,\alpha/\alpha_2]}} {\alpha_1}} f {\alpha_2}
+    : \harrapp Q {\alpha_1}{\alpha_2}}
   \end{mathpar}  
   \caption{Unit Primitive Rules}
 \end{figure}
@@ -950,14 +949,14 @@ in particular.
 
   \inferrule*[right=Tensor simpl]
   {\Gamma\pipe\cdot \vdash R : \harr {C} {E}\and
-   \Gamma\pipe\cdot \vdash N : \coendallXdotY {\alpha:C} {\homrallXYtoZ {\beta:D} P {\homrallXYtoZ {\gamma:E} Q {\harrapp R \alpha\gamma}}}}
+   \Gamma\pipe\cdot \vdash N : \pendallXdotY {\alpha:C} {\homrallXYtoZ {\beta:D} P {\homrallXYtoZ {\gamma:E} Q {\harrapp R \alpha\gamma}}}}
   {\Gamma\pipe\alpha:C,p:\tensorexistsXwithYandZ {\beta:D} P Q,\gamma:E \vdash\tensorelimVatWtoXtoYwithkontZ p \alpha \gamma R N : \harrapp R A G}
 
   \inferrule*[right=Tensor elim]
   {\Gamma\pipe\cdot \vdash R : \harr {C} {E}\and
    \Gamma\pipe\Phi \vdash M : \tensorexistsXwithYandZ {\beta:D} {P[A/\alpha;]} {Q[;G/\gamma]}\and
-   \Gamma\pipe\cdot \vdash N : \coendallXdotY {\alpha:C} {\homrallXYtoZ {\beta:D} P {\homrallXYtoZ {\gamma:E} Q {\harrapp R \alpha\gamma}}}}
-  {\Gamma\pipe\alpha:C,p:\tensorexistsXwithYandZ {\beta:D} P Q,\gamma:E \vdash\tensorelimVatWtoXtoYwithkontZ M A G R N : \harrapp R A G}
+   \Gamma\pipe\cdot \vdash N : \pendallXdotY {\alpha:C} {\homrallXYtoZ {\beta:D} P {\homrallXYtoZ {\gamma:E} Q {\harrapp R \alpha\gamma}}}}
+  {\Gamma\pipe\Phi \vdash\tensorelimVatWtoXtoYwithkontZ M A G R N : \harrapp R A G}
 
   J_\odot(\alpha. \gamma. S, \alpha.q.\beta.r.\gamma.N, A, M, G)[\phi] =
   J_\odot(\alpha. \gamma. S, \alpha.q.\beta.r.\gamma.N, A[d^-\phi], M[\phi], G[d^+\phi])
@@ -1144,22 +1143,22 @@ and identity types.
 
     \inferrule
     {\Gamma \pipe \alpha:\cat C\vdash R \isaSet}
-    {\Gamma \pipe \cdot \vdash \coendallXdotY {\alpha:{\cat C}} R \isaSet}
+    {\Gamma \pipe \cdot \vdash \pendallXdotY {\alpha:{\cat C}} R \isaSet}
 
     \inferrule
     {\Gamma \pipe \alpha:\cat C\vdash M : R}
-    {\Gamma \pipe \cdot \vdash \coendlambdaXdotY \alpha M : \coendallXdotY \alpha R}
+    {\Gamma \pipe \cdot \vdash \pendlambdaXdotY \alpha M : \pendallXdotY \alpha R}
 
     \inferrule
     {\Gamma\pipe\cdot \pipe \cdot \vdash M : \forall \alpha:\cat C. R\and
       \Gamma \pipe \beta:\cat D \vdash A : \cat C}
-    {\Gamma \pipe \beta:\cat D\pipe\beta:\cat D \vdash \coendappXtoY M A : R[A/\alpha]}
+    {\Gamma \pipe \beta:\cat D\pipe\beta:\cat D \vdash \pendappXtoY M A : R[A/\alpha]}
 
-    \coendappXtoY {(\coendlambdaXdotY \alpha M)} A = M[A/\alpha]
+    \pendappXtoY {(\pendlambdaXdotY \alpha M)} A = M[A/\alpha]
 
     \inferrule*[right=2Cell$\eta$]
-    {\Gamma \pipe \cdot \vdash M : \coendallXdotY \alpha R }
-    {\Gamma \pipe \cdot \vdash M = \coendlambdaXdotY \alpha {\coendappXtoY M \alpha} : \coendallXdotY \alpha R }
+    {\Gamma \pipe \cdot \vdash M : \pendallXdotY \alpha R }
+    {\Gamma \pipe \cdot \vdash M = \pendlambdaXdotY \alpha {\pendappXtoY M \alpha} : \pendallXdotY \alpha R }
   \end{mathpar}
   \caption{Internalizing VE Structure}
 \end{figure}
@@ -1293,9 +1292,9 @@ read exactly as the classical definitions.
   \item A sort $C_0 : \Sort$
   \item A span $C_1 : \harr{C_0}{ C_0}$
   \item Identity arrows
-    $C_r : \coendallXdotY {\alpha :  C_0} {\harrapp{C_1} \alpha \alpha}$
+    $C_r : \pendallXdotY {\alpha :  C_0} {\harrapp{C_1} \alpha \alpha}$
   \item Composition of arrows
-    \[ C_t : \coendallXdotY \alpha {\homrallXYtoZ \beta {\harrapp{C_1} \alpha \beta} {\homrallXYtoZ \gamma {\harrapp{C_1} \beta \gamma} {\harrapp{C_1} \alpha \gamma}}}\]
+    \[ C_t : \pendallXdotY \alpha {\homrallXYtoZ \beta {\harrapp{C_1} \alpha \beta} {\homrallXYtoZ \gamma {\harrapp{C_1} \beta \gamma} {\harrapp{C_1} \alpha \gamma}}}\]
     
     %% \[ C_t^\triangleright : \forall \alpha :  C_0. \forall \beta. ({C_1} \beta \alpha) \triangleright \forall \gamma. ({C_1} \gamma \beta) \triangleright {C_1} \gamma \alpha \]
 
@@ -1313,28 +1312,28 @@ read exactly as the classical definitions.
     %% \[ C_t^\odot : \forall \gamma. \forall \alpha. {C_1}\alpha\gamma \triangleleft (\exists \beta. {C_1}\alpha\beta\odot {C_1}\beta\gamma)\]
   \item Satisfying right unitality, i.e., for any $\Phi \vdash f :
     \harrapp {C_1} A B$, we'd like $f; r(B) = f$. We can formalize this
-    using an equality of two transformations of type $\coendallXdotY
+    using an equality of two transformations of type $\pendallXdotY
     \alpha {\homrallXYtoZ \beta {\harrapp{C_1} \alpha \beta} {\harrapp{C_1} \alpha \beta}}$
 
-    \[ \coendlambdaXdotY \alpha {\homrlambdaXatYdotZ f \beta {\homrappXtoYatZ {\homrappXtoYatZ {\coendappXtoY {C_t} \alpha} {f} \beta} {\coendappXtoY {C_r} \beta} \beta}}
-    = \coendlambdaXdotY \alpha {\homrlambdaXatYdotZ f \beta f} \]
+    \[ \pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f \beta {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} {f} \beta} {\pendappXtoY {C_r} \beta} \beta}}
+    = \pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f \beta f} \]
 
     These kinds of equalities between 2-cells are very common in
     internal category theory, so to save space we will suppress the
     sequence of $\lambda$s that start such equalities. So the above can simply be written as
 
-    \[ { {\homrappXtoYatZ {\homrappXtoYatZ {\coendappXtoY {C_t} \alpha} {f} \beta} {\coendappXtoY {C_r} \beta} \beta}} = { f}\]
+    \[ { {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} {f} \beta} {\pendappXtoY {C_r} \beta} \beta}} = { f}\]
 
   \item and left unitality (an equality of the same type as right unitality):
 
 
-    \[ { {\homrappXtoYatZ {\homrappXtoYatZ {\coendappXtoY {C_t} \alpha} {\coendappXtoY {C_r} \alpha} \alpha} f \beta}} = { f}\]
+    \[ { {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} {\pendappXtoY {C_r} \alpha} \alpha} f \beta}} = { f}\]
   \item and associativity, which is an equality at type
-    \[ \coendallXdotY \alpha {\homrallXYtoZ \beta {\harrapp{C_1} \alpha \beta} {\homrallXYtoZ \gamma {\harrapp{C_1} \beta \gamma} {\homrallXYtoZ \delta {\harrapp{C_1} \gamma \delta} {\harrapp{C_1} \alpha \delta}}}}\]
+    \[ \pendallXdotY \alpha {\homrallXYtoZ \beta {\harrapp{C_1} \alpha \beta} {\homrallXYtoZ \gamma {\harrapp{C_1} \beta \gamma} {\homrallXYtoZ \delta {\harrapp{C_1} \gamma \delta} {\harrapp{C_1} \alpha \delta}}}}\]
 
-    \[ \homrappXtoYatZ {\homrappXtoYatZ {\coendappXtoY {C_t}\alpha} f \beta} {(\homrappXtoYatZ {\homrappXtoYatZ {\coendappXtoY {C_t}\beta} g \gamma} h \delta)} \delta
+    \[ \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t}\alpha} f \beta} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t}\beta} g \gamma} h \delta)} \delta
     =
-    \homrappXtoYatZ {\homrappXtoYatZ {\coendappXtoY {C_t}\alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\coendappXtoY {C_t}\alpha} f \beta} g \gamma)} \gamma} h \delta \]
+    \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t}\alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t}\alpha} f \beta} g \gamma)} \gamma} h \delta \]
   \end{enumerate}
 \end{definition}
 
@@ -1345,23 +1344,23 @@ read exactly as the classical definitions.
   \begin{enumerate}
   \item a map of objects $F_0 : \varr {C_0} {D_0}$
   \item a map of arrows
-    $F_1 : \coendallXdotY {\alpha}
+    $F_1 : \pendallXdotY {\alpha}
     {\homrallXYtoZ \beta {\harrapp{C_1} \alpha \beta} {\harrapp{D_1} {F_0 \alpha}{F_0 \beta}}}$
   \item That preserves identity. This is given by equality between the
     following terms of type $\forall \alpha:{{C_0}}. D_1 {(F_0 \alpha)}{(F_0\alpha)}$:
-    \[ \homrappXtoYatZ {\coendappXtoY {F_1}\alpha} {\coendappXtoY {C_r} \alpha} \alpha = \coendappXtoY {D_r}{F_0\alpha} \]
+    \[ \homrappXtoYatZ {\pendappXtoY {F_1}\alpha} {\pendappXtoY {C_r} \alpha} \alpha = \pendappXtoY {D_r}{F_0\alpha} \]
   \item And preserves composition.
     This is given by an equality between the following terms of type
 
-    \[ \coendallXdotY \alpha
+    \[ \pendallXdotY \alpha
     \homrallXYtoZ {\beta} {\harrapp{C_1} \alpha \beta} {\homrallXYtoZ \gamma {\harrapp{C_1} \beta \gamma} {\harrapp{D_1} {F_0 \alpha} {F_0 \gamma}}}\]
 
     First, we can compose in $C$, and then map using $F$:
-    \[ \homrappXtoYatZ {\coendappXtoY{F_1} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\coendappXtoY {C_t} \alpha} f \beta} g \gamma)}\gamma\]
+    \[ \homrappXtoYatZ {\pendappXtoY{F_1} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} f \beta} g \gamma)}\gamma\]
 
     
     or we can map the morphisms with $F$, and then compose them in $D$:
-    \[ \homrappXtoYatZ {\homrappXtoYatZ {\coendappXtoY {D_t} {(F_0 \alpha)}} {(\homrappXtoYatZ {\coendappXtoY {F_1} \alpha} f \beta)} {(F_0 \beta)}} {(\homrappXtoYatZ {\coendappXtoY {F_1} \beta} g \gamma)} {{F_0} \gamma}\]
+    \[ \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {(F_0 \alpha)}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {(F_0 \beta)}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {{F_0} \gamma}\]
   \end{enumerate}
 \end{definition}
 
