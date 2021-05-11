@@ -62,8 +62,9 @@
 
 \newcommand{\odotexists}[1]{\mathop{\overset{\exists #1}\odot}}
 \newcommand{\tensorexistsXwithYandZ}[3]{#2 \odotexists{#1} #3}
-\newcommand{\tensorintroatXwithYandZ}[3]{(#2,{}^{#1},#3)}
+\newcommand{\tensorintroofXandY}[2]{\textrm{pair}_\odot(#1,#2)}
 \newcommand{\tensorelimXtoYwithkontZ}[3]{\textrm{ind}_{\to}(#1,#2,#3)}
+\newcommand{\tensorelimfromWXtoYwithkontZ}[4]{\textrm{ind}_{\odot}(#1,#2,#3,#4)}
 \newcommand{\tensorelimVatWtoXtoYwithkontZ}[5]{\textrm{ind}_{\to}(#4,#2,#1,#3,#5)}
 
 \newcommand{\tlwith}[1]{\mathop{\prescript{#1}{}\triangleleft}}
@@ -923,7 +924,7 @@ a coend:
 
 \[ \int^{d \in D} R(-,d) \otimes S(d,=) \]
 
-We will instead use slightly more logical notation, writing the end as
+We will instead use slightly more logical notation, writing the coend as
 an existential quantifier, justified by the analogy between the two
 and the structure of the introduction/elimination forms in our syntax
 in particular.
@@ -939,27 +940,39 @@ in particular.
   %% {\alpha : \cat C, q : Q, \beta : \cat D, r : R, \gamma : \cat E \vdash (q, \beta,r) : \exists \beta : \cat D. Q \odot R}
 
   \inferrule*[right=Tensor introduction]
-  {\Phi = \Psi_M \jnctx \Psi_N \and
-   \Gamma \pipe d^+\Psi_M \vdash B : D\and
-   \Gamma \pipe \Psi_M \vdash M : P[;B/\beta] \and
-   \Gamma \pipe \Psi_N \vdash N : Q[B/\beta;]}
-  {\Gamma\pipe\Phi\vdash \tensorintroatXwithYandZ B M N : \tensorexistsXwithYandZ {\beta : D} P Q}
+  {\Gamma \vdash P : \harr C D \and
+    \Gamma \vdash Q : \harr D E}
+  {\Gamma\pipe\cdot\vdash \tensorintroofXandY P Q : \pendallXdotY {\alpha} \homrallXYtoZ \beta {\harrapp P \alpha \beta} {\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta}{\harrapp Q \beta \gamma})}}}
 
-  \tensorintroatXwithYandZ B M N [\phi,B'/\beta',\psi] = \tensorintroatXwithYandZ {B[B'\beta]} {M[\phi]} {N[\psi]}
+  %% \inferrule*[right=Tensor introduction]
+  %% {\Phi = \Psi_M \jnctx \Psi_N \and
+  %%  \Gamma \pipe d^+\Psi_M \vdash B : D\and
+  %%  \Gamma \pipe \Psi_M \vdash M : P[;B/\beta] \and
+  %%  \Gamma \pipe \Psi_N \vdash N : Q[B/\beta;]}
+  %% {\Gamma\pipe\Phi\vdash \tensorintroatXwithYandZ B M N : \tensorexistsXwithYandZ {\beta : D} P Q}
 
-  \inferrule*[right=Tensor simpl]
-  {\Gamma\pipe\cdot \vdash R : \harr {C} {E}\and
-   \Gamma\pipe\cdot \vdash N : \pendallXdotY {\alpha:C} {\homrallXYtoZ {\beta:D} P {\homrallXYtoZ {\gamma:E} Q {\harrapp R \alpha\gamma}}}}
-  {\Gamma\pipe\alpha:C,p:\tensorexistsXwithYandZ {\beta:D} P Q,\gamma:E \vdash\tensorelimVatWtoXtoYwithkontZ p \alpha \gamma R N : \harrapp R A G}
+  %% \tensorintroatXwithYandZ B M N [\phi,B'/\beta',\psi] = \tensorintroatXwithYandZ {B[B'\beta]} {M[\phi]} {N[\psi]}
 
-  \inferrule*[right=Tensor elim]
-  {\Gamma\pipe\cdot \vdash R : \harr {C} {E}\and
-   \Gamma\pipe\Phi \vdash M : \tensorexistsXwithYandZ {\beta:D} {P[A/\alpha;]} {Q[;G/\gamma]}\and
-   \Gamma\pipe\cdot \vdash N : \pendallXdotY {\alpha:C} {\homrallXYtoZ {\beta:D} P {\homrallXYtoZ {\gamma:E} Q {\harrapp R \alpha\gamma}}}}
-  {\Gamma\pipe\Phi \vdash\tensorelimVatWtoXtoYwithkontZ M A G R N : \harrapp R A G}
+  %% \inferrule*[right=Tensor simpl]
+  %% {\Gamma\pipe\cdot \vdash R : \harr {C} {E}\and
+  %%  \Gamma\pipe\cdot \vdash N : \pendallXdotY {\alpha:C} {\homrallXYtoZ {\beta:D} P {\homrallXYtoZ {\gamma:E} Q {\harrapp R \alpha\gamma}}}}
+  %% {\Gamma\pipe\alpha:C,p:\tensorexistsXwithYandZ {\beta:D} P Q,\gamma:E \vdash\tensorelimVatWtoXtoYwithkontZ p \alpha \gamma R N : \harrapp R A G}
 
-  J_\odot(\alpha. \gamma. S, \alpha.q.\beta.r.\gamma.N, A, M, G)[\phi] =
-  J_\odot(\alpha. \gamma. S, \alpha.q.\beta.r.\gamma.N, A[d^-\phi], M[\phi], G[d^+\phi])
+  \inferrule*[right=Tensor-elim]
+  {\Gamma \pipe \cdot \vdash P : \harr C D\and\Gamma \pipe \cdot \vdash Q : \harr D E\and
+   \Gamma \pipe \cdot \vdash R : \harr C E\and
+   \Gamma \pipe \cdot \vdash N : \pendallXdotY \alpha {\homrallXYtoZ \beta {\harrapp P \alpha \beta} {\homrallXYtoZ \gamma {\harrapp Q \beta \gamma}}}   
+  }
+  {\Gamma\pipe\cdot \vdash \tensorelimfromWXtoYwithkontZ P Q R N : \pendallXdotY \alpha {\homrallXYtoZ \gamma {\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta}{\harrapp Q \beta \gamma}} {\harrapp R \alpha \gamma}}}
+  
+  %% \inferrule*[right=Tensor elim]
+  %% {\Gamma\pipe\cdot \vdash R : \harr {C} {E}\and
+  %%  \Gamma\pipe\Phi \vdash M : \tensorexistsXwithYandZ {\beta:D} {P[A/\alpha;]} {Q[;G/\gamma]}\and
+  %%  \Gamma\pipe\cdot \vdash N : \pendallXdotY {\alpha:C} {\homrallXYtoZ {\beta:D} P {\homrallXYtoZ {\gamma:E} Q {\harrapp R \alpha\gamma}}}}
+  %% {\Gamma\pipe\Phi \vdash\tensorelimVatWtoXtoYwithkontZ M A G R N : \harrapp R A G}
+
+  %% J_\odot(\alpha. \gamma. S, \alpha.q.\beta.r.\gamma.N, A, M, G)[\phi] =
+  %% J_\odot(\alpha. \gamma. S, \alpha.q.\beta.r.\gamma.N, A[d^-\phi], M[\phi], G[d^+\phi])
 
   %% \inferrule*[right=Tensor elim Sequent]
   %% {\Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Psi \vdash N : S}
@@ -971,14 +984,22 @@ in particular.
   %% \phi : \Psi \to \Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Phi'}
   %% {\Psi  \vdash J_\odot(x;q.\beta.r. N)[\phi] : S}
 
+
+  
   \inferrule*[right=Tensor $\beta$]
-  {}{J_\odot(\alpha.\gamma.S, \alpha.q.\beta.r.\gamma.N,A,(M,B,N),G) = N[A/\alpha,M/q,B/\beta,N/r,G/\gamma]}
+  {}
+  {\homrappXtoYatZ {\pendappXtoY{\tensorelimfromWXtoYwithkontZ P Q R N} A} {(\homrappXtoYatZ{\homrappXtoYatZ{\pendappXtoY {\tensorintroofXandY P Q} A} f B} g G)} G =
+    \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY N A} f B} g G}
+  
+  %% \inferrule*[right=Tensor $\beta$]
+  %% {}{J_\odot(\alpha.\gamma.S, \alpha.q.\beta.r.\gamma.N,A,(M,B,N),G) = N[A/\alpha,M/q,B/\beta,N/r,G/\gamma]}
 
   \inferrule*[right=Tensor$\eta$]
-  {\alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E \vdash M : S}
+  {\alpha : \cat C, x : \tensorexistsXwithYandZ \beta P Q, \gamma : \cat E \vdash M : R}
   {\alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E \vdash M =
-    J(\alpha.\gamma.S, \alpha.q.\beta.r.\gamma. M[\alpha/\alpha,(q,\beta,r)/x,\gamma/\gamma])
-    : S}
+    \homrappXtoYatZ {\pendappXtoY{\tensorelimfromWXtoYwithkontZ P Q R
+        {\pendlambdaXdotY \alpha {\homrlambdaXatYdotZ p \beta {\homrlambdaXatYdotZ q \gamma {M[\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {\tensorintroofXandY P Q} \alpha} p \beta} q \gamma/x]}}}}
+      } \alpha} x \gamma : S}
 \end{mathpar}
 \caption{Tensor Primitive Rules}
 \label{fig:tensor}
