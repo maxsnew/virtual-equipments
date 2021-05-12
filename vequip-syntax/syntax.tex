@@ -80,6 +80,14 @@
 \newcommand{\homrappXtoYatZ}[3]{#1 \trwith{#3} #2}
 \newcommand{\homlappXtoYatZ}[3]{#2 \tlwith{#3} #1}
 
+\newcommand{\lambdaunary}[4]{\pendlambdaXdotY {#1} {\homrlambdaXatYdotZ {#2} {#3} {#4}}}
+\newcommand{\lambdabinary}[6]{\lambdaunary{#1}{#2}{#3}{\homrlambdaXatYdotZ{#4}{#5}{#6}}}
+\newcommand{\lambdatrinary}[8]{\lambdabinary{#1}{#2}{#3}{#4}{#5}{\homrlambdaXatYdotZ{#6}{#7}{#8}}}
+
+\newcommand{\appunary}[4]{\homrappXtoYatZ {\pendappXtoY {#1} {#2}} {#3} {#4}}
+\newcommand{\appbinary}[6]{\homrappXtoYatZ {\appunary{#1}{#2}{#3}{#4}}{#5}{#6}}
+\newcommand{\apptrinary}[8]{\homrappXtoYatZ {\appbinary{#1}{#2}{#3}{#4}{#5}{#6}}{#7}{#8}}
+
 \newcommand{\pendallXdotY}[2]{\forall #1. #2}
 \newcommand{\pendlambdaXdotY}[2]{\lambda #1. #2}
 \newcommand{\pendappXtoY}[2]{#1^{#2}}
@@ -1572,6 +1580,11 @@ Next, we show that Profunctors can be restricted by functors.
   \end{enumerate}
 \end{definition}
 
+\begin{definition}
+  An isomorphism between profunctors $R$ and $S$ is a mutually inverse
+  pair of homomorphisms.
+\end{definition}
+
 Additionally, we can define natural transformations between functors,
 but more generally, we can define a natural element of any
 endo-profunctor, where natural transformations from $F$ to $G$ are the
@@ -1587,24 +1600,32 @@ same as natural elements of $\text{Hom}(F-,G=)$.
   \]
 \end{definition}
 
+\begin{definition}[Natural Transformation]
+  A natural transformation from $F : \text{Functor} \,C\, D$ and $G :
+  \text{Functor}\,C\,D$ is a natural element of $\text{Hom}(D)[F;G]$
+\end{definition}
+
 Composition of natural transformations is then given by $C_t$.
 
 Natural elements are closely related to homomorphisms: a natural
-element equivalent to a homomorphism out of a Hom profunctor.
+element equivalent to a homomorphism out of a Hom profunctor. This is
+our first instance of a ``Yoneda'' principle that the behavior of some
+structure that varies naturally with the morphisms of a category is
+fully determined by its action on the identity morphisms.
 
 \begin{theorem}
   Natural elements of $R : \text{Prof}\, C C$ are equivalent to
   homomorphisms from $\text{Hom}_C$ to $R$.
 \end{theorem}
 \begin{enumerate}
-\item Given a natural element $\phi$ of $R$, define
-  \[ m(\phi) = \lambda \alpha. \lambda f : C_1 \alpha \alpha',\alpha'.
-  R_r(\phi \alpha, f) \]
-  (or equivalently $R_l(f, \phi \alpha')$).
+\item Given a natural element $\phi$ of $R$, we can define a
+  homomorphism by
+  \[ \pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f {\alpha'} \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} \alpha} {\pendappXtoY {C_r} \alpha} \alpha}{\pendappXtoY \phi \alpha} {\alpha}} f {\alpha'}} \]
+\item Given a homomorphism $m$ from $\text{Hom}(C)$ to $R$, define the
+  element as
+  \[ \pendlambdaXdotY \alpha {\homrappXtoYatZ {\pendappXtoY {m_f} \alpha} {\pendappXtoY {C_r}\alpha} \alpha}  \]
 
-  TODO:
-\item Given a homomorphism $m$ from $\text{Hom}_C$ to $R$, define the element as
-  \[ \lambda \alpha. m_f(C_r\alpha) \]
+  We should be able to show this is an isomorphism in the logic TODO!
 \end{enumerate}
 
 %% This last definition is probably unfamiliar to the reader that is not
@@ -1701,7 +1722,7 @@ $Hom_D(-,G=)$.
   between them. Then a \emph{right representation} of $Q$ consists of
   \begin{enumerate}
   \item A functor $G : \textrm{Functor}\, D C$
-  \item An isomorphism $I,I^-$ between $Q$ and $\text{Hom}_C(Id,G)$
+  \item An isomorphism $I,I^-$ between $Q$ and $\text{Hom}(C)[Id;G]$
   \end{enumerate}
 \end{definition}
 
@@ -1715,16 +1736,31 @@ of the structure. This can be simplified to the notion of a
   there exists
   \begin{enumerate}
   \item A function on objects $G_0 : \varr {D_0} {C_0}$
-  \item An ``introduction rule'', i.e., a term
-    $I : \forall \alpha. \forall \beta. (C_1 \alpha (G \beta))\triangleleft (Q_s \alpha \beta)$
-    (with no homomorphism conditions).
-  \item An ``universal morphism'', i.e., a term $\epsilon : \forall
-    \beta:D. Q(G \beta) \beta$.
-  \item Such that composition with $\epsilon$ is an inverse to $I$, i.e.,
+  \item A ``universal morphism'', i.e., a term $\epsilon :
+    \pendallXdotY \beta {\harrapp Q {G_0 \beta} \beta}$ (not
+    presupposed to be natural).
+  \item An ``introduction rule'', i.e., a term $I : \pendallXdotY
+    \alpha {\homrallXYtoZ \beta {\harrapp {Q_s}\alpha \beta} {\harrapp
+        {C_1} \alpha {G_0\beta}}}$ (not presupposed to satisfy the
+    homomorphism condition).
+  \item Such that composition with $\epsilon$ is a left and right
+    inverse to $I$. In more detail, we have two equalities.
 
-    \[
-    Q_r(\epsilon \beta, I(q)) = q
-    \]
+    \begin{enumerate}
+    \item First, the $\beta$ rule states that composing the universal
+      morphism with the introduction rule applied to a morphism $q : \harrapp {Q} \alpha {\beta}$ is
+      equal to the original $q$:
+
+      \[ q = \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} \alpha} {(\homrappXtoYatZ {\pendappXtoY I \alpha} {q} \beta)} {G_0 \beta}} {\pendappXtoY \epsilon \beta} {\beta}} {\pendappXtoY {D_r} \beta} {\beta} \]
+
+    \item Second, the $\eta$ rule says that every morphism $f :
+      \harrapp {C_1} \alpha {G_0 \beta}$ can be reconstructed using
+      $I$ after postcomposing with $\epsilon$:
+
+      \[ f = \homrappXtoYatZ {\pendappXtoY I \alpha} {({\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} \alpha} {f} {G_0 \beta}} {\pendappXtoY \epsilon \beta} {\beta}} {\pendappXtoY {D_r} \beta} {\beta}  })} {\beta}\]
+
+      As a special case, if $f = \pendappXtoY {C_r} {G_0 \beta}$, this shows that $\homrappXtoYatZ {\pendappXtoY I {G_0 \beta}} {\pendappXtoY \epsilon \beta} \beta = \pendappXtoY {C_r} {G_0 \beta}$
+    \end{enumerate}
   \end{enumerate}
 \end{definition}
 
@@ -1735,144 +1771,332 @@ naturality of $I,I^{-1}$.
 %
 The proof can be broken up into 3 conceptual steps:
 \begin{enumerate}
-\item First, $I^{-1}$ is, by a version of the Yoneda lemma, completely
-  determined by its behavior on the identity, which is precisely
-  $\epsilon$.
-\item Next, the functoriality of $G$ is derivable from $I,\epsilon$.
+\item First,, the functoriality of $G$ is derivable from $I,\epsilon$.
 \item Next, $I^{-1}$ is a homomorphism automatically since composition
-  with a morphism is automatically natural.
-\item Finally, $I$ is a homomorphism because the inverse of a natural
-  transformation is always natural.
+  with a morphism is automatically natural, where $I^{-1}$ is defined as
+  \[\pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f {\beta} \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} \alpha} f \beta}{\pendappXtoY \epsilon \beta} {\beta}} {\pendappXtoY {D_r \beta}} {\beta}} \]
+
+  \item Finally, $I$ is a homomorphism because the inverse of a
+    natural transformation is always natural.
 \end{enumerate}
 
-Part of this equivalence is the \emph{Yoneda Lemma}, which we state
-now in its internal, parameterized form.
-The usual non-parameterized Yoneda lemma can be formed if we have a
-unit sort.
+%% Part of this equivalence is the \emph{Yoneda Lemma}, which we state
+%% now in its internal, parameterized form.
+%% The usual non-parameterized Yoneda lemma can be formed if we have a
+%% unit sort.
 
-\begin{lemma}[Parameterized Yoneda Lemma]
-  Given categories $\cat C, \cat D$ and a profunctor $\alpha^o:\cat
-  C;\beta : \cat D \vdash \alpha \to_{Q} \beta$ and a function
-  $\beta : \cat D \vdash G[\beta] : \cat C$, then there is an
-  isomorphism between
-  \begin{enumerate}
-  \item Terms $\cdot \vdash t : G[\beta] \to_{Q} \beta$
-  \item left-homomorphisms $\phi : \alpha \to_{\cat C} G[\beta] \vdash
-    u : \alpha \to_{Q} \beta$ i.e. they satisfy homomorphism on the
-    left (the other side doesn't make sense if $G$ is not a functor):
-    $u[\phi \circ \psi] = u[\phi] \circ \psi$
-  \end{enumerate}
+\begin{lemma}[Universal Constructions are functorial]
+  For any universal construction $(G_0,\epsilon,I)$ for $Q :
+  \text{Prof}\,C\,D$, we can extend $G_0$ to a functor by defining
+
+  \[ G_1 = \pendlambdaXdotY \beta {\homrlambdaXatYdotZ f {\beta'}
+    {\homrappXtoYatZ {\pendappXtoY I {G_0\beta}} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} {G_0\beta}} {\pendappXtoY {C_r} {G_0\beta}} {G_0\beta}} {\pendappXtoY \epsilon {\beta}} \beta} {f} {\beta'})} {\beta'}}
+  }\]
+
+  Furthermore, $I,I^-1$ are homomorphisms with respect to the induced
+  profunctor structure.
 \end{lemma}
 \begin{proof}
-  First, the constructions
   \begin{enumerate}
-  \item Given $t$, we define $u(t)$ to be
-    \[\phi : \alpha \to_{\cat C} G[\beta] \vdash t \circ_{Q} \phi : \alpha \to_{Q} \beta\]
+  \item To prove $G_1$ preserves identity we need to show
+    \[ {\homrappXtoYatZ {\pendappXtoY I {G_0\beta}} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} {G_0\beta}} {\pendappXtoY {C_r} {G_0\beta}} {G_0\beta}} {\pendappXtoY \epsilon {\beta}} \beta} {\pendappXtoY {\pendappXtoY {D_r} {\beta}}} {\beta})} {\beta}} = \pendappXtoY{C_r} {G_0\beta}\]
+    which is precisely the $\eta$ principle.
 
-    Which is a left-homomorphism because:
-    \[ (t \circ_{Q} \phi) \circ_{Q} \psi = t \circ_{Q} (\phi \circ_{\cat C} \psi)\]
-  \item Given $u$, we define $t(u)$ to be
-    \[ \cdot \vdash u[\id_{G[\beta]}/\phi] : G[\beta] \to_{Q} \beta \]
-  \end{enumerate}
-  Now we show they are inverse
-  \begin{enumerate}
-  \item First, the very easy case, $\cdot \vdash t(u(t)) : G[\beta] \to_{Q} \beta$:
+  \item Next, we show $I^{-1}$ is a homomorphism from $\text{Hom}(C)[\text{Id}(C);G]$ to $Q$.
+    All of this is under the binders
+    \[\lambdatrinary {\alpha : C} {f : \harrapp {C_s} \alpha {\alpha'}}
+    {\alpha' : C} {g : \harrapp{C_s} {\alpha'} {G_0 \beta'}}
+    {\beta' : D} {h : \harrapp {D_s} {\beta'} {\beta}}
+    {}\]
+
+    % given
+    % f : a -> a' in C
+    % g : a' -> G b'
+    % h : b' -> b
+
+    %% I^{-1} (f ;C (g ;C G_1 h)) = Q_t f (I^{-1} g) h
+    
     \begin{align*}
-      t \circ_{Q} \id_{G[\beta]} &= t
+      & \appunary
+      {I^{-1}}
+      \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} {(
+          \appbinary {C_t} {\alpha'} g {G_0\beta'}
+          {(\appunary {G_1} {\beta'} h \beta)} {G_0 \beta})} {G_0 \beta})}
+      {\beta}\\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} {(
+          \appbinary {C_t} {\alpha'} g {G_0\beta'}
+          {(\appunary {G_1} {\beta'} h \beta)} {G_0 \beta})} {G_0 \beta})} \beta
+      {\pendappXtoY \epsilon \beta} \beta
+      {\pendappXtoY {D_r} \beta} {\beta}\\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} {(
+          \appbinary {C_t} {\alpha'} g {G_0\beta'}
+          {(\appunary {G_1} {\beta'} h \beta)} {G_0 \beta})} {G_0 \beta})} \beta
+      {\pendappXtoY \epsilon \beta} \beta
+      {(\appbinary {D_t} \beta {\pendappXtoY {D_r} \beta} \beta {\pendappXtoY {D_r} \beta} \beta)} {\beta}\\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
+        {(\appunary {G_1} {\beta'} h \beta)} {G_0 \beta})} \beta
+      {\pendappXtoY \epsilon \beta} \beta
+      {(\appbinary {D_t} \beta {\pendappXtoY {D_r} \beta} \beta {\pendappXtoY {D_r} \beta} \beta)} {\beta}\\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
+      {(\apptrinary {Q_t} {G_0 \beta'}
+        {(\appunary {G_1} {\beta'} h {\beta})} {G_0 \beta}
+        {\pendappXtoY \epsilon \beta} \beta
+        {\pendappXtoY {D_r} \beta} \beta)} \beta
+      {\pendappXtoY {D_r} \beta} \beta
+      \\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
+      {(\appunary {I^{-1}} {G_0 \beta'} {(\appunary {G_1} {\beta'} h \beta)} \beta)} \beta
+      {\pendappXtoY {D_r} \beta} \beta
+      \\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
+      {(\appunary {I^{-1}} {G_0 \beta'} {(\appunary {I} {G_0\beta'} {(\apptrinary {Q_t} {G_0 \beta'} {\pendappXtoY {C_r} {G_0 \beta'}} {G_0 \beta'} {\pendappXtoY \epsilon {\beta'}} {\beta'} h \beta)} \beta)} \beta)} \beta
+      {\pendappXtoY {D_r} \beta} \beta
+      \\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
+      {(\apptrinary {Q_t} {G_0 \beta'} {\pendappXtoY {C_r} {G_0 \beta'}} {G_0 \beta'} {\pendappXtoY \epsilon {\beta'}} {\beta'} h \beta)} \beta
+      {\pendappXtoY {D_r} \beta} \beta
+      \\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
+        {\pendappXtoY {C_r} {G_0 \beta'}} {G_0 \beta'})} {G_0 \beta'}
+      {\pendappXtoY \epsilon {\beta'}} {\beta'}
+      {(\appbinary {D_t} {\beta'} h \beta {\pendappXtoY {D_r} \beta} \beta)} \beta\\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
+      {\pendappXtoY \epsilon {\beta'}} {\beta'}
+      {(\appbinary {D_t} {\beta'} {\pendappXtoY {D_r} {\beta'}} {\beta'} h \beta )} \beta\\
+      &=
+      \apptrinary {Q_t} \alpha
+      f {\alpha'}
+      {(\apptrinary {Q_t} {\alpha'} g {G_0 \beta'} {\pendappXtoY \epsilon {\beta'}} {\beta'}{\pendappXtoY {D_r} {\beta'}} {\beta'})} {\beta'}
+      h \beta\\
+      &= \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} \alpha} f {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY {I^{-1}} {\alpha'}} {g} {\beta'})} {\beta'}} {h} {\beta}\\
     \end{align*}
-    by the fact that $Q$ is a profunctor.
-  \item Next, $\phi : \alpha \to_{\cat C} G[\beta] \vdash u(t(u)) : \alpha \to_{Q} \beta$:
+
+    
+  \item To prove $G_1$ preserves composition given $f : \harrapp {D_1} {\beta} {\beta'}$, $f' : \harrapp {D_1} {\beta'} {\beta''}$:
     \begin{align*}
-      u[\id_{G[\beta]}/\phi] \circ_{Q} \phi &= u[\id \circ_{\cat C} \phi/\phi]\\
-      &= u[\phi/\phi]\\
-      &= u
+      & \appunary {G_1} {\beta} {\appbinary {D_t} {\beta} f {\beta'} {f'} {\beta''}} {\beta'}\\
+      &= \appunary {I} {G_0 \beta} {(\apptrinary {Q_t} {G_0 \beta} {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta} {\pendappXtoY \epsilon {\beta}} {\beta} {({\appbinary {D_t} {\beta} f {\beta'} {f'} {\beta''}})} {\beta''})} {\beta''}\\
+      &= \appunary {I} {G_0 \beta} {(\apptrinary {Q_t} {G_0 \beta} {(\appbinary {C_t} {G_0 \beta} {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta} {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta})} {G_0 \beta} {\pendappXtoY \epsilon {\beta}} {\beta} {({\appbinary {D_t} {\beta} f {\beta'} {f'} {\beta''}})} {\beta''})} {\beta''}\\
+      &=
+      \appunary {I} {G_0 \beta}
+      {(\apptrinary {Q_t} {G_0 \beta}
+        {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta}
+        {(\apptrinary {Q_t} {G_0 \beta}
+          {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta}
+          {\pendappXtoY \epsilon {\beta}} {\beta}
+          f {\beta'})} {\beta'}
+        {f'} {\beta''}
+        )}
+      {\beta''}\\
+      &=
+      \appbinary {C_t} {G_0 \beta}
+      {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta}
+      {(\appbinary {C_t} {G_0 \beta}
+        {(\appunary {I} {G_0 \beta}
+        {(\apptrinary {Q_t} {G_0 \beta}
+          {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta}
+          {\pendappXtoY \epsilon {\beta}} {\beta}
+          f {\beta'})} {\beta'})} {G_0 \beta'}
+        {(\appunary {G_1} {\beta'} {f'} {\beta''})} {G_0 \beta''})}
+      {G_0 \beta''}\\
+      &=
+      \appbinary {C_t} {G_0 \beta}
+        {(\appbinary {C_t} {G_0 \beta}
+          {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta}
+          {(\appbinary {C_t} {G_0 \beta}
+            {(\appunary {I} {G_0 \beta} {\pendappXtoY \epsilon {\beta}} {\beta})} {G_0 \beta}
+            {(\appunary {G_1} \beta f {\beta'})} {G_0 \beta'})} {G_0 \beta'})} {G_0 \beta'}
+        {(\appunary {G_1} {\beta'} {f'} {\beta''})} {G_0 \beta''}\\
+      &=
+      \appbinary {C_t} {G_0 \beta}
+        {(\appbinary {C_t} {G_0 \beta}
+            {(\appunary {I} {G_0 \beta} {\pendappXtoY \epsilon {\beta}} {\beta})} {G_0 \beta}
+            {(\appunary {G_1} \beta f {\beta'})} {G_0 \beta'})} {G_0 \beta'}
+        {(\appunary {G_1} {\beta'} {f'} {\beta''})} {G_0 \beta''}\\
+      &=
+      \appbinary {C_t} {G_0 \beta}
+        {(\appbinary {C_t} {G_0 \beta}
+            {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta}
+            {(\appunary {G_1} \beta f {\beta'})} {G_0 \beta'})} {G_0 \beta'}
+        {(\appunary {G_1} {\beta'} {f'} {\beta''})} {G_0 \beta''}\\
+      &=
+      \appbinary {C_t} {G_0 \beta}
+      {(\appunary {G_1} \beta f {\beta'})} {G_0 \beta'}
+        {(\appunary {G_1} {\beta'} {f'} {\beta''})} {G_0 \beta''}\\
+      %% &\homrappXtoYatZ {\pendappXtoY {G_1} \beta} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {\beta}} {f} {\beta'}} {f'} {\beta''})} {\beta''}\\
+      %% &={\homrappXtoYatZ {\pendappXtoY I {G_0\beta}} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} {G_0\beta}} {\pendappXtoY {C_r} {G_0\beta}} {G_0\beta}} {\pendappXtoY \epsilon {\beta}} \beta} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {\beta}} {f} {\beta'}} {f'} {\beta''})} {\beta''})} {\beta''}}\\
+      %% &={\homrappXtoYatZ {\pendappXtoY I {G_0\beta}} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} {G_0\beta}} {({\pendappXtoY {C_r} {G_0\beta}})} {G_0\beta}} {\pendappXtoY \epsilon {\beta}} \beta} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {\beta}} {f} {\beta'}} {f'} {\beta''})} {\beta''})} {\beta''}}\\
     \end{align*}
-    which uses the fact that $u$ is a left-homomorphism.
+    %% \[
+    %%   {\homrappXtoYatZ {\pendappXtoY I {G_0\beta}} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} {G_0\beta}} {\pendappXtoY {C_r} {G_0\beta}} {G_0\beta}} {\pendappXtoY \epsilon {\beta}} \beta} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {\beta}} {f} {\beta'}} {f'} {\beta''})} {\beta''})} {\beta''}}
+    %% \]
   \end{enumerate}
 \end{proof}
 
-\begin{theorem}[Negative Types and Right Representables are Equivalent]
-  For any profunctor $\alpha^o: \cat C; \beta : \cat D \pipe \alpha
-  \to_{Q} \beta$, there is a bijection between
-  \begin{enumerate}
-  \item Right Represntables $\beta : \cat D \vdash G[\beta] : \cat C$ for $Q$.
-  \item Negative Types $\beta : \cat D \vdash N[\beta] : \cat C$
-    representing $Q$.
-  \end{enumerate}
-\end{theorem}
+\begin{lemma}[Inverse of homomorphism is a homomorphism]
+  Let $\phi$ be a homomorphism from $R$ to $S : \text{Prof} C D$ and
+  let $\psi : \pendallXdotY \alpha {\homrallXYtoZ \beta {\harrapp S
+      \alpha \beta}{\harrapp R \alpha \beta}}$. If $\psi$ is a
+  two-sided inverse to $\phi_f$ then $\psi$ is a homomorphism.
+\end{lemma}
 \begin{proof}
-  \begin{enumerate}
-  \item Given a right representable $G[\beta]$, we set $N(G)[\beta] =
-    G[\beta]$, the introduction rule is the same and the elimination
-    rule is given as in the Yoneda lemma and the inverse property
-    follows by the Yoneda isomorphism and the fact that $I_G^{-1}$ is
-    an inverse for $I_G$.
-  \item Given a negative type $N[\beta]$ we set $G(N)[\beta] =
-    N[\beta]$, the introduction rule is the same and the inverse
-    introduction rule is given as in the Yoneda lemma.  We need to
-    show that $N[\beta]$ has the structure of a functor and that
-    $I_{N}$ and $I_{N}^{-1}$ are homomorphisms on the right with
-    respect to that structure.  Define $N_1$ as follows:
-    \begin{mathpar}
-      \inferrule
-          {\beta_1^o:\cat D;\beta_2:\cat D \vdash \psi \circ \epsilon : N[\beta_1/\beta] \to_{Q} \beta_2\\
-            \phi : N[\beta_1/\beta] \to_{Q} \beta_2 \vdash I_N[\phi] : N[\beta_1/\beta] \to_{\cat C} N[\beta_2/\beta]
-          }
-          {\beta_1^o:\cat D;\beta_2:\cat D\pipe \psi : \beta_1 \to_{\cat D} \beta_2 \vdash I_N[\psi \circ \epsilon_{\beta_1}/\phi] : N[\beta_1/\beta] \to_{\cat C} N[\beta_2/\beta]}
-    \end{mathpar}
-    We need to show functoriality.
-    For identity we have
-    \begin{align*}
-      I_N[\id_{\beta} \circ \epsilon_{\beta}/\phi] &= I_N[\epsilon_{\beta}]\\
-      &= I_N[\epsilon \circ \id_{N[\beta]}]\\
-      &= \id_{N[\beta]} \tag{$\eta$}
-    \end{align*}
-    For composition,
-    \begin{align*}
-      N_1[\theta] \circ N_1[\psi]
-      &= I_N[\theta \circ \epsilon] \circ I_N[\psi \circ \epsilon]\\
-      &= I_N[(\theta \circ \epsilon) \circ I_N[\psi \circ \epsilon]]\tag{left homomorphism}\\
-      &= I_N[\theta \circ (\epsilon \circ I_N[\psi \circ \epsilon])]\\
-      &= I_N[\theta \circ (\psi \circ \epsilon)] \tag{$\beta$}\\
-      &= I_N[(\theta \circ \psi) \circ \epsilon]\\
-      &= N_1[\theta \circ \psi]
-    \end{align*}
-    Next we show $I_N$ is a right homomorphism, the typing here is
-    $\phi : \alpha \to_{Q} \beta_1, \theta : \beta_1 \to_{\cat D}
-    \beta_2$.
-    \begin{align*}
-      N_1[\theta] \circ I_N[\phi] &= I_N[\theta \circ \epsilon] \circ I_N[\phi]\\
-      &= I_N[\theta \circ \epsilon \circ I_N[\phi]]\tag{left homomorphism}\\
-      &= I_N[\theta \circ \phi] \tag{$\beta$}
-    \end{align*}
-    and to show $I_N^{-1}$ is a right homomorphism under $\phi : \alpha \to_{\cat C}N[\beta_1], \theta : \beta_1 \to_{\cat D} \beta_2$
-    \begin{align*}
-      I_N^{-1}[N_1[\theta] \circ \phi] &= \epsilon \circ (N_1[\theta] \circ \phi) \tag{def}\\
-      &= \epsilon \circ (I_N[\theta \circ \epsilon] \circ \phi)\tag{def}\\
-      &= (\epsilon \circ I_N[\theta \circ \epsilon]) \circ \phi\tag{assoc}\\
-      &= (\theta \circ \epsilon) \circ \phi\tag{$\beta$}\\
-      &= \theta \circ (\epsilon \circ \phi)\tag{assoc}\\
-      &= \theta \circ I_N^{-1}[\phi] \tag{def}
-    \end{align*}
-  \end{enumerate}
+  We need to show the homomorphism condition for $\psi$:
+  \[ \homrappXtoYatZ {\pendappXtoY \psi \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {S_t} \alpha} f {\alpha'}} s {\beta'}} g {\beta})} {\beta}
+    = \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} \alpha} f {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY \psi {\alpha'}} s {\beta'})} {\beta'}} g \beta
+    \]
 
-  Next we need to show that this is a \emph{bijection}.
-  \begin{enumerate}
-  \item Starting with a negative type $N[\beta]$, we recover the
-    original $\epsilon$ by the Yoneda lemma.
-  \item Starting with a right representable $G[\beta]$, we recover the
-    original $I_N^{-1}$ by the Yoneda lemma. We need to show that the
-    action of $G$ on arrows is the same as the one defined from $G$
-    viewed as a negative type, which we will call $G_1'$:
     \begin{align*}
-      G_1'[\theta] &= I_G[\theta \circ \epsilon]\\
-      &= G_1[\theta] \circ I_G[\epsilon]\tag{right homomorphism}\\
-      &= G_1[\theta] \circ I_G[\epsilon \circ \id]\\
-      &= G_1[\theta] \circ \id\\
-      &= G_1[\theta]
+      \homrappXtoYatZ {\pendappXtoY \psi \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {S_t} \alpha} f {\alpha'}} s {\beta'}} g {\beta})} {\beta}
+      &= \homrappXtoYatZ {\pendappXtoY \psi \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {S_t} \alpha} f {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY {\phi_f} {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY \psi {\alpha'}} s {\beta'})} {\beta'})} {\beta'}} g {\beta})} {\beta}\\
+      &= \homrappXtoYatZ {\pendappXtoY \psi \alpha}
+      {(\homrappXtoYatZ {\pendappXtoY {\phi_f} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} \alpha} f {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY \psi {\alpha'}} s {\beta'})} {\beta'}} g \beta)} \beta)} {\beta}\\
+      & = \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} \alpha} f {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY \psi {\alpha'}} s {\beta'})} {\beta'}} g \beta
     \end{align*}
-  \end{enumerate}
 \end{proof}
+
+%% \begin{lemma}[Parameterized Yoneda Lemma]
+%%   Given categories $\cat C, \cat D$ and a profunctor $\alpha^o:\cat
+%%   C;\beta : \cat D \vdash \alpha \to_{Q} \beta$ and a function
+%%   $\beta : \cat D \vdash G[\beta] : \cat C$, then there is an
+%%   isomorphism between
+%%   \begin{enumerate}
+%%   \item Terms $\cdot \vdash t : G[\beta] \to_{Q} \beta$
+%%   \item left-homomorphisms $\phi : \alpha \to_{\cat C} G[\beta] \vdash
+%%     u : \alpha \to_{Q} \beta$ i.e. they satisfy homomorphism on the
+%%     left (the other side doesn't make sense if $G$ is not a functor):
+%%     $u[\phi \circ \psi] = u[\phi] \circ \psi$
+%%   \end{enumerate}
+%% \end{lemma}
+%% \begin{proof}
+%%   First, the constructions
+%%   \begin{enumerate}
+%%   \item Given $t$, we define $u(t)$ to be
+%%     \[\phi : \alpha \to_{\cat C} G[\beta] \vdash t \circ_{Q} \phi : \alpha \to_{Q} \beta\]
+
+%%     Which is a left-homomorphism because:
+%%     \[ (t \circ_{Q} \phi) \circ_{Q} \psi = t \circ_{Q} (\phi \circ_{\cat C} \psi)\]
+%%   \item Given $u$, we define $t(u)$ to be
+%%     \[ \cdot \vdash u[\id_{G[\beta]}/\phi] : G[\beta] \to_{Q} \beta \]
+%%   \end{enumerate}
+%%   Now we show they are inverse
+%%   \begin{enumerate}
+%%   \item First, the very easy case, $\cdot \vdash t(u(t)) : G[\beta] \to_{Q} \beta$:
+%%     \begin{align*}
+%%       t \circ_{Q} \id_{G[\beta]} &= t
+%%     \end{align*}
+%%     by the fact that $Q$ is a profunctor.
+%%   \item Next, $\phi : \alpha \to_{\cat C} G[\beta] \vdash u(t(u)) : \alpha \to_{Q} \beta$:
+%%     \begin{align*}
+%%       u[\id_{G[\beta]}/\phi] \circ_{Q} \phi &= u[\id \circ_{\cat C} \phi/\phi]\\
+%%       &= u[\phi/\phi]\\
+%%       &= u
+%%     \end{align*}
+%%     which uses the fact that $u$ is a left-homomorphism.
+%%   \end{enumerate}
+%% \end{proof}
+
+%% \begin{theorem}[Negative Types and Right Representables are Equivalent]
+%%   For any profunctor $\alpha^o: \cat C; \beta : \cat D \pipe \alpha
+%%   \to_{Q} \beta$, there is a bijection between
+%%   \begin{enumerate}
+%%   \item Right Represntables $\beta : \cat D \vdash G[\beta] : \cat C$ for $Q$.
+%%   \item Negative Types $\beta : \cat D \vdash N[\beta] : \cat C$
+%%     representing $Q$.
+%%   \end{enumerate}
+%% \end{theorem}
+%% \begin{proof}
+%%   \begin{enumerate}
+%%   \item Given a right representable $G[\beta]$, we set $N(G)[\beta] =
+%%     G[\beta]$, the introduction rule is the same and the elimination
+%%     rule is given as in the Yoneda lemma and the inverse property
+%%     follows by the Yoneda isomorphism and the fact that $I_G^{-1}$ is
+%%     an inverse for $I_G$.
+%%   \item Given a negative type $N[\beta]$ we set $G(N)[\beta] =
+%%     N[\beta]$, the introduction rule is the same and the inverse
+%%     introduction rule is given as in the Yoneda lemma.  We need to
+%%     show that $N[\beta]$ has the structure of a functor and that
+%%     $I_{N}$ and $I_{N}^{-1}$ are homomorphisms on the right with
+%%     respect to that structure.  Define $N_1$ as follows:
+%%     \begin{mathpar}
+%%       \inferrule
+%%           {\beta_1^o:\cat D;\beta_2:\cat D \vdash \psi \circ \epsilon : N[\beta_1/\beta] \to_{Q} \beta_2\\
+%%             \phi : N[\beta_1/\beta] \to_{Q} \beta_2 \vdash I_N[\phi] : N[\beta_1/\beta] \to_{\cat C} N[\beta_2/\beta]
+%%           }
+%%           {\beta_1^o:\cat D;\beta_2:\cat D\pipe \psi : \beta_1 \to_{\cat D} \beta_2 \vdash I_N[\psi \circ \epsilon_{\beta_1}/\phi] : N[\beta_1/\beta] \to_{\cat C} N[\beta_2/\beta]}
+%%     \end{mathpar}
+%%     We need to show functoriality.
+%%     For identity we have
+%%     \begin{align*}
+%%       I_N[\id_{\beta} \circ \epsilon_{\beta}/\phi] &= I_N[\epsilon_{\beta}]\\
+%%       &= I_N[\epsilon \circ \id_{N[\beta]}]\\
+%%       &= \id_{N[\beta]} \tag{$\eta$}
+%%     \end{align*}
+%%     For composition,
+%%     \begin{align*}
+%%       N_1[\theta] \circ N_1[\psi]
+%%       &= I_N[\theta \circ \epsilon] \circ I_N[\psi \circ \epsilon]\\
+%%       &= I_N[(\theta \circ \epsilon) \circ I_N[\psi \circ \epsilon]]\tag{left homomorphism}\\
+%%       &= I_N[\theta \circ (\epsilon \circ I_N[\psi \circ \epsilon])]\\
+%%       &= I_N[\theta \circ (\psi \circ \epsilon)] \tag{$\beta$}\\
+%%       &= I_N[(\theta \circ \psi) \circ \epsilon]\\
+%%       &= N_1[\theta \circ \psi]
+%%     \end{align*}
+%%     Next we show $I_N$ is a right homomorphism, the typing here is
+%%     $\phi : \alpha \to_{Q} \beta_1, \theta : \beta_1 \to_{\cat D}
+%%     \beta_2$.
+%%     \begin{align*}
+%%       N_1[\theta] \circ I_N[\phi] &= I_N[\theta \circ \epsilon] \circ I_N[\phi]\\
+%%       &= I_N[\theta \circ \epsilon \circ I_N[\phi]]\tag{left homomorphism}\\
+%%       &= I_N[\theta \circ \phi] \tag{$\beta$}
+%%     \end{align*}
+%%     and to show $I_N^{-1}$ is a right homomorphism under $\phi : \alpha \to_{\cat C}N[\beta_1], \theta : \beta_1 \to_{\cat D} \beta_2$
+%%     \begin{align*}
+%%       I_N^{-1}[N_1[\theta] \circ \phi] &= \epsilon \circ (N_1[\theta] \circ \phi) \tag{def}\\
+%%       &= \epsilon \circ (I_N[\theta \circ \epsilon] \circ \phi)\tag{def}\\
+%%       &= (\epsilon \circ I_N[\theta \circ \epsilon]) \circ \phi\tag{assoc}\\
+%%       &= (\theta \circ \epsilon) \circ \phi\tag{$\beta$}\\
+%%       &= \theta \circ (\epsilon \circ \phi)\tag{assoc}\\
+%%       &= \theta \circ I_N^{-1}[\phi] \tag{def}
+%%     \end{align*}
+%%   \end{enumerate}
+
+%%   Next we need to show that this is a \emph{bijection}.
+%%   \begin{enumerate}
+%%   \item Starting with a negative type $N[\beta]$, we recover the
+%%     original $\epsilon$ by the Yoneda lemma.
+%%   \item Starting with a right representable $G[\beta]$, we recover the
+%%     original $I_N^{-1}$ by the Yoneda lemma. We need to show that the
+%%     action of $G$ on arrows is the same as the one defined from $G$
+%%     viewed as a negative type, which we will call $G_1'$:
+%%     \begin{align*}
+%%       G_1'[\theta] &= I_G[\theta \circ \epsilon]\\
+%%       &= G_1[\theta] \circ I_G[\epsilon]\tag{right homomorphism}\\
+%%       &= G_1[\theta] \circ I_G[\epsilon \circ \id]\\
+%%       &= G_1[\theta] \circ \id\\
+%%       &= G_1[\theta]
+%%     \end{align*}
+%%   \end{enumerate}
+%% \end{proof}
+
 
 \subsection{Adjunctions by Universal Morphism}
 
