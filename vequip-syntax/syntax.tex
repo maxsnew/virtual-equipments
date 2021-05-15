@@ -80,6 +80,8 @@
 \newcommand{\homrappXtoYatZ}[3]{#1 \trwith{#3} #2}
 \newcommand{\homlappXtoYatZ}[3]{#2 \tlwith{#3} #1}
 
+\newcommand{\homunary}[4]{\pendallXdotY {#1} {\homrallXYtoZ {#3} {#2} {#4}}}
+
 \newcommand{\lambdaunary}[4]{\pendlambdaXdotY {#1} {\homrlambdaXatYdotZ {#2} {#3} {#4}}}
 \newcommand{\lambdabinary}[6]{\lambdaunary{#1}{#2}{#3}{\homrlambdaXatYdotZ{#4}{#5}{#6}}}
 \newcommand{\lambdatrinary}[8]{\lambdabinary{#1}{#2}{#3}{#4}{#5}{\homrlambdaXatYdotZ{#6}{#7}{#8}}}
@@ -92,7 +94,7 @@
 \newcommand{\pendlambdaXdotY}[2]{\lambda #1. #2}
 \newcommand{\pendappXtoY}[2]{#1^{#2}}
 
-
+\newcommand{\equalizeVofWbyXeqYatZ}[5]{\{ {#1} : {#2} \pipe {#3} = {#4} : {#5} \}}
 
 
 \title{Judgment Theory: A Syntax for Virtual Equipments with applications to Internal and Synthetic Category Theory}
@@ -1189,6 +1191,58 @@ and identity types.
   \caption{Internalizing VE Structure}
 \end{figure}
 
+\subsection{Equalizers}
+
+To encode the concept of internal hom of profunctors, kan extensions
+and (co-)limits, we need to define the \emph{equalizer} of horizontal
+arrows. Specifically, the universal property that we need is an
+equalizer in the category whose objects are horizontal arrows (for
+fixed endpoints) and whose arrows are the 2-cells.
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule*[right=Equalizer-formation]
+    {\Gamma \pipe \cdot \vdash P : \harr\, C\,D\and
+     \Gamma \pipe \cdot \vdash Q : \harr\, C \, D\\\\
+     \Gamma \pipe \cdot \vdash \phi : \homunary \alpha {\harrapp P \alpha \beta} \beta {\harrapp Q \alpha \beta}\and
+     \Gamma \pipe \cdot \vdash \psi : \homunary \alpha {\harrapp P \alpha \beta} \beta {\harrapp Q \alpha \beta}\and}
+    {\Gamma \pipe \cdot \vdash \textrm{Equalizer}(C,D,P,\phi,\psi) : \harr\, C\, D}\and
+
+    \inferrule
+    {\Gamma \pipe \Phi \vdash M : \harrapp{\textrm{Equalizer}(C,D,P,\phi,\psi)} A B}
+    {\Gamma \pipe \Phi \vdash \textrm{forget}(M) : \harrapp P A B}
+
+    \inferrule
+    {\Gamma \pipe \Phi \vdash M : \harrapp P A B \and \appunary \phi A M B = \appunary \psi A M B}
+    {\Gamma \pipe \Phi \vdash \textrm{equalizing}_{\phi,\psi}(M) : \harrapp{\textrm{Equalizer}(C,D,P,\phi,\psi)} A B}
+
+    TODO: obvious equations
+  \end{mathpar}
+  \caption{Equalizers (Logical Framework style)}
+\end{figure}
+
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule*[right=Equalizer-formation]
+    {\Gamma \pipe \Xi \vdash P \isaSet\and\Gamma \pipe \Xi \vdash Q \isaSet\and
+      \Gamma\pipe d^-\Xi, p : P, d^+ \Xi \vdash \phi : Q\and
+      \Gamma\pipe d^-\Xi, p : P, d^+ \Xi \vdash \psi : Q }
+    {\Gamma \pipe \Xi \vdash \equalizeVofWbyXeqYatZ p P \phi \psi Q : \harr\, C\, D}\and
+
+    \inferrule
+    {\Gamma \pipe \Phi \vdash M : \equalizeVofWbyXeqYatZ p P \phi \psi Q}
+    {\Gamma \pipe \Phi \vdash \pi_{eq}\,M : P}
+
+    \inferrule
+    {\Gamma \pipe \Phi \vdash M : \harrapp P A B \and \appunary \phi A M B = \appunary \psi A M B}
+    {\Gamma \pipe \Phi \vdash \textrm{equalizing}_{\phi,\psi}(M) : \harrapp{\textrm{Equalizer}(C,D,P,\phi,\psi)} A B}
+
+    TODO: equations
+  \end{mathpar}
+  \caption{Equalizers (Natural Deduction Style)}
+\end{figure}
+
 \subsection{Products}
 
 We add in parallel two different notions of product: products of sorts
@@ -1973,6 +2027,35 @@ The proof can be broken up into 3 conceptual steps:
     \end{align*}
 \end{proof}
 
+\subsection{Self-Interpretation: Hom of Internal Profunctors}
+
+We can define a version of the hom $\homrallXYtoZ \alpha P Q$ on
+\emph{internal} profunctors using a combination of this connective,
+and an \emph{equalizer} to enforce a homomorphism condition.
+
+\begin{definition}[Internal Covariant Hom of Profunctors]
+  Let $P : \textrm{Prof}\,D\,E$ and $Q : \textrm{Prof}\,C\,E$. Define
+  the covariant Hom $P \triangleright Q : \textrm{Prof}\,C\,D$ by
+  \[ (P \triangleright Q)_1 = \lambda (\alpha;\beta). \equalizeVofWbyXeqYatZ \phi {\homrallXYtoZ \gamma {\harrapp {P_1} \alpha \gamma} {\harrapp {Q_1} \beta \gamma}} {\psi_{dom}} {\psi_{cod}} {\homrallXYtoZ {\gamma'} {\harrapp {P_1 }\beta {\gamma'}} {\homrallXYtoZ {\gamma} {\harrapp {E_1} {\gamma'} \gamma} {\harrapp {Q_1} \alpha \gamma}}}\]
+  where $\psi_{dom}$ and $\chi_{cod}$ are  as
+  \[ \psi_{dom} =\homrlambdaXatYdotZ p {\gamma'} {\homrlambdaXatYdotZ e \gamma
+    {\homrappXtoYatZ {\phi} {(\apptrinary {P_t} \beta {\pendappXtoY {D_r} \beta} \beta p {\gamma'} e \gamma)} \gamma}}
+  \]
+  \[
+  \psi_{cod} = \homrlambdaXatYdotZ p {\gamma'} {\homrlambdaXatYdotZ e \gamma
+    {\apptrinary {Q_t} \alpha {\pendappXtoY {C_r} \alpha} \alpha {(\homrappXtoYatZ \phi {p} {\gamma'})} {\gamma'} e \gamma}}
+  \]
+\end{definition}
+
+\subsection{Limits and Kan Extensions}
+
+To encode (co)-limits and more generally kan extensions, we need both
+hom and also equalizers.
+
+
+
+
+
 %% \begin{lemma}[Parameterized Yoneda Lemma]
 %%   Given categories $\cat C, \cat D$ and a profunctor $\alpha^o:\cat
 %%   C;\beta : \cat D \vdash \alpha \to_{Q} \beta$ and a function
@@ -2098,147 +2181,147 @@ The proof can be broken up into 3 conceptual steps:
 %% \end{proof}
 
 
-\subsection{Adjunctions by Universal Morphism}
+%% \subsection{Adjunctions by Universal Morphism}
 
-As an example of formal category theory in our syntax, let's prove the
-equivalence between two definitions of an adjunction: one by universal
-morphism and the other by natural hom isomorphism.
-%
-Though the definitions and proof will look like we are doing ordinary
-category theory, since it is syntactic it immediately applies to all
-models, including enriched and internal category theory.
+%% As an example of formal category theory in our syntax, let's prove the
+%% equivalence between two definitions of an adjunction: one by universal
+%% morphism and the other by natural hom isomorphism.
+%% %
+%% Though the definitions and proof will look like we are doing ordinary
+%% category theory, since it is syntactic it immediately applies to all
+%% models, including enriched and internal category theory.
 
-We start with the usual definition of an adjunction using
-hom-isomorphism and a profunctor.
-\begin{definition}
-  Let $C,D$ be categories and $c^o:C_0,d:D_0 \vdash H[c,d]$ a
-  profunctor between them. A \emph{left adjoint} to $H$ consists of
-  \begin{enumerate}
-  \item A functor $c:C \vdash F[c] : D$
-  \item A natural isomorphism $c,d \pipe h : H[c,d] \vdash
-    F_{ind}[h]: D_1[F_0[c],d]$. Call the inverse $g. F_{ind}^{-1}[g]$.
-  \end{enumerate}
-\end{definition}
+%% We start with the usual definition of an adjunction using
+%% hom-isomorphism and a profunctor.
+%% \begin{definition}
+%%   Let $C,D$ be categories and $c^o:C_0,d:D_0 \vdash H[c,d]$ a
+%%   profunctor between them. A \emph{left adjoint} to $H$ consists of
+%%   \begin{enumerate}
+%%   \item A functor $c:C \vdash F[c] : D$
+%%   \item A natural isomorphism $c,d \pipe h : H[c,d] \vdash
+%%     F_{ind}[h]: D_1[F_0[c],d]$. Call the inverse $g. F_{ind}^{-1}[g]$.
+%%   \end{enumerate}
+%% \end{definition}
 
-\begin{definition}
-  Let $c:C_0,d:D_0 \vdash H[c,d]$ be a profunctor.
-  A \emph{universal $H$-heteromorphism from $C$} consists of
-  \begin{enumerate}
-  \item For every $c:C_0$, an $H$-morphism $\eta_c : H(c,F_0[c])$ for
-    some function $c:C_0 \vdash F_0[c] : D_0$.
-  \item Such that every $h : H[c,d]$ factors through $\eta_c$ in that
-    there is a unique $h : H[c,d] \vdash F_{ind}[h] : D[F_0[c],d]$
-    such that $h = F_{ind}[h] \circ \eta_c$.  Uniqueness means
-    validity of the following rule:
-    \begin{mathpar}
-      \inferrule
-      {g:D[F_0[c],d] \vdash g \circ \eta = h}
-      {g:D[F_0[c],d] \vdash g = F_{ind}[h]}
-    \end{mathpar}
-    (Note that we do not require $F_{ind}$ to be natural in any sense)
-  \end{enumerate}
-\end{definition}
+%% \begin{definition}
+%%   Let $c:C_0,d:D_0 \vdash H[c,d]$ be a profunctor.
+%%   A \emph{universal $H$-heteromorphism from $C$} consists of
+%%   \begin{enumerate}
+%%   \item For every $c:C_0$, an $H$-morphism $\eta_c : H(c,F_0[c])$ for
+%%     some function $c:C_0 \vdash F_0[c] : D_0$.
+%%   \item Such that every $h : H[c,d]$ factors through $\eta_c$ in that
+%%     there is a unique $h : H[c,d] \vdash F_{ind}[h] : D[F_0[c],d]$
+%%     such that $h = F_{ind}[h] \circ \eta_c$.  Uniqueness means
+%%     validity of the following rule:
+%%     \begin{mathpar}
+%%       \inferrule
+%%       {g:D[F_0[c],d] \vdash g \circ \eta = h}
+%%       {g:D[F_0[c],d] \vdash g = F_{ind}[h]}
+%%     \end{mathpar}
+%%     (Note that we do not require $F_{ind}$ to be natural in any sense)
+%%   \end{enumerate}
+%% \end{definition}
 
-It is easy to see that a left adjoint gives a universal heteromorphism
-by a Yoneda-like argument:
-\begin{construction}
-  Let $F$ be a left adjoint to $H$. Then we define a left universal
-  $H$-heteromorphism by
-  \begin{enumerate}
-  \item $c \vdash \eta_c = F_{ind}^{-1}[\id[F_0[c]]]: H[c,F_0[c]]$
-  \item Every $h : H[c,d]$ factorizes through $\eta$ because
-    \begin{align*}
-      F_{ind}[h] \circ F_{ind}^{-1}[\id] &= F_{ind}^{-1}[F_{ind}[h] \circ \id] \tag{naturality}\\
-      &= F_{ind}^{-1}[F_{ind}[h]] \tag{unit}\\
-      &= h \tag{isomorphism}
-    \end{align*}
-    This factorization is unique because if $g \circ F^{-1}[\id] = h$,
-    then
-    \begin{align*}
-      F_{ind}[h] &= F_{ind}[g \circ F^{-1}[\id]] \tag{congruence}\\
-      &= g \circ F_{ind}[F^{-1}[\id]] \tag{naturality}\\
-      &= g \circ \id \tag{iso}\\
-      &= g \tag{unit}
-    \end{align*}
-  \end{enumerate}
-\end{construction}
+%% It is easy to see that a left adjoint gives a universal heteromorphism
+%% by a Yoneda-like argument:
+%% \begin{construction}
+%%   Let $F$ be a left adjoint to $H$. Then we define a left universal
+%%   $H$-heteromorphism by
+%%   \begin{enumerate}
+%%   \item $c \vdash \eta_c = F_{ind}^{-1}[\id[F_0[c]]]: H[c,F_0[c]]$
+%%   \item Every $h : H[c,d]$ factorizes through $\eta$ because
+%%     \begin{align*}
+%%       F_{ind}[h] \circ F_{ind}^{-1}[\id] &= F_{ind}^{-1}[F_{ind}[h] \circ \id] \tag{naturality}\\
+%%       &= F_{ind}^{-1}[F_{ind}[h]] \tag{unit}\\
+%%       &= h \tag{isomorphism}
+%%     \end{align*}
+%%     This factorization is unique because if $g \circ F^{-1}[\id] = h$,
+%%     then
+%%     \begin{align*}
+%%       F_{ind}[h] &= F_{ind}[g \circ F^{-1}[\id]] \tag{congruence}\\
+%%       &= g \circ F_{ind}[F^{-1}[\id]] \tag{naturality}\\
+%%       &= g \circ \id \tag{iso}\\
+%%       &= g \tag{unit}
+%%     \end{align*}
+%%   \end{enumerate}
+%% \end{construction}
 
-But the utility of the universal morphism definition is that the
-universal morphism extracted from a left adjoint is enough to uniquely
-reconstruct the rest of the structure, which includes (1)
-functoriality of $F$ and (2) naturality of $F_{ind}$.
-\begin{construction}
-  Let $(F_0,\eta,F_{ind}[h])$ be a left universal $H$-morphism.
-  We extend this to a left adjoint as follows.
-  \begin{enumerate}
-  \item First, $F$ acts on morphisms by
-    \begin{mathpar}
-      \inferrule
-      {
-        \inferrule
-         {f : C[c,c'] \and \eta_{c'} : H[c',F_0[c']]}
-         {f : C[c,c'] \vdash \eta_{c'} \circ f : H[c,F_0[c']]}
-      }
-      {f : C[c,c'] \vdash F_{ind}[\eta_{c'} \circ f] : D[F_0[c],F_0[c']]}
-    \end{mathpar}
-    This preserves identity
-    \begin{mathpar}
-      \inferrule
-      {
-        \inferrule
-        {\id \circ \eta = \eta}
-        {\id = F_{ind}[\eta]}
-      }
-      {\id = F_{ind}[\eta \circ \id]}
-    \end{mathpar}
-    And composition
-    \begin{mathpar}
-      \inferrule
-      {F_{ind}[\eta \circ f] \circ F_{ind}[\eta \circ g] \circ \eta = \eta \circ f \circ g}
-      {F_{ind}[\eta \circ f] \circ F_{ind}[\eta \circ g] = F_{ind}[\eta \circ f \circ g]}
-    \end{mathpar}
-    Which follows by a couple uses of the factorization:
-    \begin{align*}
-      F_{ind}[\eta \circ f] \circ F_{ind}[\eta \circ g] \circ \eta
-      &= F_{ind}[\eta \circ f] \circ \eta \circ g \\
-      &= \eta \circ f \circ g
-    \end{align*}
-  \item Next, we show that $h : H[c,d] \vdash F_{ind}[h] :
-    D[F_0[c],d]$ is a natural transformation. As a first step, we show
-    that $\eta_c : H[c,F_0[c]]$ is natural in $c$ with the action of
-    $F$ on morphisms we have just defined.
-    \[ \eta \circ f = F[f] \circ \eta \]
-    expanding the definition, this is precisely the factorization
-    property:
-    \[ \eta \circ f = F_{ind}[\eta \circ f] \circ \eta \]
+%% But the utility of the universal morphism definition is that the
+%% universal morphism extracted from a left adjoint is enough to uniquely
+%% reconstruct the rest of the structure, which includes (1)
+%% functoriality of $F$ and (2) naturality of $F_{ind}$.
+%% \begin{construction}
+%%   Let $(F_0,\eta,F_{ind}[h])$ be a left universal $H$-morphism.
+%%   We extend this to a left adjoint as follows.
+%%   \begin{enumerate}
+%%   \item First, $F$ acts on morphisms by
+%%     \begin{mathpar}
+%%       \inferrule
+%%       {
+%%         \inferrule
+%%          {f : C[c,c'] \and \eta_{c'} : H[c',F_0[c']]}
+%%          {f : C[c,c'] \vdash \eta_{c'} \circ f : H[c,F_0[c']]}
+%%       }
+%%       {f : C[c,c'] \vdash F_{ind}[\eta_{c'} \circ f] : D[F_0[c],F_0[c']]}
+%%     \end{mathpar}
+%%     This preserves identity
+%%     \begin{mathpar}
+%%       \inferrule
+%%       {
+%%         \inferrule
+%%         {\id \circ \eta = \eta}
+%%         {\id = F_{ind}[\eta]}
+%%       }
+%%       {\id = F_{ind}[\eta \circ \id]}
+%%     \end{mathpar}
+%%     And composition
+%%     \begin{mathpar}
+%%       \inferrule
+%%       {F_{ind}[\eta \circ f] \circ F_{ind}[\eta \circ g] \circ \eta = \eta \circ f \circ g}
+%%       {F_{ind}[\eta \circ f] \circ F_{ind}[\eta \circ g] = F_{ind}[\eta \circ f \circ g]}
+%%     \end{mathpar}
+%%     Which follows by a couple uses of the factorization:
+%%     \begin{align*}
+%%       F_{ind}[\eta \circ f] \circ F_{ind}[\eta \circ g] \circ \eta
+%%       &= F_{ind}[\eta \circ f] \circ \eta \circ g \\
+%%       &= \eta \circ f \circ g
+%%     \end{align*}
+%%   \item Next, we show that $h : H[c,d] \vdash F_{ind}[h] :
+%%     D[F_0[c],d]$ is a natural transformation. As a first step, we show
+%%     that $\eta_c : H[c,F_0[c]]$ is natural in $c$ with the action of
+%%     $F$ on morphisms we have just defined.
+%%     \[ \eta \circ f = F[f] \circ \eta \]
+%%     expanding the definition, this is precisely the factorization
+%%     property:
+%%     \[ \eta \circ f = F_{ind}[\eta \circ f] \circ \eta \]
     
-    Next, to show that $F_{ind}$ is natural, we need to show that
-    (when it is well-defined):
-    \[F_{ind}[g \circ h \circ f] = g \circ F_{ind}[h] \circ F[f] \]
-    By the factorization property, the following sufficeth:
-    \begin{align*}
-     g \circ F_{ind}[h] \circ F[f] \circ \eta
-     &= g \circ F_{ind}[h] \circ \eta \circ f \tag{naturality of $\eta$}\\
-     &= g \circ h \circ f \tag{factorization}
-    \end{align*}
-  \item Finally, we define $F_{ind}^{-1}[g]$ as
-    \[ g : D[F_0[c],d] \vdash F_{ind}^{-1}[g] = g \circ \eta : H[c,d] \]
-    And we need to confirm that it is (1) a section of $F_{ind}$ (2) a
-    retraction of $F_{ind}$ and (3) natural.
-    \begin{enumerate}
-    \item For retraction we need to show $h \vdash F_{ind}[h] \circ
-      \eta = h$ which is precisely the factorization property.
-    \item For section, we need to show $g \vdash F_{ind}[g \circ \eta]
-      = g$. Immediately the uniquenes principle says its sufficient to
-      show $g \circ \eta = g \circ \eta$.
-    \item For naturality, we need to show
-      \[ F_{ind}^{-1}[k \circ g \circ F[f]] = k \circ F_{ind}^{-1}[g] \circ f \]
-      expanding the definition this is just:
-      \[ k \circ g \circ F[f] \circ \eta = k \circ g \circ \eta \circ f \]
-      which is just naturality of $\eta$.
-    \end{enumerate}
-  \end{enumerate}
-\end{construction}
+%%     Next, to show that $F_{ind}$ is natural, we need to show that
+%%     (when it is well-defined):
+%%     \[F_{ind}[g \circ h \circ f] = g \circ F_{ind}[h] \circ F[f] \]
+%%     By the factorization property, the following sufficeth:
+%%     \begin{align*}
+%%      g \circ F_{ind}[h] \circ F[f] \circ \eta
+%%      &= g \circ F_{ind}[h] \circ \eta \circ f \tag{naturality of $\eta$}\\
+%%      &= g \circ h \circ f \tag{factorization}
+%%     \end{align*}
+%%   \item Finally, we define $F_{ind}^{-1}[g]$ as
+%%     \[ g : D[F_0[c],d] \vdash F_{ind}^{-1}[g] = g \circ \eta : H[c,d] \]
+%%     And we need to confirm that it is (1) a section of $F_{ind}$ (2) a
+%%     retraction of $F_{ind}$ and (3) natural.
+%%     \begin{enumerate}
+%%     \item For retraction we need to show $h \vdash F_{ind}[h] \circ
+%%       \eta = h$ which is precisely the factorization property.
+%%     \item For section, we need to show $g \vdash F_{ind}[g \circ \eta]
+%%       = g$. Immediately the uniquenes principle says its sufficient to
+%%       show $g \circ \eta = g \circ \eta$.
+%%     \item For naturality, we need to show
+%%       \[ F_{ind}^{-1}[k \circ g \circ F[f]] = k \circ F_{ind}^{-1}[g] \circ f \]
+%%       expanding the definition this is just:
+%%       \[ k \circ g \circ F[f] \circ \eta = k \circ g \circ \eta \circ f \]
+%%       which is just naturality of $\eta$.
+%%     \end{enumerate}
+%%   \end{enumerate}
+%% \end{construction}
 
 \subsection{Products and Units of Internal Categories}
 
