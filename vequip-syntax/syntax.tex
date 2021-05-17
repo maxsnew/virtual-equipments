@@ -1230,6 +1230,15 @@ fixed endpoints) and whose arrows are the 2-cells.
       \Gamma\pipe d^-\Xi, p : P, d^+ \Xi \vdash \psi : Q }
     {\Gamma \pipe \Xi \vdash \equalizeVofWbyXeqYatZ p P \phi \psi Q : \harr\, C\, D}\and
 
+    \inferrule*[right=Equalizer-formation]
+    {\Gamma \pipe \alpha:C;\beta:D \vdash P \isaSet\and\Gamma \pipe \alpha:C;\beta:D \vdash Q \isaSet\and
+      \Gamma \pipe d^-\Xi \vdash A : C\and
+      \Gamma \pipe d^+\Xi \vdash B : C\\\\
+      \Gamma\pipe \cdot \vdash \phi : \homunary \alpha P \beta Q\and
+      \Gamma\pipe \cdot \vdash \psi : \homunary \alpha P \beta Q
+    }
+    {\Gamma \pipe \Xi \vdash \equalizeVofWbyXeqYatZ p {P[A/\alpha;B/\beta]} {\appunary \phi A p B} {\appunary \psi A p B} Q : \harr\, C\, D}\and
+
     \inferrule
     {\Gamma \pipe \Phi \vdash M : \equalizeVofWbyXeqYatZ p P \phi \psi Q}
     {\Gamma \pipe \Phi \vdash \pi_{eq}\,M : P}
