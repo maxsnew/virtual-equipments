@@ -2047,80 +2047,128 @@ and an \emph{equalizer} to enforce a homomorphism condition.
   \]
 \end{definition}
 
+We can easily define a contravariant hom $P \triangleleft Q$ by a dual
+definition (TODO).
+
 \subsection{Limits and Kan Extensions}
 
-To encode (co)-limits and more generally kan extensions, we need both
-hom and also equalizers.
-The right Kan extension of $F$ along $J$ is the best way to fill in the following square:
+We can then use our notion of Hom of profunctors 
+
+The right Kan extension of $F$ along $J$ is the best (maximal) way to
+fill in the following square:
 \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEQBfU9TXfIRQBGclVqMWbACLdeIDNjwEiZYePrNWiDgHJu4mFADm8IqABmAJwgBbJGRA4ISAEzVNUnQCk5lm-aIjs5IohJabABiBlxAA
 \begin{tikzcd}
 C \arrow[d, "J"] \arrow[r, "F"] & D \\
 C'                              &  
 \end{tikzcd}\]
 I.e. a functor $Ran_J F : C' \to D$ with a natural transformation
-$Ran_J F \Rightarrow F$ that is universal something something. Recall
-that a natural transformation of this sort would look like:
+$Ran_J F \Rightarrow F$ that is universal something something.
 
-
-
-If $D$ is complete, there is a formula using ends for this. Using
-cotensor, we can directly adapt this to define a \emph{profunctor}
-that is a universal filler. We can then say that a right Kan extension
-is a functor that represents this profunctor.
+If $D$ is complete, there is a formula using ends for this. Using hom
+of profunctors, we can directly adapt this to define a
+\emph{profunctor} that is a universal filler. We can then say that a
+right Kan extension is precisely a functor that represents this
+profunctor.
 
 \begin{definition}
-  Let $\cat C, \cat C', \cat D$ be categories and let $\alpha : \cat C
-  \vdash A : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be
-  functors. Then the right Kan extension profunctor is a profunctor
-  $\beta^o:\cat D; \gamma:\cat C' \pipe (RPan_J A)[\beta;\gamma]$ which we can define as
-  \[ \beta^o:\cat D; \gamma:\cat C' \pipe (RPan_J A)[\beta;\gamma] = \forall \alpha:\cat C.~ (\beta \to_{\cat D} A) \triangleleft (\gamma \to_{\cat C'} J)
-  \]
-  A right Kan extension is then a functor $\gamma:\cat C' \vdash
-  Ran_J[\alpha] : \cat D$ that represents $RPan_J A$ in that
-  \[ (\beta \to_{\cat D} Ran_J[\gamma]) \cong (RPan_J A)[\beta;\gamma] \]
+  Let $C,C',D$ be categories and let $F : \textrm{Functor}\,C\,D$ and
+  $J: \textrm{Functor}\,C'\,C$ be functors. Then the right Kan
+  extension specification profunctor is a profunctor
+  $\textrm{RanSpec}_J\,F : \textrm{Prof}\,D\,C$ defined as
+
+  \[ \textrm{RanSpec}_J\,F = \textrm{Hom}(C')[;J] \triangleright \textrm{Hom}(D)[;F] \]
+
+  And a right Kan extension is a functor
+  $\textrm{Ran}_JF:\textrm{Functor}\,C'\,D$ that is a
+  right-representation of $\textrm{RanSpec}_J F$.
 \end{definition}
 
-If we have a unit type, then we can now define limits as a special
-case.
+Writing this out more pointfully, we get that the hom set
+$\harrapp{D_1} {\beta}{\textrm{Ran}_JF\, \alpha}$ is an equalizer of
+the following spans:
+\[ \homrallXYtoZ {\alpha':C'} {\harrapp {C_1'} {\alpha'}{J_0\alpha}}{\harrapp {D_1} {\beta} {F_0 \alpha'}}\]
+
+If we have a unit and therefore unit category and functor, then we can
+now define limits as a special case of Kan extensions.
 \begin{definition}
-  The limit of a functor $\alpha : \cat C \vdash A : \cat D$ is the
-  right Kan extension of $A$ along $\alpha : \cat C \vdash () : 1$.
-
-  Unraveling the definition this means
-  \[ (\beta \to_{\cat D} \lim_\alpha A) \cong \forall \alpha:\cat C.~ (\beta \to_{\cat D} A) \triangleleft (\gamma \to_{1} ()) \]
+  The limit of a functor $J : \textrm{Functor}I\,C$ is a right Kan
+  extension $\textrm{Ran}_E J$ where $E$ is the unique functor $E :
+  \textrm{Functor}I\,1$.
 \end{definition}
-Since morphisms in $1$ are trivial, we can almost directly read this
-as saying that a morphism into a limit of a functor is precisely a
-cone: for every $\alpha$, a morphism from $\beta$ to $A[\alpha]$. The
-side condition of naturality of this family is automatically
-satisfied.
 
-We can also define a left Kan extensions using the contravariant
-cotensors.  Normally the left Kan extension is defined using tensors,
-but the definition using profunctors doesn't look right to me. Let's
-work backwards from the definition of colimit to see why.
+Unraveling this definition, we get that $\harrapp{C_1} \alpha {\lim_{i} J(i)}$ is a coherent family (i.e., equalizer) of
+\[  \homrallXYtoZ {i:I} {1} {\harrapp{C_1} \alpha {J_0(i)}}  \]
+with the equalizing condition being that for any $p : \homrallXYtoZ
+{i:I} {1} {\harrapp{C_1} \alpha {J_0(i)}}$ and $f : \harrapp{I_1} {i'}{i}$ and $g : \harrapp{1}{pt}{E_0 i'}$
+\[ \homrappXtoYatZ {p} {(\appbinary {1_t} {pt} {\pendappXtoY {1_r} {pt}} {pt} {(\appbinary {1_t} {pt} g {E_0 i'} {(\appunary {E_1} {i'} f {i})} {i})} {i})} {i}
+= \appbinary {C_t} {\alpha} {(\homrappXtoYatZ {p} g {i'})} {J_0 i'} {(\appbinary {C_t} {J_0 i'} {(\appunary {J_1} i f {i'})} {J_0 i} {\pendappXtoY {C_r} {J_0 i}} {J_0 i})} {J_0 i}
+\]
+We can greatly simplify using the $\eta$ principle for $1$ and
+eliminating some reflexivities to reduce this to
+\[ \homrappXtoYatZ {p} {()} {i} =
+\appbinary {C_t} {\alpha} {(\homrappXtoYatZ {p} {()} {i'})} {J_0 i'} {{(\appunary {J_1} i f {i'})}} {J_0 i}
+\]
+which reads exactly as the commuting condition for a cone.
 
-Let $\alpha : \cat C \vdash A : \cat D$ be a functor we want the
-colimit of. The UP of a colimit is that maps out of it are equivalent
-to cocones from $A$. Semi-formally this looks like
-\[ (\colim_{\alpha} A \to_{\cat D} \beta) \cong \forall \alpha:\cat C.~ A \to_{\cat D} \beta \]
-This looks a lot like a cotensor with a trivial domain:
-\[ (\colim_{\alpha} A \to_{\cat D} \beta) \cong \forall \alpha. (() \to_{1} \gamma) \triangleright (A \to_{\cat D} \beta) \]
-Suggesting that we define the left Kan extension profunctor as a
-contravariant cotensor as follows.
+We can similarly define \emph{left} Kan extensions by a dual
+formula. Left Kan extensions are the ``minimal'' solution to the same
+filling problem as right Kan extensions. I.e., they have a universal
+morphism out of them. They can be described by a coend formula, but in
+our profunctor calculus, they are easiest to describe using a similar
+formula to right Kan extensions, but using the contravariant hom of
+profunctors.
+
 \begin{definition}
-  Let $\cat C,\cat C',\cat D$ be cats and let $\alpha:\cat C \vdash A
-  : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be functors.
-  Then the left Kan extension profunctor $\gamma^o:\cat C'; \beta:\cat
-  D \pipe (PLan_J A)[\gamma;\beta]$ is defined as
-  \[
-  \gamma^o:\cat C'; \beta:\cat D \pipe (PLan_J A)[\gamma;\beta]
-  := \forall \alpha : \cat C.~ (J \to_{\cat C'} \gamma) \triangleright (A \to_{\cat D} \beta)
-  \]
-  Then a left Kan extension of $A$ along $J$ is a functor $\gamma :
-  \cat C' \vdash Lan_J A : \cat D$ that represents $PLan_J A$ in that
-  \[ (Lan_J A \to_{\cat D} \beta) \cong (LPan_J A)[\gamma;\beta] \]
+  Let $C,C',D$ be categories and let $F : \textrm{Functor}\,C\,D$ and
+  $J: \textrm{Functor}\,C'\,C$ be functors. Then the left Kan
+  extension specification profunctor is a profunctor
+  $\textrm{LanSpec}_J\,F : \textrm{Prof}\,C\,D$ defined as
+
+  \[ \textrm{RanSpec}_J\,F = \textrm{Hom}(D)[F;] \triangleleft \textrm{Hom}(C')[J;]  \]
+  And a left Kan extension is a functor $\textrm{Lan}_J F :
+  \textrm{Functor}\,C'\,D$ that represents this profunctor on the
+  left.
 \end{definition}
+
+Unraveling the definition we get the hom span $\harrapp {D_1}{\textrm{Ran}_JF {\alpha'}} \beta$ is an equalizer of
+\[ \homlallXYtoZ \alpha {\harrapp {C_1'} {J_0 \alpha} {\alpha'}} {\harrapp{D_1} {F_0 \alpha} \beta}\]
+
+\begin{definition}
+  The colimit of a functor $J : \textrm{Functor}I\,C$ is a left Kan
+  extension $\textrm{Lan}_E J$ where $E$ is the unique functor $E :
+  \textrm{Functor}I\,1$.
+\end{definition}
+
+We can similarly unravel this definition to see that this looks
+essentially like the classical definition of colimits as universal
+cocones.
+
+%% We can also define a left Kan extensions using the contravariant
+%% cotensors.  Normally the left Kan extension is defined using tensors,
+%% but the definition using profunctors doesn't look right to me. Let's
+%% work backwards from the definition of colimit to see why.
+
+%% Let $\alpha : \cat C \vdash A : \cat D$ be a functor we want the
+%% colimit of. The UP of a colimit is that maps out of it are equivalent
+%% to cocones from $A$. Semi-formally this looks like
+%% \[ (\colim_{\alpha} A \to_{\cat D} \beta) \cong \forall \alpha:\cat C.~ A \to_{\cat D} \beta \]
+%% This looks a lot like a cotensor with a trivial domain:
+%% \[ (\colim_{\alpha} A \to_{\cat D} \beta) \cong \forall \alpha. (() \to_{1} \gamma) \triangleright (A \to_{\cat D} \beta) \]
+%% Suggesting that we define the left Kan extension profunctor as a
+%% contravariant cotensor as follows.
+%% \begin{definition}
+%%   Let $\cat C,\cat C',\cat D$ be cats and let $\alpha:\cat C \vdash A
+%%   : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be functors.
+%%   Then the left Kan extension profunctor $\gamma^o:\cat C'; \beta:\cat
+%%   D \pipe (PLan_J A)[\gamma;\beta]$ is defined as
+%%   \[
+%%   \gamma^o:\cat C'; \beta:\cat D \pipe (PLan_J A)[\gamma;\beta]
+%%   := \forall \alpha : \cat C.~ (J \to_{\cat C'} \gamma) \triangleright (A \to_{\cat D} \beta)
+%%   \]
+%%   Then a left Kan extension of $A$ along $J$ is a functor $\gamma :
+%%   \cat C' \vdash Lan_J A : \cat D$ that represents $PLan_J A$ in that
+%%   \[ (Lan_J A \to_{\cat D} \beta) \cong (LPan_J A)[\gamma;\beta] \]
+%% \end{definition}
 
 
 %% \begin{definition}
