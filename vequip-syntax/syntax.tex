@@ -1548,7 +1548,7 @@ We can immediately define identity and composition of functors.
       &=
       {(({\homrappXtoYatZ {\homrappXtoYatZ{\pendappXtoY{(\pendlambdaXdotY {\alpha'} {\homrlambdaXatYdotZ {f'} {\beta'} {\homrlambdaXatYdotZ {g'} {\gamma'} {{\homrappXtoYatZ {\pendappXtoY {G_1} {\alpha'}} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t}{\alpha'}} {f'} {\beta'}} {g'} {\gamma'})} {\gamma'}}}}})}{F_0\alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {F_0\beta}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {F_0\gamma}}))}\\
       &=
-      {(({\homrappXtoYatZ {\homrappXtoYatZ{\pendappXtoY{(\pendlambdaXdotY {\alpha'} {\homrlambdaXatYdotZ {f'} {\beta'} {\homrlambdaXatYdotZ {g'} {\gamma'} {{\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {E_t} {(G_0 \alpha')}} {(\homrappXtoYatZ {\pendappXtoY {G_1} \alpha'} {f'} {\beta'})} {(G_0 \beta')}} {(\homrappXtoYatZ {\pendappXtoY {G_1} \beta'} {g'} {\gamma'})} {{G_0} \gamma'}}}}})}{F_0\alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {F_0\beta}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {F_0\gamma}}))}\\
+      {(({\homrappXtoYatZ {\homrappXtoYatZ{\pendappXtoY{(\pendlambdaXdotY {\alpha'} {\homrlambdaXatYdotZ {f'} {\beta'} {\homrlambdaXatYdotZ {g'} {\gamma'} {{\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {E_t} {(G_0 {\alpha'})}} {(\homrappXtoYatZ {\pendappXtoY {G_1} {\alpha'}} {f'} {\beta'})} {(G_0 \beta')}} {(\homrappXtoYatZ {\pendappXtoY {G_1} {\beta'}} {g'} {\gamma'})} {{G_0} \gamma'}}}}})}{F_0\alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {F_0\beta}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {F_0\gamma}}))}\\
       &= \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {E_t} {G_0(F_0\alpha)}}
       {({\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {F_0 \beta}})}
       {G_0(F_0\beta)}}
@@ -1821,14 +1821,14 @@ of the structure. This can be simplified to the notion of a
 These two notions turn out to be equivalent because the ``extra''
 information in the hom isomorphism is in fact fully determined by the
 data of a universal morphism: the functoriality of $G$ and the
-naturality of $I,I^{-1}$.
+naturality of $I,I_{inv}$.
 %
 The proof can be broken up into 3 conceptual steps:
 \begin{enumerate}
 \item First,, the functoriality of $G$ is derivable from $I,\epsilon$.
-\item Next, $I^{-1}$ is a homomorphism automatically since composition
-  with a morphism is automatically natural, where $I^{-1}$ is defined as
-  \[\pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f {\beta} \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} \alpha} f \beta}{\pendappXtoY \epsilon \beta} {\beta}} {\pendappXtoY {D_r \beta}} {\beta}} \]
+\item Next, $I_{inv}$ is a homomorphism automatically since composition
+  with a morphism is automatically natural, where $I_{inv}$ is defined as
+  \[\pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f {\beta} \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} \alpha} f \beta}{\pendappXtoY \epsilon \beta} {\beta}} {\pendappXtoY {D_r }\beta} {\beta}} \]
 
   \item Finally, $I$ is a homomorphism because the inverse of a
     natural transformation is always natural.
@@ -1853,10 +1853,10 @@ The proof can be broken up into 3 conceptual steps:
 \begin{proof}
   \begin{enumerate}
   \item To prove $G_1$ preserves identity we need to show
-    \[ {\homrappXtoYatZ {\pendappXtoY I {G_0\beta}} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} {G_0\beta}} {\pendappXtoY {C_r} {G_0\beta}} {G_0\beta}} {\pendappXtoY \epsilon {\beta}} \beta} {\pendappXtoY {\pendappXtoY {D_r} {\beta}}} {\beta})} {\beta}} = \pendappXtoY{C_r} {G_0\beta}\]
+    \[ {\homrappXtoYatZ {\pendappXtoY I {G_0\beta}} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} {G_0\beta}} {\pendappXtoY {C_r} {G_0\beta}} {G_0\beta}} {\pendappXtoY \epsilon {\beta}} \beta} {\pendappXtoY {D_r} {\beta}} {\beta})} {\beta}} = \pendappXtoY{C_r} {G_0\beta}\]
     which is precisely the $\eta$ principle.
 
-  \item Next, we show $I^{-1}$ is a homomorphism from $\text{Hom}(C)[\text{Id}(C);G]$ to $Q$.
+  \item Next, we show $I_{inv}$ is a homomorphism from $\text{Hom}(C)[\text{Id}(C);G]$ to $Q$.
     All of this is under the binders
     \[\lambdatrinary {\alpha : C} {f : \harrapp {C_s} \alpha {\alpha'}}
     {\alpha' : C} {g : \harrapp{C_s} {\alpha'} {G_0 \beta'}}
@@ -1868,11 +1868,11 @@ The proof can be broken up into 3 conceptual steps:
     % g : a' -> G b'
     % h : b' -> b
 
-    %% I^{-1} (f ;C (g ;C G_1 h)) = Q_t f (I^{-1} g) h
-    
+    %% I_{inv} (f ;C (g ;C G_1 h)) = Q_t f (I_{inv} g) h
+
     \begin{align*}
       & \appunary
-      {I^{-1}}
+      {I_{inv}}
       \alpha
       {(\appbinary {C_t} \alpha f {\alpha'} {(
           \appbinary {C_t} {\alpha'} g {G_0\beta'}
@@ -1910,13 +1910,13 @@ The proof can be broken up into 3 conceptual steps:
       &=
       \apptrinary {Q_t} \alpha
       {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
-      {(\appunary {I^{-1}} {G_0 \beta'} {(\appunary {G_1} {\beta'} h \beta)} \beta)} \beta
+      {(\appunary {I_{inv}} {G_0 \beta'} {(\appunary {G_1} {\beta'} h \beta)} \beta)} \beta
       {\pendappXtoY {D_r} \beta} \beta
       \\
       &=
       \apptrinary {Q_t} \alpha
       {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
-      {(\appunary {I^{-1}} {G_0 \beta'} {(\appunary {I} {G_0\beta'} {(\apptrinary {Q_t} {G_0 \beta'} {\pendappXtoY {C_r} {G_0 \beta'}} {G_0 \beta'} {\pendappXtoY \epsilon {\beta'}} {\beta'} h \beta)} \beta)} \beta)} \beta
+      {(\appunary {I_{inv}} {G_0 \beta'} {(\appunary {I} {G_0\beta'} {(\apptrinary {Q_t} {G_0 \beta'} {\pendappXtoY {C_r} {G_0 \beta'}} {G_0 \beta'} {\pendappXtoY \epsilon {\beta'}} {\beta'} h \beta)} \beta)} \beta)} \beta
       {\pendappXtoY {D_r} \beta} \beta
       \\
       &=
@@ -1941,7 +1941,7 @@ The proof can be broken up into 3 conceptual steps:
       f {\alpha'}
       {(\apptrinary {Q_t} {\alpha'} g {G_0 \beta'} {\pendappXtoY \epsilon {\beta'}} {\beta'}{\pendappXtoY {D_r} {\beta'}} {\beta'})} {\beta'}
       h \beta\\
-      &= \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} \alpha} f {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY {I^{-1}} {\alpha'}} {g} {\beta'})} {\beta'}} {h} {\beta}\\
+      &= \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} \alpha} f {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY {I_{inv}} {\alpha'}} {g} {\beta'})} {\beta'}} {h} {\beta}\\
     \end{align*}
 
     
@@ -2051,9 +2051,91 @@ and an \emph{equalizer} to enforce a homomorphism condition.
 
 To encode (co)-limits and more generally kan extensions, we need both
 hom and also equalizers.
+The right Kan extension of $F$ along $J$ is the best way to fill in the following square:
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEQBfU9TXfIRQBGclVqMWbACLdeIDNjwEiZYePrNWiDgHJu4mFADm8IqABmAJwgBbJGRA4ISAEzVNUnQCk5lm-aIjs5IohJabABiBlxAA
+\begin{tikzcd}
+C \arrow[d, "J"] \arrow[r, "F"] & D \\
+C'                              &  
+\end{tikzcd}\]
+I.e. a functor $Ran_J F : C' \to D$ with a natural transformation
+$Ran_J F \Rightarrow F$ that is universal something something. Recall
+that a natural transformation of this sort would look like:
 
 
 
+If $D$ is complete, there is a formula using ends for this. Using
+cotensor, we can directly adapt this to define a \emph{profunctor}
+that is a universal filler. We can then say that a right Kan extension
+is a functor that represents this profunctor.
+
+\begin{definition}
+  Let $\cat C, \cat C', \cat D$ be categories and let $\alpha : \cat C
+  \vdash A : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be
+  functors. Then the right Kan extension profunctor is a profunctor
+  $\beta^o:\cat D; \gamma:\cat C' \pipe (RPan_J A)[\beta;\gamma]$ which we can define as
+  \[ \beta^o:\cat D; \gamma:\cat C' \pipe (RPan_J A)[\beta;\gamma] = \forall \alpha:\cat C.~ (\beta \to_{\cat D} A) \triangleleft (\gamma \to_{\cat C'} J)
+  \]
+  A right Kan extension is then a functor $\gamma:\cat C' \vdash
+  Ran_J[\alpha] : \cat D$ that represents $RPan_J A$ in that
+  \[ (\beta \to_{\cat D} Ran_J[\gamma]) \cong (RPan_J A)[\beta;\gamma] \]
+\end{definition}
+
+If we have a unit type, then we can now define limits as a special
+case.
+\begin{definition}
+  The limit of a functor $\alpha : \cat C \vdash A : \cat D$ is the
+  right Kan extension of $A$ along $\alpha : \cat C \vdash () : 1$.
+
+  Unraveling the definition this means
+  \[ (\beta \to_{\cat D} \lim_\alpha A) \cong \forall \alpha:\cat C.~ (\beta \to_{\cat D} A) \triangleleft (\gamma \to_{1} ()) \]
+\end{definition}
+Since morphisms in $1$ are trivial, we can almost directly read this
+as saying that a morphism into a limit of a functor is precisely a
+cone: for every $\alpha$, a morphism from $\beta$ to $A[\alpha]$. The
+side condition of naturality of this family is automatically
+satisfied.
+
+We can also define a left Kan extensions using the contravariant
+cotensors.  Normally the left Kan extension is defined using tensors,
+but the definition using profunctors doesn't look right to me. Let's
+work backwards from the definition of colimit to see why.
+
+Let $\alpha : \cat C \vdash A : \cat D$ be a functor we want the
+colimit of. The UP of a colimit is that maps out of it are equivalent
+to cocones from $A$. Semi-formally this looks like
+\[ (\colim_{\alpha} A \to_{\cat D} \beta) \cong \forall \alpha:\cat C.~ A \to_{\cat D} \beta \]
+This looks a lot like a cotensor with a trivial domain:
+\[ (\colim_{\alpha} A \to_{\cat D} \beta) \cong \forall \alpha. (() \to_{1} \gamma) \triangleright (A \to_{\cat D} \beta) \]
+Suggesting that we define the left Kan extension profunctor as a
+contravariant cotensor as follows.
+\begin{definition}
+  Let $\cat C,\cat C',\cat D$ be cats and let $\alpha:\cat C \vdash A
+  : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be functors.
+  Then the left Kan extension profunctor $\gamma^o:\cat C'; \beta:\cat
+  D \pipe (PLan_J A)[\gamma;\beta]$ is defined as
+  \[
+  \gamma^o:\cat C'; \beta:\cat D \pipe (PLan_J A)[\gamma;\beta]
+  := \forall \alpha : \cat C.~ (J \to_{\cat C'} \gamma) \triangleright (A \to_{\cat D} \beta)
+  \]
+  Then a left Kan extension of $A$ along $J$ is a functor $\gamma :
+  \cat C' \vdash Lan_J A : \cat D$ that represents $PLan_J A$ in that
+  \[ (Lan_J A \to_{\cat D} \beta) \cong (LPan_J A)[\gamma;\beta] \]
+\end{definition}
+
+
+%% \begin{definition}
+  %% Let $\cat C,\cat C',\cat D$ be cats and let $\alpha:\cat C \vdash
+  %% : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be functors.
+  %% Then the left Kan extension profunctor $\beta^o:\cat D; \gamma:\cat
+  %% C' \pipe (PLan_J F)[\beta;\gamma]$ is defined as
+%%   \[
+%%   \beta^o:\cat D; \gamma:\cat C' \pipe (PLan_J A)[\beta;\gamma] :=
+%%   \exists \alpha:\cat C. (\beta \to_{\cat D} A[\alpha]) \odot (J[\alpha] \to_{\cat C'} \gamma)
+%%   \]
+%%   And a left Kan extension is a functor $\gamma :\cat C' \vdash Lan_J
+%%   A : \cat D$ that represents $PLan_J A$ in that
+%%   \[ (\beta \to_{\cat D} Lan_J A[\alpha]) \cong (PLan_J A)[\beta;\alpha] \]
+%% \end{definition}
 
 
 %% \begin{lemma}[Parameterized Yoneda Lemma]
@@ -2702,97 +2784,6 @@ that Hom is the unit for the cotensor product.
 \end{proof}
 
 
-
-\subsection{Kan Extensions}
-
-I \emph{think} this is the right way to define left and right Kan
-extensions using tensor/cotensor.
-
-The right Kan extension of $F$ along $J$ is the best way to fill in the following square:
-\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEQBfU9TXfIRQBGclVqMWbACLdeIDNjwEiZYePrNWiDgHJu4mFADm8IqABmAJwgBbJGRA4ISAEzVNUnQCk5lm-aIjs5IohJabABiBlxAA
-\begin{tikzcd}
-C \arrow[d, "J"] \arrow[r, "F"] & D \\
-C'                              &  
-\end{tikzcd}\]
-I.e. a functor $Ran_J F : C' \to D$ with a natural transformation
-$Ran_J F \Rightarrow F$ that is universal something something. Recall
-that a natural transformation of this sort would look like:
-
-
-
-If $D$ is complete, there is a formula using ends for this. Using
-cotensor, we can directly adapt this to define a \emph{profunctor}
-that is a universal filler. We can then say that a right Kan extension
-is a functor that represents this profunctor.
-
-\begin{definition}
-  Let $\cat C, \cat C', \cat D$ be categories and let $\alpha : \cat C
-  \vdash A : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be
-  functors. Then the right Kan extension profunctor is a profunctor
-  $\beta^o:\cat D; \gamma:\cat C' \pipe (RPan_J A)[\beta;\gamma]$ which we can define as
-  \[ \beta^o:\cat D; \gamma:\cat C' \pipe (RPan_J A)[\beta;\gamma] = \forall \alpha:\cat C.~ (\beta \to_{\cat D} A) \triangleleft (\gamma \to_{\cat C'} J)
-  \]
-  A right Kan extension is then a functor $\gamma:\cat C' \vdash
-  Ran_J[\alpha] : \cat D$ that represents $RPan_J A$ in that
-  \[ (\beta \to_{\cat D} Ran_J[\gamma]) \cong (RPan_J A)[\beta;\gamma] \]
-\end{definition}
-
-If we have a unit type, then we can now define limits as a special
-case.
-\begin{definition}
-  The limit of a functor $\alpha : \cat C \vdash A : \cat D$ is the
-  right Kan extension of $A$ along $\alpha : \cat C \vdash () : 1$.
-
-  Unraveling the definition this means
-  \[ (\beta \to_{\cat D} \lim_\alpha A) \cong \forall \alpha:\cat C.~ (\beta \to_{\cat D} A) \triangleleft (\gamma \to_{1} ()) \]
-\end{definition}
-Since morphisms in $1$ are trivial, we can almost directly read this
-as saying that a morphism into a limit of a functor is precisely a
-cone: for every $\alpha$, a morphism from $\beta$ to $A[\alpha]$. The
-side condition of naturality of this family is automatically
-satisfied.
-
-We can also define a left Kan extensions using the contravariant
-cotensors.  Normally the left Kan extension is defined using tensors,
-but the definition using profunctors doesn't look right to me. Let's
-work backwards from the definition of colimit to see why.
-
-Let $\alpha : \cat C \vdash A : \cat D$ be a functor we want the
-colimit of. The UP of a colimit is that maps out of it are equivalent
-to cocones from $A$. Semi-formally this looks like
-\[ (\colim_{\alpha} A \to_{\cat D} \beta) \cong \forall \alpha:\cat C.~ A \to_{\cat D} \beta \]
-This looks a lot like a cotensor with a trivial domain:
-\[ (\colim_{\alpha} A \to_{\cat D} \beta) \cong \forall \alpha. (() \to_{1} \gamma) \triangleright (A \to_{\cat D} \beta) \]
-Suggesting that we define the left Kan extension profunctor as a
-contravariant cotensor as follows.
-\begin{definition}
-  Let $\cat C,\cat C',\cat D$ be cats and let $\alpha:\cat C \vdash A
-  : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be functors.
-  Then the left Kan extension profunctor $\gamma^o:\cat C'; \beta:\cat
-  D \pipe (PLan_J A)[\gamma;\beta]$ is defined as
-  \[
-  \gamma^o:\cat C'; \beta:\cat D \pipe (PLan_J A)[\gamma;\beta]
-  := \forall \alpha : \cat C.~ (J \to_{\cat C'} \gamma) \triangleright (A \to_{\cat D} \beta)
-  \]
-  Then a left Kan extension of $A$ along $J$ is a functor $\gamma :
-  \cat C' \vdash Lan_J A : \cat D$ that represents $PLan_J A$ in that
-  \[ (Lan_J A \to_{\cat D} \beta) \cong (LPan_J A)[\gamma;\beta] \]
-\end{definition}
-
-
-%% \begin{definition}
-  %% Let $\cat C,\cat C',\cat D$ be cats and let $\alpha:\cat C \vdash
-  %% : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be functors.
-  %% Then the left Kan extension profunctor $\beta^o:\cat D; \gamma:\cat
-  %% C' \pipe (PLan_J F)[\beta;\gamma]$ is defined as
-%%   \[
-%%   \beta^o:\cat D; \gamma:\cat C' \pipe (PLan_J A)[\beta;\gamma] :=
-%%   \exists \alpha:\cat C. (\beta \to_{\cat D} A[\alpha]) \odot (J[\alpha] \to_{\cat C'} \gamma)
-%%   \]
-%%   And a left Kan extension is a functor $\gamma :\cat C' \vdash Lan_J
-%%   A : \cat D$ that represents $PLan_J A$ in that
-%%   \[ (\beta \to_{\cat D} Lan_J A[\alpha]) \cong (PLan_J A)[\beta;\alpha] \]
-%% \end{definition}
 
 \subsection{Right (Left) Adjoints preserve (co-)Limits}
 
