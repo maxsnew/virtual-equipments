@@ -73,3 +73,12 @@ B <- R ▹ P -> C
 
 the formula is (R ▹ P)(b,c) = forall a. R(a,b) -> P(a,c)
 
+# Function Extensionality
+
+Haven't run into a need for any kind of funext yet, but there might be
+an issue if we include a "mixed" Sigma type (or mixed Pi):
+
+G | * |- S set
+G | a:C;b:D |- R set
+----
+G | a:C;b:D |- Sigma_{x : S} R set
