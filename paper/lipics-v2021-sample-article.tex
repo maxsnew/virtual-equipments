@@ -1,4 +1,18 @@
 \documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{tikz-cd}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{stmaryrd}
+\usepackage{mathpartir}
+\usepackage{bbm}
+\usepackage{cleveref}
+
+\DeclareMathOperator*{\colim}{colim}
+
 %This is a template for producing LIPIcs articles. 
 %See lipics-v2021-authors-guidelines.pdf for further information.
 %for A4 paper format use option "a4paper", for US-letter use option "letterpaper"
@@ -72,6 +86,83 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
+%% \newtheorem{theorem}{Theorem}
+%% \newtheorem{lemma}{Lemma}
+%% \newtheorem{construction}{Construction}
+%% \newtheorem{definition}{Definition}
+\newcommand{\pto}{\nrightarrow}
+\newcommand{\pfrom}{\nleftarrow}
+\newcommand{\vcat}{\mathcal}
+\newcommand{\cat}{\mathbbm}
+\newcommand{\isaSet}{\,\,\textrm{Set}}
+\newcommand{\Set}{\textrm{Set}}
+\newcommand{\vtkmnd}{\mathbb{K}\text{Mod} (\vcat{V},T)}
+\newcommand{\rmod}{\text{RMod}}
+\newcommand{\lmod}{\text{LMod}}
+\newcommand{\varr}[2]{\text{Fun}{#1}{#2}}
+\newcommand{\harr}[2]{\text{Rel}{#1}{#2}}
+\newcommand{\harrapp}[3]{#1(#2;#3)}
+
+\newcommand{\jnctx}{\curlyveedownarrow}
+
+\newcommand{\id}{\textrm{id}}
+\newcommand{\for}{\textrm{for}\,}
+\newcommand{\when}{\textrm{when}\,}
+\newcommand{\lett}{\textrm{let}\,}
+%% \newcommand{\sort}{\,\,\textrm{sort}}
+\newcommand{\Sort}{\textrm{Sort}}
+\newcommand{\isadtctx}{\,\,\textrm{type context}}
+\newcommand{\isavectx}{\,\,\textrm{cat context}}
+%% \newcommand{\obctx}{\,\,\textrm{object context}}
+\newcommand{\boundary}{\,\,\textrm{boundary}}
+\newcommand{\prof}{\,\,\textrm{span}}
+\newcommand{\subst}{\,\,\textrm{subst}}
+\newcommand{\sigctx}{\,\,\textrm{sig-ctx}}
+\newcommand{\sig}{\,\,\textrm{sig}}
+\newcommand{\pipe}{\mathrel{|}}
+
+\newcommand{\punitinXfromYtoZ}[3]{#2 \mathop{\to_{#1}} #3}
+\newcommand{\punitrefl}[1]{\textrm{id}_{#1}}
+\newcommand{\punitelimtoYwithkontZ}[2]{\textrm{ind}_{\to}(#1,#2)}
+
+\newcommand{\odotexists}[1]{\mathop{\overset{\exists #1}\odot}}
+\newcommand{\tensorexistsXwithYandZ}[3]{#2 \odotexists{#1} #3}
+\newcommand{\tensorintroofXandY}[2]{\textrm{pair}_\odot(#1,#2)}
+\newcommand{\tensorelimXtoYwithkontZ}[3]{\textrm{ind}_{\to}(#1,#2,#3)}
+\newcommand{\tensorelimfromWXtoYwithkontZ}[4]{\textrm{ind}_{\odot}(#1,#2,#3,#4)}
+\newcommand{\tensorelimVatWtoXtoYwithkontZ}[5]{\textrm{ind}_{\to}(#4,#2,#1,#3,#5)}
+
+\newcommand{\tlwith}[1]{\mathop{\prescript{#1}{}\triangleleft}}
+\newcommand{\tlforall}[1]{\tlwith{\forall #1}}
+
+\newcommand{\trwith}[1]{\mathop{\triangleright^{#1}}}
+\newcommand{\trforall}[1]{\trwith {\forall #1}}
+
+\newcommand{\homrallXYtoZ}[3]{#2 \trforall {#1} #3}
+
+\newcommand{\homlallXYtoZ}[3]{#2 \tlforall #1 #3}
+
+\newcommand{\homrlambdaXatYdotZ}[3]{\lambda^\triangleright (#1, #2). #3}
+\newcommand{\homllambdaXatYdotZ}[3]{\lambda^\triangleleft (#2, #1). #3}
+
+\newcommand{\homrappXtoYatZ}[3]{#1 \trwith{#3} #2}
+\newcommand{\homlappXtoYatZ}[3]{#2 \tlwith{#3} #1}
+
+\newcommand{\homunary}[4]{\pendallXdotY {#1} {\homrallXYtoZ {#3} {#2} {#4}}}
+
+\newcommand{\lambdaunary}[4]{\pendlambdaXdotY {#1} {\homrlambdaXatYdotZ {#2} {#3} {#4}}}
+\newcommand{\lambdabinary}[6]{\lambdaunary{#1}{#2}{#3}{\homrlambdaXatYdotZ{#4}{#5}{#6}}}
+\newcommand{\lambdatrinary}[8]{\lambdabinary{#1}{#2}{#3}{#4}{#5}{\homrlambdaXatYdotZ{#6}{#7}{#8}}}
+
+\newcommand{\appunary}[4]{\homrappXtoYatZ {\pendappXtoY {#1} {#2}} {#3} {#4}}
+\newcommand{\appbinary}[6]{\homrappXtoYatZ {\appunary{#1}{#2}{#3}{#4}}{#5}{#6}}
+\newcommand{\apptrinary}[8]{\homrappXtoYatZ {\appbinary{#1}{#2}{#3}{#4}{#5}{#6}}{#7}{#8}}
+
+\newcommand{\pendallXdotY}[2]{\forall #1. #2}
+\newcommand{\pendlambdaXdotY}[2]{\lambda #1. #2}
+\newcommand{\pendappXtoY}[2]{#1^{#2}}
+
+\newcommand{\equalizeVofWbyXeqYatZ}[5]{\{ {#1} : {#2} \pipe {#3} = {#4} : {#5} \}}
 
 \maketitle
 
@@ -144,7 +235,7 @@ judgment theory has a straightforward semantics in the category of
 sets and relations.
 
 The reason profunctors are not commonly introduced is that they are
-seen as an auxiliary notion: a profunctor $R : C \relto D$ is
+seen as an auxiliary notion: a profunctor $R : C \pto D$ is
 typically defined as a functor $C^{\textrm{op}}\times D \to
 \textrm{Set}$. However this definition requires two concepts that are
 somewhat problematic: the opposite category $C^\textrm{op}$ and the
@@ -162,29 +253,2778 @@ The syntax of judgment theory is an internal language for
 \emph{virtual equipments}. These are a kind of joint generalization of
 double categories and multicategories.
 
-Notably, the definition of a category in \secref{sec:internal} can be
+Notably, the definition of a category in \cref{sec:internal} can be
 applied as an extremely general notion of category, including internal
 categories and enriched categories. This general notion is often
 called a ``generalized multi-category'' and encompasses an astonishing
 range of mathematical structures, including categories, topological
 spaces, metric spaces, etc.
 
-\section{Syntax of Judgment Theory}
+\section{Syntax of SCT}
 
-\subsection{Positive Multiplicatives}
+\begin{figure}
+  \begin{mathpar}
+    \begin{array}{rcl}
+      \textrm{Type} & A,B,C ::= &
+      \sum_{X:A} B \pipe \prod_{X:A} B \pipe \Id A M N \\
+      \Cat \pipe \varr{\cat C}{\cat D}\pipe \harr {\cat C} {\cat D}\pipe \pendallXdotY {\alpha:{\cat C}} R\\
+      \textrm{Term} & L,M,N ::= & X \pipe \lambda X:M. N \pipe M\,N \pipe (M,N) \pipe \pi_1 M \pipe \pi_2 M\\
+      &&\lceil \cat C \rceil \pipe \vlambda {\alpha:\cat C} a \pipe \hlambda {\alpha:\cat C}{\beta: \cat D} R \ldots \\
+      \textrm{Categories} &\cat C, \cat D, \cat E ::= & M \pipe \cat C \times \cat D \pipe \cat 1\\
+      \textrm{Objects} & a, b, c ::= & \alpha \pipe M a \ldots\\
+      \textrm{Sets} & P,Q,R ::= & \ldots \\
+      \textrm{Transformations} & s,t,u & ::= & \ldots \\
+      \\
+      \textrm{Type Context} & \Gamma ::= & \cdot \pipe \Gamma, X : A\\
+      \textrm{Cat Context} & \Phi,\Psi ::= & \cdot \pipe \alpha : \cat C \pipe \Phi , x : P , \Psi\\
+    \end{array}
+  \end{mathpar}
+  \caption{Simple Category Theory Syntactic Forms}
+\end{figure}
 
-\subsection{Negative Multiplicatives}
+\subsection{Judgmental Structure}
 
-\subsection{Additives}
+The following figures present the basic formation, primitive and
+admissible equality rules of our type theory, an internal language for
+virtual double categories with restrictions.
+%
+The type theory has 4 central concepts, which we will refer to
+sometimes using type theoretic/set theoretic and at other times
+category-theoretic terminology.
+%
+In type theoretic terminology, judgment theory has \emph{sorts} $\cat
+C, \cat D, \cat E$, and \emph{types} $A,B,C$ which have a given sort
+and are also \emph{parameterized} by an object of some other sort, and
+so can also be thought of as \emph{functions} with input and output
+sorts.
+%
+Next there are \emph{judgments} $P,Q,R,S$ which are parameterized by
+two variables.
+%
+In $\alpha^o:\cat C;\beta : \cat D \pipe R$, we say $R$ depends on
+$\alpha$ \emph{contravariantly} and in $\beta$ \emph{covariantly}.
+%
+Finally, we have \emph{terms} $s,t,u$ that are elements of some
+judgment $R$ but are also parameterized by elements of some other
+judgments which are given by a \emph{context} $\Phi$, which is a
+``compatible string'' of judgments where the covariant variable of one
+judgment is the same as the contravariant variable of the next.
+%
+Since these terms are parameterized by other terms, we can see these
+as \emph{inference rules} for the judgments.
+
+At other times we will want to think of these using set-theoretic
+terminology, in which case we have sets $\cat C,\cat D, \cat E$,
+functions/elements $A,B,C$, \emph{spans} $R,\ldots$ and morphisms of
+spans $s,t,u$.
+%
+Finally when we develop multicategory theory we will use
+category-theoretic terminology, in which the structure is most
+familiar and we have categories, objects/functors,
+\emph{profunctors}/bimodules and 2-cells/homomorphisms of bimodules.
+
+Figure\ref{fig:formation} introduces the formation rules for the basic
+constructs. Sorts give a syntax for objects of the double
+category. Types have an output sort and a sorted input variable, and
+model vertical arrows. Next, judgments have two sorted variables, one
+contravariant and one covariant, which can be the same
+variable. Judgments model the horizontal arrows. Next are contexts,
+whose formation rule is the same as judgments, and which give a syntax
+for ``compatible strings'' of judgments. Then terms have an input
+context and an output judgment, which must have the same covariant and
+contravaiant variables, modeling ``globular'' 2-cells. Finally, we
+have substitutions for terms, which are typed with respect to an input
+context, an output context and two types, forming a kind of
+square. These model the ``compatible string'' of 2-cells that arise in
+the composition laws.
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule
+        {}
+        {\Gamma \isadtctx}
+
+    \inferrule
+    {\Gamma \isadtctx}
+    {\Gamma \vdash \Xi \boundary}
+
+    \inferrule
+    {\Gamma \isadtctx \and \Gamma \vdash \Xi \boundary}
+    {\Gamma \pipe \Xi \vdash S \isaSet}
+
+    \inferrule*[right=Object/Type-formation]
+    {\Gamma \vdash \cat C : \Sort \and \Gamma \vdash \cat D : \Sort}
+    {\Gamma \pipe \alpha : \cat C \vdash A : \cat D}\\
+
+    \inferrule*[right=Context-formation]
+    {\Gamma \isadtctx}
+    {\Gamma \vdash \Phi \isavectx}
+
+    \inferrule*[right=Term formation]
+    {\Gamma \vdash \Phi \isavectx\and
+     \Gamma\pipe \underline \Phi \vdash R \isaSet}
+    {\Gamma \pipe \Phi \vdash M : R}
+
+    \inferrule
+    {\Delta \isadtctx \and \Gamma \isadtctx}
+    {\gamma : \Delta \to \Gamma}
+    
+    \inferrule*[right=Boundary Map formation]
+    {\Gamma \vdash Z \boundary \and \Gamma \vdash \Xi \boundary}
+    {\Gamma \vdash \xi : Z \to \Xi}
+
+    \inferrule*[right=Cat Subst formation]
+    {\Gamma \vdash \Psi \isavectx \and \Gamma \vdash \Phi \isavectx}
+    {\Gamma \vdash \phi : \Psi \to \Phi}
+  \end{mathpar}
+  \caption{Formation Rules}
+  \label{fig:formation}
+\end{figure}
+
+Next, Figure~\ref{fig:basic-rules} gives the basic structural rules of
+judgment theory, which model composition and restrictions in a virtual
+double category. First, we have varialbes and substitution for types,
+modeling identity and composition of vertical arrows. Next, we have
+restriction of a judgment to more specific types, which is given by
+substitution of types for the judgment's parameter variables. Next, we
+have rules for constructing an ``empty'' context, which is just a
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule{}{\cdot \isadtctx}
+
+    \inferrule
+    {\Gamma \isadtctx \and \Gamma\pipe \cdot \vdash A \isaSet}
+    {\Gamma , x : A \isadtctx}\\
+
+    \inferrule{}{\Gamma \vdash \cdot \boundary}
+
+    \inferrule{\Gamma \vdash C : \Sort}{\Gamma \vdash \alpha: C \boundary}
+
+    \inferrule{\Gamma \vdash C : \Sort\and\Gamma\vdash D : \Sort}{\Gamma \vdash \alpha: C;\beta:D \boundary}\\
+
+    \inferrule{}{\Gamma \vdash \cdot \isavectx}
+
+    \inferrule{\Gamma \vdash C : \Sort}{\Gamma \vdash \alpha: C \isavectx}
+
+    \inferrule
+    {\Gamma \vdash \Phi \isavectx\and
+    \Gamma \vdash \Psi \isavectx \and
+    \Gamma \pipe d^+\Phi, d^- \Psi \vdash R \isaSet}
+    {\Gamma \vdash \Phi, x:R, \Psi \isavectx}
+
+    (\Phi,x:R,\Psi),y:S,\Sigma = \Phi,(x:R,\Psi,y:S,\Sigma)
+  \end{mathpar}
+  \begin{align*}
+    \underline \cdot &= \cdot\\
+    \underline {\alpha:C} &= \alpha:C\\
+    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
+  \end{align*}
+  \begin{align*}
+    d^{\pm}(\cdot) &\quad\text{undefined}\\
+    d^{\pm}(\alpha:C) &= \alpha : C\\
+    d^{-}(\Phi,x:R,\Psi) &= d^-\Phi\\
+    d^{+}(\Phi,x:R,\Psi) &= d^-\Psi
+  \end{align*}
+  \caption{Basic Rules for Contexts}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule
+    {}
+    {\Gamma\pipe \cdot \vdash \Sort \isaSet}
+
+    \inferrule
+    {x:S \in \Gamma}
+    {\Gamma \pipe \cdot \vdash x : S}
+
+    \inferrule
+    {\Gamma\pipe\cdot \vdash C : \Sort}
+    {\Gamma \pipe \alpha:\cat C \vdash \alpha : \cat C}
+
+    \inferrule
+    {\Gamma \pipe \alpha:C,\beta:D \vdash R \isaSet}
+    {\Gamma\pipe \alpha:C, x:R, \beta: D \vdash x : R}
+
+    \inferrule{\forall x:A \in \Gamma. \Delta \vdash \gamma(x) : A}{\gamma : \Delta \to \Gamma}\\
+
+    \inferrule*%% [right=NullaryBoundaryMap]
+               {\Gamma \isadtctx}{\Gamma \vdash \cdot : \cdot \to \cdot}\and
+    \inferrule*{\Gamma \pipe \alpha':C' \vdash A : C}{\Gamma \vdash A/\alpha : \alpha':C' \to \alpha:C}
+
+    \inferrule*
+    {\Gamma \pipe \alpha':C' \vdash A : C\and
+      \Gamma \pipe \beta':D' \vdash B : D
+    }
+    {\Gamma \vdash (A/\alpha;B/\beta) : (\alpha':C';\beta':D') \to (\alpha:C;\beta':D')}\\
+
+    \inferrule*%% [right=NullCtxMap]
+               {\Gamma \isadtctx}{\Gamma \vdash \cdot : \cdot \to \cdot}
+
+    \inferrule*{\Gamma \pipe \alpha':C' \vdash A : C}{\Gamma \vdash A/\alpha : \alpha':C' \to \alpha:C}
+
+    \inferrule
+    {\Psi = \Psi_1 \jnctx \Psi_M \jnctx \Psi_2\and
+      \Gamma \vdash \phi_1 : \Psi_1 \to \Phi_1\and
+      \Gamma \pipe \Psi_M \vdash M : R[d^+\phi_1;d^-\phi_2] \and
+      \Gamma \vdash \phi_2 : \Psi_2 \to \Phi_2
+      }
+    {\Gamma \vdash \phi_1,M/x,\phi_2 : \Psi \to \Phi_1,x:R,\Phi_2}
+  \end{mathpar}
+  \caption{Basic Rules of Judgment Theory}
+  \label{fig:basic-rules}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule
+    {\Gamma \vdash \Phi \isavectx \and
+    \Gamma \vdash \Psi \isavectx \and
+    d^+\Phi = d^- \Psi}
+    {\Gamma \vdash \Phi \jnctx \Psi \isavectx}
+
+    \inferrule
+    {\Gamma \vdash \phi : \Phi' \to \Phi \and
+     \Gamma \vdash \psi : \Psi' \to \Psi\and
+     d^+\phi = d^- \psi}
+    {\Gamma \vdash \phi \jnctx \psi : \Phi' \jnctx \Psi' \to \Phi \jnctx \Psi}
+
+    \inferrule*[right=ObSubst]
+    {\alpha : \cat C \vdash B : \cat D\and
+    \beta : \cat D \vdash A : \cat E}
+    {\alpha : \cat C \vdash A[B/\beta] : \cat E}\\
+
+    \inferrule*[right=Everything Subst]{\gamma : \Delta \to \Gamma \and \Gamma J}{\Delta J}
+
+    \inferrule{\Gamma \vdash \xi : Z \to \Xi\and \Gamma \pipe \Xi \vdash R \isaSet}{\Gamma \pipe Z \vdash R[\xi] \isaSet}
+
+    \inferrule{\Gamma \vdash \phi : \Psi \to \Phi\and \Gamma \pipe \Phi \vdash M : R}{\Gamma \pipe \Psi \vdash M[\phi] : R[\underline \phi]}
+  \end{mathpar}
+  \begin{align*}
+    (\Phi \jnctx \Psi) \jnctx \Sigma &= \Phi \jnctx (\Psi \jnctx \Sigma)\\
+    \Phi \jnctx \alpha:C &= \Phi\\
+    \alpha:C \jnctx \Psi &= \Psi\\\\
+    d^\pm(A/\alpha) &= A/\alpha\\
+    d^+(\phi_1,M/x,\phi_2) &= d^+ \phi_2\\
+    d^-(\phi_1,M/x,\phi_2) &= d^- \phi_1\\\\
+    \underline \cdot &= \cdot\\
+    \underline {A/\alpha} &= A/\alpha\\
+    \underline {\phi_1,M/x,\phi_2} &= d^-\phi_1;d^+\phi_2
+  \end{align*}
+  \caption{Admissible Rules}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    \begin{array}{rcl}
+      x[\gamma] &=& \gamma(x)\\
+      J[\gamma][\delta] & = & J[\gamma[\delta]]\\
+      \gamma[\delta](x) &=& \gamma(x)[\delta]\\
+      
+      A[\alpha/\alpha] &=& A\\
+      \alpha[A/\alpha] &=& A\\
+      A[B/\beta][C/\gamma] & = & A[B[C/\gamma]/\beta]\\
+      A[B/\beta][\gamma] &=& A[\gamma][B[\gamma]/\beta]\\\\
+      
+      R[\cdot] &=& R\\
+      R[\alpha/\alpha] &=& R\\
+      R[\alpha/\alpha,\beta/\beta] &=& R\\\\
+      R[\xi][\xi'] & = & R[\xi[\xi']]\\
+      R[\xi][\gamma] &=& R[\gamma][\xi[\gamma]]\\\\
+
+      \cdot[\xi] &=& \cdot\\
+      (A/\alpha)[B/\beta] &=& A[B/\beta]/\alpha\\
+      (A/\alpha;B/\beta)[\xi] &=& A[d^-\xi]/\alpha,B[d^+\xi]/\beta\\
+      \cdot[\gamma] &=& \cdot\\
+      (A/\alpha)[\gamma] &=& A[\gamma]/\alpha\\
+      (A/\alpha;B/\beta)[\gamma] &=& A[\gamma]/\alpha;B[\gamma]/\beta\\\\
+
+      \cdot[\gamma] &=& \cdot\\
+      (A/\alpha)[\gamma] &=& A[\gamma]/\alpha\\
+      (\phi_1,M/x,\phi_2)[\gamma] &=& \phi_1[\gamma],M[\gamma]/x,\phi_2[\gamma]
+
+      TODO: cat substitution id/assoc
+    \end{array}
+  \end{mathpar}  
+  \caption{Algebraic Properties}
+  \label{fig:equations}
+\end{figure}
+
+Now that we have established a judgmental structure, we move on to the
+multiplicative connectives, starting with the easier negative
+connectives and then the more difficult positives.
+
+\subsection{Left and Right Hom of Profunctors}
+
+First, we study the two ``internal homs'' of judgments. Since the
+``monoidal'' structure of judgments is not symmetric, we get two
+distinct notions internalizing concatenating on the left and the right
+of the context. In ordinary category theory, these profunctors can be
+constructed using an \emph{end} and the hom of functor
+categories. Given two profunctors $P : C^o \times E \to \Set$ and $R :
+D^o \times E \to Set$, their hom is given as
+\[ \int_{e \in E} R(-,e) \Rightarrow P(e,=) \]
+
+Type theoretically this is a kind of multi-hom where we are
+quantifying both over an indexing sort variable $e$ and a profunctor
+variable of type $R$. We write the covariant and contravariant
+versions of these connectives as $\homrallXYtoZ \gamma R S$ and
+$\homlallXYtoZ \alpha R S$.
+
+The syntax is given in Figure~\ref{fig:cotensor}.
+%
+First, the formation rule for covariant cotensor formation requires
+that the covariant variables for $R,P$ are the same, and the
+contravariant variables match the boundary of the overall
+judgment. Note that we use $d^+\Xi,d^-\Xi$ to allow for the case that
+the boundary is a single variable $\Xi = \alpha:\cat C$.
+%
+Next, the substitution rule is straightforward.
+%
+Then we have the elimination form, first written in a simple form with
+no substitution built in.
+%
+This says that given a variable of the cotensor judgment, and another
+variable of judgment $R$, we can apply these to get a term of judgment
+$P$. As a diagram this is written as follows:
+
+\[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEQBfU9TXfIRQBGclVqMWbACLdeIDNjwEiAJjHV6zVohABROXyWCiZYeK1TdnHkYEqU685sk793cTCgBzeEVAAZgBOEAC2SGQgOBBIohLabAA6iQEQQYwMAATJ3nShoXQAdJkACtmJOEFYdGDeDDD1ATiZAEqGIMFhsdTRSOrxViBtth0h4YgAzD0xiAAsLgm6Je2d45G9k9QMWGBuUBBMAEb1INQAFjB0UGyQu6dRdFgMNwSsI6t900jzIBdXL3ctjs9gdjqweo9nrpbm8KFwgA
+\begin{tikzcd}
+C \arrow[r, "\forall \gamma. P \triangleleft R"] \arrow[d, no head, Rightarrow] & D \arrow[r, "R"] & E \arrow[d, no head, Rightarrow] \\
+C \arrow[rr, "P"]                                                               &                  & E                               
+\end{tikzcd}\]
+
+The universal property of this judgment is that this is the universal
+2-cell of this type, in that any 2-cell
+
+
+\[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEByEAX1PUy58hFACZyVWoxZsAIr34gM2PASIBmCdXrNWiEAFEFAlcKJkAjJJ0z97Y0sGqRyTVe3S9hh8qFqUFlpSumy8kjBQAObwRKAAZgBOEAC2SIEgOBBI4sG2IABKDokpSJoZWYgALB4h+gAKRUmpiGTlpdQMWGBecBCdUCDUABYwdAOIYEwMDNQ4dFgMbJDdjSWIOZlI1SAjY0sErB1dXlAQTABGDIcZ84v6y6x88U1IrZuIAKxPIMXNH7MVdKdFb6KB0OAjAbDUbjcAHMI8IA
+\begin{tikzcd}
+C' \arrow[d] \arrow[r] & {} \arrow[r, no head, dashed] & D \arrow[r, "R"] & E \arrow[d, no head, Rightarrow] \\
+C \arrow[rrr, "P"]     &                               &                  & E                               
+\end{tikzcd}\]
+
+Exhibits a unique factorization:
+
+\[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQBhEAX1PU1z5CKAEwVqdJq3YARHnxAZseAkQDM4mgxZtEIAKLz+yoUTIiJ26Xq69jg1Sg0WtU3QaOKBK4SVLFLN3YOAHJPJQdfcn9AnXZw71NRGNc4vTk7LxNHZA0A1OsPbgkYKABzeCJQADMAJwgAWyRokBwIJDFJNJAAJU86xqQNVvbEABYC9wAFfvqmxDIRoZpGLDB3KAhmACNGNhoACxh6KHZIdZAaHHosRjOCNkyB+c62pAmQI5P7i5W1ja2u32rRudz050eCmeSAArFdRgA2J5zJAI+FIADsfwueig9DgR1Oh2Op3BD1mg0QWKWiBaqxxIE2Oz2l0+JJ+wOutw5FPmcJpxGRlMWb1pk3YAB0JdUILUmIwAARSsr0BoNegAOgVUyVEpwtSw9DAZT2e2qOAVfSF82pooAHOK9FaoSjEA6aZ16QDmcCvqTwOSrqCecVuEA
+\begin{tikzcd}
+C' \arrow[r] \arrow[d]                                                           & {} \arrow[r, no head, dashed] & D \arrow[d, no head, Rightarrow] \arrow[r, "R"] & E \arrow[d, no head, Rightarrow] \\
+C \arrow[d, no head, Rightarrow] \arrow[rr, "\forall \gamma. P \triangleleft R"] &                               & D \arrow[r, "R"]                                & E \arrow[d, no head, Rightarrow] \\
+C \arrow[rrr, "P"]                                                               &                               &                                                 & E                               
+\end{tikzcd}\]
+
+We give elimination rules and introduction rules in a style similar to
+$\lambda$-calculus, with corresponding $\beta\eta$ rules.
+
+\begin{figure}
+  \begin{mathpar}
+      \inferrule*[right=Covariant Hom formation]
+      {\Gamma \pipe d^+\Xi; \alpha : \cat C \vdash  R \and \Gamma \pipe  d^-\Xi; \alpha : \cat C \vdash P}
+      {\Gamma \pipe \Xi \vdash \homrallXYtoZ \alpha R P}
+
+      (\homrallXYtoZ \alpha R P)[\xi] = \homrallXYtoZ \alpha {R[d^+\xi;\alpha/\alpha]} {P[\alpha/\alpha;d^-\xi]}
+
+      \inferrule*[right=Covariant Hom introduction]
+      {\Gamma \pipe \Phi, x : R, \alpha : \cat C \vdash M : P}
+      {\Gamma \pipe \Phi \vdash
+        \homrlambdaXatYdotZ {x : R} {\alpha : \cat C} M : \homrallXYtoZ \alpha R P}
+
+     (\homrlambdaXatYdotZ {x} {\alpha} M)[\phi]
+      = \homrlambdaXatYdotZ {x} {\alpha} M[\phi,x/x,\gamma/\gamma]
+
+      %% \inferrule*[right=Covar Hom elim simple]
+      %% {}
+      %% {\alpha: \cat C, f:\forall \gamma. P \triangleleft R, \beta : \cat D, x : R, \gamma : \cat E \vdash f\triangleleft (x, \gamma) : P}
+
+      \inferrule*[right=Covariant Hom elimination]
+      {\Phi = \Phi_f \jnctx \Phi_a\and
+       \Gamma\pipe\Phi_f \vdash M : \homrallXYtoZ \alpha R P \and
+       \Phi_a \vdash N : R[A/\alpha]
+        }
+      {\Gamma\pipe \Phi \vdash \homrappXtoYatZ M N A : P[A/\alpha]}\\
+
+      \homrappXtoYatZ {(\homrlambdaXatYdotZ x \alpha M)} N A = M[N/x,A/\alpha] (\beta)
+      %% (\lambda^\triangleleft (x, \gamma). M)\triangleleft (x, \gamma) = M (\beta)
+
+      \inferrule
+      {\Gamma\pipe\Phi, x:R, \alpha : \cat C \vdash \homrappXtoYatZ M x \alpha = \homrappXtoYatZ N x \alpha : P}
+      {\Gamma\pipe\Phi \vdash M = N : \homrallXYtoZ \alpha R P}
+
+      \inferrule*[right=Contra Hom formation]
+      {\Gamma \pipe \alpha:\cat C; d^-\Xi\vdash R \and \Gamma \pipe \alpha : \cat C; d^+\Xi\vdash P}
+      {\Gamma \pipe \Xi \vdash \homlallXYtoZ \alpha R P}
+
+      \inferrule*[right=Contra Hom introduction]
+      {\Gamma\pipe\alpha:\cat C, x : R, \Phi \vdash M : P}
+      {\Gamma\pipe\Phi \vdash \homllambdaXatYdotZ {x : R} {\alpha : \cat C} M : \homlallXYtoZ \alpha R P}
+
+     (\homllambdaXatYdotZ {x} {\alpha} M)[\phi]
+      = \homllambdaXatYdotZ {x} {\alpha} M[\phi,x/x,\gamma/\gamma]
+
+      \inferrule*[right=Contra Hom elimination]
+      {\Phi = \Phi_a \jnctx \Phi_f\and
+       \Gamma \pipe \Phi_a \vdash N : R[A/\alpha] \and
+       \Gamma \pipe \Phi_f \vdash M : \homlallXYtoZ \alpha R P}
+      {\Gamma \pipe \Phi \vdash \homlappXtoYatZ M N A : P[A/\alpha]}\\
+
+      \inferrule*[Right=$\beta$]
+                 {}
+                 {\homlappXtoYatZ {(\homllambdaXatYdotZ x \alpha M)} N A = M[A/\alpha,N/x]}
+
+      \inferrule*[right=$\eta$]
+      {\Gamma \pipe \alpha:\cat C, x:R, \Phi \vdash \homlappXtoYatZ M x \alpha = \homlappXtoYatZ N x \alpha : P}
+      {\Gamma \pipe \Phi \vdash M = N : \homlallXYtoZ \alpha R P}
+  \end{mathpar}
+  \caption{Hom of Relations/Profunctors}
+  \label{fig:hom}
+\end{figure}
+
+Hom judgments are useful not just in applications (Kan extensions, the
+Yoneda lemma), but also for purely syntactic reasons. In particular, I
+don't see how to give a sensible, complete natural deduction-style
+syntax for the other multiplicative connectives (Unit (i.e., the hom
+profunctor) and Tensor (profunctor composition) without relying on the
+presence of homs. The key property that the hom allows is that given
+any variable in context of a term $\Phi,\alpha,x,\beta,\Psi \vdash M :
+Q$ we can represent this term as a ``single-variable term'' by moving
+$\Phi$ and $\Psi$ to the right of the turnstile:
+
+\[ \alpha, x, \beta \vdash \lambda \Phi. \lambda \Psi M. : \Phi \triangleright Q \triangleleft \Psi \]
+
+This allows us to describe restricted positive eliminations that only
+work on single variable contexts. We give an admissible ``syntax
+sugar'' in Figure~\ref{fig:multi-hom}.
+
+
+Any $\Phi_l,\beta:C,\Phi_r \vdash M : R$ can be represented as a term
+$\beta:C \vdash M' : \Phi_r \triangleright_{\beta:C} R \triangleleft_{\beta:C} $
+
+
+Say we have a term in context
+\[ \alpha,x:P,\beta,y:Q,\gamma \vdash M : R \]
+Using $\triangleright\triangleleft$, we can produce an equivalent term
+of a different output type whose context is one of the single
+variables $\alpha,\beta$ or $\gamma$ in the context.
+
+We can make it $\alpha$ by using $\triangleleft$ twice:
+\[ \alpha \vdash \lambda^\triangleleft (x:P,\beta). \lambda^\triangleleft (y:Q, \gamma). M : \forall \beta. (\forall \gamma. R \triangleleft Q) \triangleleft P \]
+
+Or $\gamma$ by using $\triangleright$ twice:
+\[ \gamma \vdash\lambda^\triangleright (\beta, y:Q).  \lambda^\triangleright (\alpha, x:P). M : \forall \gamma. Q \triangleright \forall \alpha. P \triangleright R \]
+
+And we have two different ways to make the context $\beta$, either we use $\triangleright$ and then $\triangleleft$:
+\[ \beta \vdash\lambda^\triangleright (\alpha, x:P).  \lambda^\triangleleft (y:Q, \gamma). M : \forall \alpha. P \triangleright (\forall \gamma. R \triangleleft Q) \]
+or we do the opposite order:
+\[ \beta \vdash \lambda^\triangleleft (y:Q, \gamma). \lambda^\triangleright (\alpha, x:P). M : \forall \gamma. (\forall \alpha. P \triangleright R) \triangleleft Q \]
+
+In general we can iterate this process. That is given any $\Phi,\Psi$
+with $d^+\Phi = d^-\Psi = \beta:D$, we can take a term $\Phi \jnctx
+\Psi \vdash M : R$ and produce an equivalent term $\beta:D \vdash M :
+\Phi \triangleright R \triangleleft \Psi$. To formalize this, we show
+how we can create ``multi-hom'' jumbo connectives $\Phi \triangleright
+R$ and $R \triangleleft \Psi$, where the boundary conditions on
+$\Phi,\Psi$ are analogous to the ordinary case. These are given in
+Figure\ref{multi-hom}.
+
+\begin{figure}
+  \begin{align*}
+    P \triangleleft \gamma:E &= P\\
+    P \triangleleft (\Psi,x:R,\gamma:E) &= (\forall \gamma: E. P \triangleleft R) \triangleleft \Psi\\
+    %% \cdot \triangleright_{\alpha : C} P &= P\\
+    %% (x:R,\beta:D,\Phi_r)\triangleright_{\alpha:C} P  &= \Phi_R \triangleright_{\beta:D} \forall \beta. R \triangleright P
+  \end{align*}
+  \begin{mathpar}
+    \inferrule
+    {\Gamma \pipe d^+\Xi; \gamma: E \vdash P \isaSet\and
+     \Gamma \pipe d^-\Xi; \gamma:E \vdash \Psi \isavectx}
+    {\Gamma \pipe \Xi \vdash P \triangleleft \Psi}
+
+    \inferrule*[right=Covariant Multi-Hom introduction]
+    {\Gamma\pipe\Phi\jnctx \Psi \vdash M : P}
+    {\Gamma\pipe\Phi \vdash \lambda^\triangleleft \Psi. M : P \triangleleft \Psi}\and
+
+    \inferrule*[right=Covar Multi-Hom elim]
+    {~}
+    {\Gamma \pipe f:P\triangleleft \Psi,\Psi \vdash \textrm{app}\triangleleft_\Psi : P}
+
+    %%   (\lambda^\triangleleft \Psi. M)[\phi] = \lambda^\triangleleft \Psi. M[\phi,\Psi]\\
+    %%   \lambda^\triangleleft \gamma. M = M\\
+    %%   \lambda^\triangleleft (\Psi,x:R,\gamma:\cat E). M = \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M\\
+
+    %%   (\lambda^\triangleleft \gamma. M)[\phi] = M[\phi] = \lambda^\triangleleft \gamma. M[\phi]\\
+    %%   (\lambda^\triangleleft (\Psi,x:r,\gamma:\cat E). M)[\phi] =
+    %%   (\lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M)[\phi]
+    %%   = \lambda^\triangleleft \Psi. (\lambda^\triangleleft (x:R,\gamma:\cat E). M)[\phi, \Psi]
+    %%   = \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M[\phi,\Psi,x:R,\gamma]      
+
+    %%   \inferrule*[right=Covariant Multi-Hom elimination]
+    %%   {\Phi_1 \vdash M : P\triangleleft \Phi_2 \and \phi_2 : \Psi \vdash \Phi_2 \subst(\xi)}
+    %%   {\Phi_1,\Psi \vdash M\triangleleft \phi_2 : P[d^+\xi]}\\
+
+    %%   M \triangleleft (A/\gamma) = M[A/\gamma]\\
+    %%   M \triangleleft (\phi, N/x,A/\gamma) =  M \triangleleft (N, A) \triangleleft \phi
+
+    %%   (M \triangleleft \phi_2)[\phi_1,\psi] = M[\phi_1] \triangleleft [\phi_2[\psi]]\\
+    %%   TODO: prove
+
+    %%   TODO: (\lambda^\triangleleft \Phi. M) \triangleleft \phi = M[\phi]
+    %%   TODO: M = \lambda^\triangleleft \Phi. M\triangleleft \Phi
+
+    %%   TODO: contravariant by duality
+    %%   %% \inferrule*[right=Contra Multi-Hom formation]
+    %%   %% {\Phi \isavectx(\alpha:\cat C; d^-\Xi) \and P \prof(\alpha : \cat C; d^+\Xi)}
+    %%   %% {\Phi \triangleright P \prof(\xi)}
+
+    %%   %% \alpha \triangleright P = P\\
+    %%   %% \alpha:\cat C, x:R, \Phi \triangleright P = \forall \alpha. R \triangleright \Phi \triangleright P\\
+  \end{mathpar}
+  \begin{align*}
+    \lambda^\triangleleft \gamma:E. M &= M\\
+    \lambda^\triangleleft (\Psi,x:R,\gamma:E). M &= \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:E). M\\\\
+    \textrm{app}\triangleleft_{\gamma:E} &= f\\
+    \textrm{app}\triangleleft_{\Psi,x:R\gamma:E} &= \textrm{app}\triangleleft_\Psi \triangleleft (x,\gamma) \\
+  \end{align*}
+  \caption{Multi-Hom}
+  \label{multi-hom}
+\end{figure}
+
+\subsection{Unit and Tensor Profunctors}
+
+While the cotensors of the previous section work quite smoothly since
+they are negative connectives in an intuitionistic-like (many formulas
+on the left of the sequent and only one on the right), the positive
+connectives, the unit and tensor, are trickier.
+
+First, to internalize $\cdot_{\alpha : \cat C}$ we can define the
+\emph{unit} $A \to_{\cat C} A'$, which in set-theoretic settings we
+might call the \emph{identity/equality judgment} $A \equiv_{\cat C}
+A'$.
+%
+First the formation rule says given two objects $A,A'$ in the same
+category $\cat C$, we can form the hom-set from $A$ to $A'$ $A
+\to_{\cat C} A'$.
+%
+The introduction rule says that given any object $A$, we can define
+the identity arrow from $A$ to itself $\id(A) : A \to_{\cat C} A$.
+%
+Without knowing more about the category in question, these are the
+only arrows we know exist.
+%
+
+The elimination form is trickiest to define in a natural deduction style.
+%
+First, let's consider the universal property of the Hom. From
+Crutwell-Shulman, we want a 2-cell
+
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQBBEAX1PU1z5CKcqQBM1Ok1bsuvftjwEiY8ZIYs2iTjz4gMioUTLF10rSABOMAGaMekmFADm8IqBuWIAWyRkQOBBIqlKa7AASProeXr6IogFBiP6MWGAWUBDMAEaMbDQAFjD0UOyQ6SA0OPRY9trlbPIgnlHxVUkhqRXamTl5lSBFJWUE+QE1deCjDtxAA
+\begin{tikzcd}
+                    & A \arrow[ldd, no head, Rightarrow] \arrow[rdd, no head, Rightarrow] &   \\
+                    & refl                                                                &   \\
+A \arrow[rr, "Hom"] &                                                                     & A
+\end{tikzcd}\]
+
+That is universal/opcartesian in that for any 2-cell $t$:
+
+\[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRACEQBfU9TXfIRQBGclVqMWbbrxAZseAkQBMY6vWatEIAIIy+CwUQAsaiZrZ6eBgUpQA2Mxqnb2Acn1z+ioclXLxZy0QAGFPeVtfUwD1SWCAEXDvIxQAZlJhQLi2HA8ucRgoAHN4IlAAMwAnCABbJDIQHAgkYWsQKtqW6iakVRAGLDBgqDo4AAtCkGoJuig2SCHPDrrEPp7EdP7B4LgIAbnpmFmkMCYGBmoGOgAjGAYABWS7fphynCnzFxAACU625aQm3Wpi2i20I3Gk0Ox20C1Y-2qKwa6wArAjOogQet7OiVijus1EI5PsEAErcChcIA
+\begin{tikzcd}
+B \arrow[r] \arrow[rrdd] & {} \arrow[r, no head, dashed] & A \arrow[rr, "Hom"] &    & A \arrow[rr, no head, dashed] &  & B' \arrow[lldd] \\
+                         &                               &                     & t' &                               &  &                 \\
+                         &                               & C \arrow[rr, "R"]   &    & D                             &  &                
+\end{tikzcd}\]
+
+there exists a $t'$ which extends $t$ in that the following is equal
+to $t$:
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoAmAXVJADcBDAGwFcYkQAhEAX1PU1z5CKAIwVqdJq3Y8+IDNjwEi5cTQYs2iEAEFZ-RUKIAWNZM3s9vA4OUoAbGY3TtHAOT75ApcOSrjEs5aIADCngq2vqYB6lLBACLh3kYoAMykqYFx7Dge1l6GdsjpxFkW2lZyET5EZKWx5SBJhb5i9eYuTfnVKciO7UEy3clF6SJlnQBOMABmjDwSMFAA5vBEoDOTEAC2SGQgOBBIIvmbO8c0h0iqIIxYYMFQ9HAAFksgNG-0UOyQD55nXaIG5XRDpW73YJwCB3H6fGDfJBgZiMRg0Rj0ABGMEYAAURsJbrMcB8OsEABLnU5bIHg0GmCH-bRPV7veGI7R-NjU86IfaggCsPKBDNB9mFSAFlyOiEcZPYACUATSkAAOaXXdGQ9hQCDMTGMNjsn6cghGg70LDzU3-CWIdUHGXgu5MkC6-WG0lfE3gM2knCW62+21yQFIACcGr5dsjjuO+xdUJhWDhIG9SJRaItVt+frtIn5MrEjKTsK9CJNyNRl0DuZDGxViALUYdiZ1zzeqfTNu5ocbDtBImLbeZHbZaYrdd7Dd5Q6jDJHbr1BvN3eD5oDOZ7C24QA
+\begin{tikzcd}
+{} \arrow[dd] \arrow[r]  & {} \arrow[dd] \arrow[rr, no head, dashed] &                     & A \arrow[ldd, no head, Rightarrow] \arrow[rdd, no head, Rightarrow] \arrow[rrr, no head, dashed] &                               &  & {} \arrow[dd, no head, Rightarrow] \\
+                         &                                           &                     & refl                                                                                             &                               &  &                                    \\
+B \arrow[r] \arrow[rrdd] & {} \arrow[r, no head, dashed]             & A \arrow[rr, "Hom"] &                                                                                                  & A \arrow[rr, no head, dashed] &  & B' \arrow[lldd]                    \\
+                         &                                           &                     & t'                                                                                               &                               &  &                                    \\
+                         &                                           & C \arrow[rr, "R"]   &                                                                                                  & D                             &  &                                   
+\end{tikzcd}\]
+
+Clearly, our introduction rule models this first 2-cell. Furthermore,
+the construction in the second condition is modeled faithfully by the
+following sequent rule in the figure. This is a J-like induction rule:
+to construct a term using an input of the Hom type, it is sufficient
+to consider the case in which the input is the identity morphism.
+%
+However, building in a substitution the usual way we would (pushing
+the substitution into the continuation $N$) doesn't work properly
+because we can't necessarily extract a substitution for the
+continuation from the substitution for the the whole term. A
+substitution for the whole term would be of the form
+\[\phi,D_1/\delta_1,M/f,D_2/\delta_2,\psi\]
+The the candidate for the continuation's substitution would be
+$\phi,?,\psi$ but there is not necessarily something to go in the
+middle here since $D_1,D_2$ do not necessarily have the same
+\emph{input variable}. However, if we assume the existence already of
+the cotensor products the problem can be simplified. Instead of
+allowing for a general elimination of a hom term anywhere in the
+context, we can instead make a remarkably restricted rule: we can only
+eliminate a Hom term when it is the \emph{sole} input in the context:
+
+\[ \inferrule*[right=Hom Elim Very Simple]{\alpha:\cat C \vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]}{\alpha_1:\cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2:\cat C \vdash J(\alpha_1.\alpha_2. Q, \alpha. N, \alpha_1, f, \alpha_2) : Q}\]
+
+While this rule looks very impoverished at first sight, it has the
+virtue of easily supporting a built-in cut:
+
+\[ \inferrule*[right=Hom Elim VSimple Subst]{
+  Q \prof(\alpha_1:\cat C; \alpha_2:\cat C)\and
+  \Phi \vdash M : A_1 \to_{\cat C} A_2\and
+  \alpha:\cat C \vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]}{\Phi \vdash J(\alpha_1.\alpha_2. Q, \alpha. N, A_1, M, A_2) : Q[A_1/\alpha_1, A_2/\alpha_2]}\]
+
+However, this rule on its own clearly is not enough to support our
+desired universal property shown above diagrammatically. To prove our
+completeness theorem, we will need to show that this rule is enough to
+give us the desired universal property \emph{assuming the presence of
+  left and right cotensors}.
+
+So first, we must show that the ``proper'' sequent rule
+
+\[ \inferrule*[right=Hom-Left (Sequent Style)]
+    {\Phi_1[\alpha/\alpha_1], \alpha:\cat C, \Phi_2[\alpha/\alpha_2]\vdash Q[\alpha/\alpha_1,\alpha/\alpha_2]}
+    {\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2\vdash : Q}
+\]
+
+is admissible.
+
+Which we can sketch as follows:
+
+\[
+\inferrule*
+    {\inferrule*{\inferrule*{\Phi_1[\alpha/\alpha_1],\alpha:\cat C, \Phi_2[\alpha/\alpha_1] \vdash Q[\alpha/\alpha_1;\alpha/\alpha_2]}{\alpha:\cat C \vdash \Phi_1[\alpha/\alpha_1] \triangleright Q[\alpha/\alpha_1;\alpha/\alpha_2] \triangleleft \Phi_2[\alpha/\alpha_2]}}{\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C\vdash \Phi_1 \triangleright Q \triangleleft \Phi_2}}
+    {\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2\vdash Q}
+\]
+
+Which using our syntax sugar is given by the term:
+\begin{mathpar}
+  \inferrule*
+    {\inferrule*
+      {\inferrule*
+        {\Phi_1[\alpha/\alpha_1],\alpha:\cat C, \Phi_2[\alpha/\alpha_1] \vdash N : Q[\alpha/\alpha_1;\alpha/\alpha_2]}
+        {\alpha:\cat C \vdash \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N : \Phi_1[\alpha/\alpha_1] \triangleright Q[\alpha/\alpha_1;\alpha/\alpha_2] \triangleleft \Phi_2[\alpha/\alpha_2]}}
+      {\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C\vdash J(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, \alpha_1,f,\alpha_2) : \Phi_1 \triangleright Q \triangleleft \Phi_2}}
+    {\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2\vdash
+      \Phi_1 \triangleright (J(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, \alpha_1,f,\alpha_2)) \triangleleft \Phi_2 : Q}
+\end{mathpar}
+
+We need to show $\beta$ and $\eta$ hold.
+
+First, $\beta$.
+
+\begin{align*}
+  &(\Phi_1 \triangleright (J_\to(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, \alpha_1,f,\alpha_2)) \triangleleft \Phi_2) [\Phi_1[A/\alpha_1],A/\alpha_1,\id(A),A/\alpha_2,\Phi_2[A/\alpha_2]] \\
+  &=
+  \Phi_1[A/\alpha_1] \triangleright (J_\to(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, A,\id(A), A)) \triangleleft \Phi_2[A/\alpha_2]\\
+  &=
+  \Phi_1[A/\alpha_1] \triangleright (\lambda^\triangleright \Phi_1[A/\alpha_1]. \lambda^\triangleleft \Phi_2[A/\alpha_2]. N[A/\alpha]) \triangleleft \Phi_2[A/\alpha_2]\\
+  &=  (\lambda^\triangleleft \Phi_2[A/\alpha_2]. N[A/\alpha]) \triangleleft \Phi_2[A/\alpha_2]\\
+  &=  N[A/\alpha]
+\end{align*}
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule*[right=Unit-Formation]
+    {\Gamma \vdash C : \Sort
+     \Gamma \pipe d^-\Xi \vdash A : \cat C\and \Gamma \pipe d^+ \Xi \vdash A' : \cat C}
+    {\Gamma \pipe \Xi \vdash \punitinXfromYtoZ {C} A {A'}}
+
+    %% (A \to A')[\xi] = A[d^-\xi] \to A'[d^+\xi]
+
+    \inferrule*[right=Unit-Introduction]
+    {\Gamma\pipe\cdot\vdash C : \Sort}
+    {\Gamma \pipe\cdot \vdash \punitrefl C : \pendallXdotY {\alpha:C} \punitinXfromYtoZ C \alpha {\alpha}}
+
+    \inferrule*[right=Unit Elim]{
+      \Gamma\pipe\cdot \vdash Q : \harr C C\and
+      \Gamma\pipe\cdot\vdash N : \pendallXdotY {\alpha:C} {\harrapp Q \alpha \alpha}}
+    {\Gamma\pipe\cdot \vdash \punitelimtoYwithkontZ Q N :
+      \pendallXdotY {\alpha} {\homrallXYtoZ {\alpha'} {\punitinXfromYtoZ C {\alpha}{\alpha'}} {\harrapp Q {\alpha}{\alpha'}}}
+      }
+
+    %% J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1, M, A_2)[\phi] = J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A_1[d^-\phi], M[\phi], A_2[d^+\phi])
+
+    %% \inferrule*[right=Unit$\beta$]{\beta:\cat D \vdash A : \cat C\and
+    %%   \alpha:\cat C \vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]
+    %% }{\beta : \cat D \vdash J_\to(\alpha_1.\alpha_2. Q, \alpha. N, A, \id(A), A) = N[A/\alpha] : Q[A/\alpha_1,A/\alpha_2]}
+    %%
+
+    \homrappXtoYatZ {\pendappXtoY {\punitelimtoYwithkontZ Q N} A} {\pendappXtoY {\punitrefl C} A} A = \pendappXtoY N A
+
+    \inferrule*[right=Unit$\eta$]
+    {\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2:\cat C \vdash M : \harrapp Q {\alpha_1} {\alpha_2}}
+    {\alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2:\cat C \vdash M =
+      \homrappXtoYatZ {\pendappXtoY {\punitelimtoYwithkontZ Q {\pendlambdaXdotY \alpha M[\alpha/\alpha_1,\pendappXtoY {\punitrefl C} \alpha/f,\alpha/\alpha_2]}} {\alpha_1}} f {\alpha_2}
+    : \harrapp Q {\alpha_1}{\alpha_2}}
+  \end{mathpar}  
+  \caption{Unit Primitive Rules}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule*[right=Full Unit Elim*]
+    {\Phi_1[\alpha/\alpha_1], \alpha:\cat C, \Phi_2[\alpha/\alpha_2]\vdash N : Q[\alpha/\alpha_1,\alpha/\alpha_2]}
+    {\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2\vdash J_\to'(\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2, Q, \alpha. N) : Q}
+
+    J_\to'(\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2, Q, \alpha. N) =
+    \Phi_1 \triangleright (J(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, \alpha_1,f,\alpha_2)) \triangleleft \Phi_2
+
+    \inferrule*[right=Full Unit $\beta$*]
+    {}
+    {J_\to'(\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2, Q, \alpha. N)[\Phi_1[\alpha/\alpha_1],\alpha/\alpha_1, \id(\alpha)/f, \alpha/\alpha_2, \Phi_2[\alpha/\alpha_2]]
+    = N}
+
+    (\Phi_1 \triangleright J(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, \alpha_1,f,\alpha_2) \triangleleft \Phi_2)[\Phi_1[\alpha/\alpha_1],\alpha/\alpha_1, \id(\alpha)/f, \alpha/\alpha_2, \Phi_2[\alpha/\alpha_2]]\\
+    = \Phi_1[\alpha/\alpha_1] \triangleright J(\alpha_1.\alpha_2.\Phi_1 \triangleright Q \triangleleft \Phi_2, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N, \alpha,\id(\alpha),\alpha) \triangleleft \Phi_2[\alpha/\alpha_2]\\
+    = \Phi_1[\alpha/\alpha_1] \triangleright
+    (\lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. N)
+    \triangleleft \Phi_2[\alpha/\alpha_2]\\
+    = N
+
+    \inferrule*[right=Unit$\eta$]
+    {\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2 \vdash M : Q}
+    {M =
+      J_\to'(\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2, Q, \alpha. M[\Phi_1[\alpha/\alpha_1],\alpha/\alpha_1,\id(\alpha), \alpha/\alpha_2,\Phi_2[\alpha/\alpha_2]])}
+
+    M
+    =(\triangleleft\beta\triangleright\beta)
+    \Phi_1 \triangleright
+    (\lambda^\triangleright \Phi_1. \lambda^\triangleleft \Phi_2. M)
+    \triangleleft \Phi_2
+    = \Phi_1 \triangleright
+    J_\to(\alpha_1.\alpha_2.Q, \alpha. \lambda^\triangleright \Phi_1[\alpha/\alpha_1]. \lambda^\triangleleft \Phi_2[\alpha/\alpha_2]. M[\alpha/\alpha_1, \id(\alpha)/f,\alpha/\alpha_2], \alpha_1, f, \alpha_2)
+    \triangleleft \Phi_2
+    =
+    J_\to'(\Phi_1, \alpha_1 : \cat C, f : \alpha_1 \to_{\cat C} \alpha_2, \alpha_2 : \cat C, \Phi_2, Q, \alpha. N)
+  \end{mathpar}  
+  \caption{Admissible Unit Universal Property Rules}
+\end{figure}
+
+Next, we can internalize the $,\alpha,$ as a positive connective as a
+kind of ``existentially quantified tensor product'', abstracting the
+composition of profunctors.
+
+The ordinary formula for this is that for profunctors $R : C^o \times
+D \to \Set$ and $S : D^o \times E \to \Set$, the composite is given by
+a coend:
+
+\[ \int^{d \in D} R(-,d) \otimes S(d,=) \]
+
+We will instead use slightly more logical notation, writing the coend as
+an existential quantifier, justified by the analogy between the two
+and the structure of the introduction/elimination forms in our syntax
+in particular.
+\begin{figure}
+\begin{mathpar}
+  \inferrule*[right=Tensor formation]
+  {\Gamma \pipe d^-\Xi; \beta:D\vdash P \isaSet\and
+    \Gamma \pipe \beta:D;d^+\Xi \vdash Q}
+  {\Gamma \pipe \Xi \vdash \tensorexistsXwithYandZ {\beta:D} P Q}
+
+  %% \inferrule*[right=Tensor intro function]
+  %% {}
+  %% {\alpha : \cat C, q : Q, \beta : \cat D, r : R, \gamma : \cat E \vdash (q, \beta,r) : \exists \beta : \cat D. Q \odot R}
+
+  \inferrule*[right=Tensor introduction]
+  {\Gamma \vdash P : \harr C D \and
+    \Gamma \vdash Q : \harr D E}
+  {\Gamma\pipe\cdot\vdash \tensorintroofXandY P Q : \pendallXdotY {\alpha} \homrallXYtoZ \beta {\harrapp P \alpha \beta} {\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta}{\harrapp Q \beta \gamma})}}}
+
+  %% \inferrule*[right=Tensor introduction]
+  %% {\Phi = \Psi_M \jnctx \Psi_N \and
+  %%  \Gamma \pipe d^+\Psi_M \vdash B : D\and
+  %%  \Gamma \pipe \Psi_M \vdash M : P[;B/\beta] \and
+  %%  \Gamma \pipe \Psi_N \vdash N : Q[B/\beta;]}
+  %% {\Gamma\pipe\Phi\vdash \tensorintroatXwithYandZ B M N : \tensorexistsXwithYandZ {\beta : D} P Q}
+
+  %% \tensorintroatXwithYandZ B M N [\phi,B'/\beta',\psi] = \tensorintroatXwithYandZ {B[B'\beta]} {M[\phi]} {N[\psi]}
+
+  %% \inferrule*[right=Tensor simpl]
+  %% {\Gamma\pipe\cdot \vdash R : \harr {C} {E}\and
+  %%  \Gamma\pipe\cdot \vdash N : \pendallXdotY {\alpha:C} {\homrallXYtoZ {\beta:D} P {\homrallXYtoZ {\gamma:E} Q {\harrapp R \alpha\gamma}}}}
+  %% {\Gamma\pipe\alpha:C,p:\tensorexistsXwithYandZ {\beta:D} P Q,\gamma:E \vdash\tensorelimVatWtoXtoYwithkontZ p \alpha \gamma R N : \harrapp R A G}
+
+  \inferrule*[right=Tensor-elim]
+  {\Gamma \pipe \cdot \vdash P : \harr C D\and\Gamma \pipe \cdot \vdash Q : \harr D E\and
+   \Gamma \pipe \cdot \vdash R : \harr C E\and
+   \Gamma \pipe \cdot \vdash N : \pendallXdotY \alpha {\homrallXYtoZ \beta {\harrapp P \alpha \beta} {\homrallXYtoZ \gamma {\harrapp Q \beta \gamma}}}   
+  }
+  {\Gamma\pipe\cdot \vdash \tensorelimfromWXtoYwithkontZ P Q R N : \pendallXdotY \alpha {\homrallXYtoZ \gamma {\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta}{\harrapp Q \beta \gamma}} {\harrapp R \alpha \gamma}}}
+  
+  %% \inferrule*[right=Tensor elim]
+  %% {\Gamma\pipe\cdot \vdash R : \harr {C} {E}\and
+  %%  \Gamma\pipe\Phi \vdash M : \tensorexistsXwithYandZ {\beta:D} {P[A/\alpha;]} {Q[;G/\gamma]}\and
+  %%  \Gamma\pipe\cdot \vdash N : \pendallXdotY {\alpha:C} {\homrallXYtoZ {\beta:D} P {\homrallXYtoZ {\gamma:E} Q {\harrapp R \alpha\gamma}}}}
+  %% {\Gamma\pipe\Phi \vdash\tensorelimVatWtoXtoYwithkontZ M A G R N : \harrapp R A G}
+
+  %% J_\odot(\alpha. \gamma. S, \alpha.q.\beta.r.\gamma.N, A, M, G)[\phi] =
+  %% J_\odot(\alpha. \gamma. S, \alpha.q.\beta.r.\gamma.N, A[d^-\phi], M[\phi], G[d^+\phi])
+
+  %% \inferrule*[right=Tensor elim Sequent]
+  %% {\Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Psi \vdash N : S}
+  %% {\Phi, \alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E,\Psi \vdash J_\odot(x;q.\beta.r. N) : S}
+
+  %% \inferrule*[right=Tensor elim Subst]
+  %% {\Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Phi' \vdash N : S
+  %% \and
+  %% \phi : \Psi \to \Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Phi'}
+  %% {\Psi  \vdash J_\odot(x;q.\beta.r. N)[\phi] : S}
+
+
+  
+  \inferrule*[right=Tensor $\beta$]
+  {}
+  {\homrappXtoYatZ {\pendappXtoY{\tensorelimfromWXtoYwithkontZ P Q R N} A} {(\homrappXtoYatZ{\homrappXtoYatZ{\pendappXtoY {\tensorintroofXandY P Q} A} f B} g G)} G =
+    \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY N A} f B} g G}
+  
+  %% \inferrule*[right=Tensor $\beta$]
+  %% {}{J_\odot(\alpha.\gamma.S, \alpha.q.\beta.r.\gamma.N,A,(M,B,N),G) = N[A/\alpha,M/q,B/\beta,N/r,G/\gamma]}
+
+  \inferrule*[right=Tensor$\eta$]
+  {\alpha : \cat C, x : \tensorexistsXwithYandZ \beta P Q, \gamma : \cat E \vdash M : R}
+  {\alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E \vdash M =
+    \homrappXtoYatZ {\pendappXtoY{\tensorelimfromWXtoYwithkontZ P Q R
+        {\pendlambdaXdotY \alpha {\homrlambdaXatYdotZ p \beta {\homrlambdaXatYdotZ q \gamma {M[\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {\tensorintroofXandY P Q} \alpha} p \beta} q \gamma/x]}}}}
+      } \alpha} x \gamma : S}
+\end{mathpar}
+\caption{Tensor Primitive Rules}
+\label{fig:tensor}
+\end{figure}
+First, the syntax for tensor is based on the coend formula that gives
+the definition in $Cat$, but using logical syntax $\exists$ rather
+than integrals because I don't like integral syntax and the syntax
+matches existential quantification in type theory.
+%
+Note that $\exists \beta. ~Q \odot R$ is the application of a single
+connective to $Q$ and $R$, and not separable into a quantifier
+$\exists$ connective and a product connective $\odot$.
+%
+Introduction, elimination and $\beta\eta$ are similar to a combination
+of existential quantification and the tensor product in linear logic.
+%
+The introduction rule is justified by the fact that semantically what
+we have is a transformation
+\[ \textrm{pair} : (\alpha : \cat C,Q,\beta:\cat D,R,\gamma:\cat E) \Rightarrow \exists \beta. R \odot Q \]
+And the introduction rule is just building in a substitution to this
+transformation.
+%
+
+For the elim rule we can pull a similar trick as with the Hom
+type. First, the rule where there's only one variable.
+\[ \inferrule*[right=Tensor elim Simple]
+  {\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E \vdash N : S}
+  {\alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E \vdash J_\odot(x, q.\beta.r. N) : S}
+\]
+
+\begin{figure}
+\begin{mathpar}
+    \inferrule*[right=Full Tensor Elim*]
+    {\Phi_1, \alpha:\cat C, q:Q, \beta:\cat D, r:R, \gamma:\cat E \Phi_2\vdash N : S}
+    {\Phi_1, \alpha : \cat C, x : \exists \beta:\cat D. Q \odot R, \gamma : \cat E, \Phi_2
+      \vdash J_\odot'(\Phi_1, \alpha : \cat C, x : \exists \beta:\cat D. Q \odot R, \gamma : \cat E, \Phi_2; S;q.\beta.r.N) : S}
+
+    J_\odot'(\Phi_1, \alpha : \cat C, x : \exists \beta:\cat D. Q \odot R, \gamma : \cat E, \Phi_2;S; q.\beta.r.N)
+    = \Phi_1 \triangleright J_\odot(\alpha.\gamma.\Phi_1 \triangleright S \triangleleft \Phi_2, \alpha.q.\beta.r.\gamma. \lambda^\triangleleft \Phi_1. \lambda^\triangleright\Phi_2. N, \alpha, x, \gamma) \triangleleft \Phi_2
+
+    J_\odot'(\Phi_1, \alpha : \cat C, x : \exists \beta:\cat D. Q \odot R, \gamma : \cat E, \Phi_2; q.\beta.r.N)[\Phi_1,\alpha/\alpha,(q,\beta,r)/x,\gamma/\gamma,\Phi_2] = N
+    
+
+  \inferrule*[right=Full Tensor elim*]{ S \prof(\alpha:\cat C; \gamma : \cat E)\and
+    \Phi \vdash M : \exists \beta. Q[A/\alpha] \odot R[G/\gamma]\and
+    \alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E \vdash N : S}
+  {\Phi \vdash J_\odot(\alpha. \gamma. S, \alpha.q.\beta.r.\gamma.N, A, M, G) : S[A/\alpha, G/\gamma]}
+
+  J_\odot(\alpha. \gamma. S, \alpha.q.\beta.r.\gamma.N, A, M, G)[\phi] =
+  J_\odot(\alpha. \gamma. S, \alpha.q.\beta.r.\gamma.N, A[d^-\phi], M[\phi], G[d^+\phi])
+
+  %% \inferrule*[right=Tensor elim Sequent]
+  %% {\Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Psi \vdash N : S}
+  %% {\Phi, \alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E,\Psi \vdash J_\odot(x;q.\beta.r. N) : S}
+
+  %% \inferrule*[right=Tensor elim Subst]
+  %% {\Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Phi' \vdash N : S
+  %% \and
+  %% \phi : \Psi \to \Phi,\alpha : \cat C, q : Q, \beta : \cat D, r: R, \gamma : \cat E,\Phi'}
+  %% {\Psi  \vdash J_\odot(x;q.\beta.r. N)[\phi] : S}
+
+  \inferrule*[right=Tensor $\beta$]
+  {}{J_\odot(\alpha.\gamma.S, \alpha.q.\beta.r.\gamma.N,A,(M,B,N),G) = N[A/\alpha,M/q,B/\beta,N/r,G/\gamma]}
+
+  \inferrule*[right=Tensor$\eta$]
+  {\alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E \vdash M : S}
+  {\alpha : \cat C, x : \exists \beta. Q \odot R, \gamma : \cat E \vdash M =
+    J(\alpha.\gamma.S, \alpha.q.\beta.r.\gamma. M[\alpha/\alpha,(q,\beta,r)/x,\gamma/\gamma])
+    : S}
+\end{mathpar}
+\caption{Tensor Admissible Universal Property Rules}
+\label{fig:tensor}
+\end{figure}
+
+\subsection{Dependent Types}
+
+Next, we cover the basic dependent type theory structure: $\Pi,\Sigma$
+and identity types.
+
+\begin{figure}
+  \begin{mathpar}
+  \inferrule
+  {\Gamma \pipe\cdot \vdash S \isaSet\and \Gamma \pipe\cdot \vdash T \isaSet}
+  {\Gamma\pipe\cdot \vdash \prod_{x:S} T \isaSet}
+
+  \inferrule
+  {\Gamma \pipe \cdot \vdash M : \prod_{x:S} T\and
+    \Gamma \pipe \cdot \vdash N : S}
+  {\Gamma \pipe \cdot \vdash M N : T[N/x]}
+
+  \inferrule
+  {\Gamma,x:S \pipe \cdot \vdash M : T}
+  {\Gamma \pipe \cdot \vdash \lambda x:S. M : \prod_{x:S} T}
+
+  \inferrule
+  {\Gamma \pipe\cdot \vdash S \isaSet\and \Gamma \pipe\cdot \vdash T \isaSet}
+  {\Gamma\pipe\cdot \vdash \sum_{x:S} T \isaSet}
+  
+  \inferrule
+  {~}
+  {\Gamma\pipe\cdot \vdash \top \isaSet}
+
+  \inferrule
+  {\Gamma \pipe \cdot \vdash M : S\and \Gamma \pipe \cdot \vdash N : S}
+  {\Gamma \pipe \cdot \vdash \textrm{Id}_S M N \isaSet}
+
+  \inferrule
+  {\Gamma \pipe \cdot \vdash M : S}
+  {\Gamma \pipe \cdot \vdash \textrm{refl}(M) : \textrm{Id}_S M M}
+
+  \inferrule
+  {\Gamma,x:S,y:S,p:\textrm{Id}_S x y \pipe \cdot \vdash C \isaSet\and
+   \Gamma \pipe \cdot \vdash M_k : \prod_{x:S} C[x/y,\textrm{refl}(x)/p]}
+  {\Gamma \pipe \cdot \vdash \textrm{J}(x,y,p.C,M) : \prod_{x:S,y:S,p:\textrm{Id}_S x y} C}
+  \end{mathpar}
+  \caption{Ordinary Dependent Type Structure}
+\end{figure}
+
+\subsection{Internalizing Virtual Equipment Structure}
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule
+    {\Gamma \vdash \cat C : \Sort \and\Gamma \vdash \cat D : \Sort}
+    {\Gamma\pipe\cdot \vdash \varr{\cat C}{\cat D} \isaSet}
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C \vdash A : \cat D}
+    {\Gamma \vdash \lambda \alpha:\cat C. A : \varr{\cat C}{\cat D}}
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C \vdash A : \cat D\and
+      \Gamma\pipe\cdot \vdash M : \varr{\cat D}{\cat E}}
+    {\Gamma\pipe \alpha:\cat C \vdash M A : \cat E}
+
+    (\lambda\alpha:C. A) B = A[B/\alpha]
+
+    \inferrule*[right=VArr $\eta$]
+    {\Gamma \pipe\cdot \vdash M : \varr C D}
+    {\Gamma \pipe\cdot \vdash M = (\lambda \alpha:C. M \alpha) : \varr C D}
+    \\
+
+    \inferrule
+    {\Gamma \vdash \cat C : \Sort \and\Gamma \vdash \cat D : \Sort}
+    {\Gamma\pipe\cdot \vdash \harr{\cat C}{\cat D} \isaSet}
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R \,\isaSet}
+    {\Gamma \vdash \lambda \alpha:\cat C;\beta:\cat D. R : \harr{\cat C}{\cat D}}
+
+    \inferrule
+    {\Gamma \vdash M : \harr{\cat C}{\cat D}\and
+     \Gamma \pipe d^- \Xi \vdash A : \cat C\and
+     \Gamma \pipe d^+ \Xi \vdash B : \cat C}
+    {\Gamma \pipe \Xi \vdash M A; B \isaSet}
+
+    (\lambda \alpha:C;\beta:D. R)A;B = R[A/\alpha;B/\beta]
+
+    \inferrule*[right=HArr $\eta$]
+    {\Gamma \pipe \cdot \vdash M : \harr C D}
+    {\Gamma \pipe \cdot \vdash M = (\lambda \alpha;\beta. M \alpha;\beta) : \harr C D}\\
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C\vdash R \isaSet}
+    {\Gamma \pipe \cdot \vdash \pendallXdotY {\alpha:{\cat C}} R \isaSet}
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C\vdash M : R}
+    {\Gamma \pipe \cdot \vdash \pendlambdaXdotY \alpha M : \pendallXdotY \alpha R}
+
+    \inferrule
+    {\Gamma\pipe\cdot \pipe \cdot \vdash M : \forall \alpha:\cat C. R\and
+      \Gamma \pipe \beta:\cat D \vdash A : \cat C}
+    {\Gamma \pipe \beta:\cat D\pipe\beta:\cat D \vdash \pendappXtoY M A : R[A/\alpha]}
+
+    \pendappXtoY {(\pendlambdaXdotY \alpha M)} A = M[A/\alpha]
+
+    \inferrule*[right=2Cell$\eta$]
+    {\Gamma \pipe \cdot \vdash M : \pendallXdotY \alpha R }
+    {\Gamma \pipe \cdot \vdash M = \pendlambdaXdotY \alpha {\pendappXtoY M \alpha} : \pendallXdotY \alpha R }
+  \end{mathpar}
+  \caption{Internalizing VE Structure}
+\end{figure}
+
+\subsection{Equalizers}
+
+To encode the concept of internal hom of profunctors, kan extensions
+and (co-)limits, we need to define the \emph{equalizer} of horizontal
+arrows. Specifically, the universal property that we need is an
+equalizer in the category whose objects are horizontal arrows (for
+fixed endpoints) and whose arrows are the 2-cells.
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule*[right=Equalizer-formation]
+    {\Gamma \pipe \cdot \vdash P : \harr\, C\,D\and
+     \Gamma \pipe \cdot \vdash Q : \harr\, C \, D\\\\
+     \Gamma \pipe \cdot \vdash \phi : \homunary \alpha {\harrapp P \alpha \beta} \beta {\harrapp Q \alpha \beta}\and
+     \Gamma \pipe \cdot \vdash \psi : \homunary \alpha {\harrapp P \alpha \beta} \beta {\harrapp Q \alpha \beta}\and}
+    {\Gamma \pipe \cdot \vdash \textrm{Equalizer}(C,D,P,\phi,\psi) : \harr\, C\, D}\and
+
+    \inferrule
+    {\Gamma \pipe \Phi \vdash M : \harrapp{\textrm{Equalizer}(C,D,P,\phi,\psi)} A B}
+    {\Gamma \pipe \Phi \vdash \textrm{forget}(M) : \harrapp P A B}
+
+    \inferrule
+    {\Gamma \pipe \Phi \vdash M : \harrapp P A B \and \appunary \phi A M B = \appunary \psi A M B}
+    {\Gamma \pipe \Phi \vdash \textrm{equalizing}_{\phi,\psi}(M) : \harrapp{\textrm{Equalizer}(C,D,P,\phi,\psi)} A B}
+
+    TODO: obvious equations
+  \end{mathpar}
+  \caption{Equalizers (Logical Framework style)}
+\end{figure}
+
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule*[right=Equalizer-formation]
+    {\Gamma \pipe \Xi \vdash P \isaSet\and\Gamma \pipe \Xi \vdash Q \isaSet\and
+      \Gamma\pipe d^-\Xi, p : P, d^+ \Xi \vdash \phi : Q\and
+      \Gamma\pipe d^-\Xi, p : P, d^+ \Xi \vdash \psi : Q }
+    {\Gamma \pipe \Xi \vdash \equalizeVofWbyXeqYatZ p P \phi \psi Q : \harr\, C\, D}\and
+
+    \inferrule*[right=Equalizer-formation]
+    {\Gamma \pipe \alpha:C;\beta:D \vdash P \isaSet\and\Gamma \pipe \alpha:C;\beta:D \vdash Q \isaSet\and
+      \Gamma \pipe d^-\Xi \vdash A : C\and
+      \Gamma \pipe d^+\Xi \vdash B : D\\\\
+      \Gamma\pipe \cdot \vdash \phi : \homunary \alpha P \beta Q\and
+      \Gamma\pipe \cdot \vdash \psi : \homunary \alpha P \beta Q
+    }
+    {\Gamma \pipe \Xi \vdash \equalizeVofWbyXeqYatZ p {P[A/\alpha;B/\beta]} {\appunary \phi A p B} {\appunary \psi A p B} {Q[A/\alpha;B/\beta]} : \harr\, C\, D}\and
+
+    \inferrule
+    {\Gamma \pipe \Phi \vdash M : \equalizeVofWbyXeqYatZ p P \phi \psi Q}
+    {\Gamma \pipe \Phi \vdash \pi_{eq}\,M : P}
+
+    \inferrule
+    {\Gamma \pipe \Phi \vdash M : \harrapp P A B \and \appunary \phi A M B = \appunary \psi A M B}
+    {\Gamma \pipe \Phi \vdash \textrm{equalizing}_{\phi,\psi}(M) : \harrapp{\textrm{Equalizer}(C,D,P,\phi,\psi)} A B}
+
+    TODO: equations
+  \end{mathpar}
+  \caption{Equalizers (Natural Deduction Style)}
+\end{figure}
+
+\subsection{Products}
+
+We add in parallel two different notions of product: products of sorts
+and products of spans, which have the universal property in their
+respective categories.
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule{}{\Gamma \vdash 1 : \Sort}\and
+    \inferrule*{}{\Gamma\pipe\alpha:C \vdash () : 1}\and
+    \inferrule*{\Gamma\pipe\alpha:C \vdash A : 1}{A = ()}
+    \inferrule{}{\Gamma\pipe \Xi \vdash 1 \isaSet}\and
+    \inferrule{}{\Gamma\pipe \Phi \vdash () :  1}\and
+    \inferrule{\Gamma\pipe \Phi \vdash M :  1}{M = ()}\\\\
+
+    \inferrule{\Gamma \vdash C : \Sort \and \Gamma \vdash D : \Sort}
+              {\Gamma \vdash C \times D : \Sort}\and
+
+    \inferrule{\forall i \in \{1,2\}.~ \Gamma \pipe \alpha:C \vdash A_i : D_i}{\Gamma \pipe \alpha:C \vdash (A_1,A_2) : D_1 \times D_2}
+
+    \inferrule{\Gamma \pipe \alpha:C \vdash A : D_1 \times D_2}{\Gamma \pipe \alpha:C \vdash \pi_i A : D_i}
+
+    \pi_i(A_1,A_2) = A_i\\
+    \inferrule{\Gamma\pipe \alpha:C \vdash A :  D_1\times D_2}{A = (\pi_1 A,\pi_2 A)}\\\\
+
+    \inferrule{\Gamma\pipe\Xi \vdash R \isaSet \and \Gamma\pipe\Xi \vdash S\isaSet}
+              {\Gamma\pipe\Xi \vdash R \times S\isaSet}\and
+
+    \inferrule{\forall i \in \{1,2\}.~ \Gamma \pipe\Phi \vdash M_i : R_i}{\Gamma \pipe\Phi \vdash (M_1,M_2) : R_1 \times R_2}
+
+    \inferrule{\Gamma \pipe\Phi\vdash M : R_1 \times R_2}{\Gamma \pipe\Phi \vdash \pi_i M : R_i}
+
+    \pi_i(M_1,M_2) = M_i\\
+    \inferrule{\Gamma\pipe\Phi \vdash M :  R_1\times R_2}{M = (\pi_1 M,\pi_2 M)}
+  \end{mathpar}
+  \caption{Products}
+  \label{fig:products}
+\end{figure}
+
+One additional connective we might desire is a ``parallel'' product of
+sets $R \times' S : \harr {C_1 \times C_2} {D_1 \times D_2}$ where $R
+: \harr {C_1} {D_1}$ and $R : \harr {C_2} {D_2}$. We don't need to
+define this as a primitive though because it is expressible in terms
+of the two kinds of products we have above:
+
+\[
+\inferrule
+{\Gamma \pipe \alpha : C_i; \beta : D_i \vdash R_i \isaSet}
+{\Gamma \pipe \alpha : C_1\times C_2; \beta : D_1 \times D_2
+  R_1[\pi_1\alpha/\alpha;\pi_1\beta/\beta] \times R_2[\pi_2\alpha/\alpha;\pi_2\beta/\beta]\isaSet}
+\]
+
+The empty products give us access now to several traditional notions
+of category theory that we couldn't before define, such as objects and
+presheaves of either variance:
+
+$$\textrm{Object}\,C = \varr 1 C$$
+$$\textrm{Presheaf}\,C = \harr 1 C$$
+$$\textrm{coPresheaf}\,C = \harr C 1$$
+
+However, we find that in practice we don't have much use for these
+concepts as most theorems about them easily generalize to more general
+theorems about arbitrary functors or profunctors.
+
+%% To define internal ends and coends, we need to go beyond the usual
+%% simple types and add equalizers (a form of subsets) and co-equalizers
+%% (a form of quotients) of judgments. Here's a sketch of the syntax for
+%% each. These make type checking very difficult as they result in
+%% obligations for proving equality of certain terms, which may or may
+%% not be decidable.
+
+%% \begin{mathpar}
+%%   \inferrule*[right=Equalizer Formation]
+%%   {\alpha;\beta\,|\, R \and
+%%   x : R \vdash t : S x:R \vdash u : S}
+%%   {\alpha;\beta\,|\,\{ x : R \,|\, t = u \}}
+
+%%   \inferrule*[right=Equalizer Intro]
+%%   {\Phi \vdash r : R \and t[r/x] = u[r/x]}
+%%   {\Phi \vdash \textrm{assert}(x.t = u)(r) : \{ x : R \,|\, t = u \}}
+
+%%   \inferrule*[right=Equalizer Elim]
+%%   {\Phi \vdash r : \{ x : R \,|\, t = u \}}
+%%   {\Phi \vdash \textrm{forget}(r) : R}
+
+%%   t[\textrm{forget}(r)/x] = u[\textrm{forget(r)}/x]
+
+%%   \textrm{assert}(x.t = u)(\textrm{forget}(r)) = r
+%%   \textrm{forget}(\textrm{assert}(x.t = u)(r)) = r
+%% \end{mathpar}
+
+%% \begin{mathpar}
+%%   \inferrule*[right=Co-equalizer Formation]
+%%   {\alpha;\beta\,|\, R \and
+%%   x : S \vdash t : R x:S \vdash u : R}
+%%   {\alpha;\beta\,|\,R/(\forall x:S. t = u)}
+
+%%   \inferrule*[right=Coequalizer Intro]
+%%   {\Phi \vdash r : R}
+%%   {\Phi \vdash \textrm{equate}(x:S.t=u)(r) : R/(\forall x.t=u)}
+
+%%   \inferrule*[right=Coequalizer Elim]
+%%   {\Psi \vdash r : R/(x.t = u) \and
+%%     \Phi,y:R,\Phi' \vdash s : S \and
+%%     s[t/y] = s[u/y]}
+%%   {\Phi,\Psi,\Phi' \vdash \textrm{lett} \textrm{equate}(y) = r.~s : S}
+
+%%   \textrm{equate}(x:S.t = u)(t[\gamma]) = \textrm{equate}(x:S.t = u)(u[\gamma])
+
+%%   \cdots
+%% \end{mathpar}
+
+%% \subsection{Positive Multiplicatives}
+
+%% \subsection{Negative Multiplicatives}
+
+%% \subsection{Additives}
 
 \section{Synthetic Category Theory}
+Next, we look at Synthetic category theory in a virtual equipment. In
+this section we will use category-theoretic terminology for judgment
+theory: categories, functors/objects, profunctors and transformations.
+
+\subsection{Profunctor Isomorphisms}
+
+Here are some isomorphisms of profunctors that should be provable
+synthetically.
+%
+Unit laws:
+\begin{enumerate}
+\item $\tensorexistsXwithYandZ {\beta} {P} {\punitinXfromYtoZ {D} {\beta} {\beta'}} \cong P[\beta'/\beta]$
+\item $\tensorexistsXwithYandZ {\alpha} {\punitinXfromYtoZ {C} {\alpha'} {\alpha}} {P} \cong P[\alpha'/\alpha]$
+\item $\homrallXYtoZ {\beta} {\punitinXfromYtoZ {D} {\beta'} {\beta}} {P}$
+\item $\homlallXYtoZ {\alpha} {\punitinXfromYtoZ {C} {\alpha} {\alpha'}} {P}$
+\end{enumerate}
+
+Associativity laws:
+\begin{enumerate}
+\item $\tensorexistsXwithYandZ {\beta} {P} {(\tensorexistsXwithYandZ \gamma Q R)} \cong \tensorexistsXwithYandZ {\gamma} {(\tensorexistsXwithYandZ \beta P Q)} R$
+\item $\homrallXYtoZ {\gamma} {\tensorexistsXwithYandZ \beta P Q} S \cong \homrallXYtoZ \beta P {\homrallXYtoZ \gamma Q S}$
+\item $\homlallXYtoZ {\alpha} {\tensorexistsXwithYandZ \beta P Q} S \cong \homlallXYtoZ \beta Q {\homlallXYtoZ \alpha P S}$
+\item $\homrallXYtoZ \gamma Q {(\homlallXYtoZ \alpha P S)} \cong \homlallXYtoZ \alpha P {(\homrallXYtoZ \gamma Q S)}$
+\end{enumerate}
+
+
+\subsection{Constructions: Categories, Functors and Natural Transformations}
+
+Hom sets don't provide primitive syntax for composition of morphisms
+in a category. As our first synthetic construction, we can
+\emph{define} composition using the elimination form.
+%
+\begin{definition}[Composition of Morphisms]
+  We define composition of morphisms as follows
+  \[
+  f : \beta \to_{\cat C} \beta', g : \beta' \to_{\cat C} \beta'' \vdash g \circ f :=
+  \when f = \id_{\beta}.~ \when g = \id_{\beta}.~ \id_{\beta} : \beta \to_{\cat c} \beta''
+  \]
+\end{definition}
+It should follow by $\beta\eta$ that this is associative and unital.
+
+Next, let's prove synthetically that every type $\alpha : \cat C
+\vdash A : \cat D$ is in fact functorial.
+\begin{definition}
+  There is a morphism
+  \[ \alpha^o:\cat C;\alpha':\cat C \vdash f : \alpha \to_{\cat C} \alpha' \vdash
+  \when f = \id_{\alpha}.~ \id_{A} : A[\alpha] \to_{\cat D} A[\alpha']
+  \]
+  which we call $A[f/\alpha]$.
+
+  Note that
+  \[ A[\id_\alpha/\alpha] = \id_{A} \]
+  \[ A[f;g] = A[f];A[g] \]
+\end{definition}
+Note the similarity to the proof that all functions are congruences in
+MLTT/HoTT.
+
+Next we can define natural transformations as specific kinds of
+terms whose type is $(F \alpha \to G \alpha')$.
+\begin{definition}
+  A natural transformation $\phi$ from $\alpha : \cat C \vdash A : \cat D$ to
+  $A'[\alpha]$ of the same type is a term
+  \[ \alpha\pipe \cdot \vdash \phi_\alpha : A[\alpha] \to_{\cat D} A'[\alpha] \]
+
+  Note that
+  \[ \alpha;\alpha' \pipe f : \alpha \to \alpha' \vdash
+  f \circ \phi_{\alpha} = \phi_{\alpha'} \circ f
+  \]
+  Because if $f$ is the identity, then both sides are the same.
+\end{definition}
+
+\subsection{Adjoint Functors}
+
+There are two common definitions of adjoint functors, one in terms of
+Hom-sets and one in terms of units and counits.
+
+\begin{definition}[Hom Iso Adjunction]
+  A functor $\alpha : \cat C \vdash L : \cat D$ is left adjoint to a
+  functor $\beta : \cat D \vdash R : \cat C$ if there is an isomorphism
+  \[ (L[\alpha] \to_{\cat D} \beta) \cong (\alpha \to_{\cat C} R[\beta]) \]
+\end{definition}
+
+\begin{definition}[Unit/Counit Adjunction]
+  Alternatively, $L$ is left adjoint to $R$ if there exist
+  transformations
+  \[ \eta : \alpha \to_{\cat C} R[L[\alpha]/\beta] \] % unit of the monad 1 -> RL 
+  \[ \epsilon : L[R[\beta]/\alpha] \to_{\cat D} \beta  \] % counit of the comonad LR -> 1
+  satisfying the triangle/zig-zag identities
+  \[ \id_{R[\beta]} = R[\epsilon_{\beta}] \circ \eta_{R[\beta]} \]
+  \[ \id_{L[\alpha]} = \epsilon_{L[\alpha]} \circ L[\eta_{\alpha}] \]
+\end{definition}
+
+\begin{definition}[Universal Morphism Adjunction]
+  A functor $\alpha: C \vdash L : D$ is a left adjoint if there exists a 
+\end{definition}
+
+We should be able to synthetically prove these are equivalent.
+
+\subsection{Tensors and CoTensors/Powers}
+
+David Jaz Myers tells me that to do all of formal category theory in
+an equipment, you just need to have hom sets, tensors and cotensors.
+
+As another example synthetic theorem, we can prove the covariant and
+contravariant \emph{co-yoneda lemmas}, which are precisely the
+statement that Hom is the unit of the tensor product.
+\begin{lemma}[CoYoneda]
+  We can define isomorphisms
+  \[ \exists \beta. (\alpha \to_{\cat C} \beta) \odot Q \equiv Q[\alpha/\beta] \]
+  \[ \exists \beta. P \odot (\beta \to_{\cat C} \gamma) \equiv P[\gamma/\beta] \]
+  The forward direction is defined by considering the case that the
+  function is the identity and the backward direction by using the
+  identity.
+\end{lemma}
+\begin{proof}
+  The terms are
+  \[ f : \exists \beta. (\alpha\to_{\cat C} \beta) \odot Q \vdash
+  \lett (\beta,g,h) = f.~ \when g = \id_{\alpha}.~ h : Q[\alpha/\beta]
+  \]
+  And the inverse
+  \[ h : Q[\alpha/\beta] \vdash (\alpha, \id_{\alpha}, h) : \exists \beta. (\alpha\to_{\cat C}\beta)\odot Q\]
+
+  One direction of iso follows by $\beta$, the other by $\eta$.
+\end{proof}
+
+And we get another synthetic theorem: the Yoneda lemma, which says
+that Hom is the unit for the cotensor product.
+\begin{lemma}[Synthetic Yoneda]
+  We can define isomorphisms
+  \[ \forall \alpha.~ (\alpha \to \beta) \triangleright P[\alpha;\gamma] \cong P[\beta/\alpha;\gamma] \]
+  \[ \forall \gamma.~ P[\alpha;\gamma] \triangleleft (\beta \to \gamma) \cong P[\alpha;\beta/\gamma]\]
+\end{lemma}
+\begin{proof}
+  Forward direction
+  \[ f : \forall \alpha.~(\alpha\to\beta)\triangleright P \vdash
+  f(\beta,\id_{\beta})^\triangleright : P[\beta/\alpha]
+  \]
+  Backwards
+  \[ x : P[\beta/\alpha]\vdash
+  \lambda^\triangleright(\alpha,\phi : \alpha \to \beta).~\when \phi = \id_{\beta}.~ x : \forall \alpha. (\alpha\to \beta) \triangleright P
+  \]
+  One direction is by $\beta$, the other $\eta$.
+\end{proof}
+
+
+
+\subsection{Right (Left) Adjoints preserve (co-)Limits}
+
+Let's prove that classic theorem!
+
+\begin{theorem}
+  Let $\alpha : \cat C \vdash A \cat D$ be an arbitrary functor and
+  $\beta : \cat D \vdash R : \cat E$ be a functor with a left adjoint
+  $L$. Then, if the limit $\lim_\alpha A$ exists, then $\lim_\alpha
+  R[A/\beta]$ also exists and is
+  \[ \lim_\alpha R[A/\beta] = R[\lim_\alpha A] \]
+\end{theorem}
+\begin{proof}
+  We need to give an isomorphism
+  \[ \gamma \to R[\lim_\alpha A/\beta] \cong PRan_{()}{\alpha. R[A/\beta]} = \forall \alpha. (\gamma \to R[A/\beta]) \triangleleft (() \to_1 ()) \]
+  By assumption we have an isomorphism
+  \[ l : \beta \to \lim_\alpha A \cong PRan_{()}{\alpha. A} = \forall \alpha. (\beta \to A[\alpha]) \triangleleft (()\to_1 ())\]
+  TODO.
+\end{proof}
+
+%% \subsection{Additive Facts}
+
+%% I think the following isomorphisms should hold, which connect additive
+%% connectives on objects with the analogous connective on profunctors:
+%% \[ () \to_1 () \cong () \]
+%% \[ (\pi_1 \alpha, \pi_2 \alpha) \to_{\cat C \times \cat D} (\pi_1 \beta, \pi_2 \beta) \cong
+%% ((\pi_1 \alpha) \to_{\cat C} (\pi_1 \beta)) \times ((\pi_2 \alpha) \to_{\cat C} (\pi_2 \beta)) \]
+
 
 \section{Internal Category Theory}
 
+Next, we introduce the notion of category internal to our syntactic
+virtual equipment and the \emph{monoids and modules} translation that
+shows that, with the inclusion of hom sets, our syntax is already
+suitable for doing syntactic category theory.
+
+The benefits of our syntax become clear when we define internal
+categories, functors, profunctors and transformations: the definitions
+read exactly as the classical definitions.
+\begin{definition}[Internal Category]
+  An \emph{(internal) category} consists of\footnote{the following is
+    easily interpreted as a $\Sigma$ type}:
+  \begin{enumerate}
+  \item A sort $C_0 : \Sort$
+  \item A span $C_1 : \harr{C_0}{ C_0}$
+  \item Identity arrows
+    $C_r : \pendallXdotY {\alpha :  C_0} {\harrapp{C_1} \alpha \alpha}$
+  \item Composition of arrows
+    \[ C_t : \pendallXdotY \alpha {\homrallXYtoZ \beta {\harrapp{C_1} \alpha \beta} {\homrallXYtoZ \gamma {\harrapp{C_1} \beta \gamma} {\harrapp{C_1} \alpha \gamma}}}\]
+    
+    %% \[ C_t^\triangleright : \forall \alpha :  C_0. \forall \beta. ({C_1} \beta \alpha) \triangleright \forall \gamma. ({C_1} \gamma \beta) \triangleright {C_1} \gamma \alpha \]
+
+    %% or
+
+    %% \[ C_t^\triangleleft : \forall \alpha. \forall \beta. (\forall \gamma. {C_1} \alpha \gamma \triangleleft {C_1} \beta \gamma) \triangleleft {C_1} \alpha \beta
+    %% \]
+
+    %% or using tensors and covariant homs
+
+    %% \[ C_t^\odot : \forall \alpha. \forall \gamma. (\exists \beta. {C_1}\alpha\beta\odot {C_1}\beta\gamma)\triangleright {C_1}\alpha \gamma \]
+
+    %% or using tensors and contravariant homs
+
+    %% \[ C_t^\odot : \forall \gamma. \forall \alpha. {C_1}\alpha\gamma \triangleleft (\exists \beta. {C_1}\alpha\beta\odot {C_1}\beta\gamma)\]
+  \item Satisfying right unitality, i.e., for any $\Phi \vdash f :
+    \harrapp {C_1} A B$, we'd like $f; r(B) = f$. We can formalize this
+    using an equality of two transformations of type $\pendallXdotY
+    \alpha {\homrallXYtoZ \beta {\harrapp{C_1} \alpha \beta} {\harrapp{C_1} \alpha \beta}}$
+
+    \[ \pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f \beta {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} {f} \beta} {\pendappXtoY {C_r} \beta} \beta}}
+    = \pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f \beta f} \]
+
+    These kinds of equalities between 2-cells are very common in
+    internal category theory, so to save space we will suppress the
+    sequence of $\lambda$s that start such equalities. So the above can simply be written as
+
+    \[ { {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} {f} \beta} {\pendappXtoY {C_r} \beta} \beta}} = { f}\]
+
+  \item and left unitality (an equality of the same type as right unitality):
+
+
+    \[ { {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} {\pendappXtoY {C_r} \alpha} \alpha} f \beta}} = { f}\]
+  \item and associativity, which is an equality at type
+    \[ \pendallXdotY \alpha {\homrallXYtoZ \beta {\harrapp{C_1} \alpha \beta} {\homrallXYtoZ \gamma {\harrapp{C_1} \beta \gamma} {\homrallXYtoZ \delta {\harrapp{C_1} \gamma \delta} {\harrapp{C_1} \alpha \delta}}}}\]
+
+    \[ \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t}\alpha} f \beta} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t}\beta} g \gamma} h \delta)} \delta
+    =
+    \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t}\alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t}\alpha} f \beta} g \gamma)} \gamma} h \delta \]
+  \end{enumerate}
+\end{definition}
+
+
+
+\begin{definition}[Internal Functor]
+  A functor $F$ between internal categories $C$ and $D$ consists of
+  \begin{enumerate}
+  \item a map of objects $F_0 : \varr {C_0} {D_0}$
+  \item a map of arrows
+    $F_1 : \pendallXdotY {\alpha}
+    {\homrallXYtoZ \beta {\harrapp{C_1} \alpha \beta} {\harrapp{D_1} {F_0 \alpha}{F_0 \beta}}}$
+  \item That preserves identity. This is given by equality between the
+    following terms of type $\forall \alpha:{{C_0}}. D_1 {(F_0 \alpha)}{(F_0\alpha)}$:
+    \[ \homrappXtoYatZ {\pendappXtoY {F_1}\alpha} {\pendappXtoY {C_r} \alpha} \alpha = \pendappXtoY {D_r}{F_0\alpha} \]
+  \item And preserves composition.
+    This is given by an equality between the following terms of type
+
+    \[ \pendallXdotY \alpha
+    \homrallXYtoZ {\beta} {\harrapp{C_1} \alpha \beta} {\homrallXYtoZ \gamma {\harrapp{C_1} \beta \gamma} {\harrapp{D_1} {F_0 \alpha} {F_0 \gamma}}}\]
+
+    First, we can compose in $C$, and then map using $F$:
+    \[ \homrappXtoYatZ {\pendappXtoY{F_1} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} f \beta} g \gamma)}\gamma\]
+
+    
+    or we can map the morphisms with $F$, and then compose them in $D$:
+    \[ \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {(F_0 \alpha)}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {(F_0 \beta)}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {{F_0} \gamma}\]
+  \end{enumerate}
+\end{definition}
+
+We can immediately define identity and composition of functors.
+
+\begin{definition}
+  For any $C : \textrm{Cat}$, we can define an identity functor
+  $\textrm{Id}_C : \textrm{Functor} C C$ by
+  \begin{enumerate}
+  \item $\textrm{Id}_0 = \lambda \alpha:C_0. \alpha$
+  \item $\textrm{Id}_1 = \pendlambdaXdotY \alpha
+    {\homrlambdaXatYdotZ f {\alpha'} f}$
+  \item Preservation of identity requires proving
+    \[
+    \lambda \alpha. \pendappXtoY {C_r}{\textrm{Id}_0\alpha} \]
+    is equal to
+    \[ \lambda \alpha.
+    \homrappXtoYatZ {\pendappXtoY {\textrm{Id}_1} \alpha} {(\pendappXtoY {C_r}\alpha)} \alpha\]
+    Both sides simply $\beta$ reduce to $ \lambda \alpha. \pendappXtoY {C_r} \alpha$
+    and the result follows by reflexivity.
+  \item Preservation of composition requires proving (under a $\lambda \alpha. \homrlambdaXatYdotZ f \beta \homrlambdaXatYdotZ g \gamma$)
+    \[
+    \homrappXtoYatZ {\pendappXtoY {{\textrm{Id}}_1} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} f \beta} g \gamma)}\gamma
+    = \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} {{\textrm{Id}}_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {{\textrm{Id}}_1} \alpha} f \beta)} {{\textrm{Id}}_0 \beta}} {(\homrappXtoYatZ {\pendappXtoY{{\textrm{Id}}_1} \beta} g \gamma)} {{\textrm{Id}}_0 \gamma}\]
+    Both sides $\beta$ reduce to
+
+    \[ \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} f \beta} g \gamma\]
+    so the result holds by reflexivity.
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}
+  Given categories $C,D,E$ and functors $F : \textrm{Functor} C D$ and
+  $G : \textrm{Functor} D E$, we define the composition $G \circ F :
+  \textrm{Functor} C E$ as
+  \begin{enumerate}
+  \item $(G \circ F)_0 = \lambda \alpha. {G_0 ({F_0} \alpha)}$
+  \item $(G \circ F)_1 =
+    \pendlambdaXdotY \alpha {
+    \homrlambdaXatYdotZ f \beta
+    {\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta} {F_0 \beta}}}$
+  \item Preservation of identity requires proving
+    \[ \lambda \alpha. \pendappXtoY {E_r} {(G \circ F)_0\alpha} \]
+    is equal to
+    \[ \lambda \alpha.
+    \homrappXtoYatZ {\pendappXtoY {(G \circ F)_1} \alpha} {\pendappXtoY {C_r}\alpha} \alpha \]
+
+    Expanding definitions and $\beta$ reducing we need to show
+
+    \[ \pendlambdaXdotY\alpha {\pendappXtoY {E_r}{G_0 (F_0 \alpha)}} \]
+    is equal to
+    \[ \pendlambdaXdotY \alpha {\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} {\pendappXtoY {C_r} \alpha} \alpha)} {F_0 \alpha}}\]
+
+    Proceeding from right to left applying transitivity:
+    \begin{align*}
+      &\pendlambdaXdotY \alpha {\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} {\pendappXtoY {C_r} \alpha} \alpha)} {F_0 \alpha}}\\
+      &=\pendlambdaXdotY \alpha {\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {(\pendappXtoY{(\pendlambdaXdotY \alpha {\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} {\pendappXtoY {C_r} \alpha} \alpha})}\alpha)}} {F_0 \alpha}\\
+      &=\pendlambdaXdotY \alpha {\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {(\pendappXtoY{(\pendlambdaXdotY \alpha {{\pendappXtoY {D_r} {F_0 \alpha}}})}\alpha)}} {F_0 \alpha}\tag{*}\\
+      &=\pendlambdaXdotY \alpha {\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {\pendappXtoY {D_r} {F_0 \alpha}}} {F_0 \alpha}\\
+      &= \pendlambdaXdotY \alpha
+      \pendappXtoY {(\pendlambdaXdotY \beta {{\homrappXtoYatZ {\pendappXtoY {G_1} \beta} {\pendappXtoY {D_r} \beta} \beta}})} {F_0 \alpha}\\
+      &= \pendlambdaXdotY \alpha
+      \pendappXtoY {(\pendlambdaXdotY \beta \pendappXtoY {E_r} {G_0 \beta})} {F_0 \alpha}\tag{*}\\
+      &= \pendlambdaXdotY \alpha \pendappXtoY {E_r} {G_0 (F_0 \beta)}\\
+    \end{align*}
+
+    Where the two marked lines follow from congruence using the
+    assumptions about $F,G$.
+
+  \item Preservation of Composition.
+    
+    \[ \homrappXtoYatZ {\pendappXtoY{(G \circ F)_1} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} f \beta} g \gamma)}\gamma\]
+    equals
+
+    \[ \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {E_t} {(G \circ F)_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {(G\circ F)_1} \alpha} f \beta)} {(G\circ F)_0 \beta}} {(\homrappXtoYatZ {\pendappXtoY {(G\circ F)_1} \beta} g \gamma)} {{F_0} \gamma}\]
+
+    Reducing, we need to show
+    \[ \homrappXtoYatZ {\pendappXtoY{G_1} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t}\alpha} f {\beta}} g {\gamma})} \gamma)} {F_0 \gamma} \]
+
+    is equal to
+    \[ \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {E_t} {G_0(F_0\alpha)}}
+      {({\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {F_0 \beta}})}
+      {G_0(F_0\beta)}}
+       {({\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \beta}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {F_0 \gamma}})}
+       {{F_0} \gamma}\]
+
+    Going from left to right:
+    \begin{align*}
+      &\homrappXtoYatZ {\pendappXtoY{G_1} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t}\alpha} f {\beta}} g {\gamma})} \gamma)} {F_0 \gamma}\\
+      &=
+      \homrappXtoYatZ
+      {\pendappXtoY{G_1} {F_0 \alpha}}
+      {(({\homrappXtoYatZ {\homrappXtoYatZ{\pendappXtoY{(\pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f \beta {\homrlambdaXatYdotZ g \gamma {\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t}\alpha} f {\beta}} g {\gamma})} \gamma}}})}\alpha} f \beta} g \gamma}))}
+      {F_0 \gamma}\\
+      &=
+      \homrappXtoYatZ
+      {\pendappXtoY{G_1} {F_0 \alpha}}
+      {(({\homrappXtoYatZ {\homrappXtoYatZ{\pendappXtoY{(\pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f \beta {\homrlambdaXatYdotZ g \gamma {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {(F_0 \alpha)}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {(F_0 \beta)}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {{F_0} \gamma}}}})}\alpha} f \beta} g \gamma}))}
+      {F_0 \gamma}\tag{*}\\
+      &=
+      \homrappXtoYatZ
+      {\pendappXtoY{G_1} {F_0 \alpha}}
+      {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {(F_0 \alpha)}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {(F_0 \beta)}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {{F_0} \gamma}}      
+      {F_0 \gamma}\\
+      &=
+      {(({\homrappXtoYatZ {\homrappXtoYatZ{\pendappXtoY{(\pendlambdaXdotY {\alpha'} {\homrlambdaXatYdotZ {f'} {\beta'} {\homrlambdaXatYdotZ {g'} {\gamma'} {{\homrappXtoYatZ {\pendappXtoY {G_1} {\alpha'}} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t}{\alpha'}} {f'} {\beta'}} {g'} {\gamma'})} {\gamma'}}}}})}{F_0\alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {F_0\beta}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {F_0\gamma}}))}\\
+      &=
+      {(({\homrappXtoYatZ {\homrappXtoYatZ{\pendappXtoY{(\pendlambdaXdotY {\alpha'} {\homrlambdaXatYdotZ {f'} {\beta'} {\homrlambdaXatYdotZ {g'} {\gamma'} {{\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {E_t} {(G_0 {\alpha'})}} {(\homrappXtoYatZ {\pendappXtoY {G_1} {\alpha'}} {f'} {\beta'})} {(G_0 \beta')}} {(\homrappXtoYatZ {\pendappXtoY {G_1} {\beta'}} {g'} {\gamma'})} {{G_0} \gamma'}}}}})}{F_0\alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {F_0\beta}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {F_0\gamma}}))}\\
+      &= \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {E_t} {G_0(F_0\alpha)}}
+      {({\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \alpha} f \beta)} {F_0 \beta}})}
+      {G_0(F_0\beta)}}
+       {({\homrappXtoYatZ {\pendappXtoY {G_1} {F_0 \beta}} {(\homrappXtoYatZ {\pendappXtoY {F_1} \beta} g \gamma)} {F_0 \gamma}})}
+       {{F_0} \gamma}
+    \end{align*}
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}[Internal Profunctor]
+  A profunctor $R$ between internal categories $\cat C$ and $\cat D$
+  consists of
+  \begin{enumerate}
+  \item A span $R_s : \harr {C_0} {D_0}$.
+  \item A ternary ``mixed composition'' action:
+    $R_t :\pendallXdotY \alpha {\homrallXYtoZ {\alpha'} {\harrapp {C_1} {\alpha}{\alpha'}} {\homrallXYtoZ {\beta'} {\harrapp {R_s} {\alpha'}{\beta'}} {\homrallXYtoZ {\beta} {\harrapp {D_1} {\beta'} {\beta}} {\harrapp {R_s} {\alpha}{\beta}}}}}$
+
+  \item Satisfying unitality (under a $\pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f \beta {}}$):
+    \[
+    f = \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} \alpha} {\pendappXtoY {C_r} \alpha} \alpha}f \beta} {\pendappXtoY {D_r} \beta} \beta
+    \]
+    
+  \item And associativity (both with a large implicit
+    $\pendlambdaXdotY \alpha {\homrlambdaXatYdotZ g \beta \homrlambdaXatYdotZ {g'} {\beta'}
+    \homrlambdaXatYdotZ {r} {\beta''}\homrlambdaXatYdotZ {f'} {\alpha''}\homrlambdaXatYdotZ {f} {\alpha'}}$)
+
+    % f : a -> a'
+    % f' : a' -> a''
+    % r : a'' -> b''
+    % g' : b'' -> b'
+    % g : b' -> b
+    %%
+    %
+    % f o (f' o r o g') o g
+    %% and
+    % (f o f') o r o (g' o g)
+
+    \[ \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} {\alpha}} {f} {\alpha'}}{({\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} {\alpha'}} {f'} {\alpha''}}r {\beta''}} {g'} {\beta'}})} {\beta'}} {g} {\beta}\]
+    is equal to
+    \[ \homrappXtoYatZ
+       {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} {\alpha}} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} {\alpha}} {f} {\alpha'}} {f'} {\alpha''})} {\alpha''}} r {\beta''}}
+       {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {\beta''}} {g'} {\beta'}} g {\beta})} {\beta}\]
+  \end{enumerate}
+\end{definition}
+
+We can immediately define the Hom profunctor for any category $C$ as
+$(\text{Hom}_C R)_s = C_1$ with actions given by $C_t$.
+
+Next, we show that Profunctors can be restricted by functors.
+
+\begin{definition}[Restriction of Profunctors]
+  If $C, D, C', D' : \text{Cat}$, and $F : \text{Functor} C C', G : \text{Functor} D D'$ and
+  $R : \text{Prof} C' D'$, then we can define a profunctor $R[F;G] : \text{Prof} C D$ by
+  \begin{enumerate}
+  \item $R[F;G]_s = \lambda (\alpha:C,\beta:D). R_s (F_0 \alpha) (G_0 \beta)$
+  \item with composition action given by
+
+    \[ R[F;G]_t =
+    \pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f {\alpha'} {\homrlambdaXatYdotZ r {\beta'} {\homrlambdaXatYdotZ g {\beta} {\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} {F_0 \alpha}} {(\homrappXtoYatZ {\pendappXtoY {F_1} {\alpha}} f {\alpha'})} {F_0 \alpha'}} r {G_0 \beta'}} {(\homrappXtoYatZ {\pendappXtoY {G_1} {\beta'}} g \beta)} {G_0 \beta}}}} }
+ \]
+  %% \item $\cat C'$ composition:
+  %%   \[ \lambda \alpha. \lambda^\triangleleft (\beta, (f : C_1 \alpha \alpha',\alpha',\alpha', r : R_s \alpha' \beta)). R_l(F_1 f, r) \]
+  %% \item $\cat D'$ composition:
+  %%   \[ \lambda \alpha. \lambda^\triangleleft ('\beta, (r : R_s \alpha \alpha',\alpha', \beta',h : D_1 \beta' \beta)). R_r(r, G_1 h) \]
+  \end{enumerate}
+  Identity and associativity properties should follow. TODO
+\end{definition}
+
+
+\begin{definition}[Homomorphism]
+  Given $R : \text{Prof} C D$ and $S : \text{Prof} C D$, a
+  homomorphism $m$ from $R$ to $S$ consists of
+  \begin{enumerate}
+  \item $m_f : \pendallXdotY \alpha {\homrallXYtoZ \beta {\harrapp R \alpha \beta}{\harrapp S \alpha \beta}}$
+    % m_f (R_t f r g) = S_t f (m_f r) g
+  \item Satisfying naturality (under a $\ldots$)
+
+    \[
+    \homrappXtoYatZ {\pendappXtoY{m_f} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} \alpha} f {\alpha'}} r {\beta'}} g \beta)} \beta
+    =
+    \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {S_t} \alpha} {f} {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY {m_f}{\alpha'}} r {\beta'})} {\beta'}} g \beta
+    \]
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}
+  An isomorphism between profunctors $R$ and $S$ is a mutually inverse
+  pair of homomorphisms.
+\end{definition}
+
+Additionally, we can define natural transformations between functors,
+but more generally, we can define a natural element of any
+endo-profunctor, where natural transformations from $F$ to $G$ are the
+same as natural elements of $\text{Hom}(F-,G=)$.
+
+\begin{definition}[Natural Element]
+  A natural element $\phi$ of a profunctor $R : \text{Prof}\,C C$ is a term
+  \[ \phi : \pendallXdotY \alpha {\harrapp R \alpha \alpha} \]
+  that is natural in that
+  \[
+  \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t} \alpha} {\pendappXtoY \phi \alpha} \alpha} f {\alpha'}
+  = \homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {C_t } \alpha} f {\alpha'}} {\pendappXtoY \phi {\alpha'}}{\alpha'}
+  \]
+\end{definition}
+
+\begin{definition}[Natural Transformation]
+  A natural transformation from $F : \text{Functor} \,C\, D$ and $G :
+  \text{Functor}\,C\,D$ is a natural element of $\text{Hom}(D)[F;G]$
+\end{definition}
+
+Composition of natural transformations is then given by $C_t$.
+
+Natural elements are closely related to homomorphisms: a natural
+element equivalent to a homomorphism out of a Hom profunctor. This is
+our first instance of a ``Yoneda'' principle that the behavior of some
+structure that varies naturally with the morphisms of a category is
+fully determined by its action on the identity morphisms.
+
+\begin{theorem}
+  Natural elements of $R : \text{Prof}\, C C$ are equivalent to
+  homomorphisms from $\text{Hom}_C$ to $R$.
+\end{theorem}
+\begin{enumerate}
+\item Given a natural element $\phi$ of $R$, we can define a
+  homomorphism by
+  \[ \pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f {\alpha'} \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} \alpha} {\pendappXtoY {C_r} \alpha} \alpha}{\pendappXtoY \phi \alpha} {\alpha}} f {\alpha'}} \]
+\item Given a homomorphism $m$ from $\text{Hom}(C)$ to $R$, define the
+  element as
+  \[ \pendlambdaXdotY \alpha {\homrappXtoYatZ {\pendappXtoY {m_f} \alpha} {\pendappXtoY {C_r}\alpha} \alpha}  \]
+
+  We should be able to show this is an isomorphism in the logic TODO!
+\end{enumerate}
+
+%% This last definition is probably unfamiliar to the reader that is not
+%% experienced with profunctors.
+%% %
+%% However, we can show that the traditional definition is equivalent to
+%% a natural transformation $\alpha : \cat C_0 \pipe \cdot \vdash
+%% t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha')$.
+
+%% \begin{definition}[Traditional Natural Transformation]
+%%   A traditional natural transformation from $\alpha : \cat C_0 \vdash
+%%   F(\alpha) : \cat D_0$ to $\alpha : \cat \vdash G(\alpha') : \cat
+%%   D_0$ consists of
+%%   \begin{enumerate}
+%%   \item A term $\cdot \vdash t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha)$
+%%   \item Such that
+%%     \[ \phi : \alpha \to_{\cat C} \alpha' \vdash t_{\alpha'} \circ F_1(\phi) \equiv G_1(\phi) \circ t_{\alpha} : F(\alpha) \to_{\cat D} G(\alpha')
+%%     \]
+%%   \end{enumerate}
+%% \end{definition}
+
+%% \begin{theorem}[Equivalent Presentations of Natural Transformations]
+%%   There is a bijection between traditional natural transformations $t
+%%   : F \to G$ and profunctor homomorphisms $h : \alpha \to_{\cat C}
+%%   \alpha' \vdash F(\alpha) \to_{\cat D} G(\alpha')$ given by
+%%   \begin{enumerate}
+%%   \item From a natural transformation $t$ we define a homomorphism
+%%     $h(t)$ by composing on the $F$ side. The choice of this side is
+%%     arbitrary and we could just as easily have used $G$ since they are
+%%     equal by naturality.
+%%     \[ \phi : \alpha \to_{\cat C} \alpha' \vdash t_{\alpha'} \circ F_1(\phi) : F(\alpha) \to_{\cat D} G_1(\alpha') \]
+%%   \item From a homomorphism $\phi.h$, we define a natural transformation $t(h)$ as
+%%     \[ \alpha \pipe \cdot \vdash h[{\id_{\alpha}}/\phi] \]
+%%   \end{enumerate}
+%% \end{theorem}
+%% \begin{proof}
+%%   First we show that the maps $h(\cdot),t(\cdot)$ actually produce
+%%   homomorphisms and natural transformations.
+%%   \begin{enumerate}
+%%   \item On the left, we need to show $h(t)_{\phi} \circ F_1(\psi) =
+%%     h(t)_{|phi \circ \psi}$. Expanding the definition, we just need
+%%     associativity and functoriality of $F_1$:
+%%     \begin{align*}
+%%       h(t)_{\phi} \circ F_1(\psi) &\equiv (t_{\alpha'} \circ F_1(\phi)) \circ F_1(\psi)\\
+%%       &\equiv t_{\alpha'} \circ F_1(\phi \circ \psi)\\
+%%       &\equiv h(t)_{\phi \circ \psi}
+%%     \end{align*}
+%%     on the right, we use naturality:
+%%     \begin{align*}
+%%       G_1(\theta) \circ h(t)_{\phi} &\equiv G_1(\theta) \circ (t_{\alpha'} \circ F_1(\phi))\\
+%%       &\equiv (t_{\alpha''} \circ F_1(\theta)) \circ F_1(\phi)\\
+%%       &\equiv t_{\alpha''} \circ F_1(\theta \circ \phi)\\
+%%       &\equiv t_{\theta \circ \phi}
+%%     \end{align*}
+%%   \item In the other direction, to prove naturality:
+%%     \begin{align*}
+%%       h[\id_\alpha/\phi] \circ F_1(\psi) &\equiv h[\id_\alpha \circ \psi/\phi]\\
+%%       &\equiv h[\psi/\phi]\\
+%%       &\equiv h[\psi \circ \id_{\alpha'}/\phi]\\
+%%       &\equiv G_1(\psi) \circ h[\id_{\alpha}/\phi]
+%%     \end{align*}
+%%   \end{enumerate}
+%%   Next we seek to prove that the functions are mutually inverse.
+%%   \begin{enumerate}
+%%   \item Round trip for homomorphisms:
+%%     \begin{align*}
+%%       h(t(h))_{\phi} &= t(h)_{\alpha} \circ F_1[\phi]\\
+%%       &= h[\id_{\alpha}] \circ F_1[\phi]\\
+%%       &= h[\id \circ \phi]\\
+%%       &= h[\phi]
+%%     \end{align*}
+%%   \item Round trip for natural transformations uses the fact that
+%%     functors preserve identity.
+%%     \begin{align*}
+%%       t(h(t))_{\alpha} &= h(t)_{\id_{\alpha}}\\
+%%       &= t_{\alpha} \circ F_1[\id_{\alpha}]\\
+%%       &= t_{\alpha} \circ \id_{F_0\alpha}\\
+%%       &= t_{\alpha}
+%%     \end{align*}
+%%   \end{enumerate}
+%% \end{proof}
+
+\subsection{Universal Properties}
+
+Since we have profunctors as a primitive notion, the most natural
+presentation of universal properties is given by the notion of a
+functor representing a profunctor.
+
+First, we have the ``algebraic'' notion of a functor representing a
+profunctor, i.e., when a profunctor $R : C\pto D$ is equivalent to
+$Hom_D(-,G=)$.
+\begin{definition}[Right Representability]
+  Let $C, D : \text{Cat}$ and $Q : \textrm{Prof}\,C D$ be a profunctor
+  between them. Then a \emph{right representation} of $Q$ consists of
+  \begin{enumerate}
+  \item A functor $G : \textrm{Functor}\, D C$
+  \item An isomorphism $I,I^-$ between $Q$ and $\text{Hom}(C)[Id;G]$
+  \end{enumerate}
+\end{definition}
+
+This is a nice definition for applications, but a lot of the structure
+(homomorphism, functoriality of G) is determined by other components
+of the structure. This can be simplified to the notion of a
+``universal morphism''.
+
+\begin{definition}[Universal Morphism]
+  A profunctor $Q : \textrm{Prof}\, C D$ is right representable when
+  there exists
+  \begin{enumerate}
+  \item A function on objects $G_0 : \varr {D_0} {C_0}$
+  \item A ``universal morphism'', i.e., a term $\epsilon :
+    \pendallXdotY \beta {\harrapp Q {G_0 \beta} \beta}$ (not
+    presupposed to be natural).
+  \item An ``introduction rule'', i.e., a term $I : \pendallXdotY
+    \alpha {\homrallXYtoZ \beta {\harrapp {Q_s}\alpha \beta} {\harrapp
+        {C_1} \alpha {G_0\beta}}}$ (not presupposed to satisfy the
+    homomorphism condition).
+  \item Such that composition with $\epsilon$ is a left and right
+    inverse to $I$. In more detail, we have two equalities.
+
+    \begin{enumerate}
+    \item First, the $\beta$ rule states that composing the universal
+      morphism with the introduction rule applied to a morphism $q : \harrapp {Q} \alpha {\beta}$ is
+      equal to the original $q$:
+
+      \[ q = \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} \alpha} {(\homrappXtoYatZ {\pendappXtoY I \alpha} {q} \beta)} {G_0 \beta}} {\pendappXtoY \epsilon \beta} {\beta}} {\pendappXtoY {D_r} \beta} {\beta} \]
+
+    \item Second, the $\eta$ rule says that every morphism $f :
+      \harrapp {C_1} \alpha {G_0 \beta}$ can be reconstructed using
+      $I$ after postcomposing with $\epsilon$:
+
+      \[ f = \homrappXtoYatZ {\pendappXtoY I \alpha} {({\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} \alpha} {f} {G_0 \beta}} {\pendappXtoY \epsilon \beta} {\beta}} {\pendappXtoY {D_r} \beta} {\beta}  })} {\beta}\]
+
+      As a special case, if $f = \pendappXtoY {C_r} {G_0 \beta}$, this shows that $\homrappXtoYatZ {\pendappXtoY I {G_0 \beta}} {\pendappXtoY \epsilon \beta} \beta = \pendappXtoY {C_r} {G_0 \beta}$
+    \end{enumerate}
+  \end{enumerate}
+\end{definition}
+
+These two notions turn out to be equivalent because the ``extra''
+information in the hom isomorphism is in fact fully determined by the
+data of a universal morphism: the functoriality of $G$ and the
+naturality of $I,I_{inv}$.
+%
+The proof can be broken up into 3 conceptual steps:
+\begin{enumerate}
+\item First,, the functoriality of $G$ is derivable from $I,\epsilon$.
+\item Next, $I_{inv}$ is a homomorphism automatically since composition
+  with a morphism is automatically natural, where $I_{inv}$ is defined as
+  \[\pendlambdaXdotY \alpha {\homrlambdaXatYdotZ f {\beta} \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} \alpha} f \beta}{\pendappXtoY \epsilon \beta} {\beta}} {\pendappXtoY {D_r }\beta} {\beta}} \]
+
+  \item Finally, $I$ is a homomorphism because the inverse of a
+    natural transformation is always natural.
+\end{enumerate}
+
+%% Part of this equivalence is the \emph{Yoneda Lemma}, which we state
+%% now in its internal, parameterized form.
+%% The usual non-parameterized Yoneda lemma can be formed if we have a
+%% unit sort.
+
+\begin{lemma}[Universal Constructions are functorial]
+  For any universal construction $(G_0,\epsilon,I)$ for $Q :
+  \text{Prof}\,C\,D$, we can extend $G_0$ to a functor by defining
+
+  \[ G_1 = \pendlambdaXdotY \beta {\homrlambdaXatYdotZ f {\beta'}
+    {\homrappXtoYatZ {\pendappXtoY I {G_0\beta}} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} {G_0\beta}} {\pendappXtoY {C_r} {G_0\beta}} {G_0\beta}} {\pendappXtoY \epsilon {\beta}} \beta} {f} {\beta'})} {\beta'}}
+  }\]
+
+  Furthermore, $I,I^-1$ are homomorphisms with respect to the induced
+  profunctor structure.
+\end{lemma}
+\begin{proof}
+  \begin{enumerate}
+  \item To prove $G_1$ preserves identity we need to show
+    \[ {\homrappXtoYatZ {\pendappXtoY I {G_0\beta}} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} {G_0\beta}} {\pendappXtoY {C_r} {G_0\beta}} {G_0\beta}} {\pendappXtoY \epsilon {\beta}} \beta} {\pendappXtoY {D_r} {\beta}} {\beta})} {\beta}} = \pendappXtoY{C_r} {G_0\beta}\]
+    which is precisely the $\eta$ principle.
+
+  \item Next, we show $I_{inv}$ is a homomorphism from $\text{Hom}(C)[\text{Id}(C);G]$ to $Q$.
+    All of this is under the binders
+    \[\lambdatrinary {\alpha : C} {f : \harrapp {C_s} \alpha {\alpha'}}
+    {\alpha' : C} {g : \harrapp{C_s} {\alpha'} {G_0 \beta'}}
+    {\beta' : D} {h : \harrapp {D_s} {\beta'} {\beta}}
+    {}\]
+
+    % given
+    % f : a -> a' in C
+    % g : a' -> G b'
+    % h : b' -> b
+
+    %% I_{inv} (f ;C (g ;C G_1 h)) = Q_t f (I_{inv} g) h
+
+    \begin{align*}
+      & \appunary
+      {I_{inv}}
+      \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} {(
+          \appbinary {C_t} {\alpha'} g {G_0\beta'}
+          {(\appunary {G_1} {\beta'} h \beta)} {G_0 \beta})} {G_0 \beta})}
+      {\beta}\\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} {(
+          \appbinary {C_t} {\alpha'} g {G_0\beta'}
+          {(\appunary {G_1} {\beta'} h \beta)} {G_0 \beta})} {G_0 \beta})} \beta
+      {\pendappXtoY \epsilon \beta} \beta
+      {\pendappXtoY {D_r} \beta} {\beta}\\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} {(
+          \appbinary {C_t} {\alpha'} g {G_0\beta'}
+          {(\appunary {G_1} {\beta'} h \beta)} {G_0 \beta})} {G_0 \beta})} \beta
+      {\pendappXtoY \epsilon \beta} \beta
+      {(\appbinary {D_t} \beta {\pendappXtoY {D_r} \beta} \beta {\pendappXtoY {D_r} \beta} \beta)} {\beta}\\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
+        {(\appunary {G_1} {\beta'} h \beta)} {G_0 \beta})} \beta
+      {\pendappXtoY \epsilon \beta} \beta
+      {(\appbinary {D_t} \beta {\pendappXtoY {D_r} \beta} \beta {\pendappXtoY {D_r} \beta} \beta)} {\beta}\\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
+      {(\apptrinary {Q_t} {G_0 \beta'}
+        {(\appunary {G_1} {\beta'} h {\beta})} {G_0 \beta}
+        {\pendappXtoY \epsilon \beta} \beta
+        {\pendappXtoY {D_r} \beta} \beta)} \beta
+      {\pendappXtoY {D_r} \beta} \beta
+      \\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
+      {(\appunary {I_{inv}} {G_0 \beta'} {(\appunary {G_1} {\beta'} h \beta)} \beta)} \beta
+      {\pendappXtoY {D_r} \beta} \beta
+      \\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
+      {(\appunary {I_{inv}} {G_0 \beta'} {(\appunary {I} {G_0\beta'} {(\apptrinary {Q_t} {G_0 \beta'} {\pendappXtoY {C_r} {G_0 \beta'}} {G_0 \beta'} {\pendappXtoY \epsilon {\beta'}} {\beta'} h \beta)} \beta)} \beta)} \beta
+      {\pendappXtoY {D_r} \beta} \beta
+      \\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
+      {(\apptrinary {Q_t} {G_0 \beta'} {\pendappXtoY {C_r} {G_0 \beta'}} {G_0 \beta'} {\pendappXtoY \epsilon {\beta'}} {\beta'} h \beta)} \beta
+      {\pendappXtoY {D_r} \beta} \beta
+      \\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
+        {\pendappXtoY {C_r} {G_0 \beta'}} {G_0 \beta'})} {G_0 \beta'}
+      {\pendappXtoY \epsilon {\beta'}} {\beta'}
+      {(\appbinary {D_t} {\beta'} h \beta {\pendappXtoY {D_r} \beta} \beta)} \beta\\
+      &=
+      \apptrinary {Q_t} \alpha
+      {(\appbinary {C_t} \alpha f {\alpha'} g {G_0 \beta'})} {G_0 \beta'}
+      {\pendappXtoY \epsilon {\beta'}} {\beta'}
+      {(\appbinary {D_t} {\beta'} {\pendappXtoY {D_r} {\beta'}} {\beta'} h \beta )} \beta\\
+      &=
+      \apptrinary {Q_t} \alpha
+      f {\alpha'}
+      {(\apptrinary {Q_t} {\alpha'} g {G_0 \beta'} {\pendappXtoY \epsilon {\beta'}} {\beta'}{\pendappXtoY {D_r} {\beta'}} {\beta'})} {\beta'}
+      h \beta\\
+      &= \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} \alpha} f {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY {I_{inv}} {\alpha'}} {g} {\beta'})} {\beta'}} {h} {\beta}\\
+    \end{align*}
+
+    
+  \item To prove $G_1$ preserves composition given $f : \harrapp {D_1} {\beta} {\beta'}$, $f' : \harrapp {D_1} {\beta'} {\beta''}$:
+    \begin{align*}
+      & \appunary {G_1} {\beta} {\appbinary {D_t} {\beta} f {\beta'} {f'} {\beta''}} {\beta'}\\
+      &= \appunary {I} {G_0 \beta} {(\apptrinary {Q_t} {G_0 \beta} {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta} {\pendappXtoY \epsilon {\beta}} {\beta} {({\appbinary {D_t} {\beta} f {\beta'} {f'} {\beta''}})} {\beta''})} {\beta''}\\
+      &= \appunary {I} {G_0 \beta} {(\apptrinary {Q_t} {G_0 \beta} {(\appbinary {C_t} {G_0 \beta} {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta} {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta})} {G_0 \beta} {\pendappXtoY \epsilon {\beta}} {\beta} {({\appbinary {D_t} {\beta} f {\beta'} {f'} {\beta''}})} {\beta''})} {\beta''}\\
+      &=
+      \appunary {I} {G_0 \beta}
+      {(\apptrinary {Q_t} {G_0 \beta}
+        {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta}
+        {(\apptrinary {Q_t} {G_0 \beta}
+          {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta}
+          {\pendappXtoY \epsilon {\beta}} {\beta}
+          f {\beta'})} {\beta'}
+        {f'} {\beta''}
+        )}
+      {\beta''}\\
+      &=
+      \appbinary {C_t} {G_0 \beta}
+      {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta}
+      {(\appbinary {C_t} {G_0 \beta}
+        {(\appunary {I} {G_0 \beta}
+        {(\apptrinary {Q_t} {G_0 \beta}
+          {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta}
+          {\pendappXtoY \epsilon {\beta}} {\beta}
+          f {\beta'})} {\beta'})} {G_0 \beta'}
+        {(\appunary {G_1} {\beta'} {f'} {\beta''})} {G_0 \beta''})}
+      {G_0 \beta''}\\
+      &=
+      \appbinary {C_t} {G_0 \beta}
+        {(\appbinary {C_t} {G_0 \beta}
+          {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta}
+          {(\appbinary {C_t} {G_0 \beta}
+            {(\appunary {I} {G_0 \beta} {\pendappXtoY \epsilon {\beta}} {\beta})} {G_0 \beta}
+            {(\appunary {G_1} \beta f {\beta'})} {G_0 \beta'})} {G_0 \beta'})} {G_0 \beta'}
+        {(\appunary {G_1} {\beta'} {f'} {\beta''})} {G_0 \beta''}\\
+      &=
+      \appbinary {C_t} {G_0 \beta}
+        {(\appbinary {C_t} {G_0 \beta}
+            {(\appunary {I} {G_0 \beta} {\pendappXtoY \epsilon {\beta}} {\beta})} {G_0 \beta}
+            {(\appunary {G_1} \beta f {\beta'})} {G_0 \beta'})} {G_0 \beta'}
+        {(\appunary {G_1} {\beta'} {f'} {\beta''})} {G_0 \beta''}\\
+      &=
+      \appbinary {C_t} {G_0 \beta}
+        {(\appbinary {C_t} {G_0 \beta}
+            {\pendappXtoY {C_r} {G_0 \beta}} {G_0 \beta}
+            {(\appunary {G_1} \beta f {\beta'})} {G_0 \beta'})} {G_0 \beta'}
+        {(\appunary {G_1} {\beta'} {f'} {\beta''})} {G_0 \beta''}\\
+      &=
+      \appbinary {C_t} {G_0 \beta}
+      {(\appunary {G_1} \beta f {\beta'})} {G_0 \beta'}
+        {(\appunary {G_1} {\beta'} {f'} {\beta''})} {G_0 \beta''}\\
+      %% &\homrappXtoYatZ {\pendappXtoY {G_1} \beta} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {\beta}} {f} {\beta'}} {f'} {\beta''})} {\beta''}\\
+      %% &={\homrappXtoYatZ {\pendappXtoY I {G_0\beta}} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} {G_0\beta}} {\pendappXtoY {C_r} {G_0\beta}} {G_0\beta}} {\pendappXtoY \epsilon {\beta}} \beta} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {\beta}} {f} {\beta'}} {f'} {\beta''})} {\beta''})} {\beta''}}\\
+      %% &={\homrappXtoYatZ {\pendappXtoY I {G_0\beta}} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} {G_0\beta}} {({\pendappXtoY {C_r} {G_0\beta}})} {G_0\beta}} {\pendappXtoY \epsilon {\beta}} \beta} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {\beta}} {f} {\beta'}} {f'} {\beta''})} {\beta''})} {\beta''}}\\
+    \end{align*}
+    %% \[
+    %%   {\homrappXtoYatZ {\pendappXtoY I {G_0\beta}} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {Q_t} {G_0\beta}} {\pendappXtoY {C_r} {G_0\beta}} {G_0\beta}} {\pendappXtoY \epsilon {\beta}} \beta} {(\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {D_t} {\beta}} {f} {\beta'}} {f'} {\beta''})} {\beta''})} {\beta''}}
+    %% \]
+  \end{enumerate}
+\end{proof}
+
+\begin{lemma}[Inverse of homomorphism is a homomorphism]
+  Let $\phi$ be a homomorphism from $R$ to $S : \text{Prof} C D$ and
+  let $\psi : \pendallXdotY \alpha {\homrallXYtoZ \beta {\harrapp S
+      \alpha \beta}{\harrapp R \alpha \beta}}$. If $\psi$ is a
+  two-sided inverse to $\phi_f$ then $\psi$ is a homomorphism.
+\end{lemma}
+\begin{proof}
+  We need to show the homomorphism condition for $\psi$:
+  \[ \homrappXtoYatZ {\pendappXtoY \psi \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {S_t} \alpha} f {\alpha'}} s {\beta'}} g {\beta})} {\beta}
+    = \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} \alpha} f {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY \psi {\alpha'}} s {\beta'})} {\beta'}} g \beta
+    \]
+
+    \begin{align*}
+      \homrappXtoYatZ {\pendappXtoY \psi \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {S_t} \alpha} f {\alpha'}} s {\beta'}} g {\beta})} {\beta}
+      &= \homrappXtoYatZ {\pendappXtoY \psi \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {S_t} \alpha} f {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY {\phi_f} {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY \psi {\alpha'}} s {\beta'})} {\beta'})} {\beta'}} g {\beta})} {\beta}\\
+      &= \homrappXtoYatZ {\pendappXtoY \psi \alpha}
+      {(\homrappXtoYatZ {\pendappXtoY {\phi_f} \alpha} {(\homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} \alpha} f {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY \psi {\alpha'}} s {\beta'})} {\beta'}} g \beta)} \beta)} {\beta}\\
+      & = \homrappXtoYatZ {\homrappXtoYatZ {\homrappXtoYatZ {\pendappXtoY {R_t} \alpha} f {\alpha'}} {(\homrappXtoYatZ {\pendappXtoY \psi {\alpha'}} s {\beta'})} {\beta'}} g \beta
+    \end{align*}
+\end{proof}
+
+\subsection{Self-Interpretation: Hom of Internal Profunctors}
+
+We can define a version of the hom $\homrallXYtoZ \alpha P Q$ on
+\emph{internal} profunctors using a combination of this connective,
+and an \emph{equalizer} to enforce a homomorphism condition.
+
+\begin{definition}[Internal Covariant Hom of Profunctors]
+  Let $P : \textrm{Prof}\,D\,E$ and $Q : \textrm{Prof}\,C\,E$. Define
+  the covariant Hom $P \triangleright Q : \textrm{Prof}\,C\,D$ by
+  \[ (P \triangleright Q)_1 = \lambda (\alpha;\beta). \equalizeVofWbyXeqYatZ \phi {\homrallXYtoZ \gamma {\harrapp {P_1} \alpha \gamma} {\harrapp {Q_1} \beta \gamma}} {\psi_{dom}} {\psi_{cod}} {\homrallXYtoZ {\gamma'} {\harrapp {P_1 }\beta {\gamma'}} {\homrallXYtoZ {\gamma} {\harrapp {E_1} {\gamma'} \gamma} {\harrapp {Q_1} \alpha \gamma}}}\]
+  where $\psi_{dom}$ and $\chi_{cod}$ are  as
+  \[ \psi_{dom} =\homrlambdaXatYdotZ p {\gamma'} {\homrlambdaXatYdotZ e \gamma
+    {\homrappXtoYatZ {\phi} {(\apptrinary {P_t} \beta {\pendappXtoY {D_r} \beta} \beta p {\gamma'} e \gamma)} \gamma}}
+  \]
+  \[
+  \psi_{cod} = \homrlambdaXatYdotZ p {\gamma'} {\homrlambdaXatYdotZ e \gamma
+    {\apptrinary {Q_t} \alpha {\pendappXtoY {C_r} \alpha} \alpha {(\homrappXtoYatZ \phi {p} {\gamma'})} {\gamma'} e \gamma}}
+  \]
+\end{definition}
+
+We can easily define a contravariant hom $P \triangleleft Q$ by a dual
+definition (TODO).
+
+\subsection{Limits and Kan Extensions}
+
+We can then use our notion of Hom of profunctors 
+
+The right Kan extension of $F$ along $J$ is the best (maximal) way to
+fill in the following square:
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEQBfU9TXfIRQBGclVqMWbACLdeIDNjwEiZYePrNWiDgHJu4mFADm8IqABmAJwgBbJGRA4ISAEzVNUnQCk5lm-aIjs5IohJabABiBlxAA
+\begin{tikzcd}
+C \arrow[d, "J"] \arrow[r, "F"] & D \\
+C'                              &  
+\end{tikzcd}\]
+I.e. a functor $Ran_J F : C' \to D$ with a natural transformation
+$Ran_J F \Rightarrow F$ that is universal something something.
+
+If $D$ is complete, there is a formula using ends for this. Using hom
+of profunctors, we can directly adapt this to define a
+\emph{profunctor} that is a universal filler. We can then say that a
+right Kan extension is precisely a functor that represents this
+profunctor.
+
+\begin{definition}
+  Let $C,C',D$ be categories and let $F : \textrm{Functor}\,C\,D$ and
+  $J: \textrm{Functor}\,C'\,C$ be functors. Then the right Kan
+  extension specification profunctor is a profunctor
+  $\textrm{RanSpec}_J\,F : \textrm{Prof}\,D\,C$ defined as
+
+  \[ \textrm{RanSpec}_J\,F = \textrm{Hom}(C')[;J] \triangleright \textrm{Hom}(D)[;F] \]
+
+  And a right Kan extension is a functor
+  $\textrm{Ran}_JF:\textrm{Functor}\,C'\,D$ that is a
+  right-representation of $\textrm{RanSpec}_J F$.
+\end{definition}
+
+Writing this out more pointfully, we get that the hom set
+$\harrapp{D_1} {\beta}{\textrm{Ran}_JF\, \alpha}$ is an equalizer of
+the following spans:
+\[ \homrallXYtoZ {\alpha':C'} {\harrapp {C_1'} {\alpha'}{J_0\alpha}}{\harrapp {D_1} {\beta} {F_0 \alpha'}}\]
+
+If we have a unit and therefore unit category and functor, then we can
+now define limits as a special case of Kan extensions.
+\begin{definition}
+  The limit of a functor $J : \textrm{Functor}I\,C$ is a right Kan
+  extension $\textrm{Ran}_E J$ where $E$ is the unique functor $E :
+  \textrm{Functor}I\,1$.
+\end{definition}
+
+Unraveling this definition, we get that $\harrapp{C_1} \alpha {\lim_{i} J(i)}$ is a coherent family (i.e., equalizer) of
+\[  \homrallXYtoZ {i:I} {1} {\harrapp{C_1} \alpha {J_0(i)}}  \]
+with the equalizing condition being that for any $p : \homrallXYtoZ
+{i:I} {1} {\harrapp{C_1} \alpha {J_0(i)}}$ and $f : \harrapp{I_1} {i'}{i}$ and $g : \harrapp{1}{pt}{E_0 i'}$
+\[ \homrappXtoYatZ {p} {(\appbinary {1_t} {pt} {\pendappXtoY {1_r} {pt}} {pt} {(\appbinary {1_t} {pt} g {E_0 i'} {(\appunary {E_1} {i'} f {i})} {i})} {i})} {i}
+= \appbinary {C_t} {\alpha} {(\homrappXtoYatZ {p} g {i'})} {J_0 i'} {(\appbinary {C_t} {J_0 i'} {(\appunary {J_1} i f {i'})} {J_0 i} {\pendappXtoY {C_r} {J_0 i}} {J_0 i})} {J_0 i}
+\]
+We can greatly simplify using the $\eta$ principle for $1$ and
+eliminating some reflexivities to reduce this to
+\[ \homrappXtoYatZ {p} {()} {i} =
+\appbinary {C_t} {\alpha} {(\homrappXtoYatZ {p} {()} {i'})} {J_0 i'} {{(\appunary {J_1} i f {i'})}} {J_0 i}
+\]
+which reads exactly as the commuting condition for a cone.
+
+We can similarly define \emph{left} Kan extensions by a dual
+formula. Left Kan extensions are the ``minimal'' solution to the same
+filling problem as right Kan extensions. I.e., they have a universal
+morphism out of them. They can be described by a coend formula, but in
+our profunctor calculus, they are easiest to describe using a similar
+formula to right Kan extensions, but using the contravariant hom of
+profunctors.
+
+\begin{definition}
+  Let $C,C',D$ be categories and let $F : \textrm{Functor}\,C\,D$ and
+  $J: \textrm{Functor}\,C'\,C$ be functors. Then the left Kan
+  extension specification profunctor is a profunctor
+  $\textrm{LanSpec}_J\,F : \textrm{Prof}\,C\,D$ defined as
+
+  \[ \textrm{RanSpec}_J\,F = \textrm{Hom}(D)[F;] \triangleleft \textrm{Hom}(C')[J;]  \]
+  And a left Kan extension is a functor $\textrm{Lan}_J F :
+  \textrm{Functor}\,C'\,D$ that represents this profunctor on the
+  left.
+\end{definition}
+
+Unraveling the definition we get the hom span $\harrapp {D_1}{\textrm{Ran}_JF {\alpha'}} \beta$ is an equalizer of
+\[ \homlallXYtoZ \alpha {\harrapp {C_1'} {J_0 \alpha} {\alpha'}} {\harrapp{D_1} {F_0 \alpha} \beta}\]
+
+\begin{definition}
+  The colimit of a functor $J : \textrm{Functor}I\,C$ is a left Kan
+  extension $\textrm{Lan}_E J$ where $E$ is the unique functor $E :
+  \textrm{Functor}I\,1$.
+\end{definition}
+
+We can similarly unravel this definition to see that this looks
+essentially like the classical definition of colimits as universal
+cocones.
+
+%% We can also define a left Kan extensions using the contravariant
+%% cotensors.  Normally the left Kan extension is defined using tensors,
+%% but the definition using profunctors doesn't look right to me. Let's
+%% work backwards from the definition of colimit to see why.
+
+%% Let $\alpha : \cat C \vdash A : \cat D$ be a functor we want the
+%% colimit of. The UP of a colimit is that maps out of it are equivalent
+%% to cocones from $A$. Semi-formally this looks like
+%% \[ (\colim_{\alpha} A \to_{\cat D} \beta) \cong \forall \alpha:\cat C.~ A \to_{\cat D} \beta \]
+%% This looks a lot like a cotensor with a trivial domain:
+%% \[ (\colim_{\alpha} A \to_{\cat D} \beta) \cong \forall \alpha. (() \to_{1} \gamma) \triangleright (A \to_{\cat D} \beta) \]
+%% Suggesting that we define the left Kan extension profunctor as a
+%% contravariant cotensor as follows.
+%% \begin{definition}
+%%   Let $\cat C,\cat C',\cat D$ be cats and let $\alpha:\cat C \vdash A
+%%   : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be functors.
+%%   Then the left Kan extension profunctor $\gamma^o:\cat C'; \beta:\cat
+%%   D \pipe (PLan_J A)[\gamma;\beta]$ is defined as
+%%   \[
+%%   \gamma^o:\cat C'; \beta:\cat D \pipe (PLan_J A)[\gamma;\beta]
+%%   := \forall \alpha : \cat C.~ (J \to_{\cat C'} \gamma) \triangleright (A \to_{\cat D} \beta)
+%%   \]
+%%   Then a left Kan extension of $A$ along $J$ is a functor $\gamma :
+%%   \cat C' \vdash Lan_J A : \cat D$ that represents $PLan_J A$ in that
+%%   \[ (Lan_J A \to_{\cat D} \beta) \cong (LPan_J A)[\gamma;\beta] \]
+%% \end{definition}
+
+
+%% \begin{definition}
+  %% Let $\cat C,\cat C',\cat D$ be cats and let $\alpha:\cat C \vdash
+  %% : \cat D$ and $\alpha : \cat C \vdash J : \cat C'$ be functors.
+  %% Then the left Kan extension profunctor $\beta^o:\cat D; \gamma:\cat
+  %% C' \pipe (PLan_J F)[\beta;\gamma]$ is defined as
+%%   \[
+%%   \beta^o:\cat D; \gamma:\cat C' \pipe (PLan_J A)[\beta;\gamma] :=
+%%   \exists \alpha:\cat C. (\beta \to_{\cat D} A[\alpha]) \odot (J[\alpha] \to_{\cat C'} \gamma)
+%%   \]
+%%   And a left Kan extension is a functor $\gamma :\cat C' \vdash Lan_J
+%%   A : \cat D$ that represents $PLan_J A$ in that
+%%   \[ (\beta \to_{\cat D} Lan_J A[\alpha]) \cong (PLan_J A)[\beta;\alpha] \]
+%% \end{definition}
+
+
+%% \begin{lemma}[Parameterized Yoneda Lemma]
+%%   Given categories $\cat C, \cat D$ and a profunctor $\alpha^o:\cat
+%%   C;\beta : \cat D \vdash \alpha \to_{Q} \beta$ and a function
+%%   $\beta : \cat D \vdash G[\beta] : \cat C$, then there is an
+%%   isomorphism between
+%%   \begin{enumerate}
+%%   \item Terms $\cdot \vdash t : G[\beta] \to_{Q} \beta$
+%%   \item left-homomorphisms $\phi : \alpha \to_{\cat C} G[\beta] \vdash
+%%     u : \alpha \to_{Q} \beta$ i.e. they satisfy homomorphism on the
+%%     left (the other side doesn't make sense if $G$ is not a functor):
+%%     $u[\phi \circ \psi] = u[\phi] \circ \psi$
+%%   \end{enumerate}
+%% \end{lemma}
+%% \begin{proof}
+%%   First, the constructions
+%%   \begin{enumerate}
+%%   \item Given $t$, we define $u(t)$ to be
+%%     \[\phi : \alpha \to_{\cat C} G[\beta] \vdash t \circ_{Q} \phi : \alpha \to_{Q} \beta\]
+
+%%     Which is a left-homomorphism because:
+%%     \[ (t \circ_{Q} \phi) \circ_{Q} \psi = t \circ_{Q} (\phi \circ_{\cat C} \psi)\]
+%%   \item Given $u$, we define $t(u)$ to be
+%%     \[ \cdot \vdash u[\id_{G[\beta]}/\phi] : G[\beta] \to_{Q} \beta \]
+%%   \end{enumerate}
+%%   Now we show they are inverse
+%%   \begin{enumerate}
+%%   \item First, the very easy case, $\cdot \vdash t(u(t)) : G[\beta] \to_{Q} \beta$:
+%%     \begin{align*}
+%%       t \circ_{Q} \id_{G[\beta]} &= t
+%%     \end{align*}
+%%     by the fact that $Q$ is a profunctor.
+%%   \item Next, $\phi : \alpha \to_{\cat C} G[\beta] \vdash u(t(u)) : \alpha \to_{Q} \beta$:
+%%     \begin{align*}
+%%       u[\id_{G[\beta]}/\phi] \circ_{Q} \phi &= u[\id \circ_{\cat C} \phi/\phi]\\
+%%       &= u[\phi/\phi]\\
+%%       &= u
+%%     \end{align*}
+%%     which uses the fact that $u$ is a left-homomorphism.
+%%   \end{enumerate}
+%% \end{proof}
+
+%% \begin{theorem}[Negative Types and Right Representables are Equivalent]
+%%   For any profunctor $\alpha^o: \cat C; \beta : \cat D \pipe \alpha
+%%   \to_{Q} \beta$, there is a bijection between
+%%   \begin{enumerate}
+%%   \item Right Represntables $\beta : \cat D \vdash G[\beta] : \cat C$ for $Q$.
+%%   \item Negative Types $\beta : \cat D \vdash N[\beta] : \cat C$
+%%     representing $Q$.
+%%   \end{enumerate}
+%% \end{theorem}
+%% \begin{proof}
+%%   \begin{enumerate}
+%%   \item Given a right representable $G[\beta]$, we set $N(G)[\beta] =
+%%     G[\beta]$, the introduction rule is the same and the elimination
+%%     rule is given as in the Yoneda lemma and the inverse property
+%%     follows by the Yoneda isomorphism and the fact that $I_G^{-1}$ is
+%%     an inverse for $I_G$.
+%%   \item Given a negative type $N[\beta]$ we set $G(N)[\beta] =
+%%     N[\beta]$, the introduction rule is the same and the inverse
+%%     introduction rule is given as in the Yoneda lemma.  We need to
+%%     show that $N[\beta]$ has the structure of a functor and that
+%%     $I_{N}$ and $I_{N}^{-1}$ are homomorphisms on the right with
+%%     respect to that structure.  Define $N_1$ as follows:
+%%     \begin{mathpar}
+%%       \inferrule
+%%           {\beta_1^o:\cat D;\beta_2:\cat D \vdash \psi \circ \epsilon : N[\beta_1/\beta] \to_{Q} \beta_2\\
+%%             \phi : N[\beta_1/\beta] \to_{Q} \beta_2 \vdash I_N[\phi] : N[\beta_1/\beta] \to_{\cat C} N[\beta_2/\beta]
+%%           }
+%%           {\beta_1^o:\cat D;\beta_2:\cat D\pipe \psi : \beta_1 \to_{\cat D} \beta_2 \vdash I_N[\psi \circ \epsilon_{\beta_1}/\phi] : N[\beta_1/\beta] \to_{\cat C} N[\beta_2/\beta]}
+%%     \end{mathpar}
+%%     We need to show functoriality.
+%%     For identity we have
+%%     \begin{align*}
+%%       I_N[\id_{\beta} \circ \epsilon_{\beta}/\phi] &= I_N[\epsilon_{\beta}]\\
+%%       &= I_N[\epsilon \circ \id_{N[\beta]}]\\
+%%       &= \id_{N[\beta]} \tag{$\eta$}
+%%     \end{align*}
+%%     For composition,
+%%     \begin{align*}
+%%       N_1[\theta] \circ N_1[\psi]
+%%       &= I_N[\theta \circ \epsilon] \circ I_N[\psi \circ \epsilon]\\
+%%       &= I_N[(\theta \circ \epsilon) \circ I_N[\psi \circ \epsilon]]\tag{left homomorphism}\\
+%%       &= I_N[\theta \circ (\epsilon \circ I_N[\psi \circ \epsilon])]\\
+%%       &= I_N[\theta \circ (\psi \circ \epsilon)] \tag{$\beta$}\\
+%%       &= I_N[(\theta \circ \psi) \circ \epsilon]\\
+%%       &= N_1[\theta \circ \psi]
+%%     \end{align*}
+%%     Next we show $I_N$ is a right homomorphism, the typing here is
+%%     $\phi : \alpha \to_{Q} \beta_1, \theta : \beta_1 \to_{\cat D}
+%%     \beta_2$.
+%%     \begin{align*}
+%%       N_1[\theta] \circ I_N[\phi] &= I_N[\theta \circ \epsilon] \circ I_N[\phi]\\
+%%       &= I_N[\theta \circ \epsilon \circ I_N[\phi]]\tag{left homomorphism}\\
+%%       &= I_N[\theta \circ \phi] \tag{$\beta$}
+%%     \end{align*}
+%%     and to show $I_N^{-1}$ is a right homomorphism under $\phi : \alpha \to_{\cat C}N[\beta_1], \theta : \beta_1 \to_{\cat D} \beta_2$
+%%     \begin{align*}
+%%       I_N^{-1}[N_1[\theta] \circ \phi] &= \epsilon \circ (N_1[\theta] \circ \phi) \tag{def}\\
+%%       &= \epsilon \circ (I_N[\theta \circ \epsilon] \circ \phi)\tag{def}\\
+%%       &= (\epsilon \circ I_N[\theta \circ \epsilon]) \circ \phi\tag{assoc}\\
+%%       &= (\theta \circ \epsilon) \circ \phi\tag{$\beta$}\\
+%%       &= \theta \circ (\epsilon \circ \phi)\tag{assoc}\\
+%%       &= \theta \circ I_N^{-1}[\phi] \tag{def}
+%%     \end{align*}
+%%   \end{enumerate}
+
+%%   Next we need to show that this is a \emph{bijection}.
+%%   \begin{enumerate}
+%%   \item Starting with a negative type $N[\beta]$, we recover the
+%%     original $\epsilon$ by the Yoneda lemma.
+%%   \item Starting with a right representable $G[\beta]$, we recover the
+%%     original $I_N^{-1}$ by the Yoneda lemma. We need to show that the
+%%     action of $G$ on arrows is the same as the one defined from $G$
+%%     viewed as a negative type, which we will call $G_1'$:
+%%     \begin{align*}
+%%       G_1'[\theta] &= I_G[\theta \circ \epsilon]\\
+%%       &= G_1[\theta] \circ I_G[\epsilon]\tag{right homomorphism}\\
+%%       &= G_1[\theta] \circ I_G[\epsilon \circ \id]\\
+%%       &= G_1[\theta] \circ \id\\
+%%       &= G_1[\theta]
+%%     \end{align*}
+%%   \end{enumerate}
+%% \end{proof}
+
+
+%% \subsection{Adjunctions by Universal Morphism}
+
+%% As an example of formal category theory in our syntax, let's prove the
+%% equivalence between two definitions of an adjunction: one by universal
+%% morphism and the other by natural hom isomorphism.
+%% %
+%% Though the definitions and proof will look like we are doing ordinary
+%% category theory, since it is syntactic it immediately applies to all
+%% models, including enriched and internal category theory.
+
+%% We start with the usual definition of an adjunction using
+%% hom-isomorphism and a profunctor.
+%% \begin{definition}
+%%   Let $C,D$ be categories and $c^o:C_0,d:D_0 \vdash H[c,d]$ a
+%%   profunctor between them. A \emph{left adjoint} to $H$ consists of
+%%   \begin{enumerate}
+%%   \item A functor $c:C \vdash F[c] : D$
+%%   \item A natural isomorphism $c,d \pipe h : H[c,d] \vdash
+%%     F_{ind}[h]: D_1[F_0[c],d]$. Call the inverse $g. F_{ind}^{-1}[g]$.
+%%   \end{enumerate}
+%% \end{definition}
+
+%% \begin{definition}
+%%   Let $c:C_0,d:D_0 \vdash H[c,d]$ be a profunctor.
+%%   A \emph{universal $H$-heteromorphism from $C$} consists of
+%%   \begin{enumerate}
+%%   \item For every $c:C_0$, an $H$-morphism $\eta_c : H(c,F_0[c])$ for
+%%     some function $c:C_0 \vdash F_0[c] : D_0$.
+%%   \item Such that every $h : H[c,d]$ factors through $\eta_c$ in that
+%%     there is a unique $h : H[c,d] \vdash F_{ind}[h] : D[F_0[c],d]$
+%%     such that $h = F_{ind}[h] \circ \eta_c$.  Uniqueness means
+%%     validity of the following rule:
+%%     \begin{mathpar}
+%%       \inferrule
+%%       {g:D[F_0[c],d] \vdash g \circ \eta = h}
+%%       {g:D[F_0[c],d] \vdash g = F_{ind}[h]}
+%%     \end{mathpar}
+%%     (Note that we do not require $F_{ind}$ to be natural in any sense)
+%%   \end{enumerate}
+%% \end{definition}
+
+%% It is easy to see that a left adjoint gives a universal heteromorphism
+%% by a Yoneda-like argument:
+%% \begin{construction}
+%%   Let $F$ be a left adjoint to $H$. Then we define a left universal
+%%   $H$-heteromorphism by
+%%   \begin{enumerate}
+%%   \item $c \vdash \eta_c = F_{ind}^{-1}[\id[F_0[c]]]: H[c,F_0[c]]$
+%%   \item Every $h : H[c,d]$ factorizes through $\eta$ because
+%%     \begin{align*}
+%%       F_{ind}[h] \circ F_{ind}^{-1}[\id] &= F_{ind}^{-1}[F_{ind}[h] \circ \id] \tag{naturality}\\
+%%       &= F_{ind}^{-1}[F_{ind}[h]] \tag{unit}\\
+%%       &= h \tag{isomorphism}
+%%     \end{align*}
+%%     This factorization is unique because if $g \circ F^{-1}[\id] = h$,
+%%     then
+%%     \begin{align*}
+%%       F_{ind}[h] &= F_{ind}[g \circ F^{-1}[\id]] \tag{congruence}\\
+%%       &= g \circ F_{ind}[F^{-1}[\id]] \tag{naturality}\\
+%%       &= g \circ \id \tag{iso}\\
+%%       &= g \tag{unit}
+%%     \end{align*}
+%%   \end{enumerate}
+%% \end{construction}
+
+%% But the utility of the universal morphism definition is that the
+%% universal morphism extracted from a left adjoint is enough to uniquely
+%% reconstruct the rest of the structure, which includes (1)
+%% functoriality of $F$ and (2) naturality of $F_{ind}$.
+%% \begin{construction}
+%%   Let $(F_0,\eta,F_{ind}[h])$ be a left universal $H$-morphism.
+%%   We extend this to a left adjoint as follows.
+%%   \begin{enumerate}
+%%   \item First, $F$ acts on morphisms by
+%%     \begin{mathpar}
+%%       \inferrule
+%%       {
+%%         \inferrule
+%%          {f : C[c,c'] \and \eta_{c'} : H[c',F_0[c']]}
+%%          {f : C[c,c'] \vdash \eta_{c'} \circ f : H[c,F_0[c']]}
+%%       }
+%%       {f : C[c,c'] \vdash F_{ind}[\eta_{c'} \circ f] : D[F_0[c],F_0[c']]}
+%%     \end{mathpar}
+%%     This preserves identity
+%%     \begin{mathpar}
+%%       \inferrule
+%%       {
+%%         \inferrule
+%%         {\id \circ \eta = \eta}
+%%         {\id = F_{ind}[\eta]}
+%%       }
+%%       {\id = F_{ind}[\eta \circ \id]}
+%%     \end{mathpar}
+%%     And composition
+%%     \begin{mathpar}
+%%       \inferrule
+%%       {F_{ind}[\eta \circ f] \circ F_{ind}[\eta \circ g] \circ \eta = \eta \circ f \circ g}
+%%       {F_{ind}[\eta \circ f] \circ F_{ind}[\eta \circ g] = F_{ind}[\eta \circ f \circ g]}
+%%     \end{mathpar}
+%%     Which follows by a couple uses of the factorization:
+%%     \begin{align*}
+%%       F_{ind}[\eta \circ f] \circ F_{ind}[\eta \circ g] \circ \eta
+%%       &= F_{ind}[\eta \circ f] \circ \eta \circ g \\
+%%       &= \eta \circ f \circ g
+%%     \end{align*}
+%%   \item Next, we show that $h : H[c,d] \vdash F_{ind}[h] :
+%%     D[F_0[c],d]$ is a natural transformation. As a first step, we show
+%%     that $\eta_c : H[c,F_0[c]]$ is natural in $c$ with the action of
+%%     $F$ on morphisms we have just defined.
+%%     \[ \eta \circ f = F[f] \circ \eta \]
+%%     expanding the definition, this is precisely the factorization
+%%     property:
+%%     \[ \eta \circ f = F_{ind}[\eta \circ f] \circ \eta \]
+    
+%%     Next, to show that $F_{ind}$ is natural, we need to show that
+%%     (when it is well-defined):
+%%     \[F_{ind}[g \circ h \circ f] = g \circ F_{ind}[h] \circ F[f] \]
+%%     By the factorization property, the following sufficeth:
+%%     \begin{align*}
+%%      g \circ F_{ind}[h] \circ F[f] \circ \eta
+%%      &= g \circ F_{ind}[h] \circ \eta \circ f \tag{naturality of $\eta$}\\
+%%      &= g \circ h \circ f \tag{factorization}
+%%     \end{align*}
+%%   \item Finally, we define $F_{ind}^{-1}[g]$ as
+%%     \[ g : D[F_0[c],d] \vdash F_{ind}^{-1}[g] = g \circ \eta : H[c,d] \]
+%%     And we need to confirm that it is (1) a section of $F_{ind}$ (2) a
+%%     retraction of $F_{ind}$ and (3) natural.
+%%     \begin{enumerate}
+%%     \item For retraction we need to show $h \vdash F_{ind}[h] \circ
+%%       \eta = h$ which is precisely the factorization property.
+%%     \item For section, we need to show $g \vdash F_{ind}[g \circ \eta]
+%%       = g$. Immediately the uniquenes principle says its sufficient to
+%%       show $g \circ \eta = g \circ \eta$.
+%%     \item For naturality, we need to show
+%%       \[ F_{ind}^{-1}[k \circ g \circ F[f]] = k \circ F_{ind}^{-1}[g] \circ f \]
+%%       expanding the definition this is just:
+%%       \[ k \circ g \circ F[f] \circ \eta = k \circ g \circ \eta \circ f \]
+%%       which is just naturality of $\eta$.
+%%     \end{enumerate}
+%%   \end{enumerate}
+%% \end{construction}
+
+\subsection{Products and Units of Internal Categories}
+
+%% While we have now proved a beautiful internal theorem in great
+%% generality that has many useful instances in different models, we are
+%% hard pressed to actually \emph{instantiate} the theorem in the syntax
+%% itself because we can't really come up with any useful universal properties!
+%% The reason is that Judgment Theory itself is too bare-bones.
+
+%% For instance how would we say that a category $\cat C$ has a
+%% \emph{terminal object}? Well, it would have to be in the first place a
+%% \emph{single} object in $\cat C$, but so far our syntax only enables
+%% us to talk about functions and functors. Well an object of $\cat C$ is
+%% the same as a function from the unit sort, but so far our syntax only
+%% has base sorts.
+
+%% So we see that defining the terminal object, \emph{necessitates} some
+%% notion of terminal object in our ``metatheory'': Judgment Theory.
+%% This mysterious and pervasive aspect of higher category theory is
+%% called the \emph{microcosm principle} because it says that in order to
+%% discuss a property of a single object in a single category (the
+%% microcosm), we need the same sort of object at the meta-level (the
+%% macrocosm). The adage here is ``As above, so below''.
+
+%% That might all sound very spiritual, but we'll see that it's actually
+%% quite a nice heuristic for formalizing universal properties in
+%% internal category theory.
+%% %
+%% In the spirit of this heuristic, instead of first giving a bunch of
+%% new type constructions for Judgment Theory and then applying them to
+%% define universal properties, we will consider them in pairs, first
+%% above, and then below.
+
+First we consider the terminal sort and then the idea of a terminal
+object in an internal category.
+
+Next, the terminal sort trivially has a category structure using the
+trivial judgment as its hom set:
+
+\begin{definition}[Terminal Category]
+  The terminal category $\cat 1$ is defined as having
+  \begin{enumerate}
+  \item Its object sort as $1$
+  \item Its hom set as $\lambda \alpha:1;\beta:1. 1 : \harr 1 1$
+  \item Its identity arrow is given by $\lambda \alpha: 1. () : 1$
+  \item Composition is defined by $\phi : 1, \psi : 1 \vdash () : 1$
+  \item Associativity and unitality are trivial by \textsc{1-$\eta$}
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}[Terminal Object Specification]
+  In judgment type theory with a terminal sort/judgment, we can define
+  for any category $\cat C$ a profunctor $\alpha^o:\cat C;\beta : \cat
+  1 \pipe 1$, which specifies a terminal object.
+\end{definition}
+
+Now let's instantiate the definition for the terminal object defined
+as a negative type and as a representable and see how it reproduces
+the standard type-theoretic and category-theoretic definitions.
+
+A representation of $\alpha^o:\cat C; \beta : \cat 1 \pipe 1$ consists
+of a functor $\beta : \cat 1 \vdash 1_{\cat C} : \cat C$, an introduction rule
+\[ \phi : 1 \vdash I_{1}[\phi] : \alpha \to_{\cat C} 1_{\cat C}[\beta] \]
+satisfying $I_{1}[\phi] \circ \gamma =I_{1}[\phi \circ \gamma]$ and an
+inverse $\psi : \alpha \to_{\cat C} 1_{\cat C}[\beta] \vdash
+I_{1}^{-1}[\psi] : 1$ which by \textsc{1-$\eta$} is equal to $()$ and
+therefore every $t : \alpha \to_{\cat C} 1_{\cat C}[\beta]$ is equal
+to $I_{1}[\phi]$. In light of this it would be appropriate to write
+$I_1[\phi]$ as $()$ and then the left-homomorphism property is $()
+\circ \gamma = ()$, which is precisely the definition of substitution.
+
+This alternate syntax makes even more sense in light of the negative
+type presentation. A negative type satisfying the terminal object
+specification consists of a functor $1_{\cat C}$ as above and an
+introduction rule as above and an elimination form $\vdash \epsilon :
+1$, which is trivial.
+
+First the product category
+\begin{definition}[Product category]
+  For any categories $\cat C_1$, $\cat C_2$ we can form the product
+  category whose sort of objects is $\cat C_1 \times \cat C_2$, whose
+  arrow judgment is $\alpha^o : \cat C_1 \times \cat C_2;\alpha \pipe
+  (\pi_1 \alpha \to_{\cat C_1} \pi_1 \alpha) \times (\pi_2 \alpha
+  \to_{\cat C_2} \pi_2 \alpha)$. Identity is given by $\alpha^o : \cat
+  C_1 \times \cat C_2;\alpha\pipe\cdot \vdash (\id_{\pi_1 \alpha},
+  \id_{\pi_2 \alpha}) : (\pi_1 \alpha \to_{\cat C_1} \pi_1 \alpha)
+  \times (\pi_2 \alpha \to_{\cat C_2} \pi_2 \alpha)$ and composition
+  by
+  \[
+  \phi %: (\pi_1 \alpha_0 \to_{\cat C_1} \pi_1 \alpha_1) \times (\pi_2 \alpha_0 \to_{\cat C_2} \pi_2 \alpha_1)
+  ,
+  \psi %: (\pi_1 \alpha_1 \to_{\cat C_1} \pi_1 \alpha_2) \times (\pi_2 \alpha_1 \to_{\cat C_2} \pi_2 \alpha_2)
+  \vdash ((\pi_1 \phi) \circ (\pi_1 \psi), (\pi_2 \psi) \circ (\pi_2 \phi)) :
+  (\pi_1 \alpha_0 \to_{\cat C_1} \pi_1 \alpha_2) \times (\pi_2 \alpha_0 \to_{\cat C_2} \pi_2 \alpha_2)  
+  \]
+  unitality, associativity follow from the same properties of $\cat C_1,\cat C_2$
+\end{definition}
+
+\begin{definition}[Product Functor Specification]
+  For any category $\cat C$, we can specify the product functor by
+  \begin{enumerate}
+  \item The span is $\alpha^o:\cat C; \beta : \cat C \times \cat C \pipe (\alpha \to_{\cat C} \pi_1 \beta) \times (\alpha \to_{\cat C} \pi_2 \beta)$
+  \item Left Composition is defined as
+    \[ \phi, \psi \vdash (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi)\]
+  \item Left unitality:
+    \begin{align*}
+      (\pi_1 \phi \circ \id, \pi_2 \phi \circ \id)
+      &= (\pi_1 \phi, \pi_2 \phi)\\
+      &= \phi\tag{$\times-eta$}
+    \end{align*}
+  \item Left associativity:
+    \begin{align*}
+      (\phi \circ \psi) \circ \psi'
+      &= (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi) \circ \psi'\\
+      &= (\pi_1 (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi) \circ \psi',
+      \pi_2 (\pi_1 \phi \circ \psi, \pi_2 \phi \circ \psi) \circ \psi')\\
+      &= ((\pi_1 \phi \circ \psi) \circ \psi', (\pi_2 \phi \circ \psi) \circ \psi')\\
+      &= (\pi_1 \phi \circ (\psi \circ \psi'), \pi_2 \phi \circ (\psi \circ \psi'))\\
+      &= \phi \circ (\psi \circ \psi')
+    \end{align*}
+  \item Right composition is defined as
+    \[ \phi, \theta \vdash (\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi) \]
+  \item Right unitality:
+    \begin{align*}
+      (\pi_1 (\id,\id) \circ \pi_1 \phi, \pi_2 (\id,\id) \circ \pi_2 \phi)
+      &= (\id \circ \pi_1 \phi, \id \circ \pi_2 \phi) \tag{$\times-\beta$}\\
+      &= (\pi_1 \phi, \id \circ \pi_2 \phi)\\
+      &= \phi \tag{$\times-\eta$}
+    \end{align*}
+  \item Right associativity
+    \begin{align*}
+      \theta' \circ (\theta \circ \phi)
+      &= \theta' \circ (\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi)\\
+      &= (\pi_1 \theta' \circ \pi_1(\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi),
+      \pi_2 \theta' \circ \pi_2(\pi_1 \theta \circ \pi_1 \phi, \pi_2 \theta \circ \pi_2 \phi))\\
+      &= (\pi_1 \theta' \circ (\pi_1 \theta \circ \pi_1 \phi), \pi_2 \theta' \circ (\pi_2 \theta \circ \pi_2 \phi))\\
+      &= ((\pi_1 \theta' \circ \pi_1 \theta) \circ \pi_1 \phi, (\pi_2 \theta' \circ \pi_2 \theta) \circ \pi_2 \phi)\\
+      &= (\pi_1(\theta' \circ \theta) \circ \pi_1 \phi, \pi_2(\theta' \circ \theta) \circ \pi_2 \phi)\\
+      &= (\theta' \circ \theta) \circ \phi \\
+    \end{align*}
+  \end{enumerate}
+\end{definition}
+
+\subsection{Discrete and Codiscrete Categories}
+
+If we have terminal judgments, then we can define the
+\emph{codiscrete} category for any sort $\cat C$.
+\begin{definition}
+  The codiscrete category $\textrm{CoDisc} \cat C$ is defined as
+  \begin{enumerate}
+  \item Object sort is $\cat C$
+  \item Morphisms judgment is $1$
+  \item Identity and composition are given by the unique terms of
+    those types, making associativity and unitality trivial to verify.
+  \end{enumerate}
+\end{definition}
+
+If we have \emph{identity} objects, which we write as $\equiv_A$, then we
+can define discrete categories.
+\begin{definition}
+  The discrete category $\textrm{Disc} \cat C$ is defined as
+  \begin{enumerate}
+  \item Object sort is $\cat C$
+  \item Morphisms judgment is $\alpha;\alpha' \pipe \alpha \equiv \alpha'$
+  \item Identity and composition are defined as in the section on
+    synthetic category theory.
+  \end{enumerate}
+\end{definition}
+
+\subsection{Internal Tensor, Cotensor}
+
+We should be able to define internal \emph{tensor} using synthetic
+tensor and coequalizers and also internal \emph{cotensor} using
+synthetic cotensor and equalizers. These look exactly like the
+set-theoretic definitions.
+\begin{definition}
+  Let $R$ be an internal profunctor from $C$ to $D$ and $S$ be an
+  internal profunctor from $D$ to $E$.
+
+  Then we can define the internal tensor product $R \odot S$, a
+  profunctor from $C$ to $E$ as
+  \begin{enumerate}
+  \item The underlying span can be defined as a quotient of the synthetic tensor product
+    \[ (R \odot S)[\alpha;\gamma] = \exists \beta:\cat D. R \odot S/Rcomp = Scomp \]
+
+    Where R-comp and S-comp have as source the span
+    \[ \exists \beta:\cat D.~ R[\alpha;\beta] \odot (\exists \beta':\cat D. Hom_C(\beta,\beta') \odot S[\beta';\gamma]) \]
+    or the isomorphic
+    \[ \exists \beta':\cat D.~ (\exists \beta:\cat D. R[\alpha;\beta] \odot Hom_C(\beta,\beta')) \odot S[\beta';\gamma] \]
+    where R-comp composes the $C$-morphism with the $R$-morphism and
+    S-comp the $S$-morphism.
+  \item Composition is defined using composition in $R,S$.
+  \end{enumerate}
+\end{definition}
+Note that $R$-comp and $S$-comp are each constructed using the 
+
+\begin{definition}
+  Let $R$ be an internal profunctor from $C$ to $D$ and $S$ be an
+  internal profunctor from $C$ to $E$. Then the internal contravariant
+  cotensor product $R \triangleright S$ is defined as
+  \[ (R \triangleright S)[\beta;\gamma] = \{ p : \forall \alpha:\cat C.~ R[\alpha;\beta] \triangleright S[\alpha;\gamma] 
+  \pipe R-comp = S-comp \}  \]
+  R-comp and S-comp have as codomain the span
+  \[ \forall \alpha:\cat C.~ R[\alpha;\beta] \triangleright \forall \alpha':\cat C.~ Hom_C(\alpha',\alpha) \triangleright S[\alpha';\gamma] \]
+  or the isomorphic
+  \[ \forall \alpha':\cat C.~ (\exists \alpha. Hom_C(\alpha',\alpha) \odot R[\alpha;\beta]) \triangleright S[\alpha';\gamma]
+  \]
+\end{definition}
+
+We can also construct the \emph{free profunctor} from a span using tensor:
+
+\begin{definition}
+  Let $\cat C$ and $\cat D$ be internal categories and let $R[\alpha;\beta]$ be a
+  span from $Ob(\cat C)$ to $Ob(\cat D)$. Then the free profunctor
+  extending $R$ to be an internal profunctor from $\cat C$ to $\cat D$ is
+  \[ F_{\cat C,\cat D}R[\alpha';\beta'] = \exists \alpha. Hom_C(\alpha',\alpha) \odot (\exists \beta. R[\alpha;\beta] \odot Hom_C(\beta,\beta')) \]
+  or the isomorphic
+  \[ F_{\cat C,\cat D}R[\alpha';\beta'] = \exists \beta. (\exists \alpha. Hom_C(\alpha',\alpha) \odot R[\alpha;\beta]) \odot Hom_C(\beta,\beta') \]
+\end{definition}
+
+And maybe we can even define the co-free profunctor from a span using cotensor?
+\begin{definition}
+  Let $\cat C$ and $\cat D$ be internal categories and let $R[\alpha;\beta]$ be a
+  span from $Ob(\cat C)$ to $Ob(\cat D)$. Then the co-free profunctor
+  extending $R$ to be an internal profunctor from $\cat C$ to $\cat D$ is
+  \[ G_{\cat C,\cat D}R[\alpha';\beta'] =
+  \forall \alpha. Hom_C(\alpha,\alpha') \triangleright (\forall \beta. R[\alpha;\beta] \triangleleft Hom_D(\beta',\beta)) \]
+  or the isomorphic
+  \[ G_{\cat C,\cat D}R[\alpha';\beta'] =
+  \forall \beta. 
+  (\forall \alpha. Hom_C(\alpha,\alpha') \triangleright R[\alpha;\beta]) \triangleleft Hom_D(\beta',\beta)) \]
+\end{definition}
+
 \subsection{Duality}
 
-\section{Semantics in Virtual Equipments}
 
+
+\section{Semantics}
+
+A model of our theory is given by a virtual double category with
+restrictions, units, tensors and homs. We informally describe the
+semantics of each judgment now.
+
+A context $\Gamma \isadtctx$ denotes a set.
+%
+A set with empty boundary $\Gamma \pipe \cdot \vdash S \isaSet$ denotes a
+set for every $\gamma:\Gamma$.
+%
+The type $\Gamma \pipe \cdot \vdash \Sort \isaSet$ denotes the set of
+objects of the virtual equipment (for any $\gamma:\Gamma$).
+%
+A term $\Gamma \pipe \alpha:C \vdash A : D$ denotes a vertical arrow
+from $C \gamma$ to $D \gamma$ for every $\gamma:\Gamma$.
+%
+A term $\Gamma \pipe \alpha:C; \beta : D \vdash R \isaSet$ denotes for
+each $\gamma:\Gamma$ a horizontal arrow from $C\gamma$ to $D\gamma$.
+%
+A term $\Gamma \pipe \alpha:C \vdash R \isaSet$ denotes for each
+$\gamma$, a horizontal arrow from $C\gamma$ to itself.
+%
+A non-$\cdot$ context $\Gamma \vdash \Phi\isavectx$ denotes a
+``composable string'' of horizontal arrows from $d^-\Phi \gamma$ to
+$d^+ \Phi \gamma$.
+%
+A term $\Gamma \pipe \cdot \vdash M : S$ denotes a function from
+$\gamma :\Gamma$ to $S \gamma$ (section of the bundle blah blah).
+%
+A term $\Gamma \pipe \Phi \vdash M : R$ for non-empty $\Phi$ denotes a
+``globular'' 2-cell in the virtual equipment for every
+$\gamma:\Gamma$.
+
+Next, substitutions model the forms of composition in the system.
+Substitution $A[B/\alpha]$ denotes composition of vertical arrows
+(with variable being the identity). Substitution $R[A/\alpha;B/\beta]$
+denotes restriction of a horizontal arrow $R$ along the vertical
+arrows $A,B$. And substitution $M[\phi]$ denotes composition of
+2-cells, where some restrictions are of course involved, and again a
+variable is the identity (globular) 2-cell.
+
+Next, we would also like to prove some kind of \emph{completeness}
+theorem for our calculus, at least the part relevant to virtual
+equipments. One way to do this would be to prove a kind of
+parameterized completeness theorem, where we treat the $\Gamma$ like a
+signature, and show that the syntax is complete for every fixed
+$\Gamma$. This amounts to proving that for any fixed $\Gamma$, the
+judgments above present a virtual equipment with a trivial model
+(i.e., each judgment is interpreted as itself). This shows that the
+syntax is closed under all constructions that are present in every
+model.
+
+Here is the outline of how we expect we should be able to prove
+this. For any fixed $\Gamma$, the objects of our double category are
+the terms $\Gamma \vdash C : \Sort$. A vertical arrow from $C$ to $D$
+is a term $\Gamma\pipe \alpha:C \vdash A : D$. A horizontal arrow from
+$C$ to $D$ is a term $\Gamma \pipe \alpha:C;\beta:D \vdash R
+\isaSet$. From any composable string of such $R$s we can construct a
+context $\Gamma \vdash \Phi \isavectx$ and then a 2-cell from $\Phi$ to
+$R$ along $A,B$ is given by a term $\Gamma \pipe \Phi \vdash
+R[A/\alpha;B/\beta]$. Compositions and restriction are modeled by the
+appropriate notion of substitution and units/tensors/homs are modeled
+by the corresponding type formers. There are a lot of details to be
+verified, especially the equations.
 
 
 \section{Related Work}
