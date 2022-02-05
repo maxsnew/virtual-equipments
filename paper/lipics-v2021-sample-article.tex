@@ -1,6 +1,5 @@
 \documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
 
-\usepackage[margin=1in]{geometry}
 \usepackage{tikz-cd}
 \usepackage{amssymb}
 \usepackage{amsmath}
@@ -95,6 +94,8 @@
 \newcommand{\vcat}{\mathcal}
 \newcommand{\cat}{\mathbbm}
 \newcommand{\isaSet}{\,\,\textrm{Set}}
+\newcommand{\isaTy}{\,\,\textrm{Type}}
+\newcommand{\isaCat}{\,\,\textrm{Cat}}
 \newcommand{\Set}{\textrm{Set}}
 \newcommand{\vtkmnd}{\mathbb{K}\text{Mod} (\vcat{V},T)}
 \newcommand{\rmod}{\text{RMod}}
@@ -112,9 +113,9 @@
 %% \newcommand{\sort}{\,\,\textrm{sort}}
 \newcommand{\Sort}{\textrm{Sort}}
 \newcommand{\isadtctx}{\,\,\textrm{type context}}
-\newcommand{\isavectx}{\,\,\textrm{cat context}}
+\newcommand{\isavectx}{\,\,\textrm{trans. context}}
 %% \newcommand{\obctx}{\,\,\textrm{object context}}
-\newcommand{\boundary}{\,\,\textrm{boundary}}
+\newcommand{\boundary}{\,\,\textrm{set context}}
 \newcommand{\prof}{\,\,\textrm{span}}
 \newcommand{\subst}{\,\,\textrm{subst}}
 \newcommand{\sigctx}{\,\,\textrm{sig-ctx}}
@@ -161,6 +162,11 @@
 \newcommand{\pendallXdotY}[2]{\forall #1. #2}
 \newcommand{\pendlambdaXdotY}[2]{\lambda #1. #2}
 \newcommand{\pendappXtoY}[2]{#1^{#2}}
+
+\newcommand{\Cat}{\textrm{Cat}}
+\newcommand{\Id}[3]{\textrm{Id} #1\,#2\,#3}
+\newcommand{\vlambda}[1]{\lambda^{F}{#1}.}
+\newcommand{\hlambda}[2]{\lambda^{P}{#1};{#2}.}
 
 \newcommand{\equalizeVofWbyXeqYatZ}[5]{\{ {#1} : {#2} \pipe {#3} = {#4} : {#5} \}}
 
@@ -262,108 +268,155 @@ spaces, metric spaces, etc.
 
 \section{Syntax of SCT}
 
+The syntactic forms of Simple Category Theory (SCT) are given in
+\cref{fig:syntax}.
+%
+First, we have the types and terms of the logic over our category
+theory. Types include the usual dependent sum, product and identity
+types of dependent type theory, as well as several forms that allow us
+to abstract over the category theoretic constructions: a type $\Cat$
+of categories, a type $\varr{\cat C}{\cat D}$ for functors from $\cat
+C$ to $\cat D$, a type $\harr{\cat C}{\cat D}$ for profunctors
+contravariant in $\cat C$ and covariant in $\cat D$, and finally a
+type $\pendallXdotY {\alpha:{\cat C}} R$ that, when combined with
+other constructions on profunctors, allows for abstraction over
+arbitrary natural transformations.
+%
+Terms $L,M,N$ describe the elements of our logic's types, and include
+the usual constructions as well as forms for defining categories,
+functors, profunctors and natural transformations.
+%
+Next, we have a syntax for categories, which are written using a
+blackboard font $\cat C, \cat D, \cat E$. Categories include terms $M$
+of the category type (allowing for abstraction), in addition to
+primitives for product and unit categories.
+%
+Next, we have a syntax for objects of a category, which, because they
+are typed with respect to an input variable, provide a syntax for
+functors.
+%
+The objects we can define are object variables, application of a
+functor $M a$, and pairs of objects (for the product category) and the
+unique object of the unit category.
+%
+Next, $P,Q,R$ stand for \emph{sets}, but similar to objects, they are
+always typed with respect to a contravariant and covariant variable,
+and so denote profunctors.
+%
+These include first the multiplicatives: the hom set
+$\punitinXfromYtoZ {\cat C} a b$ representing the morphisms from $a$
+to $b$ in $\cat C$, a tensor product $\tensorexistsXwithYandZ
+{\beta:\cat D} P Q$, and two kinds of ``ordered function types''
+$\homrallXYtoZ \beta P Q$ and $\homlallXYtoZ \alpha R S$. 
+%
+We also include application of a profunctor term $M$ to two objects,
+and cartesian product and unit sets.
+%
+Next, we have transformations $s,t,u$, which are typed with respect
+to (0 or more) input and (one) output set.
+
+Finally, we have three forms of contexts, type contexts $\Gamma$, set
+contexts $\Xi$ and transformation contexts $\Phi$. A type context
+$\Gamma$ is the familiar notion of context from dependent type
+theory. We use uppercase $X,Y,Z$ for term variables to distinguish
+them from set variables. Every set expression $P$ must depend on an
+object of one category covariantly and an object of one category
+contravariantly, however these are allowed to be the same
+object. These two scenarios are captured by the notion of set context
+$\Xi$. The set context $\alpha:\cat C; \beta: \cat D$ gives the common
+case where the contravariant variable $\alpha$ is different from the
+covariant variable $\beta$, and the set context $\alpha: \cat C$ alone
+gives the case where the profunctor depends on the same variable both
+covariantly and contravariantly. Note that we write object variables
+as greek letters $\alpha, \beta$. Transformation contexts $\Phi$
+describe the inputs to a natural transformation. The input variables
+of a natural transformation $x: R$ stand for elements of sets, but as
+just described, sets always have covariant and contravariant
+dependencies. For this reason, transformation contexts include
+category variables $\alpha: \cat C$ interleaved with the set variables
+$x : R$, a typical context $\Phi$ would look like $\alpha_1:\cat C_1,
+x_1:R_1, \alpha_2: \cat C_2, x_2 : R_2, \alpha_3: \cat C_3$, where
+$R_1$ is parameterized by $\alpha_1$ contravariantly and $\alpha_2$
+covariantly and $R_2$ is similarly parameterized by
+$\alpha_2;\alpha_3$. Note that we consider transformation contexts up
+to associativity in that $(\Phi, x:R, \Psi), y : S, \Sigma$ should be
+considered equal to $\Phi, x:R, (\Psi, y: S, \Sigma)$.  In this
+calculus there is no single ``empty'' transformation context, but
+rather the empty context is one that consists of a single category
+variable $\alpha:\cat C$ and no set variables. Each form of context
+has a corresponding form of substitution, denoted using the lower-case
+form of the same greek letters.
+
 \begin{figure}
   \begin{mathpar}
-    \begin{array}{rcl}
-      \textrm{Type} & A,B,C ::= &
+    \begin{array}{rccl}
+      \textrm{Type} & A,B,C & ::= &
       \sum_{X:A} B \pipe \prod_{X:A} B \pipe \Id A M N \\
-      \Cat \pipe \varr{\cat C}{\cat D}\pipe \harr {\cat C} {\cat D}\pipe \pendallXdotY {\alpha:{\cat C}} R\\
-      \textrm{Term} & L,M,N ::= & X \pipe \lambda X:M. N \pipe M\,N \pipe (M,N) \pipe \pi_1 M \pipe \pi_2 M\\
-      &&\lceil \cat C \rceil \pipe \vlambda {\alpha:\cat C} a \pipe \hlambda {\alpha:\cat C}{\beta: \cat D} R \ldots \\
-      \textrm{Categories} &\cat C, \cat D, \cat E ::= & M \pipe \cat C \times \cat D \pipe \cat 1\\
-      \textrm{Objects} & a, b, c ::= & \alpha \pipe M a \ldots\\
-      \textrm{Sets} & P,Q,R ::= & \ldots \\
+      &&& \Cat \pipe \varr{\cat C}{\cat D}\pipe \harr {\cat C} {\cat D}\pipe \pendallXdotY {\alpha:{\cat C}} R\\
+      \textrm{Term} & L,M,N & ::= & X \pipe \lambda X:M. N \pipe M\,N \pipe (M,N) \pipe \pi_1 M \pipe \pi_2 M\\
+      &&&\lceil \cat C \rceil \pipe \vlambda {\alpha:\cat C} a \pipe \hlambda {\alpha:\cat C}{\beta: \cat D} R \ldots \\
+      \textrm{Categories} &\cat C, \cat D, \cat E & ::= & M \pipe \cat C \times \cat D \pipe \cat 1\\
+      \textrm{Objects} & a, b, c & ::= & \alpha \pipe M a \pipe (a,b) \pipe () \ldots\\
+      \textrm{Sets} & P,Q,R & ::= & \punitinXfromYtoZ {\cat C} a b \pipe \tensorexistsXwithYandZ {\beta} P Q \pipe \homrallXYtoZ \beta P Q \pipe \homlallXYtoZ \alpha R S \\
+      &&& M(a,b) \pipe 1 \pipe P \times Q\\
       \textrm{Transformations} & s,t,u & ::= & \ldots \\
       \\
-      \textrm{Type Context} & \Gamma ::= & \cdot \pipe \Gamma, X : A\\
-      \textrm{Cat Context} & \Phi,\Psi ::= & \cdot \pipe \alpha : \cat C \pipe \Phi , x : P , \Psi\\
+      \textrm{Type Context} & \Gamma, \Delta & ::= & \cdot \pipe \Gamma, X : A\\
+      \textrm{Category Context} & \Xi & ::= & \alpha:\cat C \pipe \alpha:\cat C;\beta: \cat D\\
+      \textrm{Set Context} & \Phi,\Psi & ::= & \alpha : \cat C \pipe \Phi , x : P , \Psi\\
+      \textrm{Term Substitution} & \gamma, \delta & ::= & \cdot \pipe \gamma, M/X\\
+      \textrm{Object Substitution} & \xi, \zeta & ::= & a/\alpha \pipe a/\alpha;b/\beta\\
+      \textrm{Transformation Substitution} & \phi, \psi & ::= & a/\alpha \pipe \phi,s/x, \psi      
     \end{array}
   \end{mathpar}
   \caption{Simple Category Theory Syntactic Forms}
+  \label{fig:syntax}
 \end{figure}
 
-\subsection{Judgmental Structure}
-
-The following figures present the basic formation, primitive and
-admissible equality rules of our type theory, an internal language for
-virtual double categories with restrictions.
-%
-The type theory has 4 central concepts, which we will refer to
-sometimes using type theoretic/set theoretic and at other times
-category-theoretic terminology.
-%
-In type theoretic terminology, judgment theory has \emph{sorts} $\cat
-C, \cat D, \cat E$, and \emph{types} $A,B,C$ which have a given sort
-and are also \emph{parameterized} by an object of some other sort, and
-so can also be thought of as \emph{functions} with input and output
-sorts.
-%
-Next there are \emph{judgments} $P,Q,R,S$ which are parameterized by
-two variables.
-%
-In $\alpha^o:\cat C;\beta : \cat D \pipe R$, we say $R$ depends on
-$\alpha$ \emph{contravariantly} and in $\beta$ \emph{covariantly}.
-%
-Finally, we have \emph{terms} $s,t,u$ that are elements of some
-judgment $R$ but are also parameterized by elements of some other
-judgments which are given by a \emph{context} $\Phi$, which is a
-``compatible string'' of judgments where the covariant variable of one
-judgment is the same as the contravariant variable of the next.
-%
-Since these terms are parameterized by other terms, we can see these
-as \emph{inference rules} for the judgments.
-
-At other times we will want to think of these using set-theoretic
-terminology, in which case we have sets $\cat C,\cat D, \cat E$,
-functions/elements $A,B,C$, \emph{spans} $R,\ldots$ and morphisms of
-spans $s,t,u$.
-%
-Finally when we develop multicategory theory we will use
-category-theoretic terminology, in which the structure is most
-familiar and we have categories, objects/functors,
-\emph{profunctors}/bimodules and 2-cells/homomorphisms of bimodules.
-
-Figure\ref{fig:formation} introduces the formation rules for the basic
-constructs. Sorts give a syntax for objects of the double
-category. Types have an output sort and a sorted input variable, and
-model vertical arrows. Next, judgments have two sorted variables, one
-contravariant and one covariant, which can be the same
-variable. Judgments model the horizontal arrows. Next are contexts,
-whose formation rule is the same as judgments, and which give a syntax
-for ``compatible strings'' of judgments. Then terms have an input
-context and an output judgment, which must have the same covariant and
-contravaiant variables, modeling ``globular'' 2-cells. Finally, we
-have substitutions for terms, which are typed with respect to an input
-context, an output context and two types, forming a kind of
-square. These model the ``compatible string'' of 2-cells that arise in
-the composition laws.
+Next, \cref{fig:formation} shows the \emph{formation} rules for these
+various syntactic forms. All other forms are typed with respect to a
+well-formed type context $\Gamma$. Objects are typed additionally with
+an input object variable $\alpha : \cat C$ and an output category
+$\cat D$; in the semantics these objects are modeled as functors. A
+set $S$ is typed with respect to a set context $\Xi$ to describe its
+covariant/contravariant dependence on some input objects. These are
+semantically modeled as profunctors. A transformation $s$ has a
+context of transformation variable and a single set output. To be well
+formed, the context and set must be parameterized by the same
+contravariant and covariant object variables. To ensure this, we use a
+coercion operation $\underline \Phi$ that erases everything in the
+context but the left-most and right-most object variables.
 
 \begin{figure}
   \begin{mathpar}
-    \inferrule
+    \inferrule*[right=TyCtxForm]
         {}
         {\Gamma \isadtctx}
 
-    \inferrule
+    \inferrule*[right=Cat-form]
+    {\Gamma \isadtctx}
+    {\Gamma\vdash \cat C \isaCat}
+
+    \inferrule*[right=Ob-form]
+    {\Gamma \vdash \cat C\isaCat\and \Gamma \vdash \cat D \isaCat}
+    {\Gamma \pipe \alpha : \cat C \vdash a : \cat D}\\
+
+    \inferrule*[right=SetCtxForm]
     {\Gamma \isadtctx}
     {\Gamma \vdash \Xi \boundary}
 
-    \inferrule
+    \inferrule*[right=SetForm]
     {\Gamma \isadtctx \and \Gamma \vdash \Xi \boundary}
     {\Gamma \pipe \Xi \vdash S \isaSet}
 
-    \inferrule*[right=Object/Type-formation]
-    {\Gamma \vdash \cat C : \Sort \and \Gamma \vdash \cat D : \Sort}
-    {\Gamma \pipe \alpha : \cat C \vdash A : \cat D}\\
-
-    \inferrule*[right=Context-formation]
+    \inferrule*[right=TransCtxForm]
     {\Gamma \isadtctx}
-    {\Gamma \vdash \Phi \isavectx}
+     {\Gamma \vdash \Phi \isavectx}
 
-    \inferrule*[right=Term formation]
+    \inferrule*[right=TransFormation]
     {\Gamma \vdash \Phi \isavectx\and
      \Gamma\pipe \underline \Phi \vdash R \isaSet}
-    {\Gamma \pipe \Phi \vdash M : R}
+    {\Gamma \pipe \Phi \vdash s : R}
 
     \inferrule
     {\Delta \isadtctx \and \Gamma \isadtctx}
@@ -381,181 +434,216 @@ the composition laws.
   \label{fig:formation}
 \end{figure}
 
-Next, Figure~\ref{fig:basic-rules} gives the basic structural rules of
-judgment theory, which model composition and restrictions in a virtual
-double category. First, we have varialbes and substitution for types,
-modeling identity and composition of vertical arrows. Next, we have
-restriction of a judgment to more specific types, which is given by
-substitution of types for the judgment's parameter variables. Next, we
-have rules for constructing an ``empty'' context, which is just a
+%% The following figures present the basic formation, primitive and
+%% admissible equality rules of our type theory, an internal language for
+%% virtual double categories with restrictions.
+%% %
+%% The type theory has 4 central concepts, which we will refer to
+%% sometimes using type theoretic/set theoretic and at other times
+%% category-theoretic terminology.
+%% %
+%% In type theoretic terminology, judgment theory has \emph{sorts} $\cat
+%% C, \cat D, \cat E$, and \emph{types} $A,B,C$ which have a given sort
+%% and are also \emph{parameterized} by an object of some other sort, and
+%% so can also be thought of as \emph{functions} with input and output
+%% sorts.
+%% %
+%% Next there are \emph{judgments} $P,Q,R,S$ which are parameterized by
+%% two variables.
+%% %
+%% In $\alpha^o:\cat C;\beta : \cat D \pipe R$, we say $R$ depends on
+%% $\alpha$ \emph{contravariantly} and in $\beta$ \emph{covariantly}.
+%% %
+%% Finally, we have \emph{terms} $s,t,u$ that are elements of some
+%% judgment $R$ but are also parameterized by elements of some other
+%% judgments which are given by a \emph{context} $\Phi$, which is a
+%% ``compatible string'' of judgments where the covariant variable of one
+%% judgment is the same as the contravariant variable of the next.
+%% %
+%% Since these terms are parameterized by other terms, we can see these
+%% as \emph{inference rules} for the judgments.
+
+%% At other times we will want to think of these using set-theoretic
+%% terminology, in which case we have sets $\cat C,\cat D, \cat E$,
+%% functions/elements $A,B,C$, \emph{spans} $R,\ldots$ and morphisms of
+%% spans $s,t,u$.
+%% %
+%% Finally when we develop multicategory theory we will use
+%% category-theoretic terminology, in which the structure is most
+%% familiar and we have categories, objects/functors,
+%% \emph{profunctors}/bimodules and 2-cells/homomorphisms of bimodules.
+
+%% Figure\ref{fig:formation} introduces the formation rules for the basic
+%% constructs. Sorts give a syntax for objects of the double
+%% category. Types have an output sort and a sorted input variable, and
+%% model vertical arrows. Next, judgments have two sorted variables, one
+%% contravariant and one covariant, which can be the same
+%% variable. Judgments model the horizontal arrows. Next are contexts,
+%% whose formation rule is the same as judgments, and which give a syntax
+%% for ``compatible strings'' of judgments. Then terms have an input
+%% context and an output judgment, which must have the same covariant and
+%% contravaiant variables, modeling ``globular'' 2-cells. Finally, we
+%% have substitutions for terms, which are typed with respect to an input
+%% context, an output context and two types, forming a kind of
+%% square. These model the ``compatible string'' of 2-cells that arise in
+%% the composition laws.
+
+
+
+%% Next, Figure~\ref{fig:basic-rules} gives the basic structural rules of
+%% judgment theory, which model composition and restrictions in a virtual
+%% double category. First, we have varialbes and substitution for types,
+%% modeling identity and composition of vertical arrows. Next, we have
+%% restriction of a judgment to more specific types, which is given by
+%% substitution of types for the judgment's parameter variables. Next, we
+%% have rules for constructing an ``empty'' context, which is just a
+In typical natural-deduction style, all syntactic forms typed in
+context admit an action of substitution. For terms, this is the
+ordinary type theoretic substitution. Naturally objects $\alpha:\cat C
+\vdash a : \cat D$ can be substituted for object variables $\beta :
+\cat D$ in other objects. We can also substitute objects into
+\emph{sets}. For instance, if we have a hom set in a category
+$\punitinXfromYtoZ {\cat C} \alpha {\alpha'}$, and we can define
+objects $a$ and $a'$ in the category $\cat C$, then we can substitute
+those in to form the hom set between $a$ and $a'$: $\punitinXfromYtoZ
+{\cat C} a {a'}$. This semantically is a ``restriction'' of a
+profunctor along two functors, and modeling this operation simply as a
+substitution considerably simplifies reasoning using profunctors.
+%
+Finally we have the action of substitution on natural
+transformations. A natural transformation is indexed by set variables
+$x:R$, whose sets are each parameterized by a contravariant and a
+covariant category variable $\alpha;\beta$. We can think of natural
+transformations as \emph{polymorphic} in the categories involved, and
+so when we make a transformation substitution, we substitute not just
+the set variables, but we also \emph{instantiate} the polymorphic
+category variables with objects.
+
+\cref{fig:contexts} details the typing rules for contexts and the
+typing for variables and the admissible actions of substitution (the
+definition of substitution is straightforward and found in the
+appendix). the rules for term and object variables are as usual.
+%
+An object substitution into a single object context $\alpha:\cat C$
+consists of an object $a : \cat C$ parameterized by an object of
+another category.
+%
+An object substitution into a pair of co- and contra-variant variables
+$\alpha:\cat C;\beta:\cat D$ is a pair of an object substituted for
+$\alpha$ and one for $\beta$, each typed with respect to the
+appropriate variable of an object context $\Xi$.
+%
+Note that this allows for $\Xi$ to consist of either two variables or
+a single variable.
+%
+When
+constructing a transformation context $\Phi, x : R, \Psi$, we need to
+ensure that the contravariant dependence of $R$ matches the covariant
+dependence of $\Phi$ and vice-versa for $\Psi$. We define this with
+auxiliary metafunctions $d^+,d^-$ which extract the covariant and
+contravariant object variable of a transformation context.
+%
+The rules for transformation variables and substitutions define the
+use of variables to be \emph{linear} (each variables is used exactly
+once) and \emph{ordered}, they occur in the term in the same order
+that they appear in the context.
+%
+The rule for a transformation variables says a variable $x$ can only
+be used when it is the sole variable in the context.
+%
+A transformation subsitution into an ``empty'' transformation context
+$\alpha: \cat C$ is the same as an object substitution into
+$\alpha:\cat C$.
+%
+The rule for constructing a transformation substitution into a
+non-empty context $\Phi_1,x:R,\Phi_2$ says we can construct a
+substitution by constructing substitutions $\phi_1,\phi_2$ for
+$\Phi_1$ and $\Phi_2$ as well as a transformation $s$ into an
+instantiation of $R$ where the input contexts come from splitting the
+input context $\Psi$ into three components, and ensuring that the
+instantiation of $R$ agrees with how $\phi_1,\phi_2$ instantiate the
+variables. This uses two new metafunctions. First, $\Phi \jnctx \Psi$
+is an operation for concatenating two contexts when $d^+(\Phi) =
+d^-(\Psi)$. Next, we extend the boundary maps $d^\pm$ to substitutions
+to extract their object substitutions.
 
 \begin{figure}
   \begin{mathpar}
     \inferrule{}{\cdot \isadtctx}
 
     \inferrule
-    {\Gamma \isadtctx \and \Gamma\pipe \cdot \vdash A \isaSet}
-    {\Gamma , x : A \isadtctx}\\
+    {\Gamma \isadtctx \and \Gamma \vdash A \isaTy}
+    {\Gamma , X : A \isadtctx}\\
 
-    \inferrule{}{\Gamma \vdash \cdot \boundary}
+    \inferrule
+    {X : A \in \Gamma}
+    {\Gamma \vdash X : A}
 
-    \inferrule{\Gamma \vdash C : \Sort}{\Gamma \vdash \alpha: C \boundary}
+    \inferrule
+    {}
+    {\alpha: \cat C \vdash \alpha: \cat C}
 
-    \inferrule{\Gamma \vdash C : \Sort\and\Gamma\vdash D : \Sort}{\Gamma \vdash \alpha: C;\beta:D \boundary}\\
+    \inferrule{\Gamma \vdash \cat C : \isaCat}{\Gamma \vdash \alpha: \cat C \boundary}
 
-    \inferrule{}{\Gamma \vdash \cdot \isavectx}
+    \inferrule{\Gamma \vdash \cat C : \isaCat\and
+      \Gamma\vdash \cat D : \isaCat}{\Gamma \vdash \alpha: \cat C;\beta:\cat D \boundary}\\
 
-    \inferrule{\Gamma \vdash C : \Sort}{\Gamma \vdash \alpha: C \isavectx}
+
+    \inferrule*
+        {\Gamma \pipe \alpha':\cat C' \vdash A : \cat C}
+        {\Gamma \vdash a/\alpha : \alpha':\cat C' \to \alpha:\cat C}
+
+    \inferrule*
+    {\Gamma \pipe d^-\Xi \vdash a : \cat C\and
+     \Gamma \pipe d^+\Xi \vdash b : \cat D
+    }
+    {\Gamma \vdash (a/\alpha;b/\beta) : \Xi \to (\alpha:\cat C;\beta:\cat D)}\\
+    
+    \inferrule
+        {\Gamma \vdash \cat C : \isaCat}
+        {\Gamma \vdash \alpha: \cat C \isavectx}
 
     \inferrule
     {\Gamma \vdash \Phi \isavectx\and
     \Gamma \vdash \Psi \isavectx \and
-    \Gamma \pipe d^+\Phi, d^- \Psi \vdash R \isaSet}
+    \Gamma \pipe d^+\Phi; d^- \Psi \vdash R \isaSet}
     {\Gamma \vdash \Phi, x:R, \Psi \isavectx}
 
-    (\Phi,x:R,\Psi),y:S,\Sigma = \Phi,(x:R,\Psi,y:S,\Sigma)
-  \end{mathpar}
-  \begin{align*}
-    \underline \cdot &= \cdot\\
-    \underline {\alpha:C} &= \alpha:C\\
-    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
-  \end{align*}
-  \begin{align*}
-    d^{\pm}(\cdot) &\quad\text{undefined}\\
-    d^{\pm}(\alpha:C) &= \alpha : C\\
-    d^{-}(\Phi,x:R,\Psi) &= d^-\Phi\\
-    d^{+}(\Phi,x:R,\Psi) &= d^-\Psi
-  \end{align*}
-  \caption{Basic Rules for Contexts}
-\end{figure}
-
-\begin{figure}
-  \begin{mathpar}
     \inferrule
     {}
-    {\Gamma\pipe \cdot \vdash \Sort \isaSet}
-
-    \inferrule
-    {x:S \in \Gamma}
-    {\Gamma \pipe \cdot \vdash x : S}
-
-    \inferrule
-    {\Gamma\pipe\cdot \vdash C : \Sort}
-    {\Gamma \pipe \alpha:\cat C \vdash \alpha : \cat C}
-
-    \inferrule
-    {\Gamma \pipe \alpha:C,\beta:D \vdash R \isaSet}
-    {\Gamma\pipe \alpha:C, x:R, \beta: D \vdash x : R}
-
-    \inferrule{\forall x:A \in \Gamma. \Delta \vdash \gamma(x) : A}{\gamma : \Delta \to \Gamma}\\
-
-    \inferrule*%% [right=NullaryBoundaryMap]
-               {\Gamma \isadtctx}{\Gamma \vdash \cdot : \cdot \to \cdot}\and
-    \inferrule*{\Gamma \pipe \alpha':C' \vdash A : C}{\Gamma \vdash A/\alpha : \alpha':C' \to \alpha:C}
-
-    \inferrule*
-    {\Gamma \pipe \alpha':C' \vdash A : C\and
-      \Gamma \pipe \beta':D' \vdash B : D
-    }
-    {\Gamma \vdash (A/\alpha;B/\beta) : (\alpha':C';\beta':D') \to (\alpha:C;\beta':D')}\\
-
-    \inferrule*%% [right=NullCtxMap]
-               {\Gamma \isadtctx}{\Gamma \vdash \cdot : \cdot \to \cdot}
-
-    \inferrule*{\Gamma \pipe \alpha':C' \vdash A : C}{\Gamma \vdash A/\alpha : \alpha':C' \to \alpha:C}
+    {\Gamma \pipe \alpha:\cat C, x : R, \beta: \cat D \vdash x : R}
 
     \inferrule
     {\Psi = \Psi_1 \jnctx \Psi_M \jnctx \Psi_2\and
       \Gamma \vdash \phi_1 : \Psi_1 \to \Phi_1\and
-      \Gamma \pipe \Psi_M \vdash M : R[d^+\phi_1;d^-\phi_2] \and
+      \Gamma \pipe \Psi_s \vdash s : R[d^+\phi_1;d^-\phi_2] \and
       \Gamma \vdash \phi_2 : \Psi_2 \to \Phi_2
       }
-    {\Gamma \vdash \phi_1,M/x,\phi_2 : \Psi \to \Phi_1,x:R,\Phi_2}
-  \end{mathpar}
-  \caption{Basic Rules of Judgment Theory}
-  \label{fig:basic-rules}
-\end{figure}
-
-\begin{figure}
-  \begin{mathpar}
-    \inferrule
-    {\Gamma \vdash \Phi \isavectx \and
-    \Gamma \vdash \Psi \isavectx \and
-    d^+\Phi = d^- \Psi}
-    {\Gamma \vdash \Phi \jnctx \Psi \isavectx}
-
-    \inferrule
-    {\Gamma \vdash \phi : \Phi' \to \Phi \and
-     \Gamma \vdash \psi : \Psi' \to \Psi\and
-     d^+\phi = d^- \psi}
-    {\Gamma \vdash \phi \jnctx \psi : \Phi' \jnctx \Psi' \to \Phi \jnctx \Psi}
-
-    \inferrule*[right=ObSubst]
-    {\alpha : \cat C \vdash B : \cat D\and
-    \beta : \cat D \vdash A : \cat E}
-    {\alpha : \cat C \vdash A[B/\beta] : \cat E}\\
-
-    \inferrule*[right=Everything Subst]{\gamma : \Delta \to \Gamma \and \Gamma J}{\Delta J}
-
-    \inferrule{\Gamma \vdash \xi : Z \to \Xi\and \Gamma \pipe \Xi \vdash R \isaSet}{\Gamma \pipe Z \vdash R[\xi] \isaSet}
-
-    \inferrule{\Gamma \vdash \phi : \Psi \to \Phi\and \Gamma \pipe \Phi \vdash M : R}{\Gamma \pipe \Psi \vdash M[\phi] : R[\underline \phi]}
+    {\Gamma \vdash \phi_1,t/x,\phi_2 : \Psi \to \Phi_1,x:R,\Phi_2}
   \end{mathpar}
   \begin{align*}
-    (\Phi \jnctx \Psi) \jnctx \Sigma &= \Phi \jnctx (\Psi \jnctx \Sigma)\\
-    \Phi \jnctx \alpha:C &= \Phi\\
-    \alpha:C \jnctx \Psi &= \Psi\\\\
-    d^\pm(A/\alpha) &= A/\alpha\\
-    d^+(\phi_1,M/x,\phi_2) &= d^+ \phi_2\\
-    d^-(\phi_1,M/x,\phi_2) &= d^- \phi_1\\\\
-    \underline \cdot &= \cdot\\
-    \underline {A/\alpha} &= A/\alpha\\
-    \underline {\phi_1,M/x,\phi_2} &= d^-\phi_1;d^+\phi_2
+    \underline{\alpha:C} &= \alpha:C\\
+    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
   \end{align*}
-  \caption{Admissible Rules}
+  \begin{align*}
+    d^{\pm}(\alpha:\cat C) &= \alpha : \cat C\\
+    d^{-}(\Phi,x:R,\Psi) &= d^-\Phi\\
+    d^{+}(\Phi,x:R,\Psi) &= d^-\Psi
+  \end{align*}
+    \begin{align*}
+    d^{\pm}(a/\alpha) &= a/\alpha\\
+    d^{-}(\phi,t/x,\psi) &= d^-\phi\\
+    d^{+}(\phi,t/x,\psi) &= d^+\psi\\
+  \end{align*}
+  \caption{Basic Rules of Judgment Theory}
+  \label{fig:contexts}
 \end{figure}
 
-\begin{figure}
-  \begin{mathpar}
-    \begin{array}{rcl}
-      x[\gamma] &=& \gamma(x)\\
-      J[\gamma][\delta] & = & J[\gamma[\delta]]\\
-      \gamma[\delta](x) &=& \gamma(x)[\delta]\\
-      
-      A[\alpha/\alpha] &=& A\\
-      \alpha[A/\alpha] &=& A\\
-      A[B/\beta][C/\gamma] & = & A[B[C/\gamma]/\beta]\\
-      A[B/\beta][\gamma] &=& A[\gamma][B[\gamma]/\beta]\\\\
-      
-      R[\cdot] &=& R\\
-      R[\alpha/\alpha] &=& R\\
-      R[\alpha/\alpha,\beta/\beta] &=& R\\\\
-      R[\xi][\xi'] & = & R[\xi[\xi']]\\
-      R[\xi][\gamma] &=& R[\gamma][\xi[\gamma]]\\\\
+Now that we have established a judgmental structure, in typical type
+theoretic fashion, our type constructs follow naturally as
+internalizing the judgments.
 
-      \cdot[\xi] &=& \cdot\\
-      (A/\alpha)[B/\beta] &=& A[B/\beta]/\alpha\\
-      (A/\alpha;B/\beta)[\xi] &=& A[d^-\xi]/\alpha,B[d^+\xi]/\beta\\
-      \cdot[\gamma] &=& \cdot\\
-      (A/\alpha)[\gamma] &=& A[\gamma]/\alpha\\
-      (A/\alpha;B/\beta)[\gamma] &=& A[\gamma]/\alpha;B[\gamma]/\beta\\\\
-
-      \cdot[\gamma] &=& \cdot\\
-      (A/\alpha)[\gamma] &=& A[\gamma]/\alpha\\
-      (\phi_1,M/x,\phi_2)[\gamma] &=& \phi_1[\gamma],M[\gamma]/x,\phi_2[\gamma]
-
-      TODO: cat substitution id/assoc
-    \end{array}
-  \end{mathpar}  
-  \caption{Algebraic Properties}
-  \label{fig:equations}
-\end{figure}
-
-Now that we have established a judgmental structure, we move on to the
-multiplicative connectives, starting with the easier negative
-connectives and then the more difficult positives.
-
-\subsection{Left and Right Hom of Profunctors}
+\subsection{Negative Multiplicatives}
 
 First, we study the two ``internal homs'' of judgments. Since the
 ``monoidal'' structure of judgments is not symmetric, we get two
@@ -3181,6 +3269,137 @@ String Diagrams?
 \bibliography{lipics-v2021-sample-article}
 
 \appendix
+
+TODO: define substitution
+\begin{figure}
+  \begin{mathpar}
+    \inferrule
+    {}
+    {\Gamma\pipe \cdot \vdash \Sort \isaSet}
+
+    \inferrule
+    {x:S \in \Gamma}
+    {\Gamma \pipe \cdot \vdash x : S}
+
+    \inferrule
+    {\Gamma\pipe\cdot \vdash C : \Sort}
+    {\Gamma \pipe \alpha:\cat C \vdash \alpha : \cat C}
+
+    \inferrule
+    {\Gamma \pipe \alpha:C,\beta:D \vdash R \isaSet}
+    {\Gamma\pipe \alpha:C, x:R, \beta: D \vdash x : R}
+
+    \inferrule{\forall x:A \in \Gamma. \Delta \vdash \gamma(x) : A}{\gamma : \Delta \to \Gamma}\\
+
+    \inferrule*%% [right=NullaryBoundaryMap]
+               {\Gamma \isadtctx}{\Gamma \vdash \cdot : \cdot \to \cdot}\and
+    \inferrule*{\Gamma \pipe \alpha':C' \vdash A : C}{\Gamma \vdash A/\alpha : \alpha':C' \to \alpha:C}
+
+    \inferrule*
+    {\Gamma \pipe \alpha':C' \vdash A : C\and
+      \Gamma \pipe \beta':D' \vdash B : D
+    }
+    {\Gamma \vdash (A/\alpha;B/\beta) : (\alpha':C';\beta':D') \to (\alpha:C;\beta':D')}\\
+
+    \inferrule*%% [right=NullCtxMap]
+               {\Gamma \isadtctx}{\Gamma \vdash \cdot : \cdot \to \cdot}
+
+    \inferrule*{\Gamma \pipe \alpha':C' \vdash A : C}{\Gamma \vdash A/\alpha : \alpha':C' \to \alpha:C}
+
+    \inferrule
+    {\Psi = \Psi_1 \jnctx \Psi_M \jnctx \Psi_2\and
+      \Gamma \vdash \phi_1 : \Psi_1 \to \Phi_1\and
+      \Gamma \pipe \Psi_M \vdash M : R[d^+\phi_1;d^-\phi_2] \and
+      \Gamma \vdash \phi_2 : \Psi_2 \to \Phi_2
+      }
+    {\Gamma \vdash \phi_1,M/x,\phi_2 : \Psi \to \Phi_1,x:R,\Phi_2}
+  \end{mathpar}
+  \caption{Substitutions in SCT}
+  \label{fig:basic-rules}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule
+    {}
+    {\cdot : \cdot \to \cdot}
+
+    \inferrule
+    {\gamma : \Delta \to \Gamma \and \Delta \vdash M : A[\gamma]}
+    {\gamma,M/X : \Delta \to \Gamma,X:A}
+    
+    \inferrule
+    {\Gamma \vdash \Phi \isavectx \and
+    \Gamma \vdash \Psi \isavectx \and
+    d^+\Phi = d^- \Psi}
+    {\Gamma \vdash \Phi \jnctx \Psi \isavectx}
+
+    \inferrule
+    {\Gamma \vdash \phi : \Phi' \to \Phi \and
+     \Gamma \vdash \psi : \Psi' \to \Psi\and
+     d^+\phi = d^- \psi}
+    {\Gamma \vdash \phi \jnctx \psi : \Phi' \jnctx \Psi' \to \Phi \jnctx \Psi}
+
+    \inferrule*[right=ObSubst]
+    {\alpha : \cat C \vdash B : \cat D\and
+    \beta : \cat D \vdash A : \cat E}
+    {\alpha : \cat C \vdash A[B/\beta] : \cat E}\\
+
+    \inferrule*[right=Everything Subst]{\gamma : \Delta \to \Gamma \and \Gamma J}{\Delta J}
+
+    \inferrule{\Gamma \vdash \xi : Z \to \Xi\and \Gamma \pipe \Xi \vdash R \isaSet}{\Gamma \pipe Z \vdash R[\xi] \isaSet}
+
+    \inferrule{\Gamma \vdash \phi : \Psi \to \Phi\and \Gamma \pipe \Phi \vdash M : R}{\Gamma \pipe \Psi \vdash M[\phi] : R[\underline \phi]}
+  \end{mathpar}
+  \begin{align*}
+    (\Phi \jnctx \Psi) \jnctx \Sigma &= \Phi \jnctx (\Psi \jnctx \Sigma)\\
+    \Phi \jnctx \alpha:C &= \Phi\\
+    \alpha:C \jnctx \Psi &= \Psi\\\\
+    d^\pm(A/\alpha) &= A/\alpha\\
+    d^+(\phi_1,M/x,\phi_2) &= d^+ \phi_2\\
+    d^-(\phi_1,M/x,\phi_2) &= d^- \phi_1\\\\
+    \underline \cdot &= \cdot\\
+    \underline {A/\alpha} &= A/\alpha\\
+    \underline {\phi_1,M/x,\phi_2} &= d^-\phi_1;d^+\phi_2
+  \end{align*}
+  \caption{Admissible Rules}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    \begin{array}{rcl}
+      x[\gamma] &=& \gamma(x)\\
+      J[\gamma][\delta] & = & J[\gamma[\delta]]\\
+      \gamma[\delta](x) &=& \gamma(x)[\delta]\\
+      
+      A[\alpha/\alpha] &=& A\\
+      \alpha[A/\alpha] &=& A\\
+      A[B/\beta][C/\gamma] & = & A[B[C/\gamma]/\beta]\\
+      A[B/\beta][\gamma] &=& A[\gamma][B[\gamma]/\beta]\\\\
+      
+      R[\cdot] &=& R\\
+      R[\alpha/\alpha] &=& R\\
+      R[\alpha/\alpha,\beta/\beta] &=& R\\\\
+      R[\xi][\xi'] & = & R[\xi[\xi']]\\
+      R[\xi][\gamma] &=& R[\gamma][\xi[\gamma]]\\\\
+
+      \cdot[\xi] &=& \cdot\\
+      (A/\alpha)[B/\beta] &=& A[B/\beta]/\alpha\\
+      (A/\alpha;B/\beta)[\xi] &=& A[d^-\xi]/\alpha,B[d^+\xi]/\beta\\
+      \cdot[\gamma] &=& \cdot\\
+      (A/\alpha)[\gamma] &=& A[\gamma]/\alpha\\
+      (A/\alpha;B/\beta)[\gamma] &=& A[\gamma]/\alpha;B[\gamma]/\beta\\\\
+
+      \cdot[\gamma] &=& \cdot\\
+      (A/\alpha)[\gamma] &=& A[\gamma]/\alpha\\
+      (\phi_1,M/x,\phi_2)[\gamma] &=& \phi_1[\gamma],M[\gamma]/x,\phi_2[\gamma]
+
+      TODO: cat substitution id/assoc
+    \end{array}
+  \end{mathpar}  
+  \caption{Algebraic Properties}
+  \label{fig:equations}
+\end{figure}
 
 \section{Additional Rules}
 
