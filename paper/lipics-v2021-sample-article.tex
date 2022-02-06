@@ -141,7 +141,7 @@
 
 \newcommand{\homrallXYtoZ}[3]{#2 \trforall {#1} #3}
 
-\newcommand{\homlallXYtoZ}[3]{#2 \tlforall #1 #3}
+\newcommand{\homlallXYtoZ}[3]{#3 \tlforall #1 #2}
 
 \newcommand{\homrlambdaXatYdotZ}[3]{\lambda^\triangleright (#1, #2). #3}
 \newcommand{\homllambdaXatYdotZ}[3]{\lambda^\triangleleft (#2, #1). #3}
@@ -641,69 +641,111 @@ to extract their object substitutions.
 
 Now that we have established a judgmental structure, in typical type
 theoretic fashion, our type constructs follow naturally as
-internalizing the judgments.
+internalizing the judgments. Though the positive multiplicatives are
+more familiar, we start by describing the negative multiplicatives,
+since they are better behaved, and are useful to have already defined
+when discussing the positives.
+
+\subsection{Types}
+
+Finally, we describe the \emph{end}, $\pendallXdotY {\alpha} P$, which
+when combined with the left or right hom types described in the next
+section allows for us to internalize arbitrary transformation sequents
+$\Phi \vdash P$ as a type.
+%
+This type is well formed when $\alpha$ is the covariant \emph{and}
+contravariant variable of $P$.
+%
+An element of the type is a polymorphic element of $P$, varying in
+$\alpha$.
+%
+The introduction form is naturally a $\lambda$ abstracting over
+$\alpha:\cat C$ and the elimination form instantiates $\alpha$ with an
+arbitrary object $a : \cat C$.
+%
+We also include the necessary $\beta\eta$ equalities.
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C\vdash P \isaSet}
+    {\Gamma \vdash \pendallXdotY {\alpha:{\cat C}} P \isaTy}
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C\vdash t : P}
+    {\Gamma \vdash \pendlambdaXdotY \alpha t : \pendallXdotY \alpha P}
+
+    \inferrule
+    {\Gamma \vdash M : \pendallXdotY \alpha P\and
+     \Gamma \pipe \beta:\cat D \vdash a : \cat C}
+    {\Gamma \pipe \beta:\cat D \vdash \pendappXtoY M a : P[a/\alpha]}
+
+    \pendappXtoY {(\pendlambdaXdotY \alpha t)} a = t[a/\alpha]
+
+    \inferrule*[right=2Cell$\eta$]
+    {\Gamma \vdash M : \pendallXdotY \alpha P }
+    {\Gamma \vdash M = \pendlambdaXdotY \alpha {\pendappXtoY M \alpha} : \pendallXdotY \alpha P}
+  \end{mathpar}
+  \caption{End}
+  \label{fig:end}
+\end{figure}
+
+Semantically, this type corresponds to taking the end of a profunctor
+$P : {\cat C}^{op} \times {\cat C} \to \Set$, typically written
+\[ \int^{\alpha:\cat C} P \alpha \alpha \]
 
 \subsection{Negative Multiplicatives}
 
-First, we study the two ``internal homs'' of judgments. Since the
-``monoidal'' structure of judgments is not symmetric, we get two
-distinct notions internalizing concatenating on the left and the right
-of the context. In ordinary category theory, these profunctors can be
-constructed using an \emph{end} and the hom of functor
-categories. Given two profunctors $P : C^o \times E \to \Set$ and $R :
-D^o \times E \to Set$, their hom is given as
-\[ \int_{e \in E} R(-,e) \Rightarrow P(e,=) \]
+Since our calculus of natural transformations is ordered linear, we
+have two distinct ``function sets'', internalizing concatenation on
+the left or right of the context. The typing rules for these are given
+in \cref{fig:cotensor}. The two types are the \emph{right hom}
+$\homrallXYtoZ \alpha R P$ and the \emph{left hom} $\homlallXYtoZ
+\alpha R P$. As a type, we can think of these both as a kind of
+polymorphic function type in that in addition to parameterizing an
+element of the set $P$ by an element of the set $R$, they also
+quantify over an object $\alpha$ that is in $P$ and $R$.
 
-Type theoretically this is a kind of multi-hom where we are
-quantifying both over an indexing sort variable $e$ and a profunctor
-variable of type $R$. We write the covariant and contravariant
-versions of these connectives as $\homrallXYtoZ \gamma R S$ and
-$\homlallXYtoZ \alpha R S$.
-
-The syntax is given in Figure~\ref{fig:cotensor}.
+These behave like function types, but their typing is somewhat
+involved. First consider the right hom $\homrallXYtoZ \alpha R
+P$. This acts very much like a polymorphic function type $\forall
+\alpha. R \to P$, but with restrictions on the object
+variables. First, the object variable $\alpha$ must occur covariantly
+in $P$ and contravariantly in $R$. Next, the contravariant variable of
+the type is the contravariant variable of $P$ and the covariant
+variable of the type is the \emph{contravariant} variable of $R$, with
+the flip in variance intuitively justified since $R$ occurs in the
+negative position of the function. The placement of the $\forall
+\alpha$ on the right side of the triangle is intended to be suggestive
+of the fact that $\alpha$ occurs \emph{covariantly} in the input and
+output sets $R,P$ and also that the corresponding $\lambda$ introduces
+variables on the right.
 %
-First, the formation rule for covariant cotensor formation requires
-that the covariant variables for $R,P$ are the same, and the
-contravariant variables match the boundary of the overall
-judgment. Note that we use $d^+\Xi,d^-\Xi$ to allow for the case that
-the boundary is a single variable $\Xi = \alpha:\cat C$.
+As you would expect from a polymorphic function type, the introduction
+form is a $\lambda$ that abstracts over both a transformation variable
+and an object variable, which are concatenated on the right of the
+context, aligning with the condition that the contravariant variable
+of $R$ match the covariant variable of the original context.
 %
-Next, the substitution rule is straightforward.
-%
-Then we have the elimination form, first written in a simple form with
-no substitution built in.
-%
-This says that given a variable of the cotensor judgment, and another
-variable of judgment $R$, we can apply these to get a term of judgment
-$P$. As a diagram this is written as follows:
+The elimination rule is a combined instantiation and application form,
+$\homrappXtoYatZ s t a$ which instantiates the object $\alpha$ to $a$
+and passes an element $t : R[a/\alpha]$ as input, yielding an element
+$P[a/\alpha]$ as output. Finally, we have the expected $\beta$ and
+$\eta$ reasoning principles that we would have for a function type.
 
-\[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEQBfU9TXfIRQBGclVqMWbACLdeIDNjwEiAJjHV6zVohABROXyWCiZYeK1TdnHkYEqU685sk793cTCgBzeEVAAZgBOEAC2SGQgOBBIohLabAA6iQEQQYwMAATJ3nShoXQAdJkACtmJOEFYdGDeDDD1ATiZAEqGIMFhsdTRSOrxViBtth0h4YgAzD0xiAAsLgm6Je2d45G9k9QMWGBuUBBMAEb1INQAFjB0UGyQu6dRdFgMNwSsI6t900jzIBdXL3ctjs9gdjqweo9nrpbm8KFwgA
-\begin{tikzcd}
-C \arrow[r, "\forall \gamma. P \triangleleft R"] \arrow[d, no head, Rightarrow] & D \arrow[r, "R"] & E \arrow[d, no head, Rightarrow] \\
-C \arrow[rr, "P"]                                                               &                  & E                               
-\end{tikzcd}\]
-
-The universal property of this judgment is that this is the universal
-2-cell of this type, in that any 2-cell
-
-
-\[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEByEAX1PUy58hFACZyVWoxZsAIr34gM2PASIBmCdXrNWiEAFEFAlcKJkAjJJ0z97Y0sGqRyTVe3S9hh8qFqUFlpSumy8kjBQAObwRKAAZgBOEAC2SIEgOBBI4sG2IABKDokpSJoZWYgALB4h+gAKRUmpiGTlpdQMWGBecBCdUCDUABYwdAOIYEwMDNQ4dFgMbJDdjSWIOZlI1SAjY0sErB1dXlAQTABGDIcZ84v6y6x88U1IrZuIAKxPIMXNH7MVdKdFb6KB0OAjAbDUbjcAHMI8IA
-\begin{tikzcd}
-C' \arrow[d] \arrow[r] & {} \arrow[r, no head, dashed] & D \arrow[r, "R"] & E \arrow[d, no head, Rightarrow] \\
-C \arrow[rrr, "P"]     &                               &                  & E                               
-\end{tikzcd}\]
-
-Exhibits a unique factorization:
-
-\[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQBhEAX1PU1z5CKAEwVqdJq3YARHnxAZseAkQDM4mgxZtEIAKLz+yoUTIiJ26Xq69jg1Sg0WtU3QaOKBK4SVLFLN3YOAHJPJQdfcn9AnXZw71NRGNc4vTk7LxNHZA0A1OsPbgkYKABzeCJQADMAJwgAWyRokBwIJDFJNJAAJU86xqQNVvbEABYC9wAFfvqmxDIRoZpGLDB3KAhmACNGNhoACxh6KHZIdZAaHHosRjOCNkyB+c62pAmQI5P7i5W1ja2u32rRudz050eCmeSAArFdRgA2J5zJAI+FIADsfwueig9DgR1Oh2Op3BD1mg0QWKWiBaqxxIE2Oz2l0+JJ+wOutw5FPmcJpxGRlMWb1pk3YAB0JdUILUmIwAARSsr0BoNegAOgVUyVEpwtSw9DAZT2e2qOAVfSF82pooAHOK9FaoSjEA6aZ16QDmcCvqTwOSrqCecVuEA
-\begin{tikzcd}
-C' \arrow[r] \arrow[d]                                                           & {} \arrow[r, no head, dashed] & D \arrow[d, no head, Rightarrow] \arrow[r, "R"] & E \arrow[d, no head, Rightarrow] \\
-C \arrow[d, no head, Rightarrow] \arrow[rr, "\forall \gamma. P \triangleleft R"] &                               & D \arrow[r, "R"]                                & E \arrow[d, no head, Rightarrow] \\
-C \arrow[rrr, "P"]                                                               &                               &                                                 & E                               
-\end{tikzcd}\]
-
-We give elimination rules and introduction rules in a style similar to
-$\lambda$-calculus, with corresponding $\beta\eta$ rules.
+The left hom $\homlallXYtoZ \alpha R P$ dually abstracts over context
+extension on the left. This time, the variable $\alpha$ occurs
+\emph{contravariantly} in the input and output sets, and the covariant
+dependence of the function set matches the covariant dependence of the
+ouput set, while the contravariant dependence is the covariant
+dependence of the input. In our notation, we place the $\forall\alpha$
+on the left to be suggestive of the fact that it is contravariant in
+$R$ and $P$. Next, the introduction form is again a polymorphic
+$\lambda$, but this time we write the object variable $\alpha$ first,
+and then the set variable $x$, to match the structure of the
+context. The elimination form is similarly an application, but to
+agree with the ordered use of variables, this time we place the
+argument to the left and the function to the right.
 
 \begin{figure}
   \begin{mathpar}
@@ -711,15 +753,10 @@ $\lambda$-calculus, with corresponding $\beta\eta$ rules.
       {\Gamma \pipe d^+\Xi; \alpha : \cat C \vdash  R \and \Gamma \pipe  d^-\Xi; \alpha : \cat C \vdash P}
       {\Gamma \pipe \Xi \vdash \homrallXYtoZ \alpha R P}
 
-      (\homrallXYtoZ \alpha R P)[\xi] = \homrallXYtoZ \alpha {R[d^+\xi;\alpha/\alpha]} {P[\alpha/\alpha;d^-\xi]}
-
       \inferrule*[right=Covariant Hom introduction]
-      {\Gamma \pipe \Phi, x : R, \alpha : \cat C \vdash M : P}
+      {\Gamma \pipe \Phi, x : R, \alpha : \cat C \vdash t : P}
       {\Gamma \pipe \Phi \vdash
-        \homrlambdaXatYdotZ {x : R} {\alpha : \cat C} M : \homrallXYtoZ \alpha R P}
-
-     (\homrlambdaXatYdotZ {x} {\alpha} M)[\phi]
-      = \homrlambdaXatYdotZ {x} {\alpha} M[\phi,x/x,\gamma/\gamma]
+        \homrlambdaXatYdotZ {x : R} {\alpha : \cat C} t : \homrallXYtoZ \alpha R P}
 
       %% \inferrule*[right=Covar Hom elim simple]
       %% {}
@@ -727,165 +764,132 @@ $\lambda$-calculus, with corresponding $\beta\eta$ rules.
 
       \inferrule*[right=Covariant Hom elimination]
       {\Phi = \Phi_f \jnctx \Phi_a\and
-       \Gamma\pipe\Phi_f \vdash M : \homrallXYtoZ \alpha R P \and
-       \Phi_a \vdash N : R[A/\alpha]
+       \Gamma\pipe\Phi_f \vdash s : \homrallXYtoZ {\alpha:\cat C} R P \and
+       d^+\Phi_a \vdash a : \cat C\and
+       \Phi_a \vdash t : R[a/\alpha]
         }
-      {\Gamma\pipe \Phi \vdash \homrappXtoYatZ M N A : P[A/\alpha]}\\
+      {\Gamma\pipe \Phi \vdash \homrappXtoYatZ s t a : P[a/\alpha]}\\
 
-      \homrappXtoYatZ {(\homrlambdaXatYdotZ x \alpha M)} N A = M[N/x,A/\alpha] (\beta)
+      \homrappXtoYatZ {(\homrlambdaXatYdotZ x \alpha s)} t a = s[t/x,a/\alpha] (\beta)
       %% (\lambda^\triangleleft (x, \gamma). M)\triangleleft (x, \gamma) = M (\beta)
 
       \inferrule
-      {\Gamma\pipe\Phi, x:R, \alpha : \cat C \vdash \homrappXtoYatZ M x \alpha = \homrappXtoYatZ N x \alpha : P}
-      {\Gamma\pipe\Phi \vdash M = N : \homrallXYtoZ \alpha R P}
+      {\Gamma\pipe\Phi \vdash s : \homrallXYtoZ \alpha R P}
+      {s = \homrlambdaXatYdotZ {x}{\alpha} \homrappXtoYatZ s x \alpha}
+      
+      %% \inferrule
+      %% {\Gamma\pipe\Phi, x:R, \alpha : \cat C \vdash \homrappXtoYatZ s x \alpha = \homrappXtoYatZ t x \alpha : P}
+      %% {\Gamma\pipe\Phi \vdash s = t : \homrallXYtoZ \alpha R P}
 
       \inferrule*[right=Contra Hom formation]
       {\Gamma \pipe \alpha:\cat C; d^-\Xi\vdash R \and \Gamma \pipe \alpha : \cat C; d^+\Xi\vdash P}
       {\Gamma \pipe \Xi \vdash \homlallXYtoZ \alpha R P}
 
       \inferrule*[right=Contra Hom introduction]
-      {\Gamma\pipe\alpha:\cat C, x : R, \Phi \vdash M : P}
-      {\Gamma\pipe\Phi \vdash \homllambdaXatYdotZ {x : R} {\alpha : \cat C} M : \homlallXYtoZ \alpha R P}
-
-     (\homllambdaXatYdotZ {x} {\alpha} M)[\phi]
-      = \homllambdaXatYdotZ {x} {\alpha} M[\phi,x/x,\gamma/\gamma]
+      {\Gamma\pipe\alpha:\cat C, x : R, \Phi \vdash t : P}
+      {\Gamma\pipe\Phi \vdash \homllambdaXatYdotZ {x : R} {\alpha : \cat C} t : \homlallXYtoZ \alpha R P}
 
       \inferrule*[right=Contra Hom elimination]
       {\Phi = \Phi_a \jnctx \Phi_f\and
-       \Gamma \pipe \Phi_a \vdash N : R[A/\alpha] \and
-       \Gamma \pipe \Phi_f \vdash M : \homlallXYtoZ \alpha R P}
-      {\Gamma \pipe \Phi \vdash \homlappXtoYatZ M N A : P[A/\alpha]}\\
+        \Gamma \pipe d^-\Phi_a \vdash a : \cat C\and
+       \Gamma \pipe \Phi_a \vdash s : R[a/\alpha] \and
+       \Gamma \pipe \Phi_f \vdash t : \homlallXYtoZ {\alpha:\cat C} R P}
+      {\Gamma \pipe \Phi \vdash \homlappXtoYatZ t s a : P[a/\alpha]}\\
 
       \inferrule*[Right=$\beta$]
                  {}
-                 {\homlappXtoYatZ {(\homllambdaXatYdotZ x \alpha M)} N A = M[A/\alpha,N/x]}
+                 {\homlappXtoYatZ {(\homllambdaXatYdotZ x \alpha t)} s a = t[a/\alpha,s/x]}
 
       \inferrule*[right=$\eta$]
-      {\Gamma \pipe \alpha:\cat C, x:R, \Phi \vdash \homlappXtoYatZ M x \alpha = \homlappXtoYatZ N x \alpha : P}
-      {\Gamma \pipe \Phi \vdash M = N : \homlallXYtoZ \alpha R P}
+      {\Gamma \pipe \Phi \vdash t : \homlallXYtoZ \alpha R P}
+      {\Gamma \pipe \Phi \vdash t = \homllambdaXatYdotZ x \alpha \homlappXtoYatZ t x \alpha : \homlallXYtoZ \alpha R P}
+
+      %% \inferrule*[right=$\eta$]
+      %% {\Gamma \pipe \alpha:\cat C, x:R, \Phi \vdash \homlappXtoYatZ M x \alpha = \homlappXtoYatZ N x \alpha : P}
+      %% {\Gamma \pipe \Phi \vdash M = N : \homlallXYtoZ \alpha R P}
   \end{mathpar}
   \caption{Hom of Relations/Profunctors}
   \label{fig:hom}
 \end{figure}
 
-Hom judgments are useful not just in applications (Kan extensions, the
-Yoneda lemma), but also for purely syntactic reasons. In particular, I
-don't see how to give a sensible, complete natural deduction-style
-syntax for the other multiplicative connectives (Unit (i.e., the hom
-profunctor) and Tensor (profunctor composition) without relying on the
-presence of homs. The key property that the hom allows is that given
-any variable in context of a term $\Phi,\alpha,x,\beta,\Psi \vdash M :
-Q$ we can represent this term as a ``single-variable term'' by moving
-$\Phi$ and $\Psi$ to the right of the turnstile:
+In category theory, these profunctors can be constructed using an
+\emph{end} and the hom of functor categories\cite{somecats}. Given two
+profunctors $P : C^o \times E \to \Set$ and $R : D^o \times E \to
+Set$, their hom is given as
+\[ \int_{e \in E} R(-,e) \Rightarrow P(e,=) \]
 
-\[ \alpha, x, \beta \vdash \lambda \Phi. \lambda \Psi M. : \Phi \triangleright Q \triangleleft \Psi \]
+%% The syntax is given in Figure~\ref{fig:cotensor}.
+%% %
+%% First, the formation rule for covariant cotensor formation requires
+%% that the covariant variables for $R,P$ are the same, and the
+%% contravariant variables match the boundary of the overall
+%% judgment. Note that we use $d^+\Xi,d^-\Xi$ to allow for the case that
+%% the boundary is a single variable $\Xi = \alpha:\cat C$.
+%% %
+%% Next, the substitution rule is straightforward.
+%% %
+%% Then we have the elimination form, first written in a simple form with
+%% no substitution built in.
+%% %
+%% This says that given a variable of the cotensor judgment, and another
+%% variable of judgment $R$, we can apply these to get a term of judgment
+%% $P$. As a diagram this is written as follows:
 
-This allows us to describe restricted positive eliminations that only
-work on single variable contexts. We give an admissible ``syntax
-sugar'' in Figure~\ref{fig:multi-hom}.
+%% \[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEQBfU9TXfIRQBGclVqMWbACLdeIDNjwEiAJjHV6zVohABROXyWCiZYeK1TdnHkYEqU685sk793cTCgBzeEVAAZgBOEAC2SGQgOBBIohLabAA6iQEQQYwMAATJ3nShoXQAdJkACtmJOEFYdGDeDDD1ATiZAEqGIMFhsdTRSOrxViBtth0h4YgAzD0xiAAsLgm6Je2d45G9k9QMWGBuUBBMAEb1INQAFjB0UGyQu6dRdFgMNwSsI6t900jzIBdXL3ctjs9gdjqweo9nrpbm8KFwgA
+%% \begin{tikzcd}
+%% C \arrow[r, "\forall \gamma. P \triangleleft R"] \arrow[d, no head, Rightarrow] & D \arrow[r, "R"] & E \arrow[d, no head, Rightarrow] \\
+%% C \arrow[rr, "P"]                                                               &                  & E                               
+%% \end{tikzcd}\]
+
+%% The universal property of this judgment is that this is the universal
+%% 2-cell of this type, in that any 2-cell
 
 
-Any $\Phi_l,\beta:C,\Phi_r \vdash M : R$ can be represented as a term
-$\beta:C \vdash M' : \Phi_r \triangleright_{\beta:C} R \triangleleft_{\beta:C} $
+%% \[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEByEAX1PUy58hFACZyVWoxZsAIr34gM2PASIBmCdXrNWiEAFEFAlcKJkAjJJ0z97Y0sGqRyTVe3S9hh8qFqUFlpSumy8kjBQAObwRKAAZgBOEAC2SIEgOBBI4sG2IABKDokpSJoZWYgALB4h+gAKRUmpiGTlpdQMWGBecBCdUCDUABYwdAOIYEwMDNQ4dFgMbJDdjSWIOZlI1SAjY0sErB1dXlAQTABGDIcZ84v6y6x88U1IrZuIAKxPIMXNH7MVdKdFb6KB0OAjAbDUbjcAHMI8IA
+%% \begin{tikzcd}
+%% C' \arrow[d] \arrow[r] & {} \arrow[r, no head, dashed] & D \arrow[r, "R"] & E \arrow[d, no head, Rightarrow] \\
+%% C \arrow[rrr, "P"]     &                               &                  & E                               
+%% \end{tikzcd}\]
 
+%% Exhibits a unique factorization:
 
-Say we have a term in context
-\[ \alpha,x:P,\beta,y:Q,\gamma \vdash M : R \]
-Using $\triangleright\triangleleft$, we can produce an equivalent term
-of a different output type whose context is one of the single
-variables $\alpha,\beta$ or $\gamma$ in the context.
+%% \[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQBhEAX1PU1z5CKAEwVqdJq3YARHnxAZseAkQDM4mgxZtEIAKLz+yoUTIiJ26Xq69jg1Sg0WtU3QaOKBK4SVLFLN3YOAHJPJQdfcn9AnXZw71NRGNc4vTk7LxNHZA0A1OsPbgkYKABzeCJQADMAJwgAWyRokBwIJDFJNJAAJU86xqQNVvbEABYC9wAFfvqmxDIRoZpGLDB3KAhmACNGNhoACxh6KHZIdZAaHHosRjOCNkyB+c62pAmQI5P7i5W1ja2u32rRudz050eCmeSAArFdRgA2J5zJAI+FIADsfwueig9DgR1Oh2Op3BD1mg0QWKWiBaqxxIE2Oz2l0+JJ+wOutw5FPmcJpxGRlMWb1pk3YAB0JdUILUmIwAARSsr0BoNegAOgVUyVEpwtSw9DAZT2e2qOAVfSF82pooAHOK9FaoSjEA6aZ16QDmcCvqTwOSrqCecVuEA
+%% \begin{tikzcd}
+%% C' \arrow[r] \arrow[d]                                                           & {} \arrow[r, no head, dashed] & D \arrow[d, no head, Rightarrow] \arrow[r, "R"] & E \arrow[d, no head, Rightarrow] \\
+%% C \arrow[d, no head, Rightarrow] \arrow[rr, "\forall \gamma. P \triangleleft R"] &                               & D \arrow[r, "R"]                                & E \arrow[d, no head, Rightarrow] \\
+%% C \arrow[rrr, "P"]                                                               &                               &                                                 & E                               
+%% \end{tikzcd}\]
 
-We can make it $\alpha$ by using $\triangleleft$ twice:
-\[ \alpha \vdash \lambda^\triangleleft (x:P,\beta). \lambda^\triangleleft (y:Q, \gamma). M : \forall \beta. (\forall \gamma. R \triangleleft Q) \triangleleft P \]
+%% We give elimination rules and introduction rules in a style similar to
+%% $\lambda$-calculus, with corresponding $\beta\eta$ rules.
 
-Or $\gamma$ by using $\triangleright$ twice:
-\[ \gamma \vdash\lambda^\triangleright (\beta, y:Q).  \lambda^\triangleright (\alpha, x:P). M : \forall \gamma. Q \triangleright \forall \alpha. P \triangleright R \]
+These hom types are useful both for category-theoretic applications
+(Kan extensions, the Yoneda lemma), but also for purely syntactic
+reasons.  The universal property of these function types allows us, by
+iterated hom to express any sequent $\Phi \vdash R$ as an equivalent
+one with an ``empty'' context, i.e., a single object variable $d^\pm
+\Phi$. Then using the end type defined in the previous section, we can
+internalize that judgment as a type in our ambient dependent type
+theory.
 
-And we have two different ways to make the context $\beta$, either we use $\triangleright$ and then $\triangleleft$:
-\[ \beta \vdash\lambda^\triangleright (\alpha, x:P).  \lambda^\triangleleft (y:Q, \gamma). M : \forall \alpha. P \triangleright (\forall \gamma. R \triangleleft Q) \]
-or we do the opposite order:
-\[ \beta \vdash \lambda^\triangleleft (y:Q, \gamma). \lambda^\triangleright (\alpha, x:P). M : \forall \gamma. (\forall \alpha. P \triangleright R) \triangleleft Q \]
+As an example, any sequent $\Gamma \pipe \alpha, x: R, \beta, y : S, \gamma \vdash
+P$ is equivalent to either of
+\[ \Gamma \vdash \pendallXdotY\alpha \homrallXYtoZ \beta R \homrallXYtoZ \gamma S P 
+\qquad\qquad\qquad \Gamma \vdash \pendallXdotY \gamma \homlallXYtoZ \beta S {\homlallXYtoZ \alpha R P}\]
+This property is useful in giving a simple syntax to positive types.
 
-In general we can iterate this process. That is given any $\Phi,\Psi$
-with $d^+\Phi = d^-\Psi = \beta:D$, we can take a term $\Phi \jnctx
-\Psi \vdash M : R$ and produce an equivalent term $\beta:D \vdash M :
-\Phi \triangleright R \triangleleft \Psi$. To formalize this, we show
-how we can create ``multi-hom'' jumbo connectives $\Phi \triangleright
-R$ and $R \triangleleft \Psi$, where the boundary conditions on
-$\Phi,\Psi$ are analogous to the ordinary case. These are given in
-Figure\ref{multi-hom}.
+\subsection{Unit and Tensor of Profunctors}
 
-\begin{figure}
-  \begin{align*}
-    P \triangleleft \gamma:E &= P\\
-    P \triangleleft (\Psi,x:R,\gamma:E) &= (\forall \gamma: E. P \triangleleft R) \triangleleft \Psi\\
-    %% \cdot \triangleright_{\alpha : C} P &= P\\
-    %% (x:R,\beta:D,\Phi_r)\triangleright_{\alpha:C} P  &= \Phi_R \triangleright_{\beta:D} \forall \beta. R \triangleright P
-  \end{align*}
-  \begin{mathpar}
-    \inferrule
-    {\Gamma \pipe d^+\Xi; \gamma: E \vdash P \isaSet\and
-     \Gamma \pipe d^-\Xi; \gamma:E \vdash \Psi \isavectx}
-    {\Gamma \pipe \Xi \vdash P \triangleleft \Psi}
+While the hom sets of the previous section work quite smoothly since
+they are negative connectives in a natural deduction system, the positive
+connectives, the unit and tensor, are trickier to define.
 
-    \inferrule*[right=Covariant Multi-Hom introduction]
-    {\Gamma\pipe\Phi\jnctx \Psi \vdash M : P}
-    {\Gamma\pipe\Phi \vdash \lambda^\triangleleft \Psi. M : P \triangleleft \Psi}\and
+First, the multiplicative unit is the set $\punitinXfromYtoZ {\cat C}
+a {a'}$, that is the hom set of the category $\cat C$. The rules for
+this type act like .
 
-    \inferrule*[right=Covar Multi-Hom elim]
-    {~}
-    {\Gamma \pipe f:P\triangleleft \Psi,\Psi \vdash \textrm{app}\triangleleft_\Psi : P}
-
-    %%   (\lambda^\triangleleft \Psi. M)[\phi] = \lambda^\triangleleft \Psi. M[\phi,\Psi]\\
-    %%   \lambda^\triangleleft \gamma. M = M\\
-    %%   \lambda^\triangleleft (\Psi,x:R,\gamma:\cat E). M = \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M\\
-
-    %%   (\lambda^\triangleleft \gamma. M)[\phi] = M[\phi] = \lambda^\triangleleft \gamma. M[\phi]\\
-    %%   (\lambda^\triangleleft (\Psi,x:r,\gamma:\cat E). M)[\phi] =
-    %%   (\lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M)[\phi]
-    %%   = \lambda^\triangleleft \Psi. (\lambda^\triangleleft (x:R,\gamma:\cat E). M)[\phi, \Psi]
-    %%   = \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M[\phi,\Psi,x:R,\gamma]      
-
-    %%   \inferrule*[right=Covariant Multi-Hom elimination]
-    %%   {\Phi_1 \vdash M : P\triangleleft \Phi_2 \and \phi_2 : \Psi \vdash \Phi_2 \subst(\xi)}
-    %%   {\Phi_1,\Psi \vdash M\triangleleft \phi_2 : P[d^+\xi]}\\
-
-    %%   M \triangleleft (A/\gamma) = M[A/\gamma]\\
-    %%   M \triangleleft (\phi, N/x,A/\gamma) =  M \triangleleft (N, A) \triangleleft \phi
-
-    %%   (M \triangleleft \phi_2)[\phi_1,\psi] = M[\phi_1] \triangleleft [\phi_2[\psi]]\\
-    %%   TODO: prove
-
-    %%   TODO: (\lambda^\triangleleft \Phi. M) \triangleleft \phi = M[\phi]
-    %%   TODO: M = \lambda^\triangleleft \Phi. M\triangleleft \Phi
-
-    %%   TODO: contravariant by duality
-    %%   %% \inferrule*[right=Contra Multi-Hom formation]
-    %%   %% {\Phi \isavectx(\alpha:\cat C; d^-\Xi) \and P \prof(\alpha : \cat C; d^+\Xi)}
-    %%   %% {\Phi \triangleright P \prof(\xi)}
-
-    %%   %% \alpha \triangleright P = P\\
-    %%   %% \alpha:\cat C, x:R, \Phi \triangleright P = \forall \alpha. R \triangleright \Phi \triangleright P\\
-  \end{mathpar}
-  \begin{align*}
-    \lambda^\triangleleft \gamma:E. M &= M\\
-    \lambda^\triangleleft (\Psi,x:R,\gamma:E). M &= \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:E). M\\\\
-    \textrm{app}\triangleleft_{\gamma:E} &= f\\
-    \textrm{app}\triangleleft_{\Psi,x:R\gamma:E} &= \textrm{app}\triangleleft_\Psi \triangleleft (x,\gamma) \\
-  \end{align*}
-  \caption{Multi-Hom}
-  \label{multi-hom}
-\end{figure}
-
-\subsection{Unit and Tensor Profunctors}
-
-While the cotensors of the previous section work quite smoothly since
-they are negative connectives in an intuitionistic-like (many formulas
-on the left of the sequent and only one on the right), the positive
-connectives, the unit and tensor, are trickier.
-
-First, to internalize $\cdot_{\alpha : \cat C}$ we can define the
-\emph{unit} $A \to_{\cat C} A'$, which in set-theoretic settings we
+we can define the
+\emph{unit} , which in set-theoretic settings we
 might call the \emph{identity/equality judgment} $A \equiv_{\cat C}
 A'$.
 %
@@ -1338,24 +1342,6 @@ and identity types.
     {\Gamma \pipe \cdot \vdash M : \harr C D}
     {\Gamma \pipe \cdot \vdash M = (\lambda \alpha;\beta. M \alpha;\beta) : \harr C D}\\
 
-    \inferrule
-    {\Gamma \pipe \alpha:\cat C\vdash R \isaSet}
-    {\Gamma \pipe \cdot \vdash \pendallXdotY {\alpha:{\cat C}} R \isaSet}
-
-    \inferrule
-    {\Gamma \pipe \alpha:\cat C\vdash M : R}
-    {\Gamma \pipe \cdot \vdash \pendlambdaXdotY \alpha M : \pendallXdotY \alpha R}
-
-    \inferrule
-    {\Gamma\pipe\cdot \pipe \cdot \vdash M : \forall \alpha:\cat C. R\and
-      \Gamma \pipe \beta:\cat D \vdash A : \cat C}
-    {\Gamma \pipe \beta:\cat D\pipe\beta:\cat D \vdash \pendappXtoY M A : R[A/\alpha]}
-
-    \pendappXtoY {(\pendlambdaXdotY \alpha M)} A = M[A/\alpha]
-
-    \inferrule*[right=2Cell$\eta$]
-    {\Gamma \pipe \cdot \vdash M : \pendallXdotY \alpha R }
-    {\Gamma \pipe \cdot \vdash M = \pendlambdaXdotY \alpha {\pendappXtoY M \alpha} : \pendallXdotY \alpha R }
   \end{mathpar}
   \caption{Internalizing VE Structure}
 \end{figure}
@@ -3270,7 +3256,23 @@ String Diagrams?
 
 \appendix
 
-TODO: define substitution
+TODO: complete substitution
+\begin{figure}
+  \begin{mathpar}
+      (\homrallXYtoZ \alpha R P)[\xi] = \homrallXYtoZ \alpha {R[d^+\xi;\alpha/\alpha]} {P[\alpha/\alpha;d^-\xi]}
+
+     (\homrlambdaXatYdotZ {x} {\alpha} M)[\phi]
+      = \homrlambdaXatYdotZ {x} {\alpha} M[\phi,x/x,\gamma/\gamma]
+
+     (\homllambdaXatYdotZ {x} {\alpha} M)[\phi]
+      = \homllambdaXatYdotZ {x} {\alpha} M[\phi,x/x,\gamma/\gamma]
+
+
+  \end{mathpar}
+  \caption{Substitution}
+  
+\end{figure}
+
 \begin{figure}
   \begin{mathpar}
     \inferrule
@@ -3402,6 +3404,110 @@ TODO: define substitution
 \end{figure}
 
 \section{Additional Rules}
+
+The key property that the hom allows is that given
+any variable in context of a term $\Phi,\alpha,x,\beta,\Psi \vdash M :
+Q$ we can represent this term as a ``single-variable term'' by moving
+$\Phi$ and $\Psi$ to the right of the turnstile:
+
+\[ \alpha, x, \beta \vdash \lambda \Phi. \lambda \Psi M. : \Phi \triangleright Q \triangleleft \Psi \]
+
+This allows us to describe restricted positive eliminations that only
+work on single variable contexts. We give an admissible ``syntax
+sugar'' in Figure~\ref{fig:multi-hom}.
+
+
+Any $\Phi_l,\beta:C,\Phi_r \vdash M : R$ can be represented as a term
+$\beta:C \vdash M' : \Phi_r \triangleright_{\beta:C} R \triangleleft_{\beta:C} $
+
+
+Say we have a term in context
+\[ \alpha,x:P,\beta,y:Q,\gamma \vdash M : R \]
+Using $\triangleright\triangleleft$, we can produce an equivalent term
+of a different output type whose context is one of the single
+variables $\alpha,\beta$ or $\gamma$ in the context.
+
+We can make it $\alpha$ by using $\triangleleft$ twice:
+\[ \alpha \vdash \lambda^\triangleleft (x:P,\beta). \lambda^\triangleleft (y:Q, \gamma). M : \forall \beta. (\forall \gamma. R \triangleleft Q) \triangleleft P \]
+
+Or $\gamma$ by using $\triangleright$ twice:
+\[ \gamma \vdash\lambda^\triangleright (\beta, y:Q).  \lambda^\triangleright (\alpha, x:P). M : \forall \gamma. Q \triangleright \forall \alpha. P \triangleright R \]
+
+And we have two different ways to make the context $\beta$, either we use $\triangleright$ and then $\triangleleft$:
+\[ \beta \vdash\lambda^\triangleright (\alpha, x:P).  \lambda^\triangleleft (y:Q, \gamma). M : \forall \alpha. P \triangleright (\forall \gamma. R \triangleleft Q) \]
+or we do the opposite order:
+\[ \beta \vdash \lambda^\triangleleft (y:Q, \gamma). \lambda^\triangleright (\alpha, x:P). M : \forall \gamma. (\forall \alpha. P \triangleright R) \triangleleft Q \]
+
+In general we can iterate this process. That is given any $\Phi,\Psi$
+with $d^+\Phi = d^-\Psi = \beta:D$, we can take a term $\Phi \jnctx
+\Psi \vdash M : R$ and produce an equivalent term $\beta:D \vdash M :
+\Phi \triangleright R \triangleleft \Psi$. To formalize this, we show
+how we can create ``multi-hom'' jumbo connectives $\Phi \triangleright
+R$ and $R \triangleleft \Psi$, where the boundary conditions on
+$\Phi,\Psi$ are analogous to the ordinary case. These are given in
+Figure\ref{multi-hom}.
+
+\begin{figure}
+  \begin{align*}
+    P \triangleleft \gamma:E &= P\\
+    P \triangleleft (\Psi,x:R,\gamma:E) &= (\forall \gamma: E. P \triangleleft R) \triangleleft \Psi\\
+    %% \cdot \triangleright_{\alpha : C} P &= P\\
+    %% (x:R,\beta:D,\Phi_r)\triangleright_{\alpha:C} P  &= \Phi_R \triangleright_{\beta:D} \forall \beta. R \triangleright P
+  \end{align*}
+  \begin{mathpar}
+    \inferrule
+    {\Gamma \pipe d^+\Xi; \gamma: E \vdash P \isaSet\and
+     \Gamma \pipe d^-\Xi; \gamma:E \vdash \Psi \isavectx}
+    {\Gamma \pipe \Xi \vdash P \triangleleft \Psi}
+
+    \inferrule*[right=Covariant Multi-Hom introduction]
+    {\Gamma\pipe\Phi\jnctx \Psi \vdash M : P}
+    {\Gamma\pipe\Phi \vdash \lambda^\triangleleft \Psi. M : P \triangleleft \Psi}\and
+
+    \inferrule*[right=Covar Multi-Hom elim]
+    {~}
+    {\Gamma \pipe f:P\triangleleft \Psi,\Psi \vdash \textrm{app}\triangleleft_\Psi : P}
+
+    %%   (\lambda^\triangleleft \Psi. M)[\phi] = \lambda^\triangleleft \Psi. M[\phi,\Psi]\\
+    %%   \lambda^\triangleleft \gamma. M = M\\
+    %%   \lambda^\triangleleft (\Psi,x:R,\gamma:\cat E). M = \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M\\
+
+    %%   (\lambda^\triangleleft \gamma. M)[\phi] = M[\phi] = \lambda^\triangleleft \gamma. M[\phi]\\
+    %%   (\lambda^\triangleleft (\Psi,x:r,\gamma:\cat E). M)[\phi] =
+    %%   (\lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M)[\phi]
+    %%   = \lambda^\triangleleft \Psi. (\lambda^\triangleleft (x:R,\gamma:\cat E). M)[\phi, \Psi]
+    %%   = \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:\cat E). M[\phi,\Psi,x:R,\gamma]      
+
+    %%   \inferrule*[right=Covariant Multi-Hom elimination]
+    %%   {\Phi_1 \vdash M : P\triangleleft \Phi_2 \and \phi_2 : \Psi \vdash \Phi_2 \subst(\xi)}
+    %%   {\Phi_1,\Psi \vdash M\triangleleft \phi_2 : P[d^+\xi]}\\
+
+    %%   M \triangleleft (A/\gamma) = M[A/\gamma]\\
+    %%   M \triangleleft (\phi, N/x,A/\gamma) =  M \triangleleft (N, A) \triangleleft \phi
+
+    %%   (M \triangleleft \phi_2)[\phi_1,\psi] = M[\phi_1] \triangleleft [\phi_2[\psi]]\\
+    %%   TODO: prove
+
+    %%   TODO: (\lambda^\triangleleft \Phi. M) \triangleleft \phi = M[\phi]
+    %%   TODO: M = \lambda^\triangleleft \Phi. M\triangleleft \Phi
+
+    %%   TODO: contravariant by duality
+    %%   %% \inferrule*[right=Contra Multi-Hom formation]
+    %%   %% {\Phi \isavectx(\alpha:\cat C; d^-\Xi) \and P \prof(\alpha : \cat C; d^+\Xi)}
+    %%   %% {\Phi \triangleright P \prof(\xi)}
+
+    %%   %% \alpha \triangleright P = P\\
+    %%   %% \alpha:\cat C, x:R, \Phi \triangleright P = \forall \alpha. R \triangleright \Phi \triangleright P\\
+  \end{mathpar}
+  \begin{align*}
+    \lambda^\triangleleft \gamma:E. M &= M\\
+    \lambda^\triangleleft (\Psi,x:R,\gamma:E). M &= \lambda^\triangleleft \Psi. \lambda^\triangleleft (x:R,\gamma:E). M\\\\
+    \textrm{app}\triangleleft_{\gamma:E} &= f\\
+    \textrm{app}\triangleleft_{\Psi,x:R\gamma:E} &= \textrm{app}\triangleleft_\Psi \triangleleft (x,\gamma) \\
+  \end{align*}
+  \caption{Multi-Hom}
+  \label{multi-hom}
+\end{figure}
 
 %% \section{Styles of lists, enumerations, and descriptions}\label{sec:itemStyles}
 
