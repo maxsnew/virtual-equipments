@@ -1377,11 +1377,13 @@ theorem for tensor is the synthetic \emph{Co-Yoneda lemma}.
   \item $\homlallXYtoZ {{\alpha'}} {(\punitinXfromYtoZ {C} {\alpha'} {\alpha})} {\harrapp P {{\alpha'}} {\beta}}$
   \end{enumerate}
 \end{lemma}
+\begin{proof}
+  TODO
+\end{proof}
 
 Next, we have various associativities between the homs, tensor and end
 constructions. Semantically, these are related to so-called
-\emph{Fubini} theorems about interchange of ends.
-
+\emph{Fubini} theorems about interchange of (co)-ends.
 \begin{lemma}[{Fubini}]
   \label{lem:fubini}
   The following isomorphisms hold for any $P : \harr {\cat C}{\cat D},
@@ -1396,10 +1398,9 @@ constructions. Semantically, these are related to so-called
   \item $\pendallXdotY \alpha \homrallXYtoZ \beta P {P'} \cong \pendallXdotY \beta \homlallXYtoZ \alpha P {P'}$
   \end{enumerate}  
 \end{lemma}
-
-
-
-
+\begin{proof}
+  TODO
+\end{proof}
 \subsection{Composition, Functoriality, Profunctoriality, Naturality}
 
 Hom sets don't provide primitive syntax for composition of morphisms
@@ -1407,10 +1408,11 @@ in a category. As our first synthetic construction, we can
 \emph{define} composition using the elimination form for the unit.
 %
 \begin{definition}[Composition of Morphisms]
-  We define composition of morphisms as the following term of type $\hombinary {\alpha_1} {\punitinXfromYtoZ {\cat C}{\alpha_1} {\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {\cat C}{\alpha_2} {\alpha_3}} {\alpha_3} {\punitinXfromYtoZ {\cat C}{\alpha_1} {\alpha_3}}$:
+  We define composition of morphisms as the following term of type $\Pi_{\cat C:\Cat}\hombinary {\alpha_1} {\punitinXfromYtoZ {\cat C}{\alpha_1} {\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {\cat C}{\alpha_2} {\alpha_3}} {\alpha_3} {\punitinXfromYtoZ {\cat C}{\alpha_1} {\alpha_3}}$:
   \[
-  \punitelimtoYwithkontZ {\hlambda {\alpha_1}{\alpha_2} \homrallXYtoZ {\alpha_3} {\punitinXfromYtoZ {\cat C} {\alpha_2} {\alpha_3}} {\punitinXfromYtoZ {\cat C} {\alpha_1} {\alpha_3}}} {\lambdaunary {\alpha} {f : \punitinXfromYtoZ {\cat C}{\alpha} {\alpha_3}} {\alpha_3} f}
+  \lambda \cat C. \punitelimtoYwithkontZ {\hlambda {\alpha_1}{\alpha_2} \homrallXYtoZ {\alpha_3} {\punitinXfromYtoZ {\cat C} {\alpha_2} {\alpha_3}} {\punitinXfromYtoZ {\cat C} {\alpha_1} {\alpha_3}}} {\lambdaunary {\alpha} {f : \punitinXfromYtoZ {\cat C}{\alpha} {\alpha_3}} {\alpha_3} f}
   \]
+  We call this term $\textrm{comp}$
 \end{definition}
 This has the same flavor as a directed type theory: to construct the
 composite it is sufficient to define the action on the identity
@@ -1425,18 +1427,22 @@ $\pendallXdotY {\alpha_2} \homrallXYtoZ {\alpha_3} {\punitinXfromYtoZ {\cat C}{\
   \punitelimtoYwithkontZ {\hlambda {\alpha_2}{\alpha_3} \homlallXYtoZ {{\alpha_1}} {\punitinXfromYtoZ {\cat C}{\alpha_1} {\alpha_2}}{\punitinXfromYtoZ {\cat C}{\alpha_1} {\alpha_3}} } {\lambdaunary {\alpha} {g : \punitinXfromYtoZ {\cat C}{\alpha_1}{\alpha}} {\alpha} g}
 \]
 
+\begin{lemma}[Equivalence of Composition Definitions]
+  TODO
+\end{lemma}
 
 It should follow by $\beta\eta$ that this is associative and unital.
 
-Next, let's prove synthetically that every type $\alpha : \cat C
-\vdash A : \cat D$ is in fact functorial.
+Next, let's prove synthetically that every functor $F : \varr{\cat
+  C}{\cat D}$ is functorial in this notion of composition.
 \begin{definition}
-  There is a morphism
-  \[ \alpha^o:\cat C;\alpha':\cat C \vdash f : \alpha \to_{\cat C} \alpha' \vdash
-  \when f = \id_{\alpha}.~ \id_{A} : A[\alpha] \to_{\cat D} A[\alpha']
+  For any $F : \varr {\cat C} {\cat D}$, we can define a morphism $F_1
+  : \homunary {\alpha_1} {\punittinXfromYtoZ {\cat C} {\alpha_1}
+    {\alpha_2}} {\alpha_2} {\punittinXfromYtoZ {\cat D} {F \alpha_1}
+    {F \alpha_2}}$ as
+  \[ F_1 = \punitelimtoYwithkontZ {\hlambda {\alpha_1}{\alpha_2} \punittinXfromYtoZ {\cat D} {F \alpha_1}{F \alpha_2}}
+  {\pendlambdaXdotY \alpha \punitrefl {\cat D} {F \alpha}}
   \]
-  which we call $A[f/\alpha]$.
-
   Note that
   \[ A[\id_\alpha/\alpha] = \id_{A} \]
   \[ A[f;g] = A[f];A[g] \]
@@ -1444,18 +1450,37 @@ Next, let's prove synthetically that every type $\alpha : \cat C
 Note the similarity to the proof that all functions are congruences in
 MLTT/HoTT.
 
-Next we can define natural transformations as specific kinds of
-terms whose type is $(F \alpha \to G \alpha')$.
+And similarly, every profunctor $R : \harr {\cat C}{\cat D}$ is
+\emph{pro-functorial}.
 \begin{definition}
-  A natural transformation $\phi$ from $\alpha : \cat C \vdash A : \cat D$ to
-  $A'[\alpha]$ of the same type is a term
-  \[ \alpha\pipe \cdot \vdash \phi_\alpha : A[\alpha] \to_{\cat D} A'[\alpha] \]
-
-  Note that
-  \[ \alpha;\alpha' \pipe f : \alpha \to \alpha' \vdash
-  f \circ \phi_{\alpha} = \phi_{\alpha'} \circ f
+  For any $R : \varr {\cat C} {\cat D}$, we can define left and right
+  actions of composition:
+  \[ \homunary {\alpha_1} {\tensorexistsXwithYandZ {\alpha_2} {(\punitinXfromYtoZ {\cat C} {\alpha_1}{\alpha_2})} {\tensorexistsXwithYandZ {\alpha_3} {(\harrapp R {\alpha_2} {\alpha_3})}}{(\punitinXfromYtoZ {\cat C} {\alpha_3}{\alpha_4})}} {\alpha_4} {\harrapp R {\alpha_1}{\alpha_4}}
   \]
-  Because if $f$ is the identity, then both sides are the same.
+  Furthermore we can show that they are functorial in that the induced functions
+  TODO
+  are equal
+\end{definition}
+
+Next we can define natural transformations as specific kinds of terms
+whose type is $\pendallXdotY {\alpha} \punitinXfromYtoZ {\cat D} {F
+  \alpha}{G \alpha}$. In fact we can generalize this to any
+endo-profunctor $P$:
+\begin{definition}[Natural element]
+  A natural element of an endo-profunctor $P : \harr {\cat C}{\cat C}$
+  is a term of type $\pendallXdotY {\alpha} \harrapp P \alpha \alpha$.
+
+  A natural transformation is the special case where $P =
+  \punitinXfromYtoZ {\cat D} {F \alpha}{G \alpha}$ for functors $F, G
+  : \varr {\cat C}{\cat D}$.
+
+  This is natural in the sense that the incuded terms
+  \[ \homunary {\alpha_1}{\punitinXfromYtoZ {} {\alpha_1}{\alpha_2}} {\alpha_2} {\harrapp P {\alpha_1}{\alpha_2}}  \]
+  and
+  \[ \pendallXdotY {\alpha_2} \homlallXYtoZ {\alpha_1} {\punitinXfromYtoZ {} {\alpha_1}{\alpha_2}} {\harrapp P {\alpha_1}{\alpha_2}}\]
+
+  are equal under the associativity equivalence between these two
+  types.
 \end{definition}
 
 
@@ -1658,6 +1683,61 @@ Let's prove that classic theorem!
 
 
 \section{Internal Category Theory}
+
+A downside of working synthetically is that since everything we define
+must be functorial/natural, we cannot prove any theorems about
+functions that are not assumed to be functorial or transformations
+that are not assumed ot be natural.
+%
+These kinds of constructions are surprisingly common in basic category theory.
+%
+For instance, when defining a left adjoint $F$ to a given right
+adjoint functor $U$, the functoriality of $F$ is often not assumed,
+rather we are given that each $F a$ has a certain universal mapping
+property and this can then be used to show the action of $F$ on
+objects extends to an action on morphisms.
+%
+This definition is quite important for applications of category theory
+to type theory: in type theory when a type constructor is defined it
+is given introduction, elimination and $\beta\eta$ rules, but no
+primitive syntax is given for a functorial action.
+%
+The fact that functoriality is determined from the universal mapping
+property of the type is then a key step in proving the type theory is
+sound and complete with respect to models which are expected to have
+certain functors on them.
+
+As another example, a common lemma states that an \emph{possibly
+unnatural} transformation is in fact natural if it is the inverse of a
+natural transformation.
+%
+Neither of these examples can be stated as synthetic theorems, as it
+is impossible to quantify over ``possibly unnatural transformations''
+or ``functions on objects''.
+%
+Inside the calculus, we cannot ``see'' that categories have an
+underlying set of objects.
+%
+Fortunately there is a way to use our calculus in a different manner
+to study these constructions: by defining categories \emph{internal
+to} SCT.
+%
+This reproduces classical constructions, since there is a model where
+a category $\cat C$ is interpreted simply as a set, functors as
+functions and profunctors $\harr {\cat C}{\cat D}$ as \emph{spans},
+i.e. sets $R$ with (source and target) projections $\cat C \leftarrow
+R \rightarrow \cat D$.
+%
+The proofs read like the classical proofs (with some care additional
+attention on the ordering of variable usage), but by virtue of being
+syntactic automatically apply to any notion of category internal to a
+virtual equipment, which includes classical internal categories,
+enriched categories and a broad range of generalized multicategory.
+
+We note that a synthetic approach to model this situation may be
+possible were we to extend our calculus with a \emph{modality} $|\cat
+C|$ that takes a category to the discrete category on the set of
+objects. We discuss this in \cref{sec:discussion}.
 
 
 
