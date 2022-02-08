@@ -1447,10 +1447,10 @@ Next, let's prove synthetically that every functor $F : \varr{\cat
   C}{\cat D}$ is functorial in this notion of composition.
 \begin{definition}
   For any $F : \varr {\cat C} {\cat D}$, we can define a morphism $F_1
-  : \homunary {\alpha_1} {\punittinXfromYtoZ {\cat C} {\alpha_1}
-    {\alpha_2}} {\alpha_2} {\punittinXfromYtoZ {\cat D} {F \alpha_1}
+  : \homunary {\alpha_1} {\punitinXfromYtoZ {\cat C} {\alpha_1}
+    {\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {\cat D} {F \alpha_1}
     {F \alpha_2}}$ as
-  \[ F_1 = \punitelimtoYwithkontZ {\hlambda {\alpha_1}{\alpha_2} \punittinXfromYtoZ {\cat D} {F \alpha_1}{F \alpha_2}}
+  \[ F_1 = \punitelimtoYwithkontZ {\hlambda {\alpha_1}{\alpha_2} \punitinXfromYtoZ {\cat D} {F \alpha_1}{F \alpha_2}}
   {\pendlambdaXdotY \alpha \punitrefl {\cat D} {F \alpha}}
   \]
   Note that
@@ -1586,11 +1586,14 @@ functors
   isomorphisms.
 \end{proof}
 
-\subsection{Limits and Kan Extensions}
+\subsection{(co)-Limits and Kan Extensions}
 
-We can then use our notion of Hom of profunctors 
+As a further example of the synthetic approach to universal
+properties, we consider \emph{Kan extensions}, which are a
+generalization of limits, and their dual \emph{Kan lifts}, which
+generalize co-limits.
 
-The right Kan extension of $F$ along $J$ is the best (maximal) way to
+The right Kan extension of $F$ along $J$ is the ``best'' (maximal) way to
 fill in the following square:
 \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEQBfU9TXfIRQBGclVqMWbACLdeIDNjwEiZYePrNWiDgHJu4mFADm8IqABmAJwgBbJGRA4ISAEzVNUnQCk5lm-aIjs5IohJabABiBlxAA
 \begin{tikzcd}
@@ -1608,7 +1611,12 @@ profunctor.
 
 \begin{definition}
   Let $C,C',D$ be categories and let $F : \textrm{Functor}\,C\,D$ and
-  $J: \textrm{Functor}\,C'\,C$ be functors. Then the right Kan
+  $J: \textrm{Functor}\,C'\,C$ be functors. Then a right Kan extension
+  is a functor $\textrm{Ran}_JF :\varr {\cat C'}{\cat D}$ that
+  right-represents the following profunctor:
+  \[ \]
+
+  Then the right Kan
   extension specification profunctor is a profunctor
   $\textrm{RanSpec}_J\,F : \textrm{Prof}\,D\,C$ defined as
 
