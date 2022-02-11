@@ -219,22 +219,96 @@ actually natural transformations. They will then work through a
 diagram chase to determine that this naturality condition indeed
 holds.
 
-Experienced category theorists have no trouble with this, as they are
-familiar with a great many principles for constructing transformations
-that are guaranteed to be natural. Consider an analogy with
-calculus. When a mathematician writes a formula such as
+More experienced users of category theory in programming language
+theory find that for modeling computational effects such as general
+recursion or indexed-state, or modeling logics for parametricity,
+gradual typing, or step-indexed logical relations involves not just
+ordinary category theory, but more general notions such as enriched,
+internal or multi-categories. However, model construction theorems and
+especially soundness and completeness theorems in these areas will
+require their own, even more complex versions of the same common
+lemmas of category theory, in addition to the domain-specific results
+such as existence of fixed points.
 
-$$\sin(f(x) - g(x))$$
+At this level of generality, the proofs can be difficult to
+understand, as they often involve some combination of the original
+category theoretic proof with some additional side-conditions that
+everythinng is in fact appropriately step-indexed, continuous etc.
+%
+The solution to taming this complexity is to prove these general
+theorems at a higher level of generality, for instance, proving them
+in some abstract 2-category of enriched/internal categories, functors
+and transformations.
+%
+For proofs in generalized category theory specifically, the notion of
+a \emph{virtual equipment} has been shown to be occupy an algebraic
+sweet-spot of being complex enough to express most basic constructions
+(functors, profunctors, natural transformations, adjunctions, kan
+extensions, etc) but also general enough to encompass internal,
+enriched and ``generalized multi-categories'', which include ordinary
+flavors of multi-categories like the cartesian multi-categories that
+model sequents in natural deduction, but even structures such as
+topological spaces.
+%
+However, there are two difficulties with this approach.
+%
+First, the abstract arguments can be difficult to understand, and can
+seem quite hard to connect to the original argument for ordinary
+category theory.
+%
+Second, the algebraic structure of a virtual equipment is quite
+unwieldy to manipulate. The equivalent of a 2-cell is a kind of
+``multi-2-cell'' with many inputs and a single output, in
+diagrammatic form these are rendered as
 
-They do not need to spend time with an explicit $\epsilon,\delta$
-proof that the function is continuous or furthermore smooth. Instead,
-they follow syntactic principles that compositions of continuous
-functions are continuous.
+\[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEB9YkAX1PSZc+QigCM5KrUYs2XMXwEgM2PASIAmSdXrNWiDpw2LBqkUQDM26XrYAdOwygQcCfqeHqUAFmu7ZBlzAYADUYrwmykJqoiSkYlL++iCRKp6xvgk6Msl8UjBQAObwRKAAZgBOEAC2SBIgOBBIWjYBIABKnAruIJU1zdSNSFatyZ3GPX21iCNDiL6jbJ2Ek1XTZA1NiPVJS9yRU0gbcwCs2bYGAGIHa0hnm0gAbOdtAMo3-fODW8+LBgDieV4QA
+\begin{tikzcd}
+C_0 \arrow[r, "R_0"] \arrow[d, "F"] & C_1 \arrow[r, "R_1"] & C_2 \arrow[r, "R_2"] & \ldots \arrow[r, "R_n"] & C_{n+1} \arrow[d, "G"] \\
+{} \arrow[rrrr, "S"]                &                      &                      &                         & {}                    
+\end{tikzcd} \]
 
-There are similar syntactic notions for guaranteeing that
-transformations are natural.
+This 2-cell has one output pro-arrow, many input pro-arrows which must
+match the source from one to the target object of the next and a left
+and right ``frame'' arrow. These can be composed in a manner similar
+to multi-categories, where you can compose this with many input
+2-cells, one for each input pro-arrow.
+%
+These then have complex associativity and unit rules and side
+conditions that say the framing arrows compose alongside the 2-cells.
 
-\subsection{Profunctors}
+We solve both of these issues by developing an alternative \emph{type
+theoretic syntax} for the constructions in a virtual equipment.
+%
+In this syntax the ``multi-2-cell'' above instead becomes a natural
+transformation judgment
+\[ \Phi \vdash t : R[F(x);G(y)] \]
+We write natural transformations in a natural deduction style: a
+transformation is written as a ``parameterized'' element of the output
+profunctor. Furthermore the restriction operators for vertical arrows
+into horizontal arrows is naturally modeled by a syntactic
+substitution.
+%
+This interpretation of restriction as substitution both matches the
+semantic intuition for the restriction operation as well as greatly
+simplifies reasoning about composition of transformations.
+
+
+%% Experienced category theorists have no trouble with this, as they are
+%% familiar with a great many principles for constructing transformations
+%% that are guaranteed to be natural. Consider an analogy with
+%% calculus. When a mathematician writes a formula such as
+
+%% $$\sin(f(x) - g(x))$$
+
+%% They do not need to spend time with an explicit $\epsilon,\delta$
+%% proof that the function is continuous or furthermore smooth. Instead,
+%% they follow syntactic principles that compositions of continuous
+%% functions are continuous.
+
+%% There are similar syntactic notions for guaranteeing that
+%% transformations are natural.
+
+\subsection{Category Theory with Profunctors}
 
 The syntax of Judgment Theory gives not just a syntax for the familiar
 trio of category, functor and natural transformation, but additionally
@@ -269,6 +343,27 @@ categories and enriched categories. This general notion is often
 called a ``generalized multi-category'' and encompasses an astonishing
 range of mathematical structures, including categories, topological
 spaces, metric spaces, etc.
+
+\subsection{Paper Overview}
+
+To demonstrate the utility of SCT, we proceed as follows
+\begin{enumerate}
+\item In \cref{sec:syntax} we introduce the syntax of Simple Category
+  Theory.
+\item In \cref{sec:synthetic} we show how common theorems of category
+  theory such as the (co)-Yoneda lemma, equivalence of different
+  formulations of adjunctions, and preservation of limits can all be
+  cleanly reproduced in SCT.
+\item In \cref{sec:internal}, we show how we can use SCT to define
+  \emph{internal categories}, which allows us to prove additional
+  theorems that are not formalizable as synthetic theorems.
+\item In \cref{sec:semantics}, we show that the syntax of SCT is sound
+  for models in an arbitrary virtual double category with
+  corresponding universal constructions.
+\item In \cref{sec:discussion}, we discuss related type theories and
+  potential extensions to model multi-variable and higher-order
+  categorical constructions.
+\end{enumerate}
 
 \section{Syntax of SCT}
 
@@ -3028,8 +3123,6 @@ defined on syntactic forms of SCT.
 
 TODO: example of applying the principle in our calculus.
 
-
-
 \section{Semantics}
 
 In this section we establish our desired semantic soundness theorem,
@@ -3039,6 +3132,18 @@ equipment with the corresponding universal properties.
 This proof is straightforward, since our constructions are explicitly
 modeled on the universal properties, with the main difference being
 that our notion of restriction is strict.
+
+\begin{definition}[Psuedo Double Category]
+  
+\end{definition}
+
+\begin{definition}[Restriction]
+  
+\end{definition}
+
+\begin{definition}[Unit]
+  
+\end{definition}
 
 %% \section{Conservativity of Homs, Tensors}
 
