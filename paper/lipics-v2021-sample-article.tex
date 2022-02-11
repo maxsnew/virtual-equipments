@@ -176,25 +176,27 @@
 
 %TODO mandatory: add short abstract of the document
 \begin{abstract}
-  We present a domain-specific type theory for formal category theory
-  constructions and proofs. The type theory axiomatizes notions of
+  We present a domain-specific type theory for constructions and
+  proofs in category theory. The type theory axiomatizes notions of
   category, functor, profunctor and a generalized form of natural
-  transformations. By restricting the type theory to a form of ordred
+  transformations. By restricting the type theory to a form of ordered
   logic, we guarantee that all mappings between categories are
   functorial and all transformations are natural by construction, with
-  no separate proof necessary. We demonstrate the utility of the type
-  theory by proving a form of the Yoneda lemma which reads as the
-  classical proof, but with all naturality side-conditions
-  automatically satisfied.
+  no separate proof necessary. Important category theoretic proofs
+  such as the Yoneda lemma and Co-yoneda lemma become simple type
+  theoretic proofs about the relationship between unit, tensor and
+  (ordered) function types.
 
-  We show that the type theory is sound and complete for virtual
-  equipments, a kind of double category which is known to model not
-  just ordinary categories but enriched and internal categories as
-  well. This means that proofs and constructions in our theory hold
-  not just for ordinary categories but also for a broad class of
-  generalized categories. We demonstrate that the type theory
-  simplifies working with virtual equipments compared to their
-  algebraic description in the literature.
+  We show that the type theory is sound for models called
+  \emph{virtual equipments}, a kind of double category which is known
+  to model not just ordinary categories but enriched, internal and
+  generalized multi-categories as well. This means that while proofs
+  and constructions in our theory read like typical category-theoretic
+  constructions, the proofs automatically apply to these generalized
+  categories. Our type theory simplifies arguments over the algebraic
+  description of virtual equipments by modeling the algebraic
+  operation of restriction of profunctors along functors as instead
+  the strict syntactic substitution.
 \end{abstract}
 
 \section{Introduction}
