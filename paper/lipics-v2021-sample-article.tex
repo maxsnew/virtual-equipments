@@ -3169,7 +3169,9 @@ by the corresponding type formers. There are a lot of details to be
 verified, especially the equations.
 
 
-\section{Related Work}
+\section{Discussion}
+
+\paragraph{Directed Type Theory}
 
 Cartesian Bicategories.
 
@@ -3179,8 +3181,67 @@ Fibrational approaches to logical relations
 
 Double-cat-like syntax: Gradual Type Theory, System P of parametricity, cubical stuff?
 
-String Diagrams? 
+String Diagrams?
 
+\paragraph{Semantic extensions}
+
+\paragraph{Extensions}
+
+While we have demonstrated that many common constructions in category
+theory can be expressed using the simple combination of homs, tensors
+and units, there are several that are out of reach for SCT due to its
+restrictive judgmental structure.
+
+First, while we can add products to the calculus, adding in a
+\emph{functor category} ${\cat C}^{\cat D}$ would necessitate adding a
+syntax for functors of multiple arguments, to allow for the lambda rule:
+\[ \inferrule {\alpha:\cat C, \beta:\cat D \vdash e : \cat E} {\alpha:\cat C \vdash \lambda \beta:\cat D. e : \cat E} \]
+This would then require also some extension to profunctors for
+allowing 0 or more covariant/contravariant dependencies as well.
+%
+In addition, we could consider extending our semantics with a notion
+of \emph{opposite category}, with the property that a covariant
+dependence of a profunctor on a variable in a category should be
+equivalent to a contravariant dependence on a variable in the opposite
+category.
+%
+This could possibly be done by introducing a modal distinction
+$\alpha:^{+}\cat C$ for covariant dependence and $\alpha:^{-}\cat C$
+for contravariant dependence, with the opposite category being a
+modality that internalizes flipping the variance as a type
+constructor.
+%
+With these two extensions, possibly, the category contexts for
+functors and profunctors could be unified as one notion of a sequence
+of object variables with variances.
+%
+With this unification, it would then be simpler to incorporate a third
+extension: a universe object, corresponding to an object
+$\textrm{Set}$, which would allow us to internalize the profunctor
+judgment in the functor judgment, modeling that in classical category
+theory, profunctors are the same as certain functors to the category
+of Sets.
+%
+While all of these extensions seem plausible, they all move away to
+the simple ordered type theory structure that allowed us to define
+units, tensor and hom profunctors so easily. It is unclear how to
+define these types in this extended structure. As a simple example, if
+profunctors have many variables of mixed variance, rather than exactly
+one of each variance, it is unclear what the appropriate
+generalization of the transformation context $\Phi$ should be.
+
+An orthogonal extension to these would be to consider adding a
+\emph{discretization} modality $|\cat C|$ that gives the discrete
+category on the underlying set of objects of $\cat C$. This would give
+us the ability to formalize concepts like ``function on objects'' or
+``unnatural transformation'' without the need to define internal
+categories. This could be modeled by adding a modal distinction
+$\alpha:^{\#}\cat C$ for ``crisp'' dependence on an object of $\cat
+C$, i.e., dependence merely on the object of $\cat C$ with no
+functoriality/naturality conditions. This would then be internalized
+by the discretization modality.
+
+   
 %% \section{Typesetting instructions -- Summary}
 %% \label{sec:typesetting-summary}
 
