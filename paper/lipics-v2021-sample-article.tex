@@ -3125,25 +3125,114 @@ TODO: example of applying the principle in our calculus.
 
 \section{Semantics}
 
-In this section we establish our desired semantic soundness theorem,
-that all constructions in the theory can be interpreted in any virtual
-equipment with the corresponding universal properties.
+In this section we establish our desired semantic soundness and
+completeness theorems for models in virtual equipments with the
+corresponding universal properties.
 %
-This proof is straightforward, since our constructions are explicitly
-modeled on the universal properties, with the main difference being
-that our notion of restriction is strict.
+The first component of this is \emph{soundness}: every category,
+object, set and transformation denote an object, vertical arrow,
+horizontal arrow and 2-cell, respectively in any representable virtual
+equipment, such that all equations in the theory are satisfied.
+%
+We combine this with a set theoretic semantics for types $A$ and
+contexts $\Gamma$ to get a simple semantics of our logic over a
+virtual equipment.
+%
+The second component of this is the \emph{completeness} theorem:
+informally, the theory contains every category, object, set and
+transformation that \emph{must} exist in any virtual equipment, and
+further equations between syntactic forms hold if and only if they
+hold in every model.
+%
+While sounding more ambitious, the completeness theorem is
+typically simpler as it just amounts to showing that the syntax itself
+forms a virtual equipment.
 
-\begin{definition}[Psuedo Double Category]
-  
+\subsection{Notion of Model}
+
+\begin{definition}[Virtual Double Category]
+  A virtual double category $V$ consists of
+  \begin{enumerate}
+    \item A set $V_0$ of objects.
+    \item For each $\cat C, \cat D \in V_0$, a set $V_v(\cat C, \cat
+      D)$ of vertical arrows, with composition and unit operations
+      satisfying the category axioms.
+    \item A set $V_h$ of horizontal arrows, with $d^+,d^- : V_h \to
+      V_0$.
+    \item For each composable string $\Phi$ of horizontal arrows
+      starting at $\cat C$ and ending at $\cat D$, and horizontal
+      arrow $R$, a set $V_2(\Phi; R)$ of 2-cells, with projection
+      functions $d^{\pm} : V_2(\Phi;R) \to V_v(d^\pm \Phi, d^\pm R)$.
+
+    \item For each $R \in V_h$, an identity arrow $\id_R \in
+      V_2(d^-R,R,d^+ R; R)$ with $d^\pm \id_R = \id_{d^\pm R}$.
+
+    \item For any $2$-cell $\alpha \in V_2(\Phi;R)$ and composable
+      string $\phi$ of 2-cells into $\Phi$, a composite $\alpha \circ
+      \phi$.
+
+    \item Composition should be unital in that:
+      \[ \id_R \circ [d^-\alpha, \alpha, d^+\alpha] = \alpha  \]
+      and
+      \[ \alpha \circ [\vec \id] = \alpha\]
+    \item And associative in that
+      \[ (\alpha \circ [\beta_1,\ldots]) \circ [\gamma_{11},\ldots,\gamma_{21},\ldots,] = \alpha \circ [(\beta_1 \circ \gamma_{11},\ldots), (\beta_2 \circ \gamma_{21},\ldots)]\]
+  \end{enumerate}
 \end{definition}
 
 \begin{definition}[Restriction]
-  
+  Let $R \in V_h$ and $f \in V_v(\cat C, d^-R)$ and $g \in V_v(\cat D,
+  d^+R)$, then a restriction of $R$ along $f,g$ is a horizontal arrow
+  $R(f,g) \in V_h$ with $d^-R(f,g)= \cat C$ and $d^+R(f,g)= \cat D$
+  with a (op?)-cartesian 2-cell $\alpha \in V_2(R(f,g),R)$ with
+  $d^-\alpha = f$ and $d^+\alpha = g$.
 \end{definition}
 
 \begin{definition}[Unit]
+  A unit $U_{\cat C}\in V_h$ with $d^\pm U_{\cat C} = \cat C$ and an op-cartesian 2-cell
+  \[ r : V_h(\cat C, U_{\cat C}) \]
+  with $d^\pm r = \id_{\cat C}$.
+\end{definition}
+
+\begin{definition}[Tensor]
+  If $R,Q \in V_h$ with $d^+R = d^-Q$, a tensor is a horizontal arrow
+  $R \odot Q \in V_h$ with $d^+ (R\odot Q) = d^+ R$ and $d^-(R \odot
+  Q) = d^- Q$ with an op-cartesian 2-cell
+  \[ p : V_h(R,Q;R \odot Q) \]
+\end{definition}
+
+\begin{definition}[Hom]
   
 \end{definition}
+
+\subsection{Soundness}
+
+
+\subsection{Completeness}
+
+\begin{definition}
+  For any $\Gamma \isadtctx$, we construct a virtual double category
+  $V^\Gamma$.
+  \begin{enumerate}
+  \item $V^\Gamma_v$ is the set of terms $\Gamma \vdash \cat C \isaCat$.
+  \item $V^\Gamma_v(\cat C, \cat D)$ is the set of objects $\Gamma
+    \pipe \alpha:\cat C \vdash a : \cat D$.
+  \item $V_h$ is the set of triples $(\cat C, \cat D, \Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R \isaSet)$
+    where $d^\pm$ are the projections
+  \item $V^\Gamma_h(\vec R; S)$ is the set of triples $(a,b,\Gamma
+    \pipe \Phi \vdash t : S[a;b])$ where $\Phi$ is the context
+    corresponding to $\vec R$ and $d^\pm$ are the obvious projections.
+
+  \item The identity morphisms are $(\cat C, \cat D, R)$ is $\Gamma\pipe\alpha:\cat C, x:R\beta:\cat D \vdash x:R$
+  \item Composition $(a,b,t) \circ [(a_1,),\ldots]$ is given by
+    substitution in each component: $(a[a_1],b[a_n], t[\phi])$.
+  \item associativity and unit rules for composition follow by the
+    definition of substitution.
+  \end{enumerate}
+\end{definition}
+
+
+
 
 %% \section{Conservativity of Homs, Tensors}
 
