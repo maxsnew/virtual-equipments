@@ -3205,8 +3205,64 @@ forms a virtual equipment.
   
 \end{definition}
 
-\subsection{Soundness}
+\subsection{Category of Signatures and Models}
 
+Our goal is to establish that the syntax of SCT (with whichever type
+constructors we choose) presents a free virtual double category (with
+the appropriate universal properties). To start we define appropriate
+categories of signatures and double categories.
+
+\begin{definition}
+  Define the category Sig to have as objects well-formed contexts
+  $\Gamma$ and morphisms $\gamma : \Delta \to \Gamma$ morphisms of
+  contexts, with the composition as substitution and identity as a
+  context morphism of all variable references.
+\end{definition}
+
+Second, there is a category of virtual double categories and functors.
+
+\begin{definition}
+  A morphism of virtual equipments with blah is a functor of virtual
+  double categories that strictly preserves the universal properties.
+\end{definition}
+
+Next, we define a profunctor between the category of signatures and
+the category of virtual equipments.
+
+\begin{definition}
+  Given a well-formed signature $\Gamma$ and a virtual equipment
+  $\mathcal V$, we mutually define the following notions:
+
+  \begin{itemize}
+  \item The set $\sem{\Gamma}_{\mathcal V}$
+  \item For any $\Gamma \vdash A$ and $\gamma \in \sem{\Gamma}_{\mathcal V}$, a set $\sem{A}_{\mathcal V} \gamma$
+  \item For any $\Gamma \vdash M : A$ and $\gamma \in \sem{\Gamma}_{\mathcal V}$, an element $\sem{M}_{\mathcal V} \in \sem{A}_{\mathcal V} \gamma$
+  \item categories...
+  \item functors...
+  \item profunctors...
+  \item trans contexts,
+  \item transformations
+  \end{itemize}
+  
+  An interpretation of a signature $\Gamma$ in a virtual equipment
+  $\mathcal V$, $\textrm{Interp}(\Gamma,\mathcal V)$ is an element of
+  the set $\sem{\Gamma}_{\mathcal V}$ where we mutually define the set
+
+  \begin{align*}
+    \sem{\cdot}_{\mathcal V} &= 1\\
+    \sem{\Gamma, x:A}_{\mathcal V} &= \sum_{\gamma \in \sem{\Gamma}_{\mathcal V}} \sem{A}_{\mathcal V}\gamma\\
+  \end{align*}
+  
+  with an 
+  \begin{align*}
+    \sem{\Gamma, x:A}_{\mathcal V} &= \sem{\Gamma}_{\mathcal V} \times \sem{A}_{\mathcal V}\\
+    \sem{\Gamma}_{\mathcal V} &= 1\\\\
+    \sem{\Sort}_{\mathcal V} &= \mathcal V_0\\
+    \sem{\varr{\cat C}{\cat D}}_{\mathcal V} &= \mathcal V_v(\sem{\cat C})
+  \end{align*}
+
+  
+\end{definition}
 
 \subsection{Completeness}
 
@@ -3215,8 +3271,10 @@ forms a virtual equipment.
   $V^\Gamma$.
   \begin{enumerate}
   \item $V^\Gamma_v$ is the set of terms $\Gamma \vdash \cat C \isaCat$.
-  \item $V^\Gamma_v(\cat C, \cat D)$ is the set of objects $\Gamma
-    \pipe \alpha:\cat C \vdash a : \cat D$.
+  \item $V^\Gamma_v(\cat C, \cat D)$ is the set of ``objects'' $\Gamma
+    \pipe \alpha:\cat C \vdash a : \cat D$. The category structure is
+    given by substitution, with the variable $\alpha \vdash \alpha$
+    the identity.
   \item $V_h$ is the set of triples $(\cat C, \cat D, \Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R \isaSet)$
     where $d^\pm$ are the projections
   \item $V^\Gamma_h(\vec R; S)$ is the set of triples $(a,b,\Gamma
@@ -3226,12 +3284,14 @@ forms a virtual equipment.
   \item The identity morphisms are $(\cat C, \cat D, R)$ is $\Gamma\pipe\alpha:\cat C, x:R\beta:\cat D \vdash x:R$
   \item Composition $(a,b,t) \circ [(a_1,),\ldots]$ is given by
     substitution in each component: $(a[a_1],b[a_n], t[\phi])$.
-  \item associativity and unit rules for composition follow by the
-    definition of substitution.
+  \item Associativity and unit rules for composition follow from the
+    definition of substitution by a straightforward induction.
   \end{enumerate}
 \end{definition}
 
+\subsection{Soundness}
 
+Let $$
 
 
 %% \section{Conservativity of Homs, Tensors}
