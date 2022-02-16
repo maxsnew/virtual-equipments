@@ -89,6 +89,7 @@
 %% \newtheorem{lemma}{Lemma}
 %% \newtheorem{construction}{Construction}
 %% \newtheorem{definition}{Definition}
+\newcommand{\sem}[1]{\llbracket{#1}\rrbracket}
 \newcommand{\pto}{\nrightarrow}
 \newcommand{\pfrom}{\nleftarrow}
 \newcommand{\vcat}{\mathcal}
@@ -3237,46 +3238,59 @@ the category of virtual equipments.
   \item The set $\sem{\Gamma}_{\mathcal V}$
   \item For any $\Gamma \vdash A$ and $\gamma \in \sem{\Gamma}_{\mathcal V}$, a set $\sem{A}_{\mathcal V} \gamma$
   \item For any $\Gamma \vdash M : A$ and $\gamma \in \sem{\Gamma}_{\mathcal V}$, an element $\sem{M}_{\mathcal V} \in \sem{A}_{\mathcal V} \gamma$
-  \item categories...
-  \item functors...
-  \item profunctors...
-  \item trans contexts,
-  \item transformations
+  \item For any $\Gamma \vdash \cat C \isaCat$ and $\gamma \in \sem{\Gamma}_{\mathcal V}$, an object $\sem{\cat C}_{\mathcal V}\gamma$
+  \item For any $\Gamma\pipe\alpha:\cat C \vdash a :\cat D$ and $\gamma \in \sem{\Gamma}_{\mathcal V}$, a vertical morphism $\sem{\alpha.a}_{\mathcal V}\gamma \in \mathcal V_v(\sem{\cat C}_{\mathcal V}\gamma, \sem{\cat D}_{\mathcal V}\gamma,)$
+  \item For any $\Gamma\pipe\Xi \vdash R \isaSet$ and $\gamma \in
+    \sem{\Gamma}_{\mathcal V}$, a horizontal arrow $\sem{R}_{\mathcal
+      V}\gamma \in \mathcal V_h$ such that $d^\pm\sem{R}_{\mathcal
+      V}\gamma = \sem{d^\pm\Xi}_{\mathcal V}\gamma$. We also extend
+    this in the obvious way to transformation contexts
+    $\sem{\Phi}_{\mathcal V}\gamma$
+  \item For any $\Gamma\pipe\Phi \vdash t : R$ and $\gamma \in
+    \sem{\Gamma}_{\mathcal V}$, a 2-cell $\sem{t}_{\mathcal V}\gamma
+    \in V_h(\sem{\Phi}_{\mathcal V}\gamma;\sem{R}_{\mathcal V}\gamma)$
+    with $d^\pm\sem{t}_{\mathcal V}\gamma = \id$.
   \end{itemize}
   
-  An interpretation of a signature $\Gamma$ in a virtual equipment
-  $\mathcal V$, $\textrm{Interp}(\Gamma,\mathcal V)$ is an element of
-  the set $\sem{\Gamma}_{\mathcal V}$ where we mutually define the set
-
-  \begin{align*}
-    \sem{\cdot}_{\mathcal V} &= 1\\
-    \sem{\Gamma, x:A}_{\mathcal V} &= \sum_{\gamma \in \sem{\Gamma}_{\mathcal V}} \sem{A}_{\mathcal V}\gamma\\
-  \end{align*}
+  %% \begin{align*}
+  %%   \sem{\cdot}_{\mathcal V} &= 1\\
+  %%   \sem{\Gamma, x:A}_{\mathcal V} &= \sum_{\gamma \in \sem{\Gamma}_{\mathcal V}} \sem{A}_{\mathcal V}\gamma\\
+  %% \end{align*}
   
-  with an 
-  \begin{align*}
-    \sem{\Gamma, x:A}_{\mathcal V} &= \sem{\Gamma}_{\mathcal V} \times \sem{A}_{\mathcal V}\\
-    \sem{\Gamma}_{\mathcal V} &= 1\\\\
-    \sem{\Sort}_{\mathcal V} &= \mathcal V_0\\
-    \sem{\varr{\cat C}{\cat D}}_{\mathcal V} &= \mathcal V_v(\sem{\cat C})
-  \end{align*}
-
-  
+  %% with an 
+  %% \begin{align*}
+  %%   \sem{\Gamma, x:A}_{\mathcal V} &= \sem{\Gamma}_{\mathcal V} \times \sem{A}_{\mathcal V}\\
+  %%   \sem{\Gamma}_{\mathcal V} &= 1\\\\
+  %%   \sem{\Sort}_{\mathcal V} &= \mathcal V_0\\
+  %%   \sem{\varr{\cat C}{\cat D}}_{\mathcal V} &= \mathcal V_v(\sem{\cat C})
+  %% \end{align*}
 \end{definition}
 
-\subsection{Completeness}
+And we define a profunctor of interpretations of a signature in a
+virtual equipment as follows:
+\begin{definition}
+  An interpretation of a signature $\Gamma$ in a virtual equipment
+  $\mathcal V$ is an element of the set $\sem{\Gamma}_{\mathcal
+    V}$. Call this set $\textrm{Interp}(\Gamma;\mathcal V)$.
 
+  Note that this constitutes a profunctor contravariant in $\Gamma$
+  and covariant in $\mathcal V$.
+\end{definition}
+
+Next, we define the syntactic virtual equipment $\textrm{Syn}(\Gamma)$
+for a signature $\Gamma$.
 \begin{definition}
   For any $\Gamma \isadtctx$, we construct a virtual double category
   $V^\Gamma$.
   \begin{enumerate}
   \item $V^\Gamma_v$ is the set of terms $\Gamma \vdash \cat C \isaCat$.
-  \item $V^\Gamma_v(\cat C, \cat D)$ is the set of ``objects'' $\Gamma
-    \pipe \alpha:\cat C \vdash a : \cat D$. The category structure is
-    given by substitution, with the variable $\alpha \vdash \alpha$
-    the identity.
-  \item $V_h$ is the set of triples $(\cat C, \cat D, \Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R \isaSet)$
-    where $d^\pm$ are the projections
+  \item $V^\Gamma_v(\cat C, \cat D)$ is the set of objects in context
+    $\Gamma \pipe \alpha:\cat C \vdash a : \cat D$. The category
+    structure is given by substitution, with the variable $\alpha
+    \vdash \alpha$ the identity.
+  \item $V_h$ is the set of triples $(\cat C, \cat D, \Gamma \pipe
+    \alpha:\cat C;\beta:\cat D \vdash R \isaSet)$ where $d^\pm$ are
+    the projections
   \item $V^\Gamma_h(\vec R; S)$ is the set of triples $(a,b,\Gamma
     \pipe \Phi \vdash t : S[a;b])$ where $\Phi$ is the context
     corresponding to $\vec R$ and $d^\pm$ are the obvious projections.
@@ -3289,9 +3303,18 @@ the category of virtual equipments.
   \end{enumerate}
 \end{definition}
 
-\subsection{Soundness}
+Then the soundness theorem says that for any $\Gamma$, the virtual
+double category $\textrm{Syn}(\Gamma)$ provides an isomorphism of profunctors:
+\[ \textrm{Interp}(\Gamma, \mathcal V \cong VE(\textrm{Syn}(\Gamma), \mathcal V) \]
+As we saw in a previous section, the backwards direction of this
+isomorphism should be a universal interpretation:
 
-Let $$
+\begin{definition}[Universal Interpretation]
+  For any signature $\Gamma$ there is a ``self-interpretation'' $\eta:
+  \textrm{Interp}(\Gamma, \textrm{Syn}(\Gamma))$ defined as the
+  identity substitution $\id \in \sem{\Gamma}_{\textrm{Syn}(\Gamma)}$
+  
+\end{definition}
 
 
 %% \section{Conservativity of Homs, Tensors}
