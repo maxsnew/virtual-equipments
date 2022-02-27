@@ -1164,6 +1164,60 @@ Semantically, the tensor product is the composition of profunctors,
 which is typically written as a coend
 \[ \int_{\beta} P(-,\beta) \times Q(\beta,=) \]
 
+\subsection{Graph of a Profunctor}
+
+One final multiplicative we can define is the \emph{graph} of a
+profunctor. This is unique among the multiplicatives in that it
+defines a \emph{category} rather than a profunctor. It is a negative
+multiplicative but it looks like a positive ??. A functor into the
+category of elements $\exists (\alpha; \beta). R$ is equivalent to a
+morphism into the functor $R$.
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule*[right=Graph-Formation]
+    {\Gamma \vdash \alpha:\cat C; \beta:\cat D \vdash R \isaSet}
+    {\Gamma \vdash \exists (\alpha;\beta). R \isaCat}
+
+    \inferrule*[right=Graph-E+]
+    {\Gamma \vdash \gamma:\cat E \vdash \phi : \exists(\alpha:\cat C;\beta: \cat D).R}
+    {\Gamma \vdash \pi_+\phi : \cat C}
+
+    \inferrule*[right=Graph-E-]
+    {\Gamma \vdash \gamma:\cat E \vdash \phi : \exists(\alpha:\cat C;\beta: \cat D).R}
+    {\Gamma \vdash \pi_-\phi : \cat D}
+
+    \inferrule*[right=Graph-Ep]
+    {\Gamma \vdash \gamma:\cat E \vdash \phi : \exists(\alpha:\cat C;\beta: \cat D).R}
+    {\Gamma \vdash \gamma:\cat E \vdash \pi_p\phi : R[\pi_+\phi/\alpha,\pi_-\phi/\beta]}
+
+    \inferrule*[right=Graph-Intro]
+    {\Gamma\vdash \gamma:\cat E \vdash a : \cat C \and
+      \Gamma\vdash \gamma:\cat E \vdash b : \cat D \and
+      \Gamma\vdash \gamma:\cat E \vdash t : R[a/\alpha;b/\beta]}
+    {\Gamma\vdash \gamma:\cat E \vdash (a,b,t) : \exists (\alpha;\beta). R}
+    
+    \inferrule*[right=Unit-Formation]
+    {\Gamma \vdash \cat C \isaCat\and
+     \Gamma \pipe d^-\Xi \vdash a_1 : \cat C\and \Gamma \pipe d^+ \Xi \vdash a_2 : \cat C}
+    {\Gamma \pipe \Xi \vdash \punitinXfromYtoZ {\cat C} {a_1} {a_2}}
+
+    \pi_+(a,b,t) = a \\
+    \pi_-(a,b,t) = b \\
+    \pi_p(a,b,t) = t\\
+
+    \inferrule
+    {\Gamma \vdash \gamma:\cat E \vdash \phi : \exists(\alpha:\cat C;\beta:\cat D). R}
+    {\phi = (\pi_+\phi, \pi_-\phi, \pi_p\phi)}
+  \end{mathpar}  
+  \caption{Graph of a Profunctor}
+\end{figure}
+
+Semantically, the graph of a profunctor is simply the category of
+elements of the profunctor. Taking the profunctor to be (restrictions
+of) the hom profunctor allows us to define the slice, arrow and comma
+categories.
+
 \subsection{Dependent Types}
 
 Next, we cover the basic dependent type theory structure: $\Pi,\Sigma$
@@ -3519,6 +3573,9 @@ $\alpha:^{\#}\cat C$ for ``crisp'' dependence on an object of $\cat
 C$, i.e., dependence merely on the object of $\cat C$ with no
 functoriality/naturality conditions. This would then be internalized
 by the discretization modality.
+
+\paragraph{As a tool for Formal Type Theory}
+
 
    
 %% \section{Typesetting instructions -- Summary}
