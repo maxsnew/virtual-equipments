@@ -1167,11 +1167,32 @@ which is typically written as a coend
 \subsection{Graph of a Profunctor}
 
 One final multiplicative we can define is the \emph{graph} of a
-profunctor. This is unique among the multiplicatives in that it
-defines a \emph{category} rather than a profunctor. It is a negative
-multiplicative but it looks like a positive ??. A functor into the
-category of elements $\exists (\alpha; \beta). R$ is equivalent to a
-morphism into the functor $R$.
+profunctor. Given a profunctor $\alpha:\cat C;\beta:\cat D \vdash R$,
+the ``graph'' of $R$ is a category $\exists \alpha;\beta. R$. In
+ordinary category theory, this is usually defined as the category of
+elements of $R$ viewed as a functor $R : \cat C^o \times D \to \Set$.
+In detail, its objects are triples $(a:\cat C, r : R, b : \cat D)$ and
+morphism from $(a,r,b)$ to $(a', r', b')$ consists of a pair of
+morphisms $g : b \to b'$ and a backwards $f : a' \to a$ such that $r'
+= g\circ r \circ f$.
+%
+By picking $R = \punitinXfromYtoZ {\cat C} {\alpha}{\alpha'}$ we
+recover the \emph{arrow} category $\exists
+(\alpha;\alpha'). \punitinXfromYtoZ {\cat C}{\alpha}{\alpha'}$, by
+composing these with functors, we recover the notion of \emph{comma}
+category $\exists \alpha;\beta. \punitinXfromYtoZ {\cat
+  E}{(F\alpha)}{(G\beta)}$ and by picking either $F$ or $G$ to have
+domain the terminal category $1$, we recover the notion of a
+\emph{slice} category.
+
+This is unique among the multiplicatives in that it defines a
+\emph{category} rather than a profunctor. Also note that while similar
+to the tensor in that we use existential notation, the graph of a
+profunctor is a \emph{negative} multiplicative, analogous to a
+$\Sigma$-type. The universal property says that a functor from $\cat
+E$ into the graph $\exists (\alpha; \beta). R$ is equivalent to a
+transformation from $\cat E$ into the functor $R$, including functors
+from $\cat E$ to $\cat C$ and $\cat D$.
 
 \begin{figure}
   \begin{mathpar}
@@ -1212,11 +1233,6 @@ morphism into the functor $R$.
   \end{mathpar}  
   \caption{Graph of a Profunctor}
 \end{figure}
-
-Semantically, the graph of a profunctor is simply the category of
-elements of the profunctor. Taking the profunctor to be (restrictions
-of) the hom profunctor allows us to define the slice, arrow and comma
-categories.
 
 \subsection{Dependent Types}
 
@@ -1645,7 +1661,7 @@ endo-profunctor $P$:
   types.
 \end{definition}
 
-\subsection{Adjoint Functors}
+\subsection{Adjoint Functors and Representable Profunctors}
 
 Next, we demonstrate that the two common definitions of adjoint
 functors are equivalent: isomorphism of hom-sets and units and
@@ -1677,18 +1693,15 @@ $\hlambda\alpha\beta\punitinXfromYtoZ {\cat C}{F\alpha}{\beta}$.
 Then we can show that any right-representation isomorphism is
 determined by a co-unit:
 \begin{lemma}[(Co)-unit of a Representation]
-  If $G: \varr {\cat D}{\cat C}$ right-represents $R : \harr {\cat C}{\cat D}$, then there is a natural element
-
+  If $G: \varr {\cat D}{\cat C}$ right-represents $R : \harr {\cat
+    C}{\cat D}$, then there is a natural element, the co-unit:
   \[ \pendallXdotY \beta \harrapp R {G\beta} \beta \]
-
   Such that the half of the isomorphism 
-
   \[ \punitinXfromYtoZ {\cat C} {\alpha} {G \beta} \multimap \harrapp R {\alpha}{\beta} \]
-
   is defined by composition with the natural element.
 
   Dually, any $F$ left-representing isomorphism with $R$ is determined
-  by a term of type $\pendallXdotY \alpha \harrapp R {\alpha}
+  by a ``unit'' of type $\pendallXdotY \alpha \harrapp R {\alpha}
   {F\alpha}$.
 \end{lemma}
 \begin{proof}
@@ -1838,6 +1851,57 @@ just limits but all right Kan extensions
     &\cong \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {\cat C'}{\alpha'}{J\alpha})} {\punitinXfromYtoZ {\cat D}{\beta'}{G(K \alpha)}} \tag{Adjunction}\\
   \end{align*}
 \end{proof}
+
+\subsection{(op)-Fibrations}
+
+Using the graph of a profunctor, we can give the following definition
+for when a functor is a fibration. This gives a very weak notion of
+fibration that is probably equivalent to a Street fibration (todo: is
+this an existing definition???).
+
+\begin{definition}{Street Fibration}
+  Let $F : \varr{\cat C}{\cat D}$, we say $F$ is a \emph{fibration}
+  when the induced functor
+  \[p : \exists {\alpha:\cat C;\alpha':\cat C} \punitinXfromYtoZ {\cat C}{\alpha}{\alpha'} \vdash (F\pi_-p,F_1\pi_pp, \pi_+p) : \exists {\beta:\cat D;\alpha':\cat C}. \punitinXfromYtoZ {\cat D} \beta {F \alpha'} \]
+  has a right adjoint inverse.
+
+  Dually, $F$ is an \emph{op-fibration} when the same induced functor
+  has a left adjoint inverse.
+\end{definition}
+
+We can get a strict notion of fibration if we allow ourselves to be a little ``evil'':
+
+\begin{definition}{Grothendieck Fibration}
+  Let $F : \varr{\cat C}{\cat D}$, we say $F$ is a \emph{strict
+  fibration} when the induced functor $F'$ has a strict right adjoint
+  inverse $R$, i.e. inverse $\lambda p. R(F'(p)) = \lambda p. p$. We
+  analogously define a strict op-fibration.  
+\end{definition}
+
+Alternatively, we can give a more traditional definition using slice
+categories, but the downside is the formulation is inevitably higher
+order.
+\begin{definition}{Street Fibration}
+  Let $F : \varr{\cat C}{\cat D}$, we say $F$ is a \emph{fibration}
+  when for every $a : \varr{1}{\cat C}$, the induced functor
+  \[p : \exists {\alpha:\cat C; o:\cat 1} \punitinXfromYtoZ {\cat C}{\alpha}{a()} \vdash (F\pi_-p,F_1\pi_pp, \pi_+p) : \exists {\beta:\cat D; o:\cat 1}. \punitinXfromYtoZ {\cat D} \beta {F(a())} \]
+  has a right adjoint inverse.
+
+  Dually, $F$ is an \emph{op-fibration} when the same induced functor
+  has a left adjoint inverse.
+\end{definition}
+
+
+\begin{lemma}{Fibrations compose}
+  If $F : \varr{\cat C}{\cat D}$ and $G : \varr{\cat D}{\cat E}$ are
+  (op)-fibrations then so is $G \circ F$.
+\end{lemma}
+\begin{proof}
+  By composition of adjoints.
+\end{proof}
+
+
+
 
 \section{Internal Category Theory}
 
