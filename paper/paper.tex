@@ -1854,43 +1854,21 @@ just limits but all right Kan extensions
 
 \subsection{(op)-Fibrations}
 
-Using the graph of a profunctor, we can give the following definition
-for when a functor is a fibration. This gives a very weak notion of
-fibration that is probably equivalent to a Street fibration (todo: is
-this an existing definition???).
+A (Street) fibration can be defined in any 2-category. A functor $p :
+\varr {\cat E}{\cat B}$ is a fibration when the morphism $p \to \cat
+B/p$ in the slice 2-category over $\cat B$ has a right adjoint.
 
-\begin{definition}{Street Fibration}
-  Let $F : \varr{\cat C}{\cat D}$, we say $F$ is a \emph{fibration}
-  when the induced functor
-  \[p : \exists {\alpha:\cat C;\alpha':\cat C} \punitinXfromYtoZ {\cat C}{\alpha}{\alpha'} \vdash (F\pi_-p,F_1\pi_pp, \pi_+p) : \exists {\beta:\cat D;\alpha':\cat C}. \punitinXfromYtoZ {\cat D} \beta {F \alpha'} \]
-  has a right adjoint inverse.
+Since we can define all of the components of this slice 2-category we
+can internalize this definition in SCT.
 
-  Dually, $F$ is an \emph{op-fibration} when the same induced functor
-  has a left adjoint inverse.
-\end{definition}
+\begin{enumerate}
+\item A functor $\textrm{wp} : \exists (\alpha:\cat B; \beta:\cat E). \punitinXfromYtoZ {\cat B} \alpha {p\beta}$
+\item In the slice category: $p(\textrm{wp}(k)) = \pi_-k$
+\item With a universal morphism $\epsilon : \pforallXfromYtoZ {k} \punitinXfromYtoZ {} {(\pi_-k,k,\punitrefl{}{\pi_-k})} {k}$
+\item In the slice category: $\pi_k \epsilon = \id$ (how to express this nicely in SCT?)
+\end{enumerate}
 
-We can get a strict notion of fibration if we allow ourselves to be a little ``evil'':
-
-\begin{definition}{Grothendieck Fibration}
-  Let $F : \varr{\cat C}{\cat D}$, we say $F$ is a \emph{strict
-  fibration} when the induced functor $F'$ has a strict right adjoint
-  inverse $R$, i.e. inverse $\lambda p. R(F'(p)) = \lambda p. p$. We
-  analogously define a strict op-fibration.  
-\end{definition}
-
-Alternatively, we can give a more traditional definition using slice
-categories, but the downside is the formulation is inevitably higher
-order.
-\begin{definition}{Street Fibration}
-  Let $F : \varr{\cat C}{\cat D}$, we say $F$ is a \emph{fibration}
-  when for every $a : \varr{1}{\cat C}$, the induced functor
-  \[p : \exists {\alpha:\cat C; o:\cat 1} \punitinXfromYtoZ {\cat C}{\alpha}{a()} \vdash (F\pi_-p,F_1\pi_pp, \pi_+p) : \exists {\beta:\cat D; o:\cat 1}. \punitinXfromYtoZ {\cat D} \beta {F(a())} \]
-  has a right adjoint inverse.
-
-  Dually, $F$ is an \emph{op-fibration} when the same induced functor
-  has a left adjoint inverse.
-\end{definition}
-
+We can also weaken this to a Street fibration if we require the more sensible $p(\textrm{wp}(k)) \cong \pi_-k$ only.
 
 \begin{lemma}{Fibrations compose}
   If $F : \varr{\cat C}{\cat D}$ and $G : \varr{\cat D}{\cat E}$ are
@@ -1899,6 +1877,10 @@ order.
 \begin{proof}
   By composition of adjoints.
 \end{proof}
+
+\begin{lemma}{Fibrations are Stable under Pullback}
+  
+\end{lemma}
 
 
 
