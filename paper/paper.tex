@@ -1941,68 +1941,112 @@ TODO: example of applying the principle in our calculus.
 
 \section{Semantics}
 
-In this section we establish our desired semantic soundness and
-completeness theorems for models in virtual equipments with the
-corresponding universal properties.
-%
-The first component of this is \emph{soundness}: every category,
-object, set and transformation denote an object, vertical arrow,
-horizontal arrow and 2-cell, respectively in any representable virtual
-equipment, such that all equations in the theory are satisfied.
-%
-We combine this with a set theoretic semantics for types $A$ and
-contexts $\Gamma$ to get a simple semantics of our logic over a
-virtual equipment.
-%
-The second component of this is the \emph{completeness} theorem:
-informally, the theory contains every category, object, set and
-transformation that \emph{must} exist in any virtual equipment, and
-further equations between syntactic forms hold if and only if they
-hold in every model.
-%
-While sounding more ambitious, the completeness theorem is
-typically simpler as it just amounts to showing that the syntax itself
-forms a virtual equipment.
+Next, we develop the basic model theory for SCT. Because SCT includes
+not just a syntax for category theory, but is also indexed by an
+ordinary context of dependent type theory $\Gamma$, a model of SCT is
+not given by a \emph{single} virtual double category, but instead by
+an \emph{indexed family} of VDCs, parameterized by an object of a
+category that interprets dependent type theory. We call such a
+structure as a \emph{VDC-hyperdoctrine}. We then show how to construct
+a VDC-hyperdoctrine indexed by the category of sets, which has the
+intuitive reading that any of the VDC judgments $\Gamma \vdash J$ is
+interpreted as simply a family of $J$-data parameterized by elements
+of the set $\Gamma$.
+
+%% The first component of this is \emph{soundness}: every category,
+%% object, set and transformation denote an object, vertical arrow,
+%% horizontal arrow and 2-cell, respectively in any representable virtual
+%% equipment, such that all equations in the theory are satisfied.
+%% %
+%% We combine this with a set theoretic semantics for types $A$ and
+%% contexts $\Gamma$ to get a simple semantics of our logic over a
+%% virtual equipment.
+%% %
+%% The second component of this is the \emph{completeness} theorem:
+%% informally, the theory contains every category, object, set and
+%% transformation that \emph{must} exist in any virtual equipment, and
+%% further equations between syntactic forms hold if and only if they
+%% hold in every model.
+%% %
+%% While sounding more ambitious, the completeness theorem is
+%% typically simpler as it just amounts to showing that the syntax itself
+%% forms a virtual equipment.
 
 \subsection{Notion of Model}
 
-%% \begin{definition}[Virtual Double Category]
-%%   A virtual double category $V$ consists of
-%%   \begin{enumerate}
-%%     \item A set $V_0$ of objects.
-%%     \item For each $\cat C, \cat D \in V_0$, a set $V_v(\cat C, \cat
-%%       D)$ of vertical arrows, with composition and unit operations
-%%       satisfying the category axioms.
-%%     \item A set $V_h$ of horizontal arrows, with $d^+,d^- : V_h \to
-%%       V_0$.
-%%     \item For each composable string $\Phi$ of horizontal arrows
-%%       starting at $\cat C$ and ending at $\cat D$, and horizontal
-%%       arrow $R$, a set $V_2(\Phi; R)$ of 2-cells, with projection
-%%       functions $d^{\pm} : V_2(\Phi;R) \to V_v(d^\pm \Phi, d^\pm R)$.
+First, we recount the definition of a virtual double category.
+\begin{definition}[Virtual Double Category]
+  A (vertically strict) virtual equipment $\mathcal V$ consists of
+  \begin{enumerate}
+    \item A set $\mathcal V_0$ of objects.
+    \item For each $\cat C, \cat D \in V_0$, a set $V_v(\cat C, \cat
+      D)$ of vertical arrows, with composition and unit operations
+      satisfying the category axioms.
+    \item A set $V_h$ of horizontal arrows, with $d^+,d^- : V_h \to
+      V_0$.
 
-%%     \item For each $R \in V_h$, an identity arrow $\id_R \in
-%%       V_2(d^-R,R,d^+ R; R)$ with $d^\pm \id_R = \id_{d^\pm R}$.
+    \item For any vertical arrows $f \in V_v(\cat C, \cat D)$ and $g
+      \in V_v(\cat E, \cat F)$ and horizontal arrow $R \in V_h$ with
+      $d^+R = \cat F$ and $d^-R = \cat D$, a \emph{restriction}
+      $R(f,g)$ with $d^+R = \cat C$ and $d^-R = \cat E$.
 
-%%     \item For any $2$-cell $\alpha \in V_2(\Phi;R)$ and composable
-%%       string $\phi$ of 2-cells into $\Phi$, a composite $\alpha \circ
-%%       \phi$.
+      This operation is furthermore associative and unital $R(f \circ
+      f',g \circ g') = R(f,g)(f',g')$ and $R(\id,\id) = R$.
+      
+    \item For each composable string $\Phi$ (defined below) of horizontal arrows
+      starting at $\cat C$ and ending at $\cat D$, and horizontal
+      arrow $R$ with $d^-R = \cat C$ and $d^+R = \cat D$, a set
+      $V_2(\Phi; R)$ of 2-cells.
 
-%%     \item Composition should be unital in that:
-%%       \[ \id_R \circ [d^-\alpha, \alpha, d^+\alpha] = \alpha  \]
-%%       and
-%%       \[ \alpha \circ [\vec \id] = \alpha\]
-%%     \item And associative in that
-%%       \[ (\alpha \circ [\beta_1,\ldots]) \circ [\gamma_{11},\ldots,\gamma_{21},\ldots,] = \alpha \circ [(\beta_1 \circ \gamma_{11},\ldots), (\beta_2 \circ \gamma_{21},\ldots)]\]
-%%   \end{enumerate}
-%% \end{definition}
+    \item For any string of vertical arrows $\vec f$ into $\Phi$ and
+      2-cell $r \in \mathcal V_2(\Phi,S)$, a restriction operation
+      $r(\vec f) \in \mathcal V_2(\Phi(\vec f), S(d^-(\vec f),
+      d^+(\vec f)))$. Furthermore, this is associative and unital
+      $r(\vec id) = r$ and $r(\vec f \circ \vec g) = r(\vec {f \circ
+        g})$
 
-%% \begin{definition}[Restriction]
-%%   Let $R \in V_h$ and $f \in V_v(\cat C, d^-R)$ and $g \in V_v(\cat D,
-%%   d^+R)$, then a restriction of $R$ along $f,g$ is a horizontal arrow
-%%   $R(f,g) \in V_h$ with $d^-R(f,g)= \cat C$ and $d^+R(f,g)= \cat D$
-%%   with a (op?)-cartesian 2-cell $\alpha \in V_2(R(f,g),R)$ with
-%%   $d^-\alpha = f$ and $d^+\alpha = g$.
-%% \end{definition}
+    \item For each $R \in V_h$, an identity arrow $\id_R \in
+      V_2(d^-R,R,d^+ R; R)$ with $d^\pm \id_R = \id_{d^\pm R}$.
+
+    \item For any $2$-cell $\alpha \in V_2(\Phi;R)$ and composable
+      string $\phi$ of 2-cells into $\Phi$, a composite $\alpha \circ
+      \phi$.
+
+    \item Composition should be unital in that:
+      \[ \id_R \circ [d^-\alpha, \alpha, d^+\alpha] = \alpha  \]
+      and
+      \[ \alpha \circ [\vec \id] = \alpha\]
+    \item And associative in that
+      \[ (\alpha \circ [\beta_1,\ldots]) \circ [\gamma_{11},\ldots,\gamma_{21},\ldots,] = \alpha \circ [(\beta_1 \circ \gamma_{11},\ldots), (\beta_2 \circ \gamma_{21},\ldots)]\]
+  \end{enumerate}
+
+  A composable string $\Phi$ of horizontal arrows is defined to be an
+  alternating sequence of objects and horizontal arrows, beginning and
+  ending with an object such that any substring $\cat C,R,\cat D$
+  satisfies $d^-R = \cat C$ and $d^+R = \cat D$.
+
+  A composable string of vertical arrows $\vec f$ into $\Phi$ is a
+  sequence of vertical arrows, one for each object in $\Phi$, with the
+  codomain of the arrow matching the object in $\Phi$. Then 
+
+  A composable string of 2-cells from $\Phi$ to $\Psi$ is a sequence
+  $\vec r$ of 2-cells, one for each horizontal arrow in $\Psi$ such
+  that the codomains match the objects in
+\end{definition}
+
+Our main departure from\cite{crutwellshulman} is making restrictions
+part of the definition, and also requiring them to be strictly
+associative and unital. In the examples that we are most concerned
+with, however, these operations are strict and so we will not explore
+the possibility of coherence theorems for proving this equivalent to a
+weaker definition.
+
+\begin{definition}
+  A functor of virtual double categories $F : \mathcal V \to \mathcal
+  U$ is a mapping on objects, vertical arrows, horizontal arrows and
+  2-cells respecting typing and preserving composition, units, and
+  restriction.
+\end{definition}
 
 %% \begin{definition}[Unit]
 %%   A unit $U_{\cat C}\in V_h$ with $d^\pm U_{\cat C} = \cat C$ and an op-cartesian 2-cell
@@ -2017,75 +2061,73 @@ forms a virtual equipment.
 %%   \[ p : V_h(R,Q;R \odot Q) \]
 %% \end{definition}
 
-\subsection{Category of Models}
-
-Our goal is to establish that the syntax of SCT (with whichever type
-constructors we choose) presents the initial indexed virtual equipment
-(with the appropriate universal properties). To start we define
-appropriate categories of equipments.
-
 \begin{definition}{Indexed Virtual Equipment}
-  A VE-hyperdoctrine is a functor $\cat C^{op} \to VE$, and a morphism
-  of VE-hyperdoctrines is a natural transformation.
+  A VE-hyperdoctrine is a pair of a category $C$ and a functor $\cat
+  C^{op} \to VE$. A morphism of VE-hyperdoctrines
+  \[(F,\phi) : (\cat C, \mathcal V : \cat C^{o} \to VE) \to (\cat D, \mathcal U : \cat D^{o} \to VE)\]
+  is a pair of a functor $F : \cat C \to \cat D$ and a natural
+  transformation $\phi : \mathcal V \Rightarrow\mathcal U \circ F^{o}$.
 \end{definition}
 
-\begin{definition}[Internal Logic]
-  Given any virtual equipment $\mathcal V$, we can construct the
-  ``internal logic'' by indexing $\mathcal V$ by $\Set$:
+\begin{definition}{Soundness}
+  
+\end{definition}
 
+\begin{definition}{Completeness}
+  We define the syntactic VE-hyperdoctrine $\textrm{Syn}$ as follows:
   \begin{enumerate}
-  \item The indexing cateogry is $\Set$.
-  \item Given $\Gamma \in \Set$, the virtual equipment $\mathcal
-    V^\Gamma$ is the ``power'' of $\mathcal V$ by $\Gamma$:
+  \item The base category is the category of contexts $\Gamma$ and substitutions.
+  \item Define $\mathcal V_\Gamma$ as follows
     \begin{enumerate}
-    \item Objects are functions $\Gamma \to \mathcal V_0$.
-    \item A vertical morphism from $O$ to $O'$ is a function $\Pi_{\gamma\in\Gamma} V_v(O\gamma,O'\gamma)$.
-    \item A horizontal morphism is a function $\Gamma \to \mathcal V_h$. This satisfies
-    \item A 2-cell from $R$ to $S$ is a family $\Pi_{\gamma\in\Gamma} \mathcal V_h(R\gamma,S\gamma)$.
+    \item An object of $\mathcal V^\Gamma$ is a proof $\Gamma \vdash \cat C \isaCat$.
+    \item A vertical morphism $\mathcal V^\Gamma(\cat C, \cat D)$ is a
+      term $\Gamma\pipe \alpha:\cat C \vdash t : \cat D$ moduleo
+      $\alpha$-equivalence. Composition and identity are given by composition/variable.
+    \item A horizontal morphism $R \in \mathcal^\Gamma_h$ is a term
+      $\Gamma\pipe \alpha:\cat C;\beta:\cat D \vdash R$ with $d^-R =
+      \cat C$ and $d^+R = \cat D$.
+    \item Restriction of $R$ along $s,t$ is given by substitution
+      $R[s/\alpha;t/\beta]$. This is clearly associative and unital.
+    \item A 2-cell from $\Phi$ to $A$ is a term $\Phi \vdash t : B$
     \end{enumerate}
-    Compositions and restrictions are given pointwise.
-  \item Restriction by a function $\gamma : \Delta \to \Gamma$ is
-    given pointwise.
   \end{enumerate}
 \end{definition}
 
+%% \begin{definition}
+%%   Given a well-formed signature $\Gamma$ and a virtual equipment
+%%   $\mathcal V$, we mutually define the following notions:
 
-
-\begin{definition}
-  Given a well-formed signature $\Gamma$ and a virtual equipment
-  $\mathcal V$, we mutually define the following notions:
-
-  \begin{itemize}
-  \item The set $\sem{\Gamma}_{\mathcal V}$
-  \item For any $\Gamma \vdash A$ and $\gamma \in \sem{\Gamma}_{\mathcal V}$, a set $\sem{A}_{\mathcal V} \gamma$
-  \item For any $\Gamma \vdash M : A$ and $\gamma \in \sem{\Gamma}_{\mathcal V}$, an element $\sem{M}_{\mathcal V} \in \sem{A}_{\mathcal V} \gamma$
-  \item For any $\Gamma \vdash \cat C \isaCat$ and $\gamma \in \sem{\Gamma}_{\mathcal V}$, an object $\sem{\cat C}_{\mathcal V}\gamma$
-  \item For any $\Gamma\pipe\alpha:\cat C \vdash a :\cat D$ and $\gamma \in \sem{\Gamma}_{\mathcal V}$, a vertical morphism $\sem{\alpha.a}_{\mathcal V}\gamma \in \mathcal V_v(\sem{\cat C}_{\mathcal V}\gamma, \sem{\cat D}_{\mathcal V}\gamma,)$
-  \item For any $\Gamma\pipe\Xi \vdash R \isaSet$ and $\gamma \in
-    \sem{\Gamma}_{\mathcal V}$, a horizontal arrow $\sem{R}_{\mathcal
-      V}\gamma \in \mathcal V_h$ such that $d^\pm\sem{R}_{\mathcal
-      V}\gamma = \sem{d^\pm\Xi}_{\mathcal V}\gamma$. We also extend
-    this in the obvious way to transformation contexts
-    $\sem{\Phi}_{\mathcal V}\gamma$
-  \item For any $\Gamma\pipe\Phi \vdash t : R$ and $\gamma \in
-    \sem{\Gamma}_{\mathcal V}$, a 2-cell $\sem{t}_{\mathcal V}\gamma
-    \in V_h(\sem{\Phi}_{\mathcal V}\gamma;\sem{R}_{\mathcal V}\gamma)$
-    with $d^\pm\sem{t}_{\mathcal V}\gamma = \id$.
-  \end{itemize}
+%%   \begin{itemize}
+%%   \item The set $\sem{\Gamma}_{\mathcal V}$
+%%   \item For any $\Gamma \vdash A$ and $\gamma \in \sem{\Gamma}_{\mathcal V}$, a set $\sem{A}_{\mathcal V} \gamma$
+%%   \item For any $\Gamma \vdash M : A$ and $\gamma \in \sem{\Gamma}_{\mathcal V}$, an element $\sem{M}_{\mathcal V} \in \sem{A}_{\mathcal V} \gamma$
+%%   \item For any $\Gamma \vdash \cat C \isaCat$ and $\gamma \in \sem{\Gamma}_{\mathcal V}$, an object $\sem{\cat C}_{\mathcal V}\gamma$
+%%   \item For any $\Gamma\pipe\alpha:\cat C \vdash a :\cat D$ and $\gamma \in \sem{\Gamma}_{\mathcal V}$, a vertical morphism $\sem{\alpha.a}_{\mathcal V}\gamma \in \mathcal V_v(\sem{\cat C}_{\mathcal V}\gamma, \sem{\cat D}_{\mathcal V}\gamma,)$
+%%   \item For any $\Gamma\pipe\Xi \vdash R \isaSet$ and $\gamma \in
+%%     \sem{\Gamma}_{\mathcal V}$, a horizontal arrow $\sem{R}_{\mathcal
+%%       V}\gamma \in \mathcal V_h$ such that $d^\pm\sem{R}_{\mathcal
+%%       V}\gamma = \sem{d^\pm\Xi}_{\mathcal V}\gamma$. We also extend
+%%     this in the obvious way to transformation contexts
+%%     $\sem{\Phi}_{\mathcal V}\gamma$
+%%   \item For any $\Gamma\pipe\Phi \vdash t : R$ and $\gamma \in
+%%     \sem{\Gamma}_{\mathcal V}$, a 2-cell $\sem{t}_{\mathcal V}\gamma
+%%     \in V_h(\sem{\Phi}_{\mathcal V}\gamma;\sem{R}_{\mathcal V}\gamma)$
+%%     with $d^\pm\sem{t}_{\mathcal V}\gamma = \id$.
+%%   \end{itemize}
   
-  %% \begin{align*}
-  %%   \sem{\cdot}_{\mathcal V} &= 1\\
-  %%   \sem{\Gamma, x:A}_{\mathcal V} &= \sum_{\gamma \in \sem{\Gamma}_{\mathcal V}} \sem{A}_{\mathcal V}\gamma\\
-  %% \end{align*}
+%%   %% \begin{align*}
+%%   %%   \sem{\cdot}_{\mathcal V} &= 1\\
+%%   %%   \sem{\Gamma, x:A}_{\mathcal V} &= \sum_{\gamma \in \sem{\Gamma}_{\mathcal V}} \sem{A}_{\mathcal V}\gamma\\
+%%   %% \end{align*}
   
-  %% with an 
-  %% \begin{align*}
-  %%   \sem{\Gamma, x:A}_{\mathcal V} &= \sem{\Gamma}_{\mathcal V} \times \sem{A}_{\mathcal V}\\
-  %%   \sem{\Gamma}_{\mathcal V} &= 1\\\\
-  %%   \sem{\Sort}_{\mathcal V} &= \mathcal V_0\\
-  %%   \sem{\varr{\cat C}{\cat D}}_{\mathcal V} &= \mathcal V_v(\sem{\cat C})
-  %% \end{align*}
-\end{definition}
+%%   %% with an 
+%%   %% \begin{align*}
+%%   %%   \sem{\Gamma, x:A}_{\mathcal V} &= \sem{\Gamma}_{\mathcal V} \times \sem{A}_{\mathcal V}\\
+%%   %%   \sem{\Gamma}_{\mathcal V} &= 1\\\\
+%%   %%   \sem{\Sort}_{\mathcal V} &= \mathcal V_0\\
+%%   %%   \sem{\varr{\cat C}{\cat D}}_{\mathcal V} &= \mathcal V_v(\sem{\cat C})
+%%   %% \end{align*}
+%% \end{definition}
 
 And we define a profunctor of interpretations of a signature in a
 virtual equipment as follows:
@@ -2137,6 +2179,41 @@ isomorphism should be a universal interpretation:
   
 \end{definition}
 
+\section{Example Models}
+
+Our main intended models are when the indexing category is $\Set$ and
+the hyperdoctrine is given by families of objects, arrows etc, of a
+fixed virtual equipment $\mathcal V$, indexed by the set
+$\sem\Gamma$. We can formalize this as the ``internal logic'' of the
+virtual equipment $\mathcal V$.
+
+\begin{definition}[Powers of Virtual Equipments]
+  Let $\mathcal V$ be a virtual equipment and let $X$ be a set.
+  Define a virtual equipment, the ``power'' $\mathcal V^X$ as follows.
+
+  \begin{enumerate}
+  \item Objects are functions $X \to \mathcal V_0$.
+  \item Vertical morphisms $\mathcal V^X_v(A,B)$ are functions
+    $\Pi_{x\inX} V_v(A x,B x)$. With pointwise composition, identity.
+  \item Horizontal morphisms $\mathcal V^X_h$ are functions $\Gamma \to \mathcal V_h$, with
+    $(d^\pm R)x = d^\pm (Rx)$.
+  \item Restriction of $R$ along $f,g$ is given by $(R(f,g))x = (R x)(f x,g x)$.
+  \item A 2-cell from $\Phi$ to $R$ is a family $\Pi_{x\in X} \mathcal
+    V^X_h(\Phix,R x)$ with composition given pointwise.
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}[Internal Logic]
+  Given any virtual equipment $\mathcal V$, we can construct the
+  ``internal logic'' by indexing $\mathcal V$ by $\Set$:
+
+  \begin{enumerate}
+  \item The indexing cateogry is $\Set$.
+  \item The equipment is defined as $\mathcal U\Gamma = \mathcam V^\Gamma$.
+  \item Restriction by a function $\gamma : \Delta \to \Gamma$ is
+    given pointwise.
+  \end{enumerate}
+\end{definition}
 
 %% \section{Conservativity of Homs, Tensors}
 
