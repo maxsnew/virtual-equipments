@@ -173,6 +173,14 @@
 
 \newcommand{\equalizeVofWbyXeqYatZ}[5]{\{ {#1} : {#2} \pipe {#3} = {#4} : {#5} \}}
 
+\newcommand{\paramPresheaf}[1]{\mathcal P^{#1}}
+\newcommand{\pmPresheaf}{\paramPresheaf\pm}
+\newcommand{\posPresheaf}{\paramPresheaf+}
+\newcommand{\negPresheaf}{\paramPresheaf-}
+\newcommand{\negPresheafApp}[2]{#1\,#2}
+\newcommand{\posPresheafApp}[2]{#1\,#2}
+
+
 \maketitle
 
 %TODO mandatory: add short abstract of the document
@@ -1180,17 +1188,15 @@ Semantically, the tensor product is the composition of profunctors,
 which is typically written as a coend
 \[ \int_{\beta} P(-,\beta) \times Q(\beta,=) \]
 
-\subsection{Graph of a Profunctor}
+\subsection{Category of Elements}
 
-One final multiplicative we can define is the \emph{graph} of a
-profunctor. Given a profunctor $\alpha:\cat C;\beta:\cat D \vdash R$,
-the ``graph'' of $R$ is a category $\exists \alpha;\beta. R$. In
-ordinary category theory, this is usually defined as the category of
-elements of $R$ viewed as a functor $R : \cat C^o \times D \to \Set$.
-In detail, its objects are triples $(a:\cat C, r : R, b : \cat D)$ and
-morphism from $(a,r,b)$ to $(a', r', b')$ consists of a pair of
-morphisms $g : b \to b'$ and a backwards $f : a' \to a$ such that $r'
-= g\circ r \circ f$.
+One final multiplicative we can define is the \emph{category of
+elements} of a profunctor. Given a profunctor $\alpha:\cat
+C;\beta:\cat D \vdash R$, the ``category of elements'' of $R$ is a
+category $\Sigma_{\alpha:\cat C;\beta:\cat D}. R$. In detail, its
+objects are triples $(a:\cat C, r : R, b : \cat D)$ and morphism from
+$(a,r,b)$ to $(a', r', b')$ consists of a pair of morphisms $g : b \to
+b'$ and a backwards $f : a' \to a$ such that $r' = g\circ r \circ f$.
 %
 By picking $R = \punitinXfromYtoZ {\cat C} {\alpha}{\alpha'}$ we
 recover the \emph{arrow} category $\exists
@@ -1248,6 +1254,61 @@ from $\cat E$ to $\cat C$ and $\cat D$.
     {\phi = (\pi_+\phi, \pi_-\phi, \pi_p\phi)}
   \end{mathpar}  
   \caption{Graph of a Profunctor}
+\end{figure}
+
+\subsection{Positive and Negative Presheaf Categories}
+
+Though defining arbitrary functor categories type-theoretically would
+require a ``multi-argument functor'' judgment, we can define
+\emph{presheaf} categories by the universal property that a functor
+$\cat C \to \mathcal P {\cat D}$ is the same as a profunctor from
+$\cat D$ to $\cat C$. To distinguish the covariant from contravariant
+presheaves, we define them dually as $\negPresheaf {\cat C}$ and
+$\posPresheaf {\cat D}$
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule*[right=NegPresheaf-Formation]
+    {\Gamma \vdash \cat C \isaCat}
+    {\Gamma \vdash \negPresheaf {\cat C} \isaCat}
+
+    \inferrule*[right=NegPresheaf-E]
+    {\Gamma \pipe d^-\Xi \vdash a : \cat C \and
+     \Gamma \pipe d^+\Xi \vdash p : \negPresheaf {\cat C}
+    }
+    {\Gamma \pipe \Xi \vdash \negPresheafApp a p \isaSet}
+
+    \inferrule*[right=NegPresheaf-I]
+    {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R : \isaSet}
+    {\Gamma \pipe \beta:\cat D \vdash \lambda \alpha:\cat C. R : \negPresheaf {\cat C}}
+
+    \negPresheafApp a (\lambda \alpha. R) = R[a/\alpha]\\
+
+    \inferrule*[right=NegPresheaf-$\eta$]
+    {\Gamma \pipe \beta:\cat D \vdash p : \negPresheaf {\cat C}}
+    {p = \lambda \alpha. \negPresheafApp \alpha p}
+
+    \inferrule*[right=PosPresheaf-Formation]
+    {\Gamma \vdash \cat D \isaCat}
+    {\Gamma \vdash \posPresheaf {\cat D} \isaCat}
+
+    \inferrule*[right=PosPresheaf-E]
+    {\Gamma \pipe d^-\Xi \vdash p : \posPresheaf {\cat D}\and
+     \Gamma \pipe d^+\Xi \vdash a : \cat D
+    }
+    {\Gamma \pipe \Xi \vdash \posPresheafApp p a \isaSet}
+
+    \inferrule*[right=PosPresheaf-I]
+    {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R : \isaSet}
+    {\Gamma \pipe \alpha:\cat C \vdash \lambda \beta:\cat D. R : \posPresheaf {\cat D}}
+
+    \posPresheafApp {(\lambda \beta. R)} b = R[b/\beta]\\
+
+    \inferrule*[right=PosPresheaf-$\eta$]
+    {\Gamma \pipe \alpha:\cat C \vdash p : \posPresheaf {\cat D}}
+    {p = \lambda \beta. \posPresheafApp p \beta}
+  \end{mathpar}
+  \caption{Presheaf Categories}
 \end{figure}
 
 \subsection{Dependent Types}
@@ -1677,6 +1738,56 @@ endo-profunctor $P$:
   types.
 \end{definition}
 
+\subsection{Yoneda Lemma and Representable Presheaves}
+
+Given any category $\cat C$, we can define the positive and negative
+Yoneda embeddings $Y^\pm : \cat C \to \pmPresheaf {\cat C}$ using the
+hom profunctor. Note that both of these functors are covariant in
+$\cat C$, so semantically, $\posPresheaf {\cat C}$ should be
+interpreted as $(\Set^{\cat C})^o$.
+
+\begin{definition}
+  Define the negative Yoneda embedding $Y^-[\alpha]$
+  \[ \alpha:\cat C \vdash Y^-[\alpha] = \lambda \alpha':\cat C. \punitinXfromYtoZ {\cat C}{\alpha'}{\alpha} : \negPresheaf {\cat C} \]
+
+  The positive Yoneda embedding is defined similarly $Y^+[\alpha]$.
+\end{definition}
+
+The Yoneda lemma says that the set of natural transformations from
+$Y^-[\alpha]$ to a presheaf $p$ is naturally isomorphic to the
+elements of the presheaf itself: $\negPresheafApp \alpha p$. In
+encoding this statement in our type theory, we find that we can use
+two different interpretations of ``natural transformations''.
+
+On the one hand, a natural transformation should be a morphism in the
+presheaf category. This interpretation of the Yoneda lemma would mean
+that we have a natural isomorphism of profunctors:
+\[ \alpha:\cat C; \pi:\negPresheaf {\cat C} \vdash \punitinXfromYtoZ{\negPresheaf {\cat C}} {Y^-[\alpha]} {\pi} \cong \negPresheafApp \alpha \pi \]
+Attempting to prove this we become stuck very quickly because we know
+nothing about the structure of morphisms in the presheaf category.
+
+On the other hand, a natural transformation of presheaves $\pi$ and
+$\rho$ can be defined as a family of functions from $\negPresheafApp
+\alpha \pi$ to $\negPresheafApp \alpha \rho$, or in other words as an
+\emph{end}. Specializing to the Yoneda lemma, we interpret ``a natural
+transformation from $Y^-[\alpha]$ to $\pi$'' as the following, which simplifies using $\beta$ reduction:
+\[ \alpha:\cat C; \pi:\negPresheaf {\cat C} \vdash \homrallXYtoZ {\alpha':\cat C} {\negPresheafApp {\alpha'} {Y^-[\alpha]}}{\negPresheafApp {\alpha'} \pi} = \homrallXYtoZ {\alpha':\cat C} {(\punitinXfromYtoZ {\cat C}{\alpha'}{\alpha})}{(\negPresheafApp {\alpha'} \pi)} \]
+And then the Yoneda lemma becomes:
+\[ \alpha:\cat C; \pi:\negPresheaf {\cat C} \vdash \homrallXYtoZ {\alpha':\cat C} {(\punitinXfromYtoZ {\cat C}{\alpha'}{\alpha})}{(\negPresheafApp {\alpha'} \pi)} \cong \negPresheafApp \alpha \pi\]
+Which is an instance of our earlier Lemma\,\ref{lem:yo-and-co-yo}
+which follows quite easily.
+
+Then we are left with the question of whether these two forms of the
+Yoneda lemma are equivalent, or slightly more generally are these two definitions of natural transformation of presheaves equivalent:
+\[ \rho:\negPresheaf{\cat C}; \pi:\negPresheaf {\cat C} \vdash \punitinXfromYtoZ{\negPresheaf {\cat C}} {\rho} {\pi} \]
+and
+\[ \rho:\negPresheaf{\cat C}; \pi:\negPresheaf {\cat C} \vdash \homrallXYtoZ {\alpha:\cat C} {\negPresheafApp \alpha \rho}{\negPresheafApp \alpha \pi} \]
+While we can show that there is a morphism from the hom set to the
+end, the inverse does not seem provable, and seems analogous to the
+\emph{univalence} axiom in homotopy type theory, as it tells us that
+the morphisms of the universe are given by a particular kind of
+function in our logic.
+
 \subsection{Adjoint Functors and Representable Profunctors}
 
 Next, we demonstrate that the two common definitions of adjoint
@@ -1939,6 +2050,25 @@ defined on syntactic forms of SCT.
 
 TODO: example of applying the principle in our calculus.
 
+\subsection{Formal Type Theory}
+
+\begin{definition}[Category with Families]
+  A category with families consists of
+  \begin{enumerate}
+  \item A category $\textrm{Ctx}\isaCat$
+  \item A presheaf $\textrm{Ty} : \harr {\textrm{Ctx}}{1}$
+  \item A presheaf $\textrm{Tm} : \harr {\Sigma_{\Gamma:\textrm{Ctx};*:1}\harrapp{\textrm{Ty}} \Gamma *} 1$
+  \item A terminal object in $\textrm{Ctx}$
+  \item An \emph{extension operation}
+    $\textrm{ext} : \Sigma_{\Gamma:\textrm{Ctx};*:1}\harrapp{\textrm{Ty}}\Gamma * \to \textrm{Ctx}$
+    right representing the profunctor
+    \[ \Delta:\textrm{Ctx};A:\Sigma_{\Gamma:\textrm{Ctx};*:1}\harrapp{\textrm{Ty}}{\Gamma}{*} \vdash \tensorexistsXwithYandZ {a}{(\punitinXfromYtoZ {} \Delta {\pi^-\pi^-a})}
+       {(\punitinXfromYtoZ {}{\pi^-a}{A})}\]
+       % {\Sigma_{\Gamma:\textrm{Ctx};*:1}\harrapp{\textrm{Ty}}{\Gamma}{*}}
+    % 
+  \end{enumerate}
+\end{definition}
+
 \section{Semantics}
 
 Next, we develop the basic model theory for SCT. Because SCT includes
@@ -1947,11 +2077,11 @@ ordinary context of dependent type theory $\Gamma$, a model of SCT is
 not given by a \emph{single} virtual double category, but instead by
 an \emph{indexed family} of VDCs, parameterized by an object of a
 category that interprets dependent type theory. We call such a
-structure as a \emph{VDC-hyperdoctrine}. We then show how to construct
-a VDC-hyperdoctrine indexed by the category of sets, which has the
-intuitive reading that any of the VDC judgments $\Gamma \vdash J$ is
-interpreted as simply a family of $J$-data parameterized by elements
-of the set $\Gamma$.
+structure a \emph{VDC-hyperdoctrine}. We then show how to construct a
+from any VDC, a VDC-hyperdoctrine indexed by the category of sets,
+which has the intuitive reading that any of the VDC judgments $\Gamma
+\vdash J$ is interpreted as simply a family of $J$-data parameterized
+by elements of the set $\Gamma$.
 
 %% The first component of this is \emph{soundness}: every category,
 %% object, set and transformation denote an object, vertical arrow,
@@ -2062,35 +2192,13 @@ weaker definition.
 %% \end{definition}
 
 \begin{definition}{Indexed Virtual Equipment}
-  A VE-hyperdoctrine is a pair of a category $C$ and a functor $\cat
-  C^{op} \to VE$. A morphism of VE-hyperdoctrines
+  A VE-hyperdoctrine is a pair of a category with families $(C,
+  \textrm{Ty}, \textrm{Tm})$ and a functor $\cat C^{op} \to VE$. A
+  morphism of VE-hyperdoctrines
   \[(F,\phi) : (\cat C, \mathcal V : \cat C^{o} \to VE) \to (\cat D, \mathcal U : \cat D^{o} \to VE)\]
-  is a pair of a functor $F : \cat C \to \cat D$ and a natural
-  transformation $\phi : \mathcal V \Rightarrow\mathcal U \circ F^{o}$.
-\end{definition}
-
-\begin{definition}{Soundness}
-  
-\end{definition}
-
-\begin{definition}{Completeness}
-  We define the syntactic VE-hyperdoctrine $\textrm{Syn}$ as follows:
-  \begin{enumerate}
-  \item The base category is the category of contexts $\Gamma$ and substitutions.
-  \item Define $\mathcal V_\Gamma$ as follows
-    \begin{enumerate}
-    \item An object of $\mathcal V^\Gamma$ is a proof $\Gamma \vdash \cat C \isaCat$.
-    \item A vertical morphism $\mathcal V^\Gamma(\cat C, \cat D)$ is a
-      term $\Gamma\pipe \alpha:\cat C \vdash t : \cat D$ moduleo
-      $\alpha$-equivalence. Composition and identity are given by composition/variable.
-    \item A horizontal morphism $R \in \mathcal^\Gamma_h$ is a term
-      $\Gamma\pipe \alpha:\cat C;\beta:\cat D \vdash R$ with $d^-R =
-      \cat C$ and $d^+R = \cat D$.
-    \item Restriction of $R$ along $s,t$ is given by substitution
-      $R[s/\alpha;t/\beta]$. This is clearly associative and unital.
-    \item A 2-cell from $\Phi$ to $A$ is a term $\Phi \vdash t : B$
-    \end{enumerate}
-  \end{enumerate}
+  is a pair of a functor of categories with families $F : \cat C \to
+  \cat D$ and a natural transformation $\phi : \mathcal V
+  \Rightarrow\mathcal U \circ F^{o}$.
 \end{definition}
 
 %% \begin{definition}
@@ -2129,57 +2237,21 @@ weaker definition.
 %%   %% \end{align*}
 %% \end{definition}
 
-And we define a profunctor of interpretations of a signature in a
-virtual equipment as follows:
-\begin{definition}
-  An interpretation of a signature $\Gamma$ in a virtual equipment
-  $\mathcal V$ is an element of the set $\sem{\Gamma}_{\mathcal
-    V}$. Call this set $\textrm{Interp}(\Gamma;\mathcal V)$.
+\subsection{Generalized Algebraic Theory of VE Hyperdoctrines}
 
-  Note that this constitutes a profunctor contravariant in $\Gamma$
-  and covariant in $\mathcal V$.
-\end{definition}
+To simplify our initiality proof, we work with an \emph{essentially
+algebraic} presentation of the notion of VE hyperdoctrine. As with all
+GATs, this has an initial model, which is a kind of ``combinator''
+syntax with explicit substitution for VE hyperdoctrines. Then we show
+that our type theoretic syntax is equivalent to the combinator syntax
+by a simple inductive ``simplification'' algorithm. We conjecture that
+a full normalization proof is possible, which would establish useful
+conservativity results for the calculus.
 
-Next, we define the syntactic virtual equipment $\textrm{Syn}(\Gamma)$
-for a signature $\Gamma$.
-\begin{definition}
-  For any $\Gamma \isadtctx$, we construct a virtual double category
-  $V^\Gamma$.
-  \begin{enumerate}
-  \item $V^\Gamma_v$ is the set of terms $\Gamma \vdash \cat C \isaCat$.
-  \item $V^\Gamma_v(\cat C, \cat D)$ is the set of objects in context
-    $\Gamma \pipe \alpha:\cat C \vdash a : \cat D$. The category
-    structure is given by substitution, with the variable $\alpha
-    \vdash \alpha$ the identity.
-  \item $V_h$ is the set of triples $(\cat C, \cat D, \Gamma \pipe
-    \alpha:\cat C;\beta:\cat D \vdash R \isaSet)$ where $d^\pm$ are
-    the projections
-  \item $V^\Gamma_h(\vec R; S)$ is the set of triples $(a,b,\Gamma
-    \pipe \Phi \vdash t : S[a;b])$ where $\Phi$ is the context
-    corresponding to $\vec R$ and $d^\pm$ are the obvious projections.
+The theory has sorts Ctx, Subst, Tm, Ty, Cat, Fun, Prof, ProfCtx and
+Trans.
 
-  \item The identity morphisms are $(\cat C, \cat D, R)$ is $\Gamma\pipe\alpha:\cat C, x:R\beta:\cat D \vdash x:R$
-  \item Composition $(a,b,t) \circ [(a_1,),\ldots]$ is given by
-    substitution in each component: $(a[a_1],b[a_n], t[\phi])$.
-  \item Associativity and unit rules for composition follow from the
-    definition of substitution by a straightforward induction.
-  \end{enumerate}
-\end{definition}
-
-Then the soundness theorem says that for any $\Gamma$, the virtual
-double category $\textrm{Syn}(\Gamma)$ provides an isomorphism of profunctors:
-\[ \textrm{Interp}(\Gamma, \mathcal V \cong VE(\textrm{Syn}(\Gamma), \mathcal V) \]
-As we saw in a previous section, the backwards direction of this
-isomorphism should be a universal interpretation:
-
-\begin{definition}[Universal Interpretation]
-  For any signature $\Gamma$ there is a ``self-interpretation'' $\eta:
-  \textrm{Interp}(\Gamma, \textrm{Syn}(\Gamma))$ defined as the
-  identity substitution $\id \in \sem{\Gamma}_{\textrm{Syn}(\Gamma)}$
-  
-\end{definition}
-
-\section{Example Models}
+\subsection{Example Models}
 
 Our main intended models are when the indexing category is $\Set$ and
 the hyperdoctrine is given by families of objects, arrows etc, of a
@@ -2194,12 +2266,12 @@ virtual equipment $\mathcal V$.
   \begin{enumerate}
   \item Objects are functions $X \to \mathcal V_0$.
   \item Vertical morphisms $\mathcal V^X_v(A,B)$ are functions
-    $\Pi_{x\inX} V_v(A x,B x)$. With pointwise composition, identity.
+    $\Pi_{x\in X} V_v(A x,B x)$. With pointwise composition, identity.
   \item Horizontal morphisms $\mathcal V^X_h$ are functions $\Gamma \to \mathcal V_h$, with
     $(d^\pm R)x = d^\pm (Rx)$.
   \item Restriction of $R$ along $f,g$ is given by $(R(f,g))x = (R x)(f x,g x)$.
   \item A 2-cell from $\Phi$ to $R$ is a family $\Pi_{x\in X} \mathcal
-    V^X_h(\Phix,R x)$ with composition given pointwise.
+    V^X_h(\Phi x,R x)$ with composition given pointwise.
   \end{enumerate}
 \end{definition}
 
@@ -2209,7 +2281,7 @@ virtual equipment $\mathcal V$.
 
   \begin{enumerate}
   \item The indexing cateogry is $\Set$.
-  \item The equipment is defined as $\mathcal U\Gamma = \mathcam V^\Gamma$.
+  \item The equipment is defined as $\mathcal U\Gamma = \mathcal V^\Gamma$.
   \item Restriction by a function $\gamma : \Delta \to \Gamma$ is
     given pointwise.
   \end{enumerate}
