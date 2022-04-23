@@ -191,6 +191,8 @@
 \newcommand{\algHSubst}{\textrm{ProfSubst}}
 \newcommand{\algHarr}{\textrm{Prof}}
 \newcommand{\algTrans}{\textrm{Trans}}
+\newcommand{\algElts}{\textrm{Elts}}
+\newcommand{\algEltsI}{\textrm{EltsI}}
 
 \maketitle
 
@@ -2402,7 +2404,7 @@ Next, we give categories and \emph{profunctor contexts} the same
 theory, where the identity $\id_h$ is the ``empty'' context $\alpha:C$ and the composition $\Phi \circ_h$.
 %
 
-
+TODO: include all of the interactions with substitutions and restrictions.
 
 \begin{figure}
   \begin{mathpar}
@@ -2417,32 +2419,72 @@ theory, where the identity $\id_h$ is the ``empty'' context $\alpha:C$ and the c
 
     \inferrule
     {}
-    {\id_h : \algVarr(C,C)}
+    {\id_v : \algVarr(C,C)}
 
-    \id_h \circ_{vs} \gamma = \id_h
+    \id_v \circ_{vs} \gamma = \id_h
 
-    (h \circ \id) = h\and \id \circ h = h
+    (f \circ_v \id_v) = f\and \id_v \circ_v f = f
 
     % theory of an indexed category (horizontal)
 
+    \inferrule
+    {\Psi : \algHCtx(D,E) \and \algHCtx(C,D)}
+    {\Psi \circ_h \Phi : \algHCtx(C,E)}
+
+    (\Psi \circ_h \Phi) \circ_{hs} \gamma = (\Psi \circ_{hs} \gamma) \circ_h (\Phi \circ_s \gamma)
+    
+    (\Sigma \circ_h \Psi) \circ_h \Phi = \Sigma \circ_h (\Psi \circ_h \Phi)
+
+    \inferrule
+    {}
+    {\id_h : \algHCtx(C,C)}
+
+    \id_h \circ_{hs} \gamma = \id_h
+
+    (\Phi \circ_h \id_h) = \Phi\and \id_h \circ_h \Phi = \Phi
+
     % embedding of displays
 
-    % strict equipment (horizontal)
-    % strict equipment  (displays)
+    \inferrule{P : \algHarr(C,D)}{i(P) : \algHCtx(C,D)}
 
     % 2-cells: substitutions
     % vertical category
     % horizontal category
     % interchange law
+    \inferrule
+    {\psi : \algHSubst(\Phi, f',g',\Psi)\and \phi : \algHSubst(\Sigma,f,g,\Phi)
+    }
+    {\psi \circ_{2v} \phi : \algHSubst(\Sigma, f' \circ f, g' \circ g, \Psi)}
 
-    % 2-cells: transformations : Q: is any of this necessary or should
-    % we just conflate transformations with substitutions into a
-    % display?
-    % 
-    % action of trans on subst with assoc, unit
-    % identity trans with unit
-    % embedding of transformations into substitutions
+    \inferrule
+    {}
+    {\id_{2v} : \algHSubst(\Phi,\id,\id,\Phi)}
 
+    (\phi \circ_{2v} \psi) \circ_{2v} \sigma = \phi \circ_{2v} (\psi \circ_{2v} \sigma)\\
+    \phi \circ_{2v} \id_{2v} = \phi \and \phi = \id_{2v} \circ_{2v} \phi\\
+
+    \inferrule
+    {\phi_1 : \algHSubst(\Psi_1,f,g,\Phi_1)\and \phi_2 : \algHSubst(\Psi_2,f,g,\Phi_2)
+    }
+    {\phi_1 \circ_{2h} \phi_2 : \algHSubst(\Psi_1 \circ_h \Psi_2, f, h, \Phi_1 \circ_h \Phi_2)}
+
+    \inferrule
+    {}
+    {\id_{2h} : \algHSubst(\id_h,f,f,\id_h)}
+
+    (\phi \circ_{2h} \psi) \circ_{2h} \sigma = \phi \circ_{2h} (\psi \circ_{2h} \sigma)\\
+    \phi \circ_{2h} \id_{2h} = \phi \and \id_{2h} \circ_{2h} \phi = \phi\\
+
+    (\phi_1 \circ_{2h} \phi_2) \circ_{2v} (\psi_1 \circ_{2h} \psi_2) = (\phi_1 \circ_{2v} \psi_1) \circ_{2h} (\phi_2 \circ_{2v} \psi_2)
+
+  \end{mathpar}
+  \caption{Double Category with Display Pro-arrows}
+  \label{fig:alg-dc-disp}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    % Restrictions
     \inferrule
     {P : \algHarr(\Gamma,C',D')
     \and f : \algVarr(\Gamma,C,C')\and
@@ -2454,24 +2496,39 @@ theory, where the identity $\id_h$ is the ``empty'' context $\alpha:C$ and the c
     P \circ_r (f,g) \circ_r (f',g') = P \circ_r (f \circ_r f', g \circ_r g')
 
     P \circ_r (\id,\id) = P
-
+    
+    % Cat Multiplicatives
+    % Cat of Elements
     \inferrule
-    {\psi : \algHSubst(f',g',\Phi,\Psi)\and \phi : \algHSubst(f,g,\Sigma,\Phi)
-    }
-    {\psi \circ \phi : \algHSubst(f' \circ f, g' \circ g, \Sigma, \Psi)}
+    {P : \algHarr(\Gamma,C,D)}
+    {\algElts(C,D,P) : \algCat(\Gamma)}
 
     \inferrule
     {}
-    {restrict(f,g,\phi) : \algHSubst(\id,\id,\Psi,\Phi)}
-  \end{mathpar}
-  \caption{Equipment with Displays}
-  \label{fig:alg-dc-disp}
-\end{figure}
+    {\pi^- : \algVarr(\algElts(C,D,P),C)}
 
-\begin{figure}
-  \begin{mathpar}
-    % Cat Multiplicatives
-    % Cat of Elements
+    \inferrule
+    {}
+    {\pi^+ : \algVarr(\algElts(C,D,P),D)}
+
+    \inferrule
+    {}
+    {\pi^p : \algHSubst(\id_h(\algElts(C,D,P)),\pi^-,\pi^+,P)}
+
+    \inferrule
+    {f : \algVarr(E,C) \and g : \algVarr(E,D)\and
+      t : \algHSubst(\id_h(E), f, g, P)
+    }
+    {\algEltsI(t,f,g) : \algVarr(E,\algElts(C,D,P))}
+
+    \pi^- \circ_v \algEltsI(t,f,g) = f\and
+    \pi^+ \circ_v \algEltsI(t,f,g) = g\and
+    \pi^p \circ_{2v} \algEltsI(t,f,g) = \alpha
+
+    \inferrule
+    {h : \algVarr(E,\algElts(C,D,P))}
+    {h = \algEltsI(\pi^-\circ_v h,\pi^+\circ_vh,\pi^p \circ_{2v} \id_{2h}(h))}
+    
     % Presheaf cats
     
     % Prof Multiplicatives
