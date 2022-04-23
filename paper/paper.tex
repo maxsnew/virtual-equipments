@@ -2052,6 +2052,30 @@ TODO: example of applying the principle in our calculus.
 
 \subsection{Formal Type Theory}
 
+Since many type theories are given semantics by free structured
+categories, we can use SCT as a logical framework in which to do
+``formal type theory''.
+
+\begin{definition}[Theory of unary Computational lambda calculus with booleans]
+  \begin{enumerate}
+  \item A category $C$
+  \item A terminal object $1$ of $C$
+  \item A monad $T$ on $C$
+  \item A type $\textrm{Bit} : \varr 1 C$
+  \item Morphisms $\textrm{y},\textrm{n} : \pendallXdotY * \punitinXfromYtoZ {1(*)} {\textrm{Bit}(*)}$
+  \item A natural transformation $\textrm{if} : \pendallXdotY * \homrallXYtoZ \alpha {(\punitinXfromYtoZ C {1(*)} \alpha) \times (\punitinXfromYtoZ C {1(*)} \alpha)} {\punitinXfromYtoZ C {\textrm{Bit}(*)} \alpha}$
+  \item Satisfying $\textrm{if} y = \pi_1$ and $\textrm{if} n = \pi_2$
+  \item A morphism $\textrm{print} : \pendallXdotY * \punitinXfromYtoZ {\textrm{Bit}(*)}{T (1(*))}$
+  \end{enumerate}
+\end{definition}
+
+Then we can ``program'' in this computational lambda calculus within
+our logical framework by constructing terms of type $\punitinXfromYtoZ
+C {A} {B}$ for any functors $A,B$ into $C$.
+
+Using a terminal category and the category of elements, we can define
+a formal category with families, an algebraic formulation of the
+judgmental structure of dependent type theory:
 \begin{definition}[Category with Families]
   A category with families consists of
   \begin{enumerate}
@@ -2239,17 +2263,158 @@ weaker definition.
 
 \subsection{Generalized Algebraic Theory of VE Hyperdoctrines}
 
-To simplify our initiality proof, we work with an \emph{essentially
-algebraic} presentation of the notion of VE hyperdoctrine. As with all
-GATs, this has an initial model, which is a kind of ``combinator''
-syntax with explicit substitution for VE hyperdoctrines. Then we show
-that our type theoretic syntax is equivalent to the combinator syntax
-by a simple inductive ``simplification'' algorithm. We conjecture that
-a full normalization proof is possible, which would establish useful
-conservativity results for the calculus.
+To simplify our initiality proof, we use an \emph{essentially
+algebraic} presentation of our notion of model. To describe this, we
+give a ``combinator'' syntax for VE hyperdoctrines, where we have
+explicit sorts for contexts $\Gamma$ and $\Phi$ and explicit judgments
+for substitutions $\gamma : \Delta \to \Gamma$ and $\phi : \Psi
+\vdash_{f,g} \Phi$.
+%
+While the explicit description of the theory is quite long, we can
+describe it in simple modular pieces.
+%
+First, we use the standard theory of a category with families, which
+describes the algebraic structure of contexts $\Gamma$, types $\Gamma
+\vdash A$ and terms $\Gamma \vdash M : A$.
+%
+Second, we add to that a theory for a slight generalization of virtual
+double categories we call \emph{double categories with display
+pro-arrows}.
+%
+The difference is that in a double category with display pro-arrows,
+we have a true double category with strict vertical and horizontal
+composition, among whom are the ``display'' pro-arrows.
+%
+The display pro-arrows model the profunctors of the syntax, which
+don't have a strict composition, whereas the arbitrary pro-arrows
+model the contexts $\Phi$, which do have a strict composition, given
+by context concatenation $\Phi,\Psi$.
+%
+The difference is that in a virtual double category the contexts are
+assumed to be given inductively by formal compositions of the display
+pro-arrows, whereas in models of this algebraic theory, the contexts
+might include other exotic objects.
+%
+This difference is analogous to the difference between a category with
+families and a contextual category in models of dependent type theory,
+and we fully expect that there is a similar relationship between the
+models: virtual double categories should form a co-reflective
+subcategory characterized as those double categories with display
+pro-arrows where all pro-arrows are equal to some concatenation of
+displays.
+%
+Finally, we parameterize all of the constructions of the theory of
+double categories with pro-arrows by contexts $\Gamma$ and add in
+equations that substitution commutes with all double category
+operations.
+%
+This means the theory presents a category with families with an double
+category with display pro-arrows internal to the category of
+presheaves on the category of contexts, i.e., a hyperdoctrine of
+double categories with display pro-arrows.
 
-The theory has sorts Ctx, Subst, Tm, Ty, Cat, Fun, Prof, ProfCtx and
-Trans.
+The main advantage of this algebraic approach is that the initiality
+theorem for the combinatory syntax is trivial. Instead, the work is to
+show that our type theoretic syntax, which restricts combinatory rules
+to make substitution an admissible rather than primitive operation, is
+equivalent to the combinatory syntax.
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule
+    {}
+    {\Gamma : \isaCtx}
+
+    \inferrule
+    {\Delta : \isaCtx \and \Gamma : \isaCtx}
+    {\gamma : \textrm{Subst}(\Delta,\Gamma)}
+
+    \inferrule
+    {\Gamma : \isaCtx}
+    {C : \textrm{Cat}(\Gamma)}
+
+    \inferrule
+    {\Gamma : \isaCtx \and C : \textrm{Cat}(\Gamma) \and D : \textrm{Cat}(\Gamma) \and
+    }
+    {F : \textrm{Functor}(\Gamma,C,D)}
+
+    \inferrule
+    {\Gamma : \isaCtx \and C : \textrm{Cat}(\Gamma) \and D : \textrm{Cat}(\Gamma) \and
+    }
+    {P : \textrm{Profunctor}(\Gamma,C,D)}
+
+    \inferrule
+    {\Gamma : \isaCtx \and C : \textrm{Cat}(\Gamma) \and D : \textrm{Cat}(\Gamma)
+    }
+    {P : \textrm{ProfCtx}(\Gamma,C,D)}
+
+    \inferrule
+    {\Gamma : \textrm{Ctx}\and
+      C  : \textrm{Cat}(\Gamma) \and D  : \textrm{Cat}(\Gamma) \and
+      C' : \textrm{Cat}(\Gamma) \and D' : \textrm{Cat}(\Gamma) \and
+      f : \textrm{Functor}(\Gamma,C,C') \and g : \textrm{Cat}(\Gamma,D,D') \and
+      \Phi : \textrm{ProfCtx}(\Gamma,C,D)\and
+      \Psi : \textrm{ProfCtx}(\Gamma,C',D')
+    }
+    {\phi : \textrm{ProfSubst}(\Gamma,C,D,C',D',f,g,\Phi,\Psi)}
+    
+    \inferrule
+    {\Gamma : \textrm{Ctx}\and
+      C  : \textrm{Cat}(\Gamma) \and D  : \textrm{Cat}(\Gamma) \and
+      C' : \textrm{Cat}(\Gamma) \and D' : \textrm{Cat}(\Gamma) \and
+      f : \textrm{Functor}(\Gamma,C,C') \and g : \textrm{Cat}(\Gamma,D,D') \and
+      \Phi : \textrm{ProfCtx}(\Gamma,C,D)\and
+      P : \textrm{ProfCtx}(\Gamma,C',D')
+    }
+    {t : \textrm{Trans}(\Gamma,C,D,C',D',f,g,\Phi,P)}
+  \end{mathpar}
+  \caption{Sorts of Algebraic SCT}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    \cdots
+  \end{mathpar}
+  \caption{Algebraic Dependent Type Theory}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule
+    {g : \textrm{Functor}(D,E) \and \textrm{Functor}(C,D)}
+    {g \circ_{\Gamma,C,D,E} f : \textrm{Functor}(C,E)}
+
+    (h \circ g) \circ f = h \circ (g \circ f)
+
+    \inferrule
+    {}
+    {\id_C : \textrm{Functor}(C,C)}
+
+    (h \circ \id) = h
+
+    \id \circ h = h
+
+    \inferrule
+    {P : \textrm{Profunctor}(\Gamma,C',D')
+    \and f : \textrm{Functor}(\Gamma,C,C')\and
+    \and g : \textrm{Functor}(\Gamma,D,D')}
+    {P \circ_{\Gamma,C,D,C',D'} (f,g) : \textrm{Profunctor}(\Gamma,C,D)}
+
+    P \circ (f,g) \circ (f',g') = P \circ (f \circ f', g \circ g')
+
+    P \circ (\id,\id) = P
+
+    \inferrule
+    {\psi : \textrm{ProfSubst}(f',g',\Phi,\Psi)\and \phi : \textrm{ProfSubst}(f,g,\Sigma,\Phi)
+    }
+    {\psi \circ \phi : \textrm{ProfSubst}(f' \circ f, g' \circ g, \Sigma, \Psi)}
+
+    \inferrule
+    {}
+    {restrict(f,g,\phi) : \textrm{ProfSubst}(\id,\id,\Psi,\Phi)}
+  \end{mathpar}
+  \caption{Algebraic Presentation of SCT}
+\end{figure}
 
 \subsection{Example Models}
 
