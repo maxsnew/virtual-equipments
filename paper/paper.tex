@@ -180,6 +180,17 @@
 \newcommand{\negPresheafApp}[2]{#1\,#2}
 \newcommand{\posPresheafApp}[2]{#1\,#2}
 
+% Algebraic notation
+\newcommand{\algCtx}{\textrm{Ctx}}
+\newcommand{\algSubst}{\textrm{Subst}}
+\newcommand{\algTy}{\textrm{Type}}
+\newcommand{\algTm}{\textrm{Term}}
+\newcommand{\algCat}{\textrm{Cat}}
+\newcommand{\algVarr}{\textrm{Functor}}
+\newcommand{\algHCtx}{\textrm{ProfCtx}}
+\newcommand{\algHSubst}{\textrm{ProfSubst}}
+\newcommand{\algHarr}{\textrm{Prof}}
+\newcommand{\algTrans}{\textrm{Trans}}
 
 \maketitle
 
@@ -2263,11 +2274,12 @@ weaker definition.
 
 \subsection{Generalized Algebraic Theory of VE Hyperdoctrines}
 
-To simplify our initiality proof, we use an \emph{essentially
-algebraic} presentation of our notion of model. To describe this, we
-give a ``combinator'' syntax for VE hyperdoctrines, where we have
-explicit sorts for contexts $\Gamma$ and $\Phi$ and explicit judgments
-for substitutions $\gamma : \Delta \to \Gamma$ and $\phi : \Psi
+To simplify our initiality proof, we use a \emph{generalized
+algebraic} presentation of our notion of
+model\cite{cartmell,sterling-eat}. To describe this, we give a
+``combinator'' syntax for VE hyperdoctrines, where we have explicit
+sorts for contexts $\Gamma$ and $\Phi$ and explicit judgments for
+substitutions $\gamma : \Delta \to \Gamma$ and $\phi : \Psi
 \vdash_{f,g} \Phi$.
 %
 While the explicit description of the theory is quite long, we can
@@ -2323,36 +2335,36 @@ equivalent to the combinatory syntax.
   \begin{mathpar}
     \inferrule
     {}
-    {\Gamma : \isaCtx}
+    {\Gamma : \algCtx}
 
     \inferrule
-    {\Delta : \isaCtx \and \Gamma : \isaCtx}
-    {\gamma : \textrm{Subst}(\Delta,\Gamma)}
+    {\Delta : \algCtx \and \Gamma : \algCtx}
+    {\gamma : \algSubst(\Delta,\Gamma)}
 
     \inferrule
-    {\Gamma : \isaCtx}
-    {C : \textrm{Cat}(\Gamma)}
+    {\Gamma : \algCtx}
+    {C : \algCat(\Gamma)}
 
     \inferrule
-    {\Gamma : \isaCtx \and C : \textrm{Cat}(\Gamma) \and D : \textrm{Cat}(\Gamma) \and
+    {\Gamma : \algCtx \and C : \algCat(\Gamma) \and D : \algCat(\Gamma) \and
     }
-    {F : \textrm{Functor}(\Gamma,C,D)}
+    {F : \algVarr(\Gamma,C,D)}
 
     \inferrule
-    {\Gamma : \isaCtx \and C : \textrm{Cat}(\Gamma) \and D : \textrm{Cat}(\Gamma) \and
+    {\Gamma : \algCtx \and C : \algCat(\Gamma) \and D : \algCat(\Gamma) \and
     }
     {P : \textrm{Profunctor}(\Gamma,C,D)}
 
     \inferrule
-    {\Gamma : \isaCtx \and C : \textrm{Cat}(\Gamma) \and D : \textrm{Cat}(\Gamma)
+    {\Gamma : \algCtx \and C : \algCat(\Gamma) \and D : \algCat(\Gamma)
     }
     {P : \textrm{ProfCtx}(\Gamma,C,D)}
 
     \inferrule
     {\Gamma : \textrm{Ctx}\and
-      C  : \textrm{Cat}(\Gamma) \and D  : \textrm{Cat}(\Gamma) \and
-      C' : \textrm{Cat}(\Gamma) \and D' : \textrm{Cat}(\Gamma) \and
-      f : \textrm{Functor}(\Gamma,C,C') \and g : \textrm{Cat}(\Gamma,D,D') \and
+      C  : \algCat(\Gamma) \and D  : \algCat(\Gamma) \and
+      C' : \algCat(\Gamma) \and D' : \algCat(\Gamma) \and
+      f : \algVarr(\Gamma,C,C') \and g : \algCat(\Gamma,D,D') \and
       \Phi : \textrm{ProfCtx}(\Gamma,C,D)\and
       \Psi : \textrm{ProfCtx}(\Gamma,C',D')
     }
@@ -2360,9 +2372,9 @@ equivalent to the combinatory syntax.
     
     \inferrule
     {\Gamma : \textrm{Ctx}\and
-      C  : \textrm{Cat}(\Gamma) \and D  : \textrm{Cat}(\Gamma) \and
-      C' : \textrm{Cat}(\Gamma) \and D' : \textrm{Cat}(\Gamma) \and
-      f : \textrm{Functor}(\Gamma,C,C') \and g : \textrm{Cat}(\Gamma,D,D') \and
+      C  : \algCat(\Gamma) \and D  : \algCat(\Gamma) \and
+      C' : \algCat(\Gamma) \and D' : \algCat(\Gamma) \and
+      f : \algVarr(\Gamma,C,C') \and g : \algCat(\Gamma,D,D') \and
       \Phi : \textrm{ProfCtx}(\Gamma,C,D)\and
       P : \textrm{ProfCtx}(\Gamma,C',D')
     }
@@ -2371,6 +2383,8 @@ equivalent to the combinatory syntax.
   \caption{Sorts of Algebraic SCT}
 \end{figure}
 
+
+
 \begin{figure}
   \begin{mathpar}
     \cdots
@@ -2378,43 +2392,111 @@ equivalent to the combinatory syntax.
   \caption{Algebraic Dependent Type Theory}
 \end{figure}
 
+The algebraic theory of a double category with displays indexed by a
+category is given in Figure~\ref{fig:alg-dc-disp}.
+%
+First, we give the categories and functors the theory of a category
+indexed by a category.
+%
+Next, we give categories and \emph{profunctor contexts} the same
+theory, where the identity $\id_h$ is the ``empty'' context $\alpha:C$ and the composition $\Phi \circ_h$.
+%
+
+
+
 \begin{figure}
   \begin{mathpar}
+    % theory of an indexed category (vertical)
     \inferrule
-    {g : \textrm{Functor}(D,E) \and \textrm{Functor}(C,D)}
-    {g \circ_{\Gamma,C,D,E} f : \textrm{Functor}(C,E)}
+    {g : \algVarr(D,E) \and \algVarr(C,D)}
+    {g \circ_v f : \algVarr(C,E)}
 
-    (h \circ g) \circ f = h \circ (g \circ f)
+    (g \circ_v f) \circ_{vs} \gamma = (g \circ_{vs} \gamma) \circ_v (f \circ_s \gamma)
+    
+    (h \circ_v g) \circ_v f = h \circ_v (g \circ_v f)
 
     \inferrule
     {}
-    {\id_C : \textrm{Functor}(C,C)}
+    {\id_h : \algVarr(C,C)}
 
-    (h \circ \id) = h
+    \id_h \circ_{vs} \gamma = \id_h
 
-    \id \circ h = h
+    (h \circ \id) = h\and \id \circ h = h
+
+    % theory of an indexed category (horizontal)
+
+    % embedding of displays
+
+    % strict equipment (horizontal)
+    % strict equipment  (displays)
+
+    % 2-cells: substitutions
+    % vertical category
+    % horizontal category
+    % interchange law
+
+    % 2-cells: transformations : Q: is any of this necessary or should
+    % we just conflate transformations with substitutions into a
+    % display?
+    % 
+    % action of trans on subst with assoc, unit
+    % identity trans with unit
+    % embedding of transformations into substitutions
 
     \inferrule
-    {P : \textrm{Profunctor}(\Gamma,C',D')
-    \and f : \textrm{Functor}(\Gamma,C,C')\and
-    \and g : \textrm{Functor}(\Gamma,D,D')}
-    {P \circ_{\Gamma,C,D,C',D'} (f,g) : \textrm{Profunctor}(\Gamma,C,D)}
+    {P : \algHarr(\Gamma,C',D')
+    \and f : \algVarr(\Gamma,C,C')\and
+    \and g : \algVarr(\Gamma,D,D')}
+    {P \circ_r (f,g) : \algHarr(\Gamma,C,D)}
 
-    P \circ (f,g) \circ (f',g') = P \circ (f \circ f', g \circ g')
+    (P \circ_r (f,g) \circ_s \gamma) = (P \circ_s \gamma) \circ_r (f \circ_s \gamma, g \circ_s \gamma)
 
-    P \circ (\id,\id) = P
+    P \circ_r (f,g) \circ_r (f',g') = P \circ_r (f \circ_r f', g \circ_r g')
+
+    P \circ_r (\id,\id) = P
 
     \inferrule
-    {\psi : \textrm{ProfSubst}(f',g',\Phi,\Psi)\and \phi : \textrm{ProfSubst}(f,g,\Sigma,\Phi)
+    {\psi : \algHSubst(f',g',\Phi,\Psi)\and \phi : \algHSubst(f,g,\Sigma,\Phi)
     }
-    {\psi \circ \phi : \textrm{ProfSubst}(f' \circ f, g' \circ g, \Sigma, \Psi)}
+    {\psi \circ \phi : \algHSubst(f' \circ f, g' \circ g, \Sigma, \Psi)}
 
     \inferrule
     {}
-    {restrict(f,g,\phi) : \textrm{ProfSubst}(\id,\id,\Psi,\Phi)}
+    {restrict(f,g,\phi) : \algHSubst(\id,\id,\Psi,\Phi)}
   \end{mathpar}
-  \caption{Algebraic Presentation of SCT}
+  \caption{Equipment with Displays}
+  \label{fig:alg-dc-disp}
 \end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    % Cat Multiplicatives
+    % Cat of Elements
+    % Presheaf cats
+    
+    % Prof Multiplicatives
+    % Unit
+    % Tensor
+    % Hom
+
+    % Internalization
+    % Cats
+    % Functor
+    % Prof
+    % ProfCtx?
+    % Trans
+
+    % Cat Additives
+    % Product
+    % Terminal
+
+    % Prof Additives
+    % Product
+    % Terminal
+  \end{mathpar}
+  \caption{UMPs in an Equipment}
+\end{figure}
+
 
 \subsection{Example Models}
 
@@ -3462,8 +3544,8 @@ multiplicative connectives to the metalevel.
 %% We can immediately define identity and composition of functors.
 
 %% \begin{definition}
-%%   For any $C : \textrm{Cat}$, we can define an identity functor
-%%   $\textrm{Id}_C : \textrm{Functor} C C$ by
+%%   For any $C : \algCat$, we can define an identity functor
+%%   $\textrm{Id}_C : \algVarr C C$ by
 %%   \begin{enumerate}
 %%   \item $\textrm{Id}_0 = \lambda \alpha:C_0. \alpha$
 %%   \item $\textrm{Id}_1 = \pendlambdaXdotY \alpha
@@ -3488,9 +3570,9 @@ multiplicative connectives to the metalevel.
 %% \end{definition}
 
 %% \begin{definition}
-%%   Given categories $C,D,E$ and functors $F : \textrm{Functor} C D$ and
-%%   $G : \textrm{Functor} D E$, we define the composition $G \circ F :
-%%   \textrm{Functor} C E$ as
+%%   Given categories $C,D,E$ and functors $F : \algVarr C D$ and
+%%   $G : \algVarr D E$, we define the composition $G \circ F :
+%%   \algVarr C E$ as
 %%   \begin{enumerate}
 %%   \item $(G \circ F)_0 = \lambda \alpha. {G_0 ({F_0} \alpha)}$
 %%   \item $(G \circ F)_1 =
@@ -3793,7 +3875,7 @@ multiplicative connectives to the metalevel.
 %%   Let $C, D : \text{Cat}$ and $Q : \textrm{Prof}\,C D$ be a profunctor
 %%   between them. Then a \emph{right representation} of $Q$ consists of
 %%   \begin{enumerate}
-%%   \item A functor $G : \textrm{Functor}\, D C$
+%%   \item A functor $G : \algVarr\, D C$
 %%   \item An isomorphism $I,I^-$ between $Q$ and $\text{Hom}(C)[Id;G]$
 %%   \end{enumerate}
 %% \end{definition}
