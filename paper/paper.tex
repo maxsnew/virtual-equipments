@@ -194,6 +194,21 @@
 \newcommand{\algElts}{\textrm{Elts}}
 \newcommand{\algEltsI}{\textrm{EltsI}}
 
+\newcommand{\algLHom}{\textrm{LHom}}
+\newcommand{\algLHomI}{\textrm{LHomI}}
+\newcommand{\algLHomE}{\textrm{LHomE}}
+\newcommand{\algRHom}{\textrm{RHom}}
+\newcommand{\algRHomI}{\textrm{RHomI}}
+\newcommand{\algRHomE}{\textrm{RHomE}}
+
+\newcommand{\algUnit}{\textrm{Unit}}
+\newcommand{\algUnitI}{\textrm{UnitI}}
+\newcommand{\algUnitE}{\textrm{UnitE}}
+
+\newcommand{\algTensor}{\textrm{Tensor}}
+\newcommand{\algTensorI}{\textrm{TensorI}}
+\newcommand{\algTensorE}{\textrm{TensorE}}
+
 \maketitle
 
 %TODO mandatory: add short abstract of the document
@@ -2496,6 +2511,87 @@ TODO: include all of the interactions with substitutions and restrictions.
     P \circ_r (f,g) \circ_r (f',g') = P \circ_r (f \circ_r f', g \circ_r g')
 
     P \circ_r (\id,\id) = P
+
+    % Prof Multiplicatives
+    % LHom
+    \inferrule
+    {P : \algHarr(C, D) \and Q : \algHarr(C,E)}
+    {\algLHom(P,Q) : \algHarr(D,E)}
+    
+    \algLHom(P,Q) \circ_{hs} \gamma = \algLHom(P \circ_{hs} \gamma, Q \circ_{hs} \gamma)\and
+    \algLHom(P,Q) \circ_{r} (f,g) = \algLHom(P \circ_r (\id,f), Q \circ_r(\id,g))
+
+    \inferrule
+    {}
+    {\algLHomE(P,Q) : \algHSubst(i(P)\circ_h i(\algLHom(P,Q)),\id_v,\id_v,i(Q))}
+
+    \inferrule
+    {t : \algHSubst(i(P) \circ_h \Phi, \id,g, i(Q))}
+    {\algLHomI(\Phi,g,t,P,Q) : \algHSubst(\Phi,\id,g,i(\algLHom(P,Q)))}
+
+    \algLHomE \circ_{2v} (\id_v(P) \circ_h \algLHomI(t)) = t\and
+    \theta = \algLHomI(\algLHomE \circ_{2v} (\id_v(P) \circ_h \theta))\and
+        
+    % RHom
+    \inferrule
+    {P : \algHarr(C, E) \and Q : \algHarr(D,E)}
+    {\algRHom(P,Q) : \algHarr(C, D)}
+
+    \algRHom(P,Q) \circ_{hs} \gamma = \algRHom(P \circ_{hs} \gamma, Q \circ_{hs} \gamma)\and
+    \algRHom(P,Q) \circ_{r} (f,g) = \algRHom(P \circ_r (f, \id), Q \circ_r(g,\id))
+
+    \inferrule
+    {}
+    {\algRHomE(P,Q) : \algHSubst(i(\algRHom(P,Q)) \id_h i(Q),\id_v,\id_v,i(P))}
+
+    \inferrule
+    {t : \algHSubst(\Phi \circ_h i(Q), f, \id, i(P))}
+    {\algRHomI(\Phi,f,t,P,Q) : \algHSubst(\Phi,\id,g,i(\algLHom(P,Q)))}
+
+    \algRHomE \circ_{2v} (\algRHomI(t) \circ_h \id(Q)) = t\and
+    \theta = \algRHomI(\algRHomE \circ_{2v} (\theta \circ_h \id(Q)))\and
+
+    % Unit
+    \inferrule
+    {C : \algCat}
+    {\algUnit(C) : \algHarr(C,C)}
+
+    \algUnit(C) \circ_{hs} \gamma = \algUnit(C \circ_{cs} \gamma)
+
+    \inferrule
+    {}
+    {\algUnitI(C) : \algSubst(\id_h(C),\id,\id,i(\algUnit(C)))}
+
+    \inferrule
+    {t : \algHSubst(\Phi \id_h \Psi,f,g,i(R))}
+    {\algUnitE(t) : \algHSubst((\Phi \circ_h i(\algUnit(C)) \circ_h \Psi), f, g, i(R))}
+
+    \algUnitE(t) \circ_{2v} (\id_{2v}(\Phi) \circ_h \algUnitI(C) \circ_h \id_{2v}(\Psi)) = t\and
+    s = \algUnitE(s \circ_{2v} (\id_{2v}(\Phi) \circ_h \algUnitI(C) \circ_h \id_{2v}(\Psi)))
+    
+    % Tensor
+    \inferrule
+    {P : \algHarr(C,D) \and Q : \algHarr(D,E)}
+    {\algTensor(P,Q) : \algHarr(C,E)}
+
+    \algTensor(P,Q) \circ_{hs} \gamma = \algTensor(P \circ_{hs} \gamma, Q \circ_{hs} \gamma)\and
+    \algTensor(P,Q) \circ_{r} (f,g) = \algTensor(P \circ_r (f,\id), Q \circ_r (\id,g))
+
+    \algTensorI(P,Q) : \algHSubst(i(P) \circ_h i(Q),\id,\id,i(\algTensor(P,Q)))
+
+    \inferrule
+    {t : \algHSubst(\Phi \circ_h i(P) \circ_h i(Q) \circ_h \Psi, f,g,i(R))}
+    {\algTensorE(t) : \algHSubst(\Phi \circ_h i(\algTensor(P,Q)) \circ_h \Psi, f,g,i(R))}
+
+    \algTensorE(t) \circ_{2v} (\id_{2v}(\Phi) \circ_{2h} \algTensorI(P,Q) \circ_{2h} \id_{2v}(\Psi)) = t\and
+    s = \algTensorE(s \circ_{2v} (\id_{2v}(\Phi) \circ_{2h} \algTensorI(P,Q) \circ_{2h} \id_{2v}(\Psi)))
+    
+    % Internalization
+    % Cats
+    % Functor
+    % Prof
+    % ProfCtx?
+    % Trans
     
     % Cat Multiplicatives
     % Cat of Elements
@@ -2531,18 +2627,6 @@ TODO: include all of the interactions with substitutions and restrictions.
     
     % Presheaf cats
     
-    % Prof Multiplicatives
-    % Unit
-    % Tensor
-    % Hom
-
-    % Internalization
-    % Cats
-    % Functor
-    % Prof
-    % ProfCtx?
-    % Trans
-
     % Cat Additives
     % Product
     % Terminal
