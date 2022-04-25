@@ -2192,79 +2192,127 @@ by elements of the set $\Gamma$.
 
 \subsection{Notion of Model}
 
-First, we recount the definition of a virtual double category.
-\begin{definition}[Virtual Double Category]
-  A (vertically strict) virtual equipment $\mathcal V$ consists of
-  \begin{enumerate}
-    \item A set $\mathcal V_0$ of objects.
-    \item For each $\cat C, \cat D \in V_0$, a set $V_v(\cat C, \cat
-      D)$ of vertical arrows, with composition and unit operations
-      satisfying the category axioms.
-    \item A set $V_h$ of horizontal arrows, with $d^+,d^- : V_h \to
-      V_0$.
+%% 1. A strict double category is a monoid in Span(Cat)
+%% 2. A strict double category internal to a topos T is a monoid in Span(T-Cat)
+%% 3. A double category with display pro-arrows is a strict double category with a span of profunctors that is representable
+%%    C0 <- C1 -> C0
+%% 4. UMPs are given on top of that structure
 
-    \item For any vertical arrows $f \in V_v(\cat C, \cat D)$ and $g
-      \in V_v(\cat E, \cat F)$ and horizontal arrow $R \in V_h$ with
-      $d^+R = \cat F$ and $d^-R = \cat D$, a \emph{restriction}
-      $R(f,g)$ with $d^+R = \cat C$ and $d^-R = \cat E$.
-
-      This operation is furthermore associative and unital $R(f \circ
-      f',g \circ g') = R(f,g)(f',g')$ and $R(\id,\id) = R$.
-      
-    \item For each composable string $\Phi$ (defined below) of horizontal arrows
-      starting at $\cat C$ and ending at $\cat D$, and horizontal
-      arrow $R$ with $d^-R = \cat C$ and $d^+R = \cat D$, a set
-      $V_2(\Phi; R)$ of 2-cells.
-
-    \item For any string of vertical arrows $\vec f$ into $\Phi$ and
-      2-cell $r \in \mathcal V_2(\Phi,S)$, a restriction operation
-      $r(\vec f) \in \mathcal V_2(\Phi(\vec f), S(d^-(\vec f),
-      d^+(\vec f)))$. Furthermore, this is associative and unital
-      $r(\vec id) = r$ and $r(\vec f \circ \vec g) = r(\vec {f \circ
-        g})$
-
-    \item For each $R \in V_h$, an identity arrow $\id_R \in
-      V_2(d^-R,R,d^+ R; R)$ with $d^\pm \id_R = \id_{d^\pm R}$.
-
-    \item For any $2$-cell $\alpha \in V_2(\Phi;R)$ and composable
-      string $\phi$ of 2-cells into $\Phi$, a composite $\alpha \circ
-      \phi$.
-
-    \item Composition should be unital in that:
-      \[ \id_R \circ [d^-\alpha, \alpha, d^+\alpha] = \alpha  \]
-      and
-      \[ \alpha \circ [\vec \id] = \alpha\]
-    \item And associative in that
-      \[ (\alpha \circ [\beta_1,\ldots]) \circ [\gamma_{11},\ldots,\gamma_{21},\ldots,] = \alpha \circ [(\beta_1 \circ \gamma_{11},\ldots), (\beta_2 \circ \gamma_{21},\ldots)]\]
-  \end{enumerate}
-
-  A composable string $\Phi$ of horizontal arrows is defined to be an
-  alternating sequence of objects and horizontal arrows, beginning and
-  ending with an object such that any substring $\cat C,R,\cat D$
-  satisfies $d^-R = \cat C$ and $d^+R = \cat D$.
-
-  A composable string of vertical arrows $\vec f$ into $\Phi$ is a
-  sequence of vertical arrows, one for each object in $\Phi$, with the
-  codomain of the arrow matching the object in $\Phi$. Then 
-
-  A composable string of 2-cells from $\Phi$ to $\Psi$ is a sequence
-  $\vec r$ of 2-cells, one for each horizontal arrow in $\Psi$ such
-  that the codomains match the objects in
-\end{definition}
-
-Our main departure from\cite{crutwellshulman} is making restrictions
-part of the definition, and also requiring them to be strictly
-associative and unital. In the examples that we are most concerned
-with, however, these operations are strict and so we will not explore
-the possibility of coherence theorems for proving this equivalent to a
-weaker definition.
+We build up the notion of a model in several stages.
 
 \begin{definition}
-  A functor of virtual double categories $F : \mathcal V \to \mathcal
-  U$ is a mapping on objects, vertical arrows, horizontal arrows and
-  2-cells respecting typing and preserving composition, units, and
-  restriction.
+  A strict double category is a monoid in the double category $Span(Cat)$.
 \end{definition}
+
+This data consists of a span $C_0 \leftarrow C_1 \rightarrow C_0$
+where $C_0$ is the vertical category and $C_1$ is the category whose
+objects are horizontal morphisms and morphisms are squares, with the
+two projections giving the left and right ``frame'' for the horizontal
+morphisms/squares. The unit gives the horizontal identity morphisms
+and the monoid multiplication is the horizontal composition.
+
+\begin{definition}
+  A double category with displays (DCD) consists of
+  \begin{enumerate}
+  \item A strict double category $C$
+  \item A category $C_d$ of (horizontal) ``display morphisms'' and ``display squares''.
+  \item A span of profunctors:
+    % https://q.uiver.app/?q=WzAsOCxbMiwyLCJDXzEiXSxbMCwyLCJDXzAiXSxbNCwyLCJDXzAiXSxbMiwwLCJDX2QiXSxbMCwwLCJDXzAiXSxbNCwwLCJDXzAiXSxbMSwxLCJcXExlZnRhcnJvdyJdLFszLDEsIlxcUmlnaHRhcnJvdyJdLFszLDAsIkNfXFx2ZGFzaCIsMix7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImJhcnJlZCJ9fX1dLFs1LDIsIlxcdGV4dHJte0hvbX0iLDAseyJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJiYXJyZWQifX19XSxbNCwxLCJcXHRleHRybXtIb219IiwyLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV0sWzMsNCwicyIsMl0sWzMsNSwidCJdLFswLDIsInQiLDJdLFswLDEsInMiXV0=
+\[\begin{tikzcd}
+	{C_0} && {C_d} && {C_0} \\
+	& \Leftarrow && \Rightarrow \\
+	{C_0} && {C_1} && {C_0}
+	\arrow["{C_\vdash}"', "\shortmid"{marking}, from=1-3, to=3-3]
+	\arrow["{\textrm{Hom}}", "\shortmid"{marking}, from=1-5, to=3-5]
+	\arrow["{\textrm{Hom}}"', "\shortmid"{marking}, from=1-1, to=3-1]
+	\arrow["s"', from=1-3, to=1-1]
+	\arrow["t", from=1-3, to=1-5]
+	\arrow["t"', from=3-3, to=3-5]
+	\arrow["s", from=3-3, to=3-1]
+\end{tikzcd}\]
+\item A fully faithful functor $i : C_d \to C_1$ that respects source and target in that the following commute:
+% https://q.uiver.app/?q=WzAsNixbMiwyLCJDXzEiXSxbMCwyLCJDXzAiXSxbNCwyLCJDXzAiXSxbMiwwLCJDX2QiXSxbMCwwLCJDXzAiXSxbNCwwLCJDXzAiXSxbMywwLCJpIiwyXSxbNSwyLCJcXGlkIl0sWzQsMSwiXFxpZCIsMl0sWzMsNCwicyIsMl0sWzMsNSwidCJdLFswLDIsInQiLDJdLFswLDEsInMiXV0=
+\[\begin{tikzcd}
+	{C_0} && {C_d} && {C_0} \\
+	\\
+	{C_0} && {C_1} && {C_0}
+	\arrow["i"', from=1-3, to=3-3]
+	\arrow["\id", from=1-5, to=3-5]
+	\arrow["\id"', from=1-1, to=3-1]
+	\arrow["s"', from=1-3, to=1-1]
+	\arrow["t", from=1-3, to=1-5]
+	\arrow["t"', from=3-3, to=3-5]
+	\arrow["s", from=3-3, to=3-1]
+\end{tikzcd}\]
+and $i$ represents $C_\vdash$ in that there is a natural isomorphism:
+    \[ e : C_\vdash(\Phi, R) \cong C_1(\Phi, i(R)) \]
+    that commutes with the natural transformations $s,t$.
+  \end{enumerate}
+\end{definition}
+
+In terms of the syntax of SCT, the category $C_0$ models the category
+and functor judgments, the category $C_1$ models the profunctor
+\emph{contexts} and substitutions and the category $C_d$ models the
+profunctor judgment. The profunctor $C_\vdash$ models the
+transformation judgment and the functor $i$ models the construction of
+a ``singleton'' context $\alpha:\cat C,x:R,\beta:\cat D$.
+
+A DCD is a more general notion that a VDC, but they are closely
+related, in that VDCs form a coreflective subcategory of DCDs. This is
+analogous to the situation in models of dependent type theory, where
+DCDs are analogous to Categories with Families \cite{cwfs,natmodels}
+and VDCs are analogous to the more ``syntactic'' notion of a
+Contextual Category/C-system \cite{ctxcat,csystem}. First, any DCD
+induces a VDC by taking the display proarrows as the proarrows and
+interpreting 2-cells using $i$ and $C_\vdash$.  Second, any VDC
+presents a DCD whose double category has the original VDC pro-arrows
+as the display morphisms and \emph{composable strings} of proarrows as
+horizontal morphisms, which gives a strict double category.
+%
+Taking as morphisms the strict morphisms of DCDs/VDCs, these
+constructions form a coreflective embedding of VDCs into DCDs.
+
+The principle advantage of DCDs over VDCs is that the presentation of
+their algebraic structure is considerably simplified and is
+straightforward to describe as a Generalized Algebraic Theory in the
+sense of \citet{CartmellGAT}. This is because we don't \emph{require}
+that our profunctor contexts are lists, but instead merely the fact
+that their concatenation forms a strict category. Then the
+associativity/identity equations for a DCD are simply those of a
+double category.
+
+Next, each of the connectives of SCT are modeled by different
+universal properties that are profunctor isomorphisms involving
+principally $C_\vdash$.
+TODO: write them down.
+
+\begin{definition}
+  An \emph{equipment with displays} (ED) is a DCD with all of the
+  universal properties in Figure\ref{eq-umps}.
+\end{definition}
+
+Finally, to model the logic over SCT provided by the dependently typed
+context $\Gamma$, we use a category with families $Ctx$, and interpret
+all of the prior constructions in this section to be internal to
+presheaves on $Ctx$. This models the syntactic aspect that all double
+category structure is parameterized by a context $\Gamma$ and stable
+under substitution. Since the category of presheaves is a topos, all
+definitions given in set-theoretic language can be interpreted
+internally.
+
+\begin{definition}
+  A Category with Families is...
+\end{definition}
+
+\begin{definition}
+  A hyperdoctrine of equipment with displays (HED) is a pair of a
+  category with families $Ctx$ modeling $\Sigma,\Pi,\textrm{Id}$ and a
+  DCD internal to $\Set^{Ctx^o}$ with categories, functors, displays
+  and unary cells representable as types.
+\end{definition}
+
+Again this notion is straightforwardly, if laboriously, interpretable
+as a GAT.
 
 %% \begin{definition}[Unit]
 %%   A unit $U_{\cat C}\in V_h$ with $d^\pm U_{\cat C} = \cat C$ and an op-cartesian 2-cell
