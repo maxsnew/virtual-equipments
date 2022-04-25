@@ -267,16 +267,16 @@ actually natural transformations. They will then work through a
 diagram chase to determine that this naturality condition indeed
 holds.
 
-More experienced users of category theory in programming language
-theory find that for modeling computational effects such as general
-recursion or indexed-state, or modeling logics for parametricity,
-gradual typing, or step-indexed logical relations involves not just
-ordinary category theory, but more general notions such as enriched,
-internal or multi-categories. However, model construction theorems and
-especially soundness and completeness theorems in these areas will
-require their own, even more complex versions of the same common
-lemmas of category theory, in addition to the domain-specific results
-such as existence of fixed points.
+More experienced practitioners of category theory in programming
+language theory find that for modeling computational effects such as
+general recursion or indexed-state, or modeling logics for
+parametricity, gradual typing, or step-indexed logical relations
+involves not just ordinary category theory, but more general notions
+such as enriched, internal or multi-categories. However, model
+construction theorems and especially soundness and completeness
+theorems in these areas will require their own, even more complex
+versions of the same common lemmas of category theory, in addition to
+the domain-specific results such as existence of fixed points.
 
 At this level of generality, the proofs can be difficult to
 understand, as they often involve some combination of the original
@@ -300,8 +300,9 @@ double categories, metric spaces and topological spaces.
 %
 However, there are two difficulties with this approach.
 %
-First, the abstract arguments can be difficult to understand compapred
-to the original argument for ordinary category theory.
+First, the algebraic arguments can be difficult to understand compared
+to the original argument for ordinary category theory, which is an
+obstacle to wider adoption of this powerful approach.
 %
 Second, the algebraic structure of a virtual equipment is quite
 unwieldy to manipulate. The abstraction of a generalized natural
@@ -323,15 +324,15 @@ to multi-categories, where you can compose this with many input
 These then have complex associativity and unit rules and side
 conditions that say the framing arrows compose alongside the 2-cells.
 
-We solve both of these issues by developing an alternative \emph{type
-theoretic syntax} for the constructions in a virtual equipment.
+We address both of these issues by developing an alternative
+\emph{type theoretic syntax} for virtual equipments.
 %
 In this syntax the ``multi-2-cell'' above instead becomes a natural
 transformation judgment
 \[ \Phi \vdash t : S[F(x);G(y)] \]
 where the composable string of input arrows is modeled by an ordered,
 linear context $\Phi$ and output $S$ and frames $F,G$ are combined in
-the output type.
+the output type using the restriction operation of an equipment.
 %
 We write natural transformations in a natural deduction style: a
 transformation is written as a ``parameterized'' element of the output
