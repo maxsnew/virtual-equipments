@@ -87,7 +87,7 @@
 \begin{document}
 %% \newtheorem{theorem}{Theorem}
 %% \newtheorem{lemma}{Lemma}
-%% \newtheorem{construction}{Construction}
+\newtheorem{construction}{Construction}
 %% \newtheorem{definition}{Definition}
 \newcommand{\sem}[1]{\llbracket{#1}\rrbracket}
 \newcommand{\pto}{\nrightarrow}
@@ -208,6 +208,17 @@
 \newcommand{\algTensor}{\textrm{Tensor}}
 \newcommand{\algTensorI}{\textrm{TensorI}}
 \newcommand{\algTensorE}{\textrm{TensorE}}
+
+\newcommand{\algCatTy}{\textrm{Cat}}
+\newcommand{\algCatQt}{\textrm{CatQt}}
+\newcommand{\algCatUnqt}{\textrm{CatUnQt}}
+
+\newcommand{\algTransTy}{\textrm{Trans}}
+\newcommand{\algTransQt}{\textrm{TransQt}}
+\newcommand{\algTransUnqt}{\textrm{TransUnQt}}
+
+\newcommand{\algVarrQt}{\textrm{FunctQt}}
+\newcommand{\algVarrUnqt}{\textrm{FunctUnQt}}
 
 \maketitle
 
@@ -2121,6 +2132,30 @@ judgmental structure of dependent type theory:
   \end{enumerate}
 \end{definition}
 
+%% Can we do pras?
+%%
+%% A PRA mode theory is given by a free 2-category
+%% 1. Each mode m is a CwF whose context cat is [m]
+%% 2. Each 1-cell μ : m -> n is a functor [μ] : [n] -> [m] that has a DRA and is a PRA
+%% 3. Each 2-cell α : μ => ν is a 2-cell
+
+%% Let C, D be CwFs.
+%% A DRA is a pair of
+%% 1. A functor  L : C -> D
+%% 2. A morphism R : L^*(D_Ty) -> C_ty in ∫C, i.e., a morphism taking LΓ |- A to Γ |- RA
+%% 3. An iso     I : L^*(D_tm)?? =~ R^*(C_tm) in ∫(L^*(DTy)) a morphism taking LΓ |- M : A to Γ |- I(M) : RA
+
+%% Let C, D such that C has a terminal object.
+%% G : C -> D is a PRA if
+%% G / 1 : C -> D / G1 is a right adjoint
+
+%% What about fixed points?
+%% Say C has a terminal object
+%% fix : Hom(a,a) -> Hom(1, a)
+%% satisfying 
+%% fix[f] = f o fix[f]?
+%% We can write down fix, but not the equation I think
+
 \section{Semantics}
 
 Next, we develop the basic model theory for SCT. Because SCT includes
@@ -2586,13 +2621,6 @@ TODO: include all of the interactions with substitutions and restrictions.
     \algTensorE(t) \circ_{2v} (\id_{2v}(\Phi) \circ_{2h} \algTensorI(P,Q) \circ_{2h} \id_{2v}(\Psi)) = t\and
     s = \algTensorE(s \circ_{2v} (\id_{2v}(\Phi) \circ_{2h} \algTensorI(P,Q) \circ_{2h} \id_{2v}(\Psi)))
     
-    % Internalization
-    % Cats
-    % Functor
-    % Prof
-    % ProfCtx?
-    % Trans
-    
     % Cat Multiplicatives
     % Cat of Elements
     \inferrule
@@ -2635,8 +2663,133 @@ TODO: include all of the interactions with substitutions and restrictions.
     % Product
     % Terminal
   \end{mathpar}
-  \caption{UMPs in an Equipment}
+  \caption{Multiplicatives}
 \end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    % Internalization
+    % Cats
+    \inferrule
+    {}
+    {\algCatTy : \algTy(1)}
+
+    \inferrule
+    {C : \algCat(\Gamma)}
+    {\algCatQt(C) : \algTm(\Gamma,\algCatTy \circ !)}
+
+    \algCatQt(C) \circ_{tms} \gamma = \algCatQt(C \circ_{cs} \gamma)\and
+
+    \inferrule
+    {M : \algTm(\Gamma,\algCatTy \circ !)}
+    {\algCatUnqt(M) : \algCat(\Gamma)}
+
+    \algCatUnqt(M) \circ_{cs} \gamma = \algCatUnqt(M \circ_{tms} \gamma)\and
+    \algCatUnqt(\algCatQt(C)) = C\and
+    M = \algCatQt(\algCatUnqt(M))
+    
+    % Functor
+    % Prof
+    % ProfCtx?
+    % Trans
+    \inferrule
+    {P : \algHarr(\Gamma,C,C)}
+    {\algTransTy(P) : \algTy(\Gamma)}
+
+    \inferrule
+    {t : \algHSubst(\id_h,\id_v,\id_v,i(P))}
+    {\algTransQt(t) : \algTm(\Gamma,\algTransTy(P))}
+
+    \algTransQt(t) \circ_{tms} \gamma = \algTransQt(t \circ_{2s} \gamma)
+    
+    \inferrule
+    {}
+    {\algTransUnqt : \algHSubst(ext(\Gamma,\algTransTy(P)),\id_h,\id_v,\id_v,i(P \circ_{hs} \pi_1))}
+
+    \algTransUnqt \circ_{2s} (\gamma,\algTransQt(t)) = t\\
+
+    % M : Tm(G,∀ α. P α α)
+    % unquote : Subst(G,t : ∀ α:C. P α α; α:C, id,id, P α α)
+    % M = unquote()
+    M = \algTransQt(\algTransUnqt \circ_{2s} ext_s(\id,M))
+  \end{mathpar}
+  \caption{Internalization}
+\end{figure}
+
+\subsection{Equivalence between Natural Deduction and Combinatory Syntaxes}
+
+Now we aim to prove that our natural deduction syntax of SCT is sound
+and complete for the algebraic notion of hyperdoctines of double
+categories with displays.
+%
+In category-theoretic terms, we want to show that the syntax of SCT
+presents an \emph{initial object} in the category of models.
+%
+This is proved in two steps: first, we show that SCT is a model
+
+\begin{construction}{Completeness}
+  SCT presents a hyperdoctrine of double categories with displays.
+\end{construction}
+\begin{proof}
+  First, the sorts.
+  \begin{align*}
+    \eta(\algCtx) &= \{ \Gamma | \Gamma \isadtctx \}\\
+    \eta(\algSubst(\Delta,\Gamma)) &= \{ \gamma | \eta(\Delta) \vdash \gamma : \eta(\Gamma) \}\\
+    \eta(\algTy(\Gamma)) &= \{ A |  \eta(\Gamma) \vdash A \isaTy \}\\
+    \eta(\algTm(\Gamma,A)) &= \{ M | \eta(\Gamma) \vdash M : \eta(A) \}\\
+    \eta(\algCat(\Gamma)) &= \{ \cat C | \eta(\Gamma) \vdash \cat C \isaCat \}\\
+    \eta(\algVarr(\Gamma,C,D)) &= \{ a | \eta(\Gamma)|\alpha:\eta(C) \vdash a : \eta(D) \}\\
+    \eta(\algHarr(\Gamma,C,D)) &= \{ R | \eta(\Gamma)|\alpha:\eta(C);\beta:\eta(D) \vdash R \isaSet \}\\
+    \eta(\algHCtx(\Gamma,C,D)) &= \{ \Phi | \eta(\Gamma) \vdash \Phi \isavectx \wedge d^-(\Phi) = \eta(C) \and d^+(\Phi) = \eta(D) \}\\
+    \eta(\algHSubst(\Gamma, \Psi, f, g, \Phi)) &= \{ \phi | \eta(\gamma)\pipe \eta(\Psi) \vdash \phi : \eta(\Phi) \wedge d^-\phi = \eta(f) \wedge d^+\phi = \eta(g) \}\\
+    1 &= \cdot\\
+    ! &= \cdot\\
+    ext(\Gamma,A) = \Gamma, x:A \\
+    \cdots\\
+    \Phi \circ_h \Psi &= \Phi \jnctx \Psi\\
+    \id_h(\cat C) &= \alpha:\cat C\\
+    i(\cat C, \cat D, R) &= \alpha:\cat C, x: R, \beta:\cat D\\
+    \phi \circ_{2v} \psi &= \phi[\psi]\\
+    \id_{2v}(\Phi) &= \id_\Phi\\
+    \id_{2h}(\alpha:\cat C \vdash a : \cat D) &= a/\beta\\
+    \phi \circ_{2h} \psi &= \phi \jnctx \psi
+  \end{align*}
+\end{proof}
+\begin{corollary}
+  There is a unique homomorphism of HDCDs
+  \[ \eta : Comb \to SCT \]
+\end{corollary}
+
+\begin{construction}{Soundness}
+  We construct a homomorphism of HDCDs
+  \[ i : SCT \to Comb \]
+  such that the composite
+  \[ \eta \circ i : SCT \to SCT \]
+  is equal to the identity.
+\end{construction}
+\begin{proof}
+  \begin{align*}
+    i(\cdot) &= 1\\
+    i(\Gamma,x:A)  &= ext(i(\Gamma),ext(A))\\
+    \cdots
+    i(\Gamma \pipe \alpha:\cat C \vdash \alpha:\cat C) &= \id_v\\
+    i(\Gamma \pipe \alpha:\cat C \vdash M a :\cat C) &= (\algVarrUnqt \circ_{vs} (\id, (i(M)))) \circ_v i(a)\\
+    % Presheaf intro
+    % elements intro
+    i(\Gamma \pipe \alpha:\cat C \vdash (a,t,b) : \Sigma_{\alpha:\cat C;\beta:\cat D} R) &= \algEltsI(i(a),i(t),i(b))\\
+    %
+  \end{align*}
+\end{proof}
+
+\begin{corollary}
+  SCT is initial in the category of HDCDs.
+\end{corollary}
+\begin{proof}
+  Since Comb is initial, the composite $i \circ \eta$ is the identity,
+  and as above the composite $\eta \circ i$ so SCT is isomorphic to
+  Comb, and therefore it is also initial.
+\end{proof}
+
 
 
 \subsection{Example Models}
