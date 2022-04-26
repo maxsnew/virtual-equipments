@@ -9,6 +9,7 @@
 \usepackage{mathpartir}
 \usepackage{bbm}
 \usepackage{cleveref}
+\usepackage{natbib}
 
 \DeclareMathOperator*{\colim}{colim}
 
@@ -233,30 +234,73 @@
   no separate proof necessary. Important category theoretic proofs
   such as the Yoneda lemma and Co-yoneda lemma become simple type
   theoretic proofs about the relationship between unit, tensor and
-  (ordered) function types.
+  (ordered) function types. We demonstrate that this type theory can
+  be used as a kind of logical framework in which we can define common
+  categorical structures such as categories with families that serve
+  as models of type theories.
 
-  We show that the type theory is sound for models in \emph{virtual
-  equipments}, a kind of double category which is known to model not
-  just ordinary categories but enriched, internal and generalized
-  multi-categories as well. This means that while proofs and
-  constructions in our theory read like typical category-theoretic
-  constructions, the proofs automatically apply to these generalized
-  categories. Our type theory simplifies arguments over the algebraic
-  description of virtual equipments by modeling the algebraic
-  operation of restriction of profunctors along functors as instead
-  the strict syntactic substitution.
+  Finally, we give a sound and complete notion of model of our type
+  theory in a structure we call a hyperdoctrine of pro-arrow
+  equipments with displays, a generalization of prior notions of
+  virtual equipments that have been shown to model enriched and
+  internal category theory. This means that while the proofs in our
+  type theory look like standard set-based arguments, the
+  substructural syntactic restrictions ensure that the proofs carry
+  over to enriched and internal settings as well.
 \end{abstract}
 
 \section{Introduction}
 
-Category theory is a branch of mathematics that formalizes the
-algebraic structure of function composition. The high level of
-abstraction allows for succinct proofs relevant to structures across a
-broad variety of mathematical domains. Category theory is of
-particular interest in the theory of programming languages and proof
-assistants, where it is commonly used to aid in the design of typed
-languages, proof assistants and functional programming abstractions. 
+Category theory is a branch of mathematics that gives a systematic
+theory of typed, ``higher-dimensional'' algebraic structures.
+%
+Originally developed for applications to homological algebra, it was
+quickly discovered that these algebraic structures were common in
+logic and computer science, and that formal systems like type theories
+and programming languages can be modeled by a sound and complete
+notion of semantic model given by some notion of structured
+category\cite{lawvere,goguen,lambek,moggi}.
+%
+Examples include the simply typed lambda calculus \cite{lambekscott},
+computational lambda calculus \cite{moggi}, linear logic \cite{girard}
+and dependent type theory\cite{not-sure}.
+%
+These seminal works have led to a fruitful field of research applying
+such categorical logic techniques to the design of new type theories
+based directly on category-theoretic semantics.
+%
+The slogan is that the syntax of a type theory should present an
+initial object in its category of models, a category-theoretic
+reformulation and generalization of the logical notion of soundness
+and completeness.
 
+% TODO: do we have citations for this?
+While this research program has been quite successful,
+category-theoretic techniques in computer science are sometimes
+criticized for being overly complex, and there is difficulty in
+acquisition of competence in category theory by computer scientists
+who do not have a strong background in ``pure'' mathemantics.
+%
+While much of this can be explained by lack of, or lack of awareness
+of, accessible material for computer scientists, in some ways category
+theory is objectively complex.
+%
+In a traditional set-theoretic formulation, notions such as adjoint
+functors and Kan extensions produce a proliferation of ``naturality''
+and ``functoriality'' side-conditions that must be discharged.
+%
+This is compounded when we move from ordinary category theory to
+enriched and internal category theory, where constructions must be
+additionally proven continuous, monotone, etc, in addition to natural
+or functorial.
+%
+These generalizations have long been recognized as being important in
+programming language applications: domain-,metric- and
+step-index-enriched categories have been used to model general
+recursion and internal categories have been used to model
+parametricity and gradual typing.
+
+% TODO: Yoneda example
 Novices in category theory are often overwhelmed by the number of
 naturality and functoriality side conditions that abound in otherwise
 simple proofs in category theory. For instance consider the proof of
@@ -266,6 +310,96 @@ show that the ``evaluation at identity'' morphism and its inverse are
 actually natural transformations. They will then work through a
 diagram chase to determine that this naturality condition indeed
 holds.
+
+Fortunately, the tools of category theory itself can be employed to
+simplify these constructions, specifically the tools of \emph{higher}
+category theory.
+%
+Consider the analogous situation in differential calculus. When a
+physicist writes down a function, they do not expand out the
+$\epsilon-\delta$ definition of continuity and prove that it is
+continuous. Rather, they are aware of certain \emph{syntactic
+principles}, most importantly that composition of continuous functions
+is continuous and that previously defined functions are known to be
+continuous.
+%
+Similar principles apply to category theory itself: a composition of
+functors is functorial, a composition of natural transformations is
+natual, etc.
+%
+In the case of category theory, these principles can be formalized
+using category-like algebraic structures such as 2-categories,
+bicategories, (virtual) double categories and pro-arrow
+equipments\cite{}.
+%
+This approach has the advantage of avoiding the need to prove
+the side conditions of naturality or enrichment.
+%
+The downside is that these algebraic structures are quite complicated,
+with a 2-dimensional diagrammatic language that can be quite beautiful
+and elegant, but is also seems very far removed from the traditional
+formulation of category theory that while complex is at least
+described in terms of a concrete notion of sets or types.
+
+In this work we show that these algebraic formulations of category
+theory can be given a type-theoretic syntax that allows us to make
+``na\"ive'' set theoretic constructions for categories, but by
+adhering to a certain syntactic discipline provide correct arguments
+for not just ordinary category theory but enriched and internal
+categories as well.
+%
+The type theory, which we call SCT, is a ``synthetic'' theory of
+categories, functors, profunctors and natural transformations.
+%
+This provides a formulation of category theory in which profunctors
+play a primary role, most recognizable in ordinary category theory in
+the prominence of ``hom isomorphism'' formulations of universal
+properties.
+%
+The semantics of SCT is given by a slight generalization of virtual
+double categories \cite{} that we call double categories with
+displays.
+%
+Additionally, to define signatures and parameterize theorems like the
+Yoneda lemma, SCT includes an ordinary dependent type theory over it
+which includes usual $\Pi,\Sigma,\Id$ types.
+%
+In an implementation of SCT, this dependent type theory might be the
+host language itself.
+
+In this work, we focus on the syntax and semantics of SCT, but the
+ultimate goal is for this theory to serve as the foundation for a
+framework in which we can more easily study and program with new type
+theories. This falls in the tradition of \emph{logical frameworks}
+such as the LF system. To provide evidence for the feasibility of this
+approach, we show that we can model structures used in recent work on
+modal dependent type theory. This shows that an implementation of SCT
+would provide at least a toy prototype implementation/type checker for
+modal dependent type theory. This can be summarized in the slogan
+\begin{quote}
+  category theory as a logical framework
+\end{quote}
+that is, that a syntax for category theory can be used as a logical
+framework for type theories with semantics in structured categories.
+%
+If implemented in a proof assistant this would also provide with it
+the soundness of the syntax in any model.
+%
+The emphasis on profunctors in SCT fits nicely with the
+\emph{judgmental} approach of Per-Martin L\"of and suggests the
+following slogan
+\begin{quote}
+  profunctors as judgments, natural transformations as derivations
+\end{quote}
+because we observe that the ``derivation tree'' style of writing
+judgments corresponds closely to the type structure of profunctors and
+natural transformations in SCT, and it should be simple to implement a
+program that converts formal natural transformations into derivation
+tree syntax.
+
+\subsection{Category theory with Profunctors}
+
+\subsection{Double Categories and Pro-arrow Equipments}
 
 More experienced practitioners of category theory in programming
 language theory find that for modeling computational effects such as
