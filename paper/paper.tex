@@ -397,51 +397,50 @@ natural transformations in SCT, and it should be simple to implement a
 program that converts formal natural transformations into derivation
 tree syntax.
 
+This work is merely a first step in this direction, as there are still
+three major components of category theory: opposite categories,
+functor categories and ``universes'' such as the category of sets or
+categories that are not nicely axiomatizable in the current system.
+%
+Nontheless, a great deal of category theory can be carried out in this
+more limited setting, and we can still take advantage of duality at a
+meta level.
+
 \subsection{Category theory with Profunctors}
+
+First, we review the 4 basic notions of our theory of categories in
+the traditional formulation. A category $\cat C$ is a set of objects
+$\cat C_0$ with a span of arrows $\cat C_0 \leftarrow \cat C_1
+\rightarrow \cat C_0$ that pick out the source and target of each
+arrow, such that there are composition and identity arrows with
+appropriate laws. A functor $F : \cat C \to \cat D$ consists of a
+function on objects $F_0 : \cat C_0 \to \cat D_0$ and a function on
+morphisms $F_1 : \cat C_1 \to \cat D_1$ that is compatible with source
+and target and preserves identity and composition.
+
+A profunctor $R$ from $\cat C$ to $\cat D$ is a span $\cat C_0
+\leftarrow R \rightarrow \cat D_0$ that is compatible with
+\emph{left}-composition by $\cat C$ and \emph{right}-composition by
+$\cat D$. If we think of categories as generalizations of (ordered)
+sets then functors generalize (monotone) functions and profunctors
+generalize (monotone) \emph{relations}. We think of an element $r \in
+R$ with $s(r) = c$ and $t(r) = d$ as a ``proof'' that $c R d$ or some
+kind of ``heteromorphism'' from $c$ to $d$. The compatibility with
+composition says that these relations are down-closed in $C$ and
+up-closed in $D$, or that heteromorphisms can be composed with
+homomorphisms.
+%
 
 \subsection{Double Categories and Pro-arrow Equipments}
 
-More experienced practitioners of category theory in programming
-language theory find that for modeling computational effects such as
-general recursion or indexed-state, or modeling logics for
-parametricity, gradual typing, or step-indexed logical relations
-involves not just ordinary category theory, but more general notions
-such as enriched, internal or multi-categories. However, model
-construction theorems and especially soundness and completeness
-theorems in these areas will require their own, even more complex
-versions of the same common lemmas of category theory, in addition to
-the domain-specific results such as existence of fixed points.
-
-At this level of generality, the proofs can be difficult to
-understand, as they often involve some combination of the original
-category theoretic proof with some additional side-conditions that
-everythinng is in fact appropriately step-indexed, continuous etc.
+We can abstract the algebraic structure of categories, functors,
+profunctors, and natural transformations as a \emph{double category}.
 %
-One approach to taming this complexity is to prove these general
-theorems at a higher level of generality, for instance, proving them
-in some abstract 2-category of enriched/internal categories, functors
-and transformations.
-%
-For proofs in generalized category theory specifically, the notion of
-a \emph{virtual equipment} has been shown to be occupy an algebraic
-sweet-spot of being complex enough to express most basic constructions
-(functors, profunctors, natural transformations, adjunctions, kan
-extensions, etc) but also general enough to encompass internal,
-enriched and ``generalized multi-categories'', which include ordinary
-flavors of multi-categories that model intuitionistic and
-substructural type theories, but also a great deal more, including
-double categories, metric spaces and topological spaces.
-%
-However, there are two difficulties with this approach.
-%
-First, the algebraic arguments can be difficult to understand compared
-to the original argument for ordinary category theory, which is an
-obstacle to wider adoption of this powerful approach.
-%
-Second, the algebraic structure of a virtual equipment is quite
-unwieldy to manipulate. The abstraction of a generalized natural
-transformation is a kind of ``multi-2-cell'' with many inputs and a
-single output. In diagrammatic form these are rendered as
+A double category is a generalization of categories where we have a
+collection of objects $C_0$, and \emph{two separate} notions of
+morphism, which we call vertical $C_v$ and horizontal $C_h$ over the
+same objects $C_0$ which each have their own identity and composition,
+and finally a notion of 2-cell that is most easily described 
 
 \[ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEB9YkAX1PSZc+QigCM5KrUYs2XMXwEgM2PASIAmSdXrNWiDpw2LBqkUQDM26XrYAdOwygQcCfqeHqUAFmu7ZBlzAYADUYrwmykJqoiSkYlL++iCRKp6xvgk6Msl8UjBQAObwRKAAZgBOEAC2SBIgOBBIWjYBIABKnAruIJU1zdSNSFatyZ3GPX21iCNDiL6jbJ2Ek1XTZA1NiPVJS9yRU0gbcwCs2bYGAGIHa0hnm0gAbOdtAMo3-fODW8+LBgDieV4QA
 \begin{tikzcd}
@@ -493,76 +492,94 @@ simplifies reasoning about composition of transformations.
 %% There are similar syntactic notions for guaranteeing that
 %% transformations are natural.
 
-\subsection{Category Theory with Profunctors}
+%% \subsection{Category Theory with Profunctors}
 
-The syntax of Judgment Theory gives not just a syntax for the familiar
-trio of category, functor and natural transformation, but additionally
-a concept that is not usually highlighted in introductory category
-theory texts: the profunctor. A simple intuition is that profunctors
-are to functors as relations are to functions. Indeed, the syntax for
-judgment theory has a straightforward semantics in the category of
-sets and relations.
+%% The syntax of Judgment Theory gives not just a syntax for the familiar
+%% trio of category, functor and natural transformation, but additionally
+%% a concept that is not usually highlighted in introductory category
+%% theory texts: the profunctor. A simple intuition is that profunctors
+%% are to functors as relations are to functions. Indeed, the syntax for
+%% judgment theory has a straightforward semantics in the category of
+%% sets and relations.
 
-The reason profunctors are not commonly introduced is that they are
-seen as an auxiliary notion: a profunctor $R : C \pto D$ is
-typically defined as a functor $C^{\textrm{op}}\times D \to
-\textrm{Set}$. However this definition requires two concepts that are
-somewhat problematic: the opposite category $C^\textrm{op}$ and the
-category of (small) sets $\textrm{Set}$. However, these notions do not
-necessarily exist in all of our intended applications. First, we are
-interested in semantics where are objects are \emph{multicategories}
-where morphisms have multiple inputs but only a single output. In this
-case the opposite of a multicategory is not a multicategory at all but
-instead some kind of ``co-multicategory'' with multiple outputs but
-one input. Second, having a universe object like $\textrm{Set}$ is also
+%% The reason profunctors are not commonly introduced is that they are
+%% seen as an auxiliary notion: a profunctor $R : C \pto D$ is
+%% typically defined as a functor $C^{\textrm{op}}\times D \to
+%% \textrm{Set}$. However this definition requires two concepts that are
+%% somewhat problematic: the opposite category $C^\textrm{op}$ and the
+%% category of (small) sets $\textrm{Set}$. However, these notions do not
+%% necessarily exist in all of our intended applications. First, we are
+%% interested in semantics where are objects are \emph{multicategories}
+%% where morphisms have multiple inputs but only a single output. In this
+%% case the opposite of a multicategory is not a multicategory at all but
+%% instead some kind of ``co-multicategory'' with multiple outputs but
+%% one input. Second, having a universe object like $\textrm{Set}$ is also
 
-\subsection{Applications to Enriched, Internal and Multicategory Theory}
+%% \subsection{Applications to Enriched, Internal and Multicategory Theory}
 
-The syntax of judgment theory is an internal language for
-\emph{virtual equipments}. These are a kind of joint generalization of
-double categories and multicategories.
+%% The syntax of judgment theory is an internal language for
+%% \emph{virtual equipments}. These are a kind of joint generalization of
+%% double categories and multicategories.
 
-Notably, the definition of a category in \cref{sec:internal} can be
-applied as an extremely general notion of category, including internal
-categories and enriched categories. This general notion is often
-called a ``generalized multi-category'' and encompasses an astonishing
-range of mathematical structures, including categories, topological
-spaces, metric spaces, etc.
+%% Notably, the definition of a category in \cref{sec:internal} can be
+%% applied as an extremely general notion of category, including internal
+%% categories and enriched categories. This general notion is often
+%% called a ``generalized multi-category'' and encompasses an astonishing
+%% range of mathematical structures, including categories, topological
+%% spaces, metric spaces, etc.
 
-\subsection{Applications to Generalized Type Theory}
+%% \subsection{Applications to Generalized Type Theory}
 
-While we mostly focus on the semantics in category theory, due to the
-tight connection between category theory and the semantics of type
-theory, there are direct applications to the study of ``abstract type
-theory'' as well. We demonstrate how we can model single-variable
-simple type theories with products and coproducts within SCT. This is
-very much in the spirit of logical frameworks \cite{TODO}, since we
-can faithfully model the terms of an object theory inside of our
-metatheory. Since we have models of our metatheory in virtual double
-categories, we establish sound semantics as well. Put succinctly,
-category theory itself is the logical framework for the study of type
-theories.
+%% While we mostly focus on the semantics in category theory, due to the
+%% tight connection between category theory and the semantics of type
+%% theory, there are direct applications to the study of ``abstract type
+%% theory'' as well. We demonstrate how we can model single-variable
+%% simple type theories with products and coproducts within SCT. This is
+%% very much in the spirit of logical frameworks \cite{TODO}, since we
+%% can faithfully model the terms of an object theory inside of our
+%% metatheory. Since we have models of our metatheory in virtual double
+%% categories, we establish sound semantics as well. Put succinctly,
+%% category theory itself is the logical framework for the study of type
+%% theories.
 
 \subsection{Paper Overview}
 
-To demonstrate the utility of SCT, we proceed as follows
 \begin{enumerate}
 \item In \cref{sec:syntax} we introduce the syntax of Simple Category
   Theory.
-\item In \cref{sec:synthetic} we show how common theorems of category
-  theory such as the (co)-Yoneda lemma, equivalence of different
-  formulations of adjunctions, and preservation of limits can all be
-  cleanly reproduced in SCT.
-\item In \cref{sec:internal}, we show how we can use SCT to define
-  \emph{internal categories}, which allows us to prove additional
-  theorems that are not formalizable as synthetic theorems.
+
+\item In \cref{sec:examples} we show how to use our syntax for
+  synthetic category theory. Much of this is just rendering well-known
+  2-categorical/double categorical constructions in our type theoretic
+  syntax to demonstrate the ``naive''/synthetic character of proofs
+  and constructions in SCT. We additionally give some examples of how
+  this can be applied to model a recent formulation of modal dependent
+  type theory.
+
+%% \item In \cref{sec:synthetic} we show how common theorems of category
+%%   theory such as the (co)-Yoneda lemma, equivalence of different
+%%   formulations of adjunctions, and preservation of limits can all be
+%%   cleanly reproduced in SCT.
+%% \item In \cref{sec:internal}, we show how we can use SCT to define
+%%   \emph{internal categories}, which allows us to prove additional
+%%   theorems that are not formalizable as synthetic theorems.
+
 \item In \cref{sec:semantics}, we show that the syntax of SCT is sound
   for models in an arbitrary virtual double category with
   corresponding universal constructions.
+
 \item In \cref{sec:discussion}, we discuss related type theories and
   potential extensions to model multi-variable and higher-order
   categorical constructions.
 \end{enumerate}
+
+We have aimed that the syntax and examples sections should be
+accessible to anyone familiar with basic category theory and
+willingness to understand profunctors and (co-)ends.
+%
+The semantics section is by necessity more advanced and may be skipped
+or skimmed by readers who are willing to trust the mathematical
+foundations of the system.
 
 \section{Syntax of SCT}
 
@@ -2293,11 +2310,11 @@ judgmental structure of dependent type theory:
 
 \section{Semantics}
 
-Next, we develop the basic model theory for SCT. Because SCT includes
-not just a syntax for category theory, but is also indexed by an
-ordinary context of dependent type theory $\Gamma$, a model of SCT is
-not given by a \emph{single} virtual double category, but instead by
-an \emph{indexed family} of VDCs, parameterized by an object of a
+Next, we develop the basics of the model theory for SCT. Because SCT
+includes not just a syntax for category theory, but is also indexed by
+an ordinary context of dependent type theory $\Gamma$, a model of SCT
+is not given by a \emph{single} virtual double category, but instead
+by an \emph{indexed family} of VDCs, parameterized by an object of a
 category that interprets dependent type theory. We call such a
 structure a \emph{VDC-hyperdoctrine}. We then show how to construct a
 from any VDC, a VDC-hyperdoctrine indexed by the category of sets,
@@ -2973,8 +2990,6 @@ This is proved in two steps: first, we show that SCT is a model
   Comb, and therefore it is also initial.
 \end{proof}
 
-
-
 \subsection{Example Models}
 
 Our main intended models are when the indexing category is $\Set$ and
@@ -3141,20 +3156,23 @@ appropriate notion of substitution and units/tensors/homs are modeled
 by the corresponding type formers. There are a lot of details to be
 verified, especially the equations.
 
-
 \section{Discussion}
 
-\paragraph{Directed Type Theory}
+\paragraph{Calculi for Presheaves/Profunctors}
+
+David Jaz Myers String Diagrams
+
+Coend calculus
 
 Cartesian Bicategories.
+
+Double-cat-like syntax: Gradual Type Theory, System P of parametricity, cubical stuff?
+
+\paragraph{Directed Type Theory}
 
 Directed Type theory
 
 Fibrational approaches to logical relations
-
-Double-cat-like syntax: Gradual Type Theory, System P of parametricity, cubical stuff?
-
-String Diagrams?
 
 \paragraph{Category Theoretic Extensions}
 
@@ -3202,7 +3220,7 @@ one of each variance, it is unclear what the appropriate
 generalization of the transformation context $\Phi$ should be.
 
 An orthogonal extension to these would be to consider adding a
-\emph{discretization} modality $|\cat C|$ that gives the discrete
+\emph{discretization} modality $\Delta\cat C$ that gives the discrete
 category on the underlying set of objects of $\cat C$. This would give
 us the ability to formalize concepts like ``function on objects'' or
 ``unnatural transformation'' without the need to define internal
@@ -3212,29 +3230,52 @@ C$, i.e., dependence merely on the object of $\cat C$ with no
 functoriality/naturality conditions. This would then be internalized
 by the discretization modality.
 
-\paragraph{As a tool for Formal Type Theory}
+A third approach would be to extend the calculus to model general
+monoidal closed structures and more generally multicategories, which
+provides semantics of modal substructural type theories.
+%
+This can be modeled by extending the ``universe'' $\Set$ to be a
+monoidal closed category, which induces a monoidal closed structure on
+profunctors by the Day convolution product \cite{...}.
+%
+Similar developments along these lines have already been done for
+coend calculus \citep{coend-calculus} and in formalization of
+substructural type theories \citep{atkey-woods}.
 
-While we can model ``unary'' type theories using profunctors, to model
-theories like simple intuitionistic, linear or bunched type theories
-we need a way to talk about ``profunctors of arbitrarily many
-arguments''. This can be accomplished using \emph{multicategory}
-theory, which models the structure of the context with its structural
-rules as a monad of ``contexts and substitutions''. A suitable notion
-of monad on a virtual double category has been developed and was in
-fact the original motivation for the concept of a virtual double
-category. However while an abstract monad of contexts $T$ is enough to
-define what a $T$-multicategory internal to a virtual equipment is, it
-does not appear possible to define the multiplicative connectives as a
-universal property, i.e., to define when the multicategory is
-\emph{representable}.
+%% A recent development in the formalization of substructural type
+%% theories is to use monoidal connectives at the meta-level when
+%% defining multiplicative connectives\cite{woodsatkeyesop2022}. This
+%% suggest one approach to extending the theory to support the
+%% formalization of multiplicative universal properties would be, in
+%% adherence to the microcosm principle, to add linear judgments and
+%% multiplicative connectives to the metalevel.
 
-A recent development in the formalization of substructural type
-theories is to use monoidal connectives at the meta-level when
-defining multiplicative connectives\cite{woodsatkeyesop2022}. This
-suggest one approach to extending the theory to support the
-formalization of multiplicative universal properties would be, in
-adherence to the microcosm principle, to add linear judgments and
-multiplicative connectives to the metalevel.
+%% \paragraph{As a tool for Formal Type Theory}
+
+%% While we can model ``unary'' type theories using profunctors, to model
+%% theories like simple intuitionistic, linear or bunched type theories
+%% we need a way to talk about ``profunctors of many arguments''. This
+%% can be accomplished using \emph{multicategory} theory, which models
+%% the structure of the context with its structural rules as a monad of
+%% ``contexts and substitutions''. A suitable notion of monad on a
+%% virtual double category has been developed and was in fact the
+%% original motivation for the concept of a virtual double
+%% category. However while an abstract monad of contexts $T$ is enough to
+%% define what a $T$-multicategory internal to a virtual equipment is, it
+%% does not appear possible to define the multiplicative connectives as a
+%% universal property, i.e., to define when the multicategory is
+%% \emph{representable}.
+
+\paragraph{Semantics}
+
+Our definition of a double category with displays is suggestive of a
+simple generalization. A double category is a monoid object in the
+double category of $Span(Cat)$, and a double category with displays
+furthermore uses certain diagrams involving profunctors, which also
+form a double category $Prof$. This suggests that the algebraic
+structure of a double category with displays is naturally modeled in
+some kind of \emph{triple category}, modeling the three types of
+morphisms: functors, profunctors and spans of functors.
    
 %% \section{Typesetting instructions -- Summary}
 %% \label{sec:typesetting-summary}
