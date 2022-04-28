@@ -3498,10 +3498,12 @@ By an inductive argument, this operation is associative and unital.
         (\phi\jnctx (\psi,t/x,a/\alpha))[\phi' \jnctx (\psi'_1\jnctx\psi'_2)]
         &= ((\phi\jnctx \psi),t/x,a/\alpha)[(\phi' \jnctx \psi'_1)\jnctx\psi'_2]\\
         &= (\phi\jnctx \psi)[\phi' \jnctx \psi'_1],t[\psi'_2]/x,a[d^+\psi'_2]/\alpha\\
-        &= (\phi[\psi'] \jnctx \psi[\psi']),t[\psi'_2]/x,a[d^+\psi'_2]/\alpha\\
-        &= \phi[\psi'] \jnctx (\psi[\psi'],t[\psi'_2]/x,a[d^+\psi'_2]/\alpha)\\
+        &= (\phi[\psi'] \jnctx \psi[\psi'_1]),t[\psi'_2]/x,a[d^+\psi'_2]/\alpha\\
+        &= \phi[\psi'] \jnctx (\psi[\psi'_1],t[\psi'_2]/x,a[d^+\psi'_2]/\alpha)\\
+        &= \phi[\psi'] \jnctx (\psi,t/x,a/\alpha)[\psi'_1\jnctx \psi'_2]
       \end{align*}
   \end{enumerate}
+  Again, this covers all cases by \cref{inversion}.
 \end{lemma}
 
 \begin{figure}
