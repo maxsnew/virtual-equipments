@@ -1,0 +1,457 @@
+\subsection{Generalized Algebraic Theory of VE Hyperdoctrines}
+
+To simplify our initiality proof, we use a \emph{generalized
+algebraic} presentation of our notion of
+model\cite{cartmell,sterling-eat}. To describe this, we give a
+``combinator'' syntax for VE hyperdoctrines, where we have explicit
+sorts for contexts $\Gamma$ and $\Phi$ and explicit judgments for
+substitutions $\gamma : \Delta \to \Gamma$ and $\phi : \Psi
+\vdash_{f,g} \Phi$.
+%
+While the explicit description of the theory is quite long, we can
+describe it in simple modular pieces.
+%
+First, we use the standard theory of a category with families, which
+describes the algebraic structure of contexts $\Gamma$, types $\Gamma
+\vdash A$ and terms $\Gamma \vdash M : A$.
+%
+Second, we add to that a theory for a slight generalization of virtual
+double categories we call \emph{double categories with display
+pro-arrows}.
+%
+The difference is that in a double category with display pro-arrows,
+we have a true double category with strict vertical and horizontal
+composition, among whom are the ``display'' pro-arrows.
+%
+The display pro-arrows model the profunctors of the syntax, which
+don't have a strict composition, whereas the arbitrary pro-arrows
+model the contexts $\Phi$, which do have a strict composition, given
+by context concatenation $\Phi,\Psi$.
+%
+The difference is that in a virtual double category the contexts are
+assumed to be given inductively by formal compositions of the display
+pro-arrows, whereas in models of this algebraic theory, the contexts
+might include other exotic objects.
+%
+This difference is analogous to the difference between a category with
+families and a contextual category in models of dependent type theory,
+and we fully expect that there is a similar relationship between the
+models: virtual double categories should form a co-reflective
+subcategory characterized as those double categories with display
+pro-arrows where all pro-arrows are equal to some concatenation of
+displays.
+%
+Finally, we parameterize all of the constructions of the theory of
+double categories with pro-arrows by contexts $\Gamma$ and add in
+equations that substitution commutes with all double category
+operations.
+%
+This means the theory presents a category with families with an double
+category with display pro-arrows internal to the category of
+presheaves on the category of contexts, i.e., a hyperdoctrine of
+double categories with display pro-arrows.
+
+The main advantage of this algebraic approach is that the initiality
+theorem for the combinatory syntax is trivial. Instead, the work is to
+show that our type theoretic syntax, which restricts combinatory rules
+to make substitution an admissible rather than primitive operation, is
+equivalent to the combinatory syntax.
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule
+    {}
+    {\Gamma : \algCtx}
+
+    \inferrule
+    {\Delta : \algCtx \and \Gamma : \algCtx}
+    {\gamma : \algSubst(\Delta,\Gamma)}
+
+    \inferrule
+    {\Gamma : \algCtx}
+    {C : \algCat(\Gamma)}
+
+    \inferrule
+    {\Gamma : \algCtx \and C : \algCat(\Gamma) \and D : \algCat(\Gamma) \and
+    }
+    {F : \algVarr(\Gamma,C,D)}
+
+    \inferrule
+    {\Gamma : \algCtx \and C : \algCat(\Gamma) \and D : \algCat(\Gamma) \and
+    }
+    {P : \textrm{Profunctor}(\Gamma,C,D)}
+
+    \inferrule
+    {\Gamma : \algCtx \and C : \algCat(\Gamma) \and D : \algCat(\Gamma)
+    }
+    {P : \textrm{ProfCtx}(\Gamma,C,D)}
+
+    \inferrule
+    {\Gamma : \textrm{Ctx}\and
+      C  : \algCat(\Gamma) \and D  : \algCat(\Gamma) \and
+      C' : \algCat(\Gamma) \and D' : \algCat(\Gamma) \and
+      f : \algVarr(\Gamma,C,C') \and g : \algCat(\Gamma,D,D') \and
+      \Phi : \textrm{ProfCtx}(\Gamma,C,D)\and
+      \Psi : \textrm{ProfCtx}(\Gamma,C',D')
+    }
+    {\phi : \textrm{ProfSubst}(\Gamma,C,D,C',D',f,g,\Phi,\Psi)}
+    
+    \inferrule
+    {\Gamma : \textrm{Ctx}\and
+      C  : \algCat(\Gamma) \and D  : \algCat(\Gamma) \and
+      C' : \algCat(\Gamma) \and D' : \algCat(\Gamma) \and
+      f : \algVarr(\Gamma,C,C') \and g : \algCat(\Gamma,D,D') \and
+      \Phi : \textrm{ProfCtx}(\Gamma,C,D)\and
+      P : \textrm{ProfCtx}(\Gamma,C',D')
+    }
+    {t : \textrm{Trans}(\Gamma,C,D,C',D',f,g,\Phi,P)}
+  \end{mathpar}
+  \caption{Sorts of Algebraic SCT}
+\end{figure}
+
+
+
+\begin{figure}
+  \begin{mathpar}
+    \cdots
+  \end{mathpar}
+  \caption{Algebraic Dependent Type Theory}
+\end{figure}
+
+The algebraic theory of a double category with displays indexed by a
+category is given in Figure~\ref{fig:alg-dc-disp}.
+%
+First, we give the categories and functors the theory of a category
+indexed by a category.
+%
+Next, we give categories and \emph{profunctor contexts} the same
+theory, where the identity $\id_h$ is the ``empty'' context $\alpha:C$ and the composition $\Phi \circ_h$.
+%
+
+TODO: include all of the interactions with substitutions and restrictions.
+
+\begin{figure}
+  \begin{mathpar}
+    % theory of an indexed category (vertical)
+    \inferrule
+    {g : \algVarr(D,E) \and \algVarr(C,D)}
+    {g \circ_v f : \algVarr(C,E)}
+
+    (g \circ_v f) \circ_{vs} \gamma = (g \circ_{vs} \gamma) \circ_v (f \circ_s \gamma)
+    
+    (h \circ_v g) \circ_v f = h \circ_v (g \circ_v f)
+
+    \inferrule
+    {}
+    {\id_v : \algVarr(C,C)}
+
+    \id_v \circ_{vs} \gamma = \id_h
+
+    (f \circ_v \id_v) = f\and \id_v \circ_v f = f
+
+    % theory of an indexed category (horizontal)
+
+    \inferrule
+    {\Psi : \algHCtx(D,E) \and \algHCtx(C,D)}
+    {\Psi \circ_h \Phi : \algHCtx(C,E)}
+
+    (\Psi \circ_h \Phi) \circ_{hs} \gamma = (\Psi \circ_{hs} \gamma) \circ_h (\Phi \circ_s \gamma)
+    
+    (\Sigma \circ_h \Psi) \circ_h \Phi = \Sigma \circ_h (\Psi \circ_h \Phi)
+
+    \inferrule
+    {}
+    {\id_h : \algHCtx(C,C)}
+
+    \id_h \circ_{hs} \gamma = \id_h
+
+    (\Phi \circ_h \id_h) = \Phi\and \id_h \circ_h \Phi = \Phi
+
+    % embedding of displays
+
+    \inferrule{P : \algHarr(C,D)}{i(P) : \algHCtx(C,D)}
+
+    % 2-cells: substitutions
+    % vertical category
+    % horizontal category
+    % interchange law
+    \inferrule
+    {\psi : \algHSubst(\Phi, f',g',\Psi)\and \phi : \algHSubst(\Sigma,f,g,\Phi)
+    }
+    {\psi \circ_{2v} \phi : \algHSubst(\Sigma, f' \circ f, g' \circ g, \Psi)}
+
+    \inferrule
+    {}
+    {\id_{2v} : \algHSubst(\Phi,\id,\id,\Phi)}
+
+    (\phi \circ_{2v} \psi) \circ_{2v} \sigma = \phi \circ_{2v} (\psi \circ_{2v} \sigma)\\
+    \phi \circ_{2v} \id_{2v} = \phi \and \phi = \id_{2v} \circ_{2v} \phi\\
+
+    \inferrule
+    {\phi_1 : \algHSubst(\Psi_1,f,g,\Phi_1)\and \phi_2 : \algHSubst(\Psi_2,f,g,\Phi_2)
+    }
+    {\phi_1 \circ_{2h} \phi_2 : \algHSubst(\Psi_1 \circ_h \Psi_2, f, h, \Phi_1 \circ_h \Phi_2)}
+
+    \inferrule
+    {}
+    {\id_{2h} : \algHSubst(\id_h,f,f,\id_h)}
+
+    (\phi \circ_{2h} \psi) \circ_{2h} \sigma = \phi \circ_{2h} (\psi \circ_{2h} \sigma)\\
+    \phi \circ_{2h} \id_{2h} = \phi \and \id_{2h} \circ_{2h} \phi = \phi\\
+
+    (\phi_1 \circ_{2h} \phi_2) \circ_{2v} (\psi_1 \circ_{2h} \psi_2) = (\phi_1 \circ_{2v} \psi_1) \circ_{2h} (\phi_2 \circ_{2v} \psi_2)
+
+  \end{mathpar}
+  \caption{Double Category with Display Pro-arrows}
+  \label{fig:alg-dc-disp}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    % Restrictions
+    \inferrule
+    {P : \algHarr(\Gamma,C',D')
+    \and f : \algVarr(\Gamma,C,C')\and
+    \and g : \algVarr(\Gamma,D,D')}
+    {P \circ_r (f,g) : \algHarr(\Gamma,C,D)}
+
+    (P \circ_r (f,g) \circ_s \gamma) = (P \circ_s \gamma) \circ_r (f \circ_s \gamma, g \circ_s \gamma)
+
+    P \circ_r (f,g) \circ_r (f',g') = P \circ_r (f \circ_r f', g \circ_r g')
+
+    P \circ_r (\id,\id) = P
+
+    % Prof Multiplicatives
+    % LHom
+    \inferrule
+    {P : \algHarr(C, D) \and Q : \algHarr(C,E)}
+    {\algLHom(P,Q) : \algHarr(D,E)}
+    
+    \algLHom(P,Q) \circ_{hs} \gamma = \algLHom(P \circ_{hs} \gamma, Q \circ_{hs} \gamma)\and
+    \algLHom(P,Q) \circ_{r} (f,g) = \algLHom(P \circ_r (\id,f), Q \circ_r(\id,g))
+
+    \inferrule
+    {}
+    {\algLHomE(P,Q) : \algHSubst(i(P)\circ_h i(\algLHom(P,Q)),\id_v,\id_v,i(Q))}
+
+    \inferrule
+    {t : \algHSubst(i(P) \circ_h \Phi, \id,g, i(Q))}
+    {\algLHomI(\Phi,g,t,P,Q) : \algHSubst(\Phi,\id,g,i(\algLHom(P,Q)))}
+
+    \algLHomE \circ_{2v} (\id_v(P) \circ_h \algLHomI(t)) = t\and
+    \theta = \algLHomI(\algLHomE \circ_{2v} (\id_v(P) \circ_h \theta))\and
+        
+    % RHom
+    \inferrule
+    {P : \algHarr(C, E) \and Q : \algHarr(D,E)}
+    {\algRHom(P,Q) : \algHarr(C, D)}
+
+    \algRHom(P,Q) \circ_{hs} \gamma = \algRHom(P \circ_{hs} \gamma, Q \circ_{hs} \gamma)\and
+    \algRHom(P,Q) \circ_{r} (f,g) = \algRHom(P \circ_r (f, \id), Q \circ_r(g,\id))
+
+    \inferrule
+    {}
+    {\algRHomE(P,Q) : \algHSubst(i(\algRHom(P,Q)) \id_h i(Q),\id_v,\id_v,i(P))}
+
+    \inferrule
+    {t : \algHSubst(\Phi \circ_h i(Q), f, \id, i(P))}
+    {\algRHomI(\Phi,f,t,P,Q) : \algHSubst(\Phi,\id,g,i(\algLHom(P,Q)))}
+
+    \algRHomE \circ_{2v} (\algRHomI(t) \circ_h \id(Q)) = t\and
+    \theta = \algRHomI(\algRHomE \circ_{2v} (\theta \circ_h \id(Q)))\and
+
+    % Unit
+    \inferrule
+    {C : \algCat}
+    {\algUnit(C) : \algHarr(C,C)}
+
+    \algUnit(C) \circ_{hs} \gamma = \algUnit(C \circ_{cs} \gamma)
+
+    \inferrule
+    {}
+    {\algUnitI(C) : \algSubst(\id_h(C),\id,\id,i(\algUnit(C)))}
+
+    \inferrule
+    {t : \algHSubst(\Phi \id_h \Psi,f,g,i(R))}
+    {\algUnitE(t) : \algHSubst((\Phi \circ_h i(\algUnit(C)) \circ_h \Psi), f, g, i(R))}
+
+    \algUnitE(t) \circ_{2v} (\id_{2v}(\Phi) \circ_h \algUnitI(C) \circ_h \id_{2v}(\Psi)) = t\and
+    s = \algUnitE(s \circ_{2v} (\id_{2v}(\Phi) \circ_h \algUnitI(C) \circ_h \id_{2v}(\Psi)))
+    
+    % Tensor
+    \inferrule
+    {P : \algHarr(C,D) \and Q : \algHarr(D,E)}
+    {\algTensor(P,Q) : \algHarr(C,E)}
+
+    \algTensor(P,Q) \circ_{hs} \gamma = \algTensor(P \circ_{hs} \gamma, Q \circ_{hs} \gamma)\and
+    \algTensor(P,Q) \circ_{r} (f,g) = \algTensor(P \circ_r (f,\id), Q \circ_r (\id,g))
+
+    \algTensorI(P,Q) : \algHSubst(i(P) \circ_h i(Q),\id,\id,i(\algTensor(P,Q)))
+
+    \inferrule
+    {t : \algHSubst(\Phi \circ_h i(P) \circ_h i(Q) \circ_h \Psi, f,g,i(R))}
+    {\algTensorE(t) : \algHSubst(\Phi \circ_h i(\algTensor(P,Q)) \circ_h \Psi, f,g,i(R))}
+
+    \algTensorE(t) \circ_{2v} (\id_{2v}(\Phi) \circ_{2h} \algTensorI(P,Q) \circ_{2h} \id_{2v}(\Psi)) = t\and
+    s = \algTensorE(s \circ_{2v} (\id_{2v}(\Phi) \circ_{2h} \algTensorI(P,Q) \circ_{2h} \id_{2v}(\Psi)))
+    
+    % Cat Multiplicatives
+    % Cat of Elements
+    \inferrule
+    {P : \algHarr(\Gamma,C,D)}
+    {\algElts(C,D,P) : \algCat(\Gamma)}
+
+    \inferrule
+    {}
+    {\pi^- : \algVarr(\algElts(C,D,P),C)}
+
+    \inferrule
+    {}
+    {\pi^+ : \algVarr(\algElts(C,D,P),D)}
+
+    \inferrule
+    {}
+    {\pi^p : \algHSubst(\id_h(\algElts(C,D,P)),\pi^-,\pi^+,P)}
+
+    \inferrule
+    {f : \algVarr(E,C) \and g : \algVarr(E,D)\and
+      t : \algHSubst(\id_h(E), f, g, P)
+    }
+    {\algEltsI(t,f,g) : \algVarr(E,\algElts(C,D,P))}
+
+    \pi^- \circ_v \algEltsI(t,f,g) = f\and
+    \pi^+ \circ_v \algEltsI(t,f,g) = g\and
+    \pi^p \circ_{2v} \algEltsI(t,f,g) = \alpha
+
+    \inferrule
+    {h : \algVarr(E,\algElts(C,D,P))}
+    {h = \algEltsI(\pi^-\circ_v h,\pi^+\circ_vh,\pi^p \circ_{2v} \id_{2h}(h))}
+    
+    % Presheaf cats
+    
+    % Cat Additives
+    % Product
+    % Terminal
+
+    % Prof Additives
+    % Product
+    % Terminal
+  \end{mathpar}
+  \caption{Multiplicatives}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    % Internalization
+    % Cats
+    \inferrule
+    {}
+    {\algCatTy : \algTy(1)}
+
+    \inferrule
+    {C : \algCat(\Gamma)}
+    {\algCatQt(C) : \algTm(\Gamma,\algCatTy \circ !)}
+
+    \algCatQt(C) \circ_{tms} \gamma = \algCatQt(C \circ_{cs} \gamma)\and
+
+    \inferrule
+    {M : \algTm(\Gamma,\algCatTy \circ !)}
+    {\algCatUnqt(M) : \algCat(\Gamma)}
+
+    \algCatUnqt(M) \circ_{cs} \gamma = \algCatUnqt(M \circ_{tms} \gamma)\and
+    \algCatUnqt(\algCatQt(C)) = C\and
+    M = \algCatQt(\algCatUnqt(M))
+    
+    % Functor
+    % Prof
+    % ProfCtx?
+    % Trans
+    \inferrule
+    {P : \algHarr(\Gamma,C,C)}
+    {\algTransTy(P) : \algTy(\Gamma)}
+
+    \inferrule
+    {t : \algHSubst(\id_h,\id_v,\id_v,i(P))}
+    {\algTransQt(t) : \algTm(\Gamma,\algTransTy(P))}
+
+    \algTransQt(t) \circ_{tms} \gamma = \algTransQt(t \circ_{2s} \gamma)
+    
+    \inferrule
+    {}
+    {\algTransUnqt : \algHSubst(ext(\Gamma,\algTransTy(P)),\id_h,\id_v,\id_v,i(P \circ_{hs} \pi_1))}
+
+    \algTransUnqt \circ_{2s} (\gamma,\algTransQt(t)) = t\\
+
+    % M : Tm(G,∀ α. P α α)
+    % unquote : Subst(G,t : ∀ α:C. P α α; α:C, id,id, P α α)
+    % M = unquote()
+    M = \algTransQt(\algTransUnqt \circ_{2s} ext_s(\id,M))
+  \end{mathpar}
+  \caption{Internalization}
+\end{figure}
+
+\subsection{Equivalence between Natural Deduction and Combinatory Syntaxes}
+
+Now we aim to prove that our natural deduction syntax of SCT is sound
+and complete for the algebraic notion of hyperdoctines of double
+categories with displays.
+%
+In category-theoretic terms, we want to show that the syntax of SCT
+presents an \emph{initial object} in the category of models.
+%
+This is proved in two steps: first, we show that SCT is a model
+
+\begin{corollary}
+  There is a unique homomorphism of HDCDs
+  \[ \eta : Comb \to SCT \]
+\end{corollary}
+
+\begin{construction}{Soundness}
+  We construct a homomorphism of HDCDs
+  \[ i : SCT \to Comb \]
+  such that the composite
+  \[ \eta \circ i : SCT \to SCT \]
+  is equal to the identity.
+\end{construction}
+\begin{proof}
+  \begin{align*}
+    i(\cdot) &= 1\\
+    i(\Gamma,x:A)  &= ext(i(\Gamma),ext(A))\\
+    \cdots
+    i(\Gamma \pipe \alpha:\cat C \vdash \alpha:\cat C) &= \id_v\\
+    i(\Gamma \pipe \alpha:\cat C \vdash M a :\cat C) &= (\algVarrUnqt \circ_{vs} (\id, (i(M)))) \circ_v i(a)\\
+    % Presheaf intro
+    % elements intro
+    i(\Gamma \pipe \alpha:\cat C \vdash (a,t,b) : \Sigma_{\alpha:\cat C;\beta:\cat D} R) &= \algEltsI(i(a),i(t),i(b))\\
+    %
+  \end{align*}
+\end{proof}
+
+\begin{construction}{Completeness}
+  SCT presents a hyperdoctrine of double categories with displays.
+\end{construction}
+\begin{proof}
+  First, the sorts.
+  \begin{align*}
+    \eta(\algCtx) &= \{ \Gamma | \Gamma \isadtctx \}\\
+    \eta(\algSubst(\Delta,\Gamma)) &= \{ \gamma | \eta(\Delta) \vdash \gamma : \eta(\Gamma) \}\\
+    \eta(\algTy(\Gamma)) &= \{ A |  \eta(\Gamma) \vdash A \isaTy \}\\
+    \eta(\algTm(\Gamma,A)) &= \{ M | \eta(\Gamma) \vdash M : \eta(A) \}\\
+    \eta(\algCat(\Gamma)) &= \{ \cat C | \eta(\Gamma) \vdash \cat C \isaCat \}\\
+    \eta(\algVarr(\Gamma,C,D)) &= \{ a | \eta(\Gamma)|\alpha:\eta(C) \vdash a : \eta(D) \}\\
+    \eta(\algHarr(\Gamma,C,D)) &= \{ R | \eta(\Gamma)|\alpha:\eta(C);\beta:\eta(D) \vdash R \isaSet \}\\
+    \eta(\algHCtx(\Gamma,C,D)) &= \{ \Phi | \eta(\Gamma) \vdash \Phi \isavectx \wedge d^-(\Phi) = \eta(C) \and d^+(\Phi) = \eta(D) \}\\
+    \eta(\algHSubst(\Gamma, \Psi, f, g, \Phi)) &= \{ \phi | \eta(\gamma)\pipe \eta(\Psi) \vdash \phi : \eta(\Phi) \wedge d^-\phi = \eta(f) \wedge d^+\phi = \eta(g) \}\\
+    1 &= \cdot\\
+    ! &= \cdot\\
+    ext(\Gamma,A) = \Gamma, x:A \\
+    \cdots\\
+    \Phi \circ_h \Psi &= \Phi \jnctx \Psi\\
+    \id_h(\cat C) &= \alpha:\cat C\\
+    i(\cat C, \cat D, R) &= \alpha:\cat C, x: R, \beta:\cat D\\
+    \phi \circ_{2v} \psi &= \phi[\psi]\\
+    \id_{2v}(\Phi) &= \id_\Phi\\
+    \id_{2h}(\alpha:\cat C \vdash a : \cat D) &= a/\beta\\
+    \phi \circ_{2h} \psi &= \phi \jnctx \psi
+  \end{align*}
+\end{proof}

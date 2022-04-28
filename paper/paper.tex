@@ -2394,7 +2394,10 @@ and functor judgments, the category $C_1$ models the profunctor
 \emph{contexts} and substitutions and the category $C_d$ models the
 profunctor judgment. The profunctor $C_\vdash$ models the
 transformation judgment and the functor $i$ models the construction of
-a ``singleton'' context $\alpha:\cat C,x:R,\beta:\cat D$.
+a ``singleton'' context $\alpha:\cat C,x:R,\beta:\cat D$. The fact
+that $i$ is fully faithful corresponds to the fact that we don't
+provide in the syntax a notion of morphism of profunctors separate
+from the notion of substitution of singleton contexts.
 
 A DCD is a more general notion that a VDC, but they are closely
 related, in that VDCs form a coreflective subcategory of DCDs. This is
@@ -2420,10 +2423,43 @@ that their concatenation forms a strict category. Then the
 associativity/identity equations for a DCD are simply those of a
 double category.
 
+The final notion of composition that we require for our structure is
+that display morphisms have \emph{restrictions} along vertical arrows.
+
+\begin{definition}
+  A DCD is an Equipment with displays when
+  \begin{enumerate}
+  \item The functor $(s,t) : C_d \to C_0$ is a split fibration, with
+    restriction operation written as $(f,g)^*R$.
+  \item The profunctor $C_\vdash$ respects restrictions in that
+    \[ C_\vdash^{f',g'}(\Phi, (f,g)^*R) \cong C_\vdash^{f\circ f',g\circ g'}(\Phi, R) \]
+  \end{enumerate}
+\end{definition}
+Specializing this property give us that $C_\vdash^{f,g}(\Phi,R) \cong
+C_\vdash^{\id,\id}(\Phi,(f,g)^*R)$, which justifies that we only need
+to give syntax for terms $\Phi \vdash t : R$ where $\Phi$ and $R$ have
+the same covariant/contravariant dependencies.
+
+We can then define the remaining connectives by UMPs in an equipment
+with displays, adding in the extra strictness criterion that these
+connectives appropriately commute with restriction.
+
+\begin{figure}
+  \begin{mathpar}
+    C_\vdash^{f,g}(\Phi \circ_{C} \Psi, R) \cong C_\vdash^{f,g}(\Phi \circ_C i(U_C) \circ_c \Psi, R) \\
+    C_\vdash^{f,g}(\Phi \circ_{C} iP \circ_D iQ \circ_E \Psi, R) \cong C_\vdash^{f,g}(\Phi \circ_C i(P \odot Q) \circ_E \Psi, R) \and (f,g)^*(P \odot Q) = (f,\id)^*P \odot (\id,g)^*Q\\
+    C_\vdash^{\id_C,g}(P \circ_c \Phi, R) \cong C_\vdash^{\id_D,g}(\Phi, P \triangleright Q) \and (f,g)^*(P \triangleright Q) = (\id,f)^*P \triangleright (\id,g)^*Q\\
+    C_\vdash^{f, \id_C}(\Phi \circ_c R, P) \cong C_\vdash^{f, \id_D}(\Phi, P \triangleleft Q)\and (f,g)^*(P \triangleleft Q) = (f,\id)^*P \triangleleft (g,\id)^*Q\\
+    C_\vdash^{f,g}(\Phi,1) \cong 1 \and (f,g)^*1 = 1\\
+    C_\vdash^{f,g}(\Phi,P \times Q) \cong C_\vdash^{f,g}(\Phi,P) \times C_\vdash^{f,g}(\Phi, Q)\and (f,g)^*(P \times Q) = (f,g)^*P \times (f,g)^*Q\\
+    C_0(C,\smallint R) \cong C_\vdash(\id_C, R)\\
+  \end{mathpar}
+  \caption{UMPs in an Equipment with Displays}
+\end{figure}
+
 Next, each of the connectives of SCT are modeled by different
 universal properties that are profunctor isomorphisms involving
-principally $C_\vdash$.
-TODO: write them down.
+principally $C_\vdash$. We define these in Figure\ref{fig:eq-umps}
 
 \begin{definition}
   An \emph{equipment with displays} (ED) is a DCD with all of the
@@ -2440,41 +2476,59 @@ definitions given in set-theoretic language can be interpreted
 internally.
 
 \begin{definition}
-  A Category with Families is...
+  A Category with Families consists of
+  \begin{enumerate}
+  \item A category $\textrm{Ctx}$
+  \item with a terminal object $1 \in \textrm{Ctx}$
+  \item A presheaf $\textrm{Ty} : \Set^\textrm{Ctx}$ of types in context.
+  \item A presheaf $\textrm{Tm} : \Set^{\int \textrm{Tm}}$ of terms of
+    a given type.
+  \item With a context extension functor $\textrm{ext} : \int
+    \textrm{Ty} \to \textrm{Ctx}$ with universal property:
+    \[ \textrm{Ctx}(\Delta,\textrm{ext}(A)) \cong (\gamma : \textrm{Ctx}(\Delta,\textrm{ctx}(A))) \times \textrm{Tm}(A[\gamma])  \]
+  \end{enumerate}
 \end{definition}
+
+This can be extended in a standard way to model $\Pi,\Sigma, \Id$
+types \citet{cwf-stuff}.
+%
+The final connectives we need are the ``universes'' that internalize
+the double category structure as types in the CwF.
 
 \begin{definition}
-  A hyperdoctrine of equipment with displays (HED) is a pair of a
-  category with families $Ctx$ modeling $\Sigma,\Pi,\textrm{Id}$ and a
-  DCD internal to $\Set^{Ctx^o}$ with categories, functors, displays
-  and unary cells representable as types.
+  Let $(\textrm{Ctx},\textrm{Ty},\textrm{Tm},\textrm{ext})$ be a
+  category with families and let $\mathcal V$ be a DCD internal to
+  $\Set^\textrm{Ctx}$. Then
+  \begin{enumerate}
+  \item $\mathcal V$ objects are representable as types if there is a
+    type given by a section $\textrm{Ob} \in \textrm{Ty}(1)$ with a
+    natural isomorphism
+    \[ \textrm{Tm}(!_\Gamma^*\textrm{Ob}) \cong \textrm{Ob}(\mathcal V)_\Gamma \]
+  \item $\mathcal V$ vertical arrows are representable as types if
+    there is a type
+    \[ \textrm{Tm}(((\gamma,\lceil a\rceil),\lceil b\rceil)^*\textrm{Functor} \cong
+    \textrm{VArr}(\mathcal V_{\Delta})(a,b)
+    \]
+    and similarly horizontal displays are representable as types if
+    \[ \textrm{Tm}(((\gamma,\lceil a\rceil),\lceil b\rceil)^*\textrm{Profunctor} \cong
+    \textrm{Disp}(\mathcal V_{\Delta})(a,b)
+    \]
+  \item Closed $\mathcal V$ transformations are representable as types if
+    \[ \textrm{Tm}() \]
+  \end{enumerate}
 \end{definition}
 
-Again this notion is straightforwardly, if laboriously, interpretable
+We then arrive at our final notion of model by collecting all of this
+algebraic structure into one definition.
+\begin{definition}
+  A hyperdoctrine of equipments with displays (HED) is a pair of a
+  category with families $Ctx$ modeling $\Sigma,\Pi,\Id$ and a DCD
+  internal to $\Set^{Ctx^o}$ with categories, functors, displays and
+  unary cells representable as types.
+\end{definition}
+
+This notion of HED is straightforwardly, if laboriously, interpretable
 as a GAT.
-
-%% \begin{definition}[Unit]
-%%   A unit $U_{\cat C}\in V_h$ with $d^\pm U_{\cat C} = \cat C$ and an op-cartesian 2-cell
-%%   \[ r : V_h(\cat C, U_{\cat C}) \]
-%%   with $d^\pm r = \id_{\cat C}$.
-%% \end{definition}
-
-%% \begin{definition}[Tensor]
-%%   If $R,Q \in V_h$ with $d^+R = d^-Q$, a tensor is a horizontal arrow
-%%   $R \odot Q \in V_h$ with $d^+ (R\odot Q) = d^+ R$ and $d^-(R \odot
-%%   Q) = d^- Q$ with an op-cartesian 2-cell
-%%   \[ p : V_h(R,Q;R \odot Q) \]
-%% \end{definition}
-
-\begin{definition}{Indexed Virtual Equipment}
-  A VE-hyperdoctrine is a pair of a category with families $(C,
-  \textrm{Ty}, \textrm{Tm})$ and a functor $\cat C^{op} \to VE$. A
-  morphism of VE-hyperdoctrines
-  \[(F,\phi) : (\cat C, \mathcal V : \cat C^{o} \to VE) \to (\cat D, \mathcal U : \cat D^{o} \to VE)\]
-  is a pair of a functor of categories with families $F : \cat C \to
-  \cat D$ and a natural transformation $\phi : \mathcal V
-  \Rightarrow\mathcal U \circ F^{o}$.
-\end{definition}
 
 %% \begin{definition}
 %%   Given a well-formed signature $\Gamma$ and a virtual equipment
@@ -2512,637 +2566,119 @@ as a GAT.
 %%   %% \end{align*}
 %% \end{definition}
 
-\subsection{Generalized Algebraic Theory of VE Hyperdoctrines}
-
-To simplify our initiality proof, we use a \emph{generalized
-algebraic} presentation of our notion of
-model\cite{cartmell,sterling-eat}. To describe this, we give a
-``combinator'' syntax for VE hyperdoctrines, where we have explicit
-sorts for contexts $\Gamma$ and $\Phi$ and explicit judgments for
-substitutions $\gamma : \Delta \to \Gamma$ and $\phi : \Psi
-\vdash_{f,g} \Phi$.
-%
-While the explicit description of the theory is quite long, we can
-describe it in simple modular pieces.
-%
-First, we use the standard theory of a category with families, which
-describes the algebraic structure of contexts $\Gamma$, types $\Gamma
-\vdash A$ and terms $\Gamma \vdash M : A$.
-%
-Second, we add to that a theory for a slight generalization of virtual
-double categories we call \emph{double categories with display
-pro-arrows}.
-%
-The difference is that in a double category with display pro-arrows,
-we have a true double category with strict vertical and horizontal
-composition, among whom are the ``display'' pro-arrows.
-%
-The display pro-arrows model the profunctors of the syntax, which
-don't have a strict composition, whereas the arbitrary pro-arrows
-model the contexts $\Phi$, which do have a strict composition, given
-by context concatenation $\Phi,\Psi$.
-%
-The difference is that in a virtual double category the contexts are
-assumed to be given inductively by formal compositions of the display
-pro-arrows, whereas in models of this algebraic theory, the contexts
-might include other exotic objects.
-%
-This difference is analogous to the difference between a category with
-families and a contextual category in models of dependent type theory,
-and we fully expect that there is a similar relationship between the
-models: virtual double categories should form a co-reflective
-subcategory characterized as those double categories with display
-pro-arrows where all pro-arrows are equal to some concatenation of
-displays.
-%
-Finally, we parameterize all of the constructions of the theory of
-double categories with pro-arrows by contexts $\Gamma$ and add in
-equations that substitution commutes with all double category
-operations.
-%
-This means the theory presents a category with families with an double
-category with display pro-arrows internal to the category of
-presheaves on the category of contexts, i.e., a hyperdoctrine of
-double categories with display pro-arrows.
-
-The main advantage of this algebraic approach is that the initiality
-theorem for the combinatory syntax is trivial. Instead, the work is to
-show that our type theoretic syntax, which restricts combinatory rules
-to make substitution an admissible rather than primitive operation, is
-equivalent to the combinatory syntax.
-
-\begin{figure}
-  \begin{mathpar}
-    \inferrule
-    {}
-    {\Gamma : \algCtx}
-
-    \inferrule
-    {\Delta : \algCtx \and \Gamma : \algCtx}
-    {\gamma : \algSubst(\Delta,\Gamma)}
-
-    \inferrule
-    {\Gamma : \algCtx}
-    {C : \algCat(\Gamma)}
-
-    \inferrule
-    {\Gamma : \algCtx \and C : \algCat(\Gamma) \and D : \algCat(\Gamma) \and
-    }
-    {F : \algVarr(\Gamma,C,D)}
-
-    \inferrule
-    {\Gamma : \algCtx \and C : \algCat(\Gamma) \and D : \algCat(\Gamma) \and
-    }
-    {P : \textrm{Profunctor}(\Gamma,C,D)}
-
-    \inferrule
-    {\Gamma : \algCtx \and C : \algCat(\Gamma) \and D : \algCat(\Gamma)
-    }
-    {P : \textrm{ProfCtx}(\Gamma,C,D)}
-
-    \inferrule
-    {\Gamma : \textrm{Ctx}\and
-      C  : \algCat(\Gamma) \and D  : \algCat(\Gamma) \and
-      C' : \algCat(\Gamma) \and D' : \algCat(\Gamma) \and
-      f : \algVarr(\Gamma,C,C') \and g : \algCat(\Gamma,D,D') \and
-      \Phi : \textrm{ProfCtx}(\Gamma,C,D)\and
-      \Psi : \textrm{ProfCtx}(\Gamma,C',D')
-    }
-    {\phi : \textrm{ProfSubst}(\Gamma,C,D,C',D',f,g,\Phi,\Psi)}
-    
-    \inferrule
-    {\Gamma : \textrm{Ctx}\and
-      C  : \algCat(\Gamma) \and D  : \algCat(\Gamma) \and
-      C' : \algCat(\Gamma) \and D' : \algCat(\Gamma) \and
-      f : \algVarr(\Gamma,C,C') \and g : \algCat(\Gamma,D,D') \and
-      \Phi : \textrm{ProfCtx}(\Gamma,C,D)\and
-      P : \textrm{ProfCtx}(\Gamma,C',D')
-    }
-    {t : \textrm{Trans}(\Gamma,C,D,C',D',f,g,\Phi,P)}
-  \end{mathpar}
-  \caption{Sorts of Algebraic SCT}
-\end{figure}
-
-
-
-\begin{figure}
-  \begin{mathpar}
-    \cdots
-  \end{mathpar}
-  \caption{Algebraic Dependent Type Theory}
-\end{figure}
-
-The algebraic theory of a double category with displays indexed by a
-category is given in Figure~\ref{fig:alg-dc-disp}.
-%
-First, we give the categories and functors the theory of a category
-indexed by a category.
-%
-Next, we give categories and \emph{profunctor contexts} the same
-theory, where the identity $\id_h$ is the ``empty'' context $\alpha:C$ and the composition $\Phi \circ_h$.
-%
-
-TODO: include all of the interactions with substitutions and restrictions.
-
-\begin{figure}
-  \begin{mathpar}
-    % theory of an indexed category (vertical)
-    \inferrule
-    {g : \algVarr(D,E) \and \algVarr(C,D)}
-    {g \circ_v f : \algVarr(C,E)}
-
-    (g \circ_v f) \circ_{vs} \gamma = (g \circ_{vs} \gamma) \circ_v (f \circ_s \gamma)
-    
-    (h \circ_v g) \circ_v f = h \circ_v (g \circ_v f)
-
-    \inferrule
-    {}
-    {\id_v : \algVarr(C,C)}
-
-    \id_v \circ_{vs} \gamma = \id_h
-
-    (f \circ_v \id_v) = f\and \id_v \circ_v f = f
-
-    % theory of an indexed category (horizontal)
-
-    \inferrule
-    {\Psi : \algHCtx(D,E) \and \algHCtx(C,D)}
-    {\Psi \circ_h \Phi : \algHCtx(C,E)}
-
-    (\Psi \circ_h \Phi) \circ_{hs} \gamma = (\Psi \circ_{hs} \gamma) \circ_h (\Phi \circ_s \gamma)
-    
-    (\Sigma \circ_h \Psi) \circ_h \Phi = \Sigma \circ_h (\Psi \circ_h \Phi)
-
-    \inferrule
-    {}
-    {\id_h : \algHCtx(C,C)}
-
-    \id_h \circ_{hs} \gamma = \id_h
-
-    (\Phi \circ_h \id_h) = \Phi\and \id_h \circ_h \Phi = \Phi
-
-    % embedding of displays
-
-    \inferrule{P : \algHarr(C,D)}{i(P) : \algHCtx(C,D)}
-
-    % 2-cells: substitutions
-    % vertical category
-    % horizontal category
-    % interchange law
-    \inferrule
-    {\psi : \algHSubst(\Phi, f',g',\Psi)\and \phi : \algHSubst(\Sigma,f,g,\Phi)
-    }
-    {\psi \circ_{2v} \phi : \algHSubst(\Sigma, f' \circ f, g' \circ g, \Psi)}
-
-    \inferrule
-    {}
-    {\id_{2v} : \algHSubst(\Phi,\id,\id,\Phi)}
-
-    (\phi \circ_{2v} \psi) \circ_{2v} \sigma = \phi \circ_{2v} (\psi \circ_{2v} \sigma)\\
-    \phi \circ_{2v} \id_{2v} = \phi \and \phi = \id_{2v} \circ_{2v} \phi\\
-
-    \inferrule
-    {\phi_1 : \algHSubst(\Psi_1,f,g,\Phi_1)\and \phi_2 : \algHSubst(\Psi_2,f,g,\Phi_2)
-    }
-    {\phi_1 \circ_{2h} \phi_2 : \algHSubst(\Psi_1 \circ_h \Psi_2, f, h, \Phi_1 \circ_h \Phi_2)}
-
-    \inferrule
-    {}
-    {\id_{2h} : \algHSubst(\id_h,f,f,\id_h)}
-
-    (\phi \circ_{2h} \psi) \circ_{2h} \sigma = \phi \circ_{2h} (\psi \circ_{2h} \sigma)\\
-    \phi \circ_{2h} \id_{2h} = \phi \and \id_{2h} \circ_{2h} \phi = \phi\\
-
-    (\phi_1 \circ_{2h} \phi_2) \circ_{2v} (\psi_1 \circ_{2h} \psi_2) = (\phi_1 \circ_{2v} \psi_1) \circ_{2h} (\phi_2 \circ_{2v} \psi_2)
-
-  \end{mathpar}
-  \caption{Double Category with Display Pro-arrows}
-  \label{fig:alg-dc-disp}
-\end{figure}
-
-\begin{figure}
-  \begin{mathpar}
-    % Restrictions
-    \inferrule
-    {P : \algHarr(\Gamma,C',D')
-    \and f : \algVarr(\Gamma,C,C')\and
-    \and g : \algVarr(\Gamma,D,D')}
-    {P \circ_r (f,g) : \algHarr(\Gamma,C,D)}
-
-    (P \circ_r (f,g) \circ_s \gamma) = (P \circ_s \gamma) \circ_r (f \circ_s \gamma, g \circ_s \gamma)
-
-    P \circ_r (f,g) \circ_r (f',g') = P \circ_r (f \circ_r f', g \circ_r g')
-
-    P \circ_r (\id,\id) = P
-
-    % Prof Multiplicatives
-    % LHom
-    \inferrule
-    {P : \algHarr(C, D) \and Q : \algHarr(C,E)}
-    {\algLHom(P,Q) : \algHarr(D,E)}
-    
-    \algLHom(P,Q) \circ_{hs} \gamma = \algLHom(P \circ_{hs} \gamma, Q \circ_{hs} \gamma)\and
-    \algLHom(P,Q) \circ_{r} (f,g) = \algLHom(P \circ_r (\id,f), Q \circ_r(\id,g))
-
-    \inferrule
-    {}
-    {\algLHomE(P,Q) : \algHSubst(i(P)\circ_h i(\algLHom(P,Q)),\id_v,\id_v,i(Q))}
-
-    \inferrule
-    {t : \algHSubst(i(P) \circ_h \Phi, \id,g, i(Q))}
-    {\algLHomI(\Phi,g,t,P,Q) : \algHSubst(\Phi,\id,g,i(\algLHom(P,Q)))}
-
-    \algLHomE \circ_{2v} (\id_v(P) \circ_h \algLHomI(t)) = t\and
-    \theta = \algLHomI(\algLHomE \circ_{2v} (\id_v(P) \circ_h \theta))\and
-        
-    % RHom
-    \inferrule
-    {P : \algHarr(C, E) \and Q : \algHarr(D,E)}
-    {\algRHom(P,Q) : \algHarr(C, D)}
-
-    \algRHom(P,Q) \circ_{hs} \gamma = \algRHom(P \circ_{hs} \gamma, Q \circ_{hs} \gamma)\and
-    \algRHom(P,Q) \circ_{r} (f,g) = \algRHom(P \circ_r (f, \id), Q \circ_r(g,\id))
-
-    \inferrule
-    {}
-    {\algRHomE(P,Q) : \algHSubst(i(\algRHom(P,Q)) \id_h i(Q),\id_v,\id_v,i(P))}
-
-    \inferrule
-    {t : \algHSubst(\Phi \circ_h i(Q), f, \id, i(P))}
-    {\algRHomI(\Phi,f,t,P,Q) : \algHSubst(\Phi,\id,g,i(\algLHom(P,Q)))}
-
-    \algRHomE \circ_{2v} (\algRHomI(t) \circ_h \id(Q)) = t\and
-    \theta = \algRHomI(\algRHomE \circ_{2v} (\theta \circ_h \id(Q)))\and
-
-    % Unit
-    \inferrule
-    {C : \algCat}
-    {\algUnit(C) : \algHarr(C,C)}
-
-    \algUnit(C) \circ_{hs} \gamma = \algUnit(C \circ_{cs} \gamma)
-
-    \inferrule
-    {}
-    {\algUnitI(C) : \algSubst(\id_h(C),\id,\id,i(\algUnit(C)))}
-
-    \inferrule
-    {t : \algHSubst(\Phi \id_h \Psi,f,g,i(R))}
-    {\algUnitE(t) : \algHSubst((\Phi \circ_h i(\algUnit(C)) \circ_h \Psi), f, g, i(R))}
-
-    \algUnitE(t) \circ_{2v} (\id_{2v}(\Phi) \circ_h \algUnitI(C) \circ_h \id_{2v}(\Psi)) = t\and
-    s = \algUnitE(s \circ_{2v} (\id_{2v}(\Phi) \circ_h \algUnitI(C) \circ_h \id_{2v}(\Psi)))
-    
-    % Tensor
-    \inferrule
-    {P : \algHarr(C,D) \and Q : \algHarr(D,E)}
-    {\algTensor(P,Q) : \algHarr(C,E)}
-
-    \algTensor(P,Q) \circ_{hs} \gamma = \algTensor(P \circ_{hs} \gamma, Q \circ_{hs} \gamma)\and
-    \algTensor(P,Q) \circ_{r} (f,g) = \algTensor(P \circ_r (f,\id), Q \circ_r (\id,g))
-
-    \algTensorI(P,Q) : \algHSubst(i(P) \circ_h i(Q),\id,\id,i(\algTensor(P,Q)))
-
-    \inferrule
-    {t : \algHSubst(\Phi \circ_h i(P) \circ_h i(Q) \circ_h \Psi, f,g,i(R))}
-    {\algTensorE(t) : \algHSubst(\Phi \circ_h i(\algTensor(P,Q)) \circ_h \Psi, f,g,i(R))}
-
-    \algTensorE(t) \circ_{2v} (\id_{2v}(\Phi) \circ_{2h} \algTensorI(P,Q) \circ_{2h} \id_{2v}(\Psi)) = t\and
-    s = \algTensorE(s \circ_{2v} (\id_{2v}(\Phi) \circ_{2h} \algTensorI(P,Q) \circ_{2h} \id_{2v}(\Psi)))
-    
-    % Cat Multiplicatives
-    % Cat of Elements
-    \inferrule
-    {P : \algHarr(\Gamma,C,D)}
-    {\algElts(C,D,P) : \algCat(\Gamma)}
-
-    \inferrule
-    {}
-    {\pi^- : \algVarr(\algElts(C,D,P),C)}
-
-    \inferrule
-    {}
-    {\pi^+ : \algVarr(\algElts(C,D,P),D)}
-
-    \inferrule
-    {}
-    {\pi^p : \algHSubst(\id_h(\algElts(C,D,P)),\pi^-,\pi^+,P)}
-
-    \inferrule
-    {f : \algVarr(E,C) \and g : \algVarr(E,D)\and
-      t : \algHSubst(\id_h(E), f, g, P)
-    }
-    {\algEltsI(t,f,g) : \algVarr(E,\algElts(C,D,P))}
-
-    \pi^- \circ_v \algEltsI(t,f,g) = f\and
-    \pi^+ \circ_v \algEltsI(t,f,g) = g\and
-    \pi^p \circ_{2v} \algEltsI(t,f,g) = \alpha
-
-    \inferrule
-    {h : \algVarr(E,\algElts(C,D,P))}
-    {h = \algEltsI(\pi^-\circ_v h,\pi^+\circ_vh,\pi^p \circ_{2v} \id_{2h}(h))}
-    
-    % Presheaf cats
-    
-    % Cat Additives
-    % Product
-    % Terminal
-
-    % Prof Additives
-    % Product
-    % Terminal
-  \end{mathpar}
-  \caption{Multiplicatives}
-\end{figure}
-
-\begin{figure}
-  \begin{mathpar}
-    % Internalization
-    % Cats
-    \inferrule
-    {}
-    {\algCatTy : \algTy(1)}
-
-    \inferrule
-    {C : \algCat(\Gamma)}
-    {\algCatQt(C) : \algTm(\Gamma,\algCatTy \circ !)}
-
-    \algCatQt(C) \circ_{tms} \gamma = \algCatQt(C \circ_{cs} \gamma)\and
-
-    \inferrule
-    {M : \algTm(\Gamma,\algCatTy \circ !)}
-    {\algCatUnqt(M) : \algCat(\Gamma)}
-
-    \algCatUnqt(M) \circ_{cs} \gamma = \algCatUnqt(M \circ_{tms} \gamma)\and
-    \algCatUnqt(\algCatQt(C)) = C\and
-    M = \algCatQt(\algCatUnqt(M))
-    
-    % Functor
-    % Prof
-    % ProfCtx?
-    % Trans
-    \inferrule
-    {P : \algHarr(\Gamma,C,C)}
-    {\algTransTy(P) : \algTy(\Gamma)}
-
-    \inferrule
-    {t : \algHSubst(\id_h,\id_v,\id_v,i(P))}
-    {\algTransQt(t) : \algTm(\Gamma,\algTransTy(P))}
-
-    \algTransQt(t) \circ_{tms} \gamma = \algTransQt(t \circ_{2s} \gamma)
-    
-    \inferrule
-    {}
-    {\algTransUnqt : \algHSubst(ext(\Gamma,\algTransTy(P)),\id_h,\id_v,\id_v,i(P \circ_{hs} \pi_1))}
-
-    \algTransUnqt \circ_{2s} (\gamma,\algTransQt(t)) = t\\
-
-    % M : Tm(G,∀ α. P α α)
-    % unquote : Subst(G,t : ∀ α:C. P α α; α:C, id,id, P α α)
-    % M = unquote()
-    M = \algTransQt(\algTransUnqt \circ_{2s} ext_s(\id,M))
-  \end{mathpar}
-  \caption{Internalization}
-\end{figure}
-
-\subsection{Equivalence between Natural Deduction and Combinatory Syntaxes}
-
-Now we aim to prove that our natural deduction syntax of SCT is sound
-and complete for the algebraic notion of hyperdoctines of double
-categories with displays.
-%
-In category-theoretic terms, we want to show that the syntax of SCT
-presents an \emph{initial object} in the category of models.
-%
-This is proved in two steps: first, we show that SCT is a model
+\subsection{Initiality}
+
+In this section we give a sketch of an initiality proof of the syntax
+of SCT in HEDs. Note that we consider all the following sets up to
+$\alpha$-equivalence of names.
 
 \begin{construction}{Completeness}
-  SCT presents a hyperdoctrine of double categories with displays.
-\end{construction}
-\begin{proof}
-  First, the sorts.
-  \begin{align*}
-    \eta(\algCtx) &= \{ \Gamma | \Gamma \isadtctx \}\\
-    \eta(\algSubst(\Delta,\Gamma)) &= \{ \gamma | \eta(\Delta) \vdash \gamma : \eta(\Gamma) \}\\
-    \eta(\algTy(\Gamma)) &= \{ A |  \eta(\Gamma) \vdash A \isaTy \}\\
-    \eta(\algTm(\Gamma,A)) &= \{ M | \eta(\Gamma) \vdash M : \eta(A) \}\\
-    \eta(\algCat(\Gamma)) &= \{ \cat C | \eta(\Gamma) \vdash \cat C \isaCat \}\\
-    \eta(\algVarr(\Gamma,C,D)) &= \{ a | \eta(\Gamma)|\alpha:\eta(C) \vdash a : \eta(D) \}\\
-    \eta(\algHarr(\Gamma,C,D)) &= \{ R | \eta(\Gamma)|\alpha:\eta(C);\beta:\eta(D) \vdash R \isaSet \}\\
-    \eta(\algHCtx(\Gamma,C,D)) &= \{ \Phi | \eta(\Gamma) \vdash \Phi \isavectx \wedge d^-(\Phi) = \eta(C) \and d^+(\Phi) = \eta(D) \}\\
-    \eta(\algHSubst(\Gamma, \Psi, f, g, \Phi)) &= \{ \phi | \eta(\gamma)\pipe \eta(\Psi) \vdash \phi : \eta(\Phi) \wedge d^-\phi = \eta(f) \wedge d^+\phi = \eta(g) \}\\
-    1 &= \cdot\\
-    ! &= \cdot\\
-    ext(\Gamma,A) = \Gamma, x:A \\
-    \cdots\\
-    \Phi \circ_h \Psi &= \Phi \jnctx \Psi\\
-    \id_h(\cat C) &= \alpha:\cat C\\
-    i(\cat C, \cat D, R) &= \alpha:\cat C, x: R, \beta:\cat D\\
-    \phi \circ_{2v} \psi &= \phi[\psi]\\
-    \id_{2v}(\Phi) &= \id_\Phi\\
-    \id_{2h}(\alpha:\cat C \vdash a : \cat D) &= a/\beta\\
-    \phi \circ_{2h} \psi &= \phi \jnctx \psi
-  \end{align*}
-\end{proof}
-\begin{corollary}
-  There is a unique homomorphism of HDCDs
-  \[ \eta : Comb \to SCT \]
-\end{corollary}
+  SCT presents a HED with
+  \begin{enumerate}
+  \item Category with Families provided by the contexts,
+    substitutions, types and terms.
+  \item Objects of $C_0^\Gamma$ provided by the terms $\Gamma \vdash \cat C \isaCat$
+  \item Morphisms of $C_0^\Gamma$ provided by terms $\Gamma
+    \alpha:\cat C \vdash b \cat D$ with source $\cat C$ and target
+    $\cat D$. With identity given by a variable and composition by identity.
+  \item Objects of $C_1^\Gamma$ are provided by the profunctor
+    contexts $\Gamma \vdash \Phi \isavectx$ with morphisms given by
+    transformation substitutions $\Gamma \pipe \Phi \vdash \psi :
+    \Psi$.
+  \item Horizontal composition of contexts is defined by gluing along
+    a variable $\Phi\jnctx \Psi$ and the horizontal identity is given
+    by the single category variable $\alpha:\cat C$.
+  \item Objects of $C_\vdash^\Gamma$ are provided by the profunctors
+    $\Gamma\alpha:\cat C;\beta:\cat D \vdash R$, and a morphism from
+    $\alpha:\cat C;\beta:\cat D \vdash R$ to $\alpha':\cat
+    C';\beta':\cat D' \vdash R'$ is a triple $(a,t,b)$ of functor
+    terms $\alpha:\cat C \vdash a : \cat C'$ and $\beta:\cat D\vdash b
+    : \cat D'$ and a term $\alpha:\cat C,x:R,\beta:\cat D \vdash t :
+    R'[a/\alpha';b/\beta']$
 
-\begin{construction}{Soundness}
-  We construct a homomorphism of HDCDs
-  \[ i : SCT \to Comb \]
-  such that the composite
-  \[ \eta \circ i : SCT \to SCT \]
-  is equal to the identity.
+    Composition $(a,t,b) \circ (a',t',b') = (a[a'],t[t'],b[b'])$ is
+    given by component-wise single-place substitution with the triple
+    of all variables the identity.
+  \item The inclusion functor $i^\Gamma : C_d \to C_1$ is defined on
+    types as the singleton context $i(R) = \alpha:\cat
+    C,x:R,\beta:\cat D$ and on morphisms as the singleton
+    substitution.
+  \item The restriction operation $R \circ (a,b)$ is defined as the
+    substitution $R[a;b]$.
+  \item The remaining universal properties are satisfied using the
+    analogous type theoretic construction.
+  \end{enumerate}
 \end{construction}
+
+The associativity, unit and interchange laws of a category are proven
+in the \cref{appendix}.
+
+\begin{theorem}{(Sketch) Soundness/Initiality}
+  Given any HED $\mathcal V$, there is a unique homomorphism of HEDs $\sem\cdot$
+  from $\textrm{Syn}(\textrm{SCT})$ to $\mathcal V$.
+\end{theorem}
 \begin{proof}
-  \begin{align*}
-    i(\cdot) &= 1\\
-    i(\Gamma,x:A)  &= ext(i(\Gamma),ext(A))\\
-    \cdots
-    i(\Gamma \pipe \alpha:\cat C \vdash \alpha:\cat C) &= \id_v\\
-    i(\Gamma \pipe \alpha:\cat C \vdash M a :\cat C) &= (\algVarrUnqt \circ_{vs} (\id, (i(M)))) \circ_v i(a)\\
-    % Presheaf intro
-    % elements intro
-    i(\Gamma \pipe \alpha:\cat C \vdash (a,t,b) : \Sigma_{\alpha:\cat C;\beta:\cat D} R) &= \algEltsI(i(a),i(t),i(b))\\
-    %
-  \end{align*}
+  Roughly the converse of the completeness theorem. For instance,
+  profunctor contexts are interpreted using horizontal identity and
+  composition as well as the $i$ functor. Preservation of the
+  restriction operation requires that restriction commutes with the
+  display connectives.
 \end{proof}
 
-\begin{corollary}
-  SCT is initial in the category of HDCDs.
-\end{corollary}
-\begin{proof}
-  Since Comb is initial, the composite $i \circ \eta$ is the identity,
-  and as above the composite $\eta \circ i$ so SCT is isomorphic to
-  Comb, and therefore it is also initial.
-\end{proof}
+Details of the interpretation of profunctor contexts and substitutions
+are given in the appendix\cref{appendix}.
 
 \subsection{Example Models}
 
-Our main intended models are when the indexing category is $\Set$ and
-the hyperdoctrine is given by families of objects, arrows etc, of a
-fixed virtual equipment $\mathcal V$, indexed by the set
-$\sem\Gamma$. We can formalize this as the ``internal logic'' of the
-virtual equipment $\mathcal V$.
+We now describe how to interpret the syntax in any virtual equipment
+(that can model the connectives). First, from any virtual equipment we
+can construct a DCD:
 
+\begin{definition}
+  Given a virtual equipment $\mathcal V$, define a DCD by taking the
+  horizontal morphisms of $\mathcal V$ as the display morphisms and
+  the horizontal morphisms as the ``composable strings'' of horizontal
+  morphisms. Then we define $C_\vdash$ using the notion of
+  ``multi-2-cell''.
+\end{definition}
+
+Next, we can upgrade any DCD in $\Set$ to a DCD internal to
+$\Set^\Set$ by taking the presheaf of objects, vertical arrows, etc as
+families of objects, vertical arrows etc indexed by the indexing set
+$\Gamma$.
 \begin{definition}[Powers of Virtual Equipments]
   Let $\mathcal V$ be a virtual equipment and let $X$ be a set.
   Define a virtual equipment, the ``power'' $\mathcal V^X$ as follows.
 
   \begin{enumerate}
   \item Objects are functions $X \to \mathcal V_0$.
-  \item Vertical morphisms $\mathcal V^X_v(A,B)$ are functions
-    $\Pi_{x\in X} V_v(A x,B x)$. With pointwise composition, identity.
-  \item Horizontal morphisms $\mathcal V^X_h$ are functions $\Gamma \to \mathcal V_h$, with
-    $(d^\pm R)x = d^\pm (Rx)$.
-  \item Restriction of $R$ along $f,g$ is given by $(R(f,g))x = (R x)(f x,g x)$.
+  \item Vertical morphisms $\mathcal V^X_0(A,B)$ are functions
+    $\Pi_{x\in X} V_0(A x,B x)$. With pointwise composition, identity.
+  \item Horizontal morphisms $\mathcal V^X_1$ are functions $\Gamma
+    \to \mathcal V_1$.
   \item A 2-cell from $\Phi$ to $R$ is a family $\Pi_{x\in X} \mathcal
-    V^X_h(\Phi x,R x)$ with composition given pointwise.
+    V^X_h(\Phi x,R x)$.
   \end{enumerate}
+  All operations are simply lifted pointwise.
 \end{definition}
 
+This defines the ``natural'' interpretation of SCT in a virtual
+equipment once we see that the powering construction is functorial in
+$\Gamma$.
 \begin{definition}[Internal Logic]
   Given any virtual equipment $\mathcal V$, we can construct the
   ``internal logic'' by indexing $\mathcal V$ by $\Set$:
 
   \begin{enumerate}
-  \item The indexing cateogry is $\Set$.
+  \item The indexing cateogry is $\Set$, which is a category with families.
   \item The equipment is defined as $\mathcal U\Gamma = \mathcal V^\Gamma$.
   \item Restriction by a function $\gamma : \Delta \to \Gamma$ is
     given pointwise.
+  \item The representing object for objects is simply
+    $\textrm{Ob}_\Gamma = \textrm{Ob}(\mathcal V)^\Gamma$ and
+    similarly for the other universe objects.
   \end{enumerate}
 \end{definition}
-
-%% \section{Conservativity of Homs, Tensors}
-
-%% The soundness theorem is not entirely sufficient for our goals,
-%% however.
-%% %
-%% In particular, we are interested in applying the internal category
-%% constructions to models that only have units, and do not necessarily
-%% admit left/right homs or tensor products of horizontal arrows.
-%% %
-%% To do so, we now prove a \emph{conservativity} result for the calculus
-%% with homs and tensors over a simpler calculus whose only profunctor
-%% constructor is the unit.
-%% %
-%% We must take care in defining the more restricted calculus, however.
-%% %
-%% If we simply remove homs and tensors from the calculus, then there is
-%% no way to internalize the transformations as types, and so no way to
-%% actually define internal categories!
-%% %
-%% For example, if we remove the hom sets, there is no way to abstract
-%% over the composition transformation:
-%% \[\alpha_1:\cat C, f : \harrapp {\cat C_1}{\alpha_1}{\alpha_2}, \alpha_2:\cat C, g : \harrapp{\cat C_1}{\alpha_2}{\alpha_3}, \alpha_3:\cat C \vdash \textrm{compose} : \harrapp{\cat C_1}{\alpha_1}{\alpha_3}
-%% \]
-%% %
-%% So in addition to removing the hom sets and tensors, we add a
-%% ``jumbo'' combined form of the hom set and end type, described in
-%% \cref{fig:jumbo}.
-%% %
-%% This type directly internalizes a transformation judgment of arbitrary
-%% large context, as opposed to the end type which internalized only
-%% transformations from an ``empty'' context.
-%% %
-
-
-%% \begin{figure}
-%%   \begin{mathpar}
-%%     \inferrule*[right=JumboHomForm]
-%%     {\Gamma \vdash \Phi \isavectx \and \Gamma \pipe \underline \Phi \vdash R \isaSet}
-%%     {\Gamma \vdash \Phi \triangleright R}
-
-%%     \inferrule*[right=JumboHomI]
-%%     {\Gamma \pipe \Phi \vdash s : R}
-%%     {\Gamma \vdash \lambda \Phi. s : \Phi \triangleright R}
-
-%%     \inferrule*[right=JumboHomE]
-%%     {\Gamma \vdash M : \Phi \triangleright R\and
-%%       \Gamma \vdash \phi : \Psi \to \Phi}
-%%     {\Gamma \pipe \Psi \vdash M \triangleright \phi : R[\underline \phi]}
-
-%%     \inferrule*[right=Jumbo$\beta$]
-%%     {}
-%%     {\lambda \Phi. M \triangleright (\Phi) = M}
-
-%%     \inferrule*[right=Jumbo$\eta$]
-%%     {\Gamma \vdash M : \Phi \triangleright R}
-%%     {M = \lambda \Phi. M \triangleright \Phi}
-%%   \end{mathpar}
-%%   \caption{Jumbo End/Homs}
-%%   \label{fig:jumbo}
-%% \end{figure}
-
-%% %
-%% To demonstrate this, we prove a \emph{conservativity} result for the
-%% calculus with homs and tensors over a calculus containing only units,
-%% and a ``jumbo'' internalization
-
-A model of our theory is given by a virtual double category with
-restrictions, units, tensors and homs. We informally describe the
-semantics of each judgment now.
-
-A context $\Gamma \isadtctx$ denotes a set.
-%
-A set with empty boundary $\Gamma \pipe \cdot \vdash S \isaSet$ denotes a
-set for every $\gamma:\Gamma$.
-%
-The type $\Gamma \pipe \cdot \vdash \Sort \isaSet$ denotes the set of
-objects of the virtual equipment (for any $\gamma:\Gamma$).
-%
-A term $\Gamma \pipe \alpha:C \vdash A : D$ denotes a vertical arrow
-from $C \gamma$ to $D \gamma$ for every $\gamma:\Gamma$.
-%
-A term $\Gamma \pipe \alpha:C; \beta : D \vdash R \isaSet$ denotes for
-each $\gamma:\Gamma$ a horizontal arrow from $C\gamma$ to $D\gamma$.
-%
-A term $\Gamma \pipe \alpha:C \vdash R \isaSet$ denotes for each
-$\gamma$, a horizontal arrow from $C\gamma$ to itself.
-%
-A non-$\cdot$ context $\Gamma \vdash \Phi\isavectx$ denotes a
-``composable string'' of horizontal arrows from $d^-\Phi \gamma$ to
-$d^+ \Phi \gamma$.
-%
-A term $\Gamma \pipe \cdot \vdash M : S$ denotes a function from
-$\gamma :\Gamma$ to $S \gamma$ (section of the bundle blah blah).
-%
-A term $\Gamma \pipe \Phi \vdash M : R$ for non-empty $\Phi$ denotes a
-``globular'' 2-cell in the virtual equipment for every
-$\gamma:\Gamma$.
-
-Next, substitutions model the forms of composition in the system.
-Substitution $A[B/\alpha]$ denotes composition of vertical arrows
-(with variable being the identity). Substitution $R[A/\alpha;B/\beta]$
-denotes restriction of a horizontal arrow $R$ along the vertical
-arrows $A,B$. And substitution $M[\phi]$ denotes composition of
-2-cells, where some restrictions are of course involved, and again a
-variable is the identity (globular) 2-cell.
-
-Next, we would also like to prove some kind of \emph{completeness}
-theorem for our calculus, at least the part relevant to virtual
-equipments. One way to do this would be to prove a kind of
-parameterized completeness theorem, where we treat the $\Gamma$ like a
-signature, and show that the syntax is complete for every fixed
-$\Gamma$. This amounts to proving that for any fixed $\Gamma$, the
-judgments above present a virtual equipment with a trivial model
-(i.e., each judgment is interpreted as itself). This shows that the
-syntax is closed under all constructions that are present in every
-model.
-
-Here is the outline of how we expect we should be able to prove
-this. For any fixed $\Gamma$, the objects of our double category are
-the terms $\Gamma \vdash C : \Sort$. A vertical arrow from $C$ to $D$
-is a term $\Gamma\pipe \alpha:C \vdash A : D$. A horizontal arrow from
-$C$ to $D$ is a term $\Gamma \pipe \alpha:C;\beta:D \vdash R
-\isaSet$. From any composable string of such $R$s we can construct a
-context $\Gamma \vdash \Phi \isavectx$ and then a 2-cell from $\Phi$ to
-$R$ along $A,B$ is given by a term $\Gamma \pipe \Phi \vdash
-R[A/\alpha;B/\beta]$. Compositions and restriction are modeled by the
-appropriate notion of substitution and units/tensors/homs are modeled
-by the corresponding type formers. There are a lot of details to be
-verified, especially the equations.
 
 \section{Discussion}
 
@@ -3632,41 +3168,39 @@ By an inductive argument, this operation is associative and unital.
   \caption{Admissible Rules}
 \end{figure}
 
-%% \begin{figure}
-%%   \begin{mathpar}
-%%     \begin{array}{rcl}
-%%       x[\gamma] &=& \gamma(x)\\
-%%       J[\gamma][\delta] & = & J[\gamma[\delta]]\\
-%%       \gamma[\delta](x) &=& \gamma(x)[\delta]\\
-      
-%%       A[\alpha/\alpha] &=& A\\
-%%       \alpha[A/\alpha] &=& A\\
-%%       A[B/\beta][C/\gamma] & = & A[B[C/\gamma]/\beta]\\
-%%       A[B/\beta][\gamma] &=& A[\gamma][B[\gamma]/\beta]\\\\
-      
-%%       R[\cdot] &=& R\\
-%%       R[\alpha/\alpha] &=& R\\
-%%       R[\alpha/\alpha,\beta/\beta] &=& R\\\\
-%%       R[\xi][\xi'] & = & R[\xi[\xi']]\\
-%%       R[\xi][\gamma] &=& R[\gamma][\xi[\gamma]]\\\\
+\section{Soundness}
 
-%%       \cdot[\xi] &=& \cdot\\
-%%       (A/\alpha)[B/\beta] &=& A[B/\beta]/\alpha\\
-%%       (A/\alpha;B/\beta)[\xi] &=& A[d^-\xi]/\alpha,B[d^+\xi]/\beta\\
-%%       \cdot[\gamma] &=& \cdot\\
-%%       (A/\alpha)[\gamma] &=& A[\gamma]/\alpha\\
-%%       (A/\alpha;B/\beta)[\gamma] &=& A[\gamma]/\alpha;B[\gamma]/\beta\\\\
+We next show how to uniquely interpret the profunctor contexts and
+substitutions in an arbitrary HED.
 
-%%       \cdot[\gamma] &=& \cdot\\
-%%       (A/\alpha)[\gamma] &=& A[\gamma]/\alpha\\
-%%       (\phi_1,M/x,\phi_2)[\gamma] &=& \phi_1[\gamma],M[\gamma]/x,\phi_2[\gamma]
+\begin{proof}
+  We sketch only the interpretation of profunctor contexts in $C_1$,
+  as the rest is a straightforward translation from type theoretic to
+  categorical syntax.  We define the translation of a context
+  $\sem{\Phi}$ by induction on $\Phi$:
 
-%%       TODO: cat substitution id/assoc
-%%     \end{array}
-%%   \end{mathpar}  
-%%   \caption{Algebraic Properties}
-%%   \label{fig:equations}
-%% \end{figure}
+  \begin{align*}
+    \sem{\alpha:\cat C} &= \sem{\id^h(\cat C)}\\
+    &= \id^h(\sem{\cat C})\\\\
+    \sem{\Phi , x:R, \beta:\cat C}\\
+    &= \sem{\Phi \circ_h i(R)}\\
+    &= \sem{\Phi} \sem{\Phi} \circ_h i(\sem{R})
+  \end{align*}
+  As these derivations show every step was uniquely determined by the
+  homomorphism property. Preservation of identity follows by
+  definition. Preservation of composition $\sem{\Phi \jnctx \Psi} =
+  \sem{\Phi} \circ_h \sem{\Psi}$ follows by induction on $\Psi$:
+  \begin{align*}
+    \sem{\Phi \jnctx (\alpha:\cat C)} &= \sem{\Phi} = \sem{\Phi} \circ_h \sem{\id(C)}\\
+    \sem{\Phi \jnctx (\Psi,x:R,\alpha:\cat C)}
+    &= \sem{(\Phi \jnctx \Psi),x:R,\alpha:\cat C} \\
+    &= \sem{(\Phi \jnctx \Psi)} \circ_h i(\sem{R})\\
+    &= (\sem{\Phi} \circ_h \sem{\Psi}) \circ_h i(\sem{R})\\
+    &= \sem{\Phi} \circ_h (\sem{\Psi} \circ_h i(\sem{R}))\\
+    &= \sem{\Phi} \circ_h \sem{\Psi, x:R, \alpha:\cat C}
+  \end{align*}
+  The interpretation of transformation substitutions is analogous.
+\end{proof}
 
 %% \section{Additional Rules}
 
@@ -5313,7 +4847,5 @@ By an inductive argument, this operation is associative and unital.
 %%   \forall \beta. 
 %%   (\forall \alpha. Hom_C(\alpha,\alpha') \triangleright R[\alpha;\beta]) \triangleleft Hom_D(\beta',\beta)) \]
 %% \end{definition}
-
-
 
 \end{document}
