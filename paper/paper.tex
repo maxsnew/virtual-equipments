@@ -898,43 +898,31 @@ to extract their object substitutions.
     {}
     {\alpha: \cat C \vdash \alpha: \cat C}
 
-    \inferrule{\Gamma \vdash \cat C : \isaCat}{\Gamma \vdash \alpha: \cat C \boundary}
-
-    \inferrule{\Gamma \vdash \cat C : \isaCat\and
-      \Gamma\vdash \cat D : \isaCat}{\Gamma \vdash \alpha: \cat C;\beta:\cat D \boundary}\\
-
-
-    \inferrule*
-        {\Gamma \pipe \alpha':\cat C' \vdash A : \cat C}
-        {\Gamma \vdash a/\alpha : \alpha':\cat C' \to \alpha:\cat C}
-
-    \inferrule*
-    {\Gamma \pipe d^-\Xi \vdash a : \cat C\and
-     \Gamma \pipe d^+\Xi \vdash b : \cat D
-    }
-    {\Gamma \vdash (a/\alpha;b/\beta) : \Xi \to (\alpha:\cat C;\beta:\cat D)}\\
-    
     \inferrule
-        {\Gamma \vdash \cat C : \isaCat}
-        {\Gamma \vdash \alpha: \cat C \isavectx}
+    {\Gamma \vdash \cat C : \isaCat}
+    {\Gamma \vdash \alpha: \cat C \isavectx}
 
     \inferrule
     {\Gamma \vdash \Phi \isavectx\and
-    \Gamma \vdash \Psi \isavectx \and
-    \Gamma \pipe d^+\Phi; d^- \Psi \vdash R \isaSet}
-    {\Gamma \vdash \Phi, x:R, \Psi \isavectx}
+    \Gamma \pipe d^+\Phi; \beta:\cat D \vdash R \isaSet}
+    {\Gamma \vdash \Phi, x:R, \beta:\cat D \isavectx}
 
     \inferrule
     {}
     {\Gamma \pipe \alpha:\cat C, x : R, \beta: \cat D \vdash x : R}
 
+    % horizontal identity
     \inferrule
-    {\Psi = \Psi_1 \jnctx \Psi_M \jnctx \Psi_2\and
-      \Gamma \vdash \phi_1 : \Psi_1 \to \Phi_1\and
-      \Gamma \pipe \Psi_s \vdash s : R[d^+\phi_1;d^-\phi_2] \and
+    {\Gamma\pipe \beta:\cat C \vdash a : \cat C}
+    {\Gamma \pipe \beta:\cat C \vdash a/\alpha : (\alpha : \cat C)}
+
+    \inferrule
+    {\Psi = \Psi_1 \jnctx \Psi_2\and
+      \Gamma\pipe\Psi_1 \vdash \phi : \Phi\and
+      \Gamma \pipe \Psi_2 \vdash t : R[d^+\phi;b/\beta] \and
       \Gamma \vdash \phi_2 : \Psi_2 \to \Phi_2
       }
-    {\Gamma \vdash \phi_1,t/x,\phi_2 : \Psi \to \Phi_1,x:R,\Phi_2}
+    {\Gamma\pipe\Psi \vdash \phi,t/x,b/\beta :: (\Phi,x:R,\beta:\cat D)}
   \end{mathpar}
   \begin{align*}
     \underline{\alpha:C} &= \alpha:C\\
@@ -945,7 +933,7 @@ to extract their object substitutions.
     d^{-}(\Phi,x:R,\Psi) &= d^-\Phi\\
     d^{+}(\Phi,x:R,\Psi) &= d^-\Psi
   \end{align*}
-    \begin{align*}
+  \begin{align*}
     d^{\pm}(a/\alpha) &= a/\alpha\\
     d^{-}(\phi,t/x,\psi) &= d^-\phi\\
     d^{+}(\phi,t/x,\psi) &= d^+\psi\\
@@ -3418,9 +3406,10 @@ morphisms: functors, profunctors and spans of functors.
 
 \bibliography{lipics-v2021-sample-article}
 
-%% \appendix
+\appendix
 
-%% TODO: complete substitution
+\section{Completeness}
+
 %% \begin{figure}
 %%   \begin{mathpar}
 %%       (\homrallXYtoZ \alpha R P)[\xi] = \homrallXYtoZ \alpha {R[d^+\xi;\alpha/\alpha]} {P[\alpha/\alpha;d^-\xi]}
@@ -3434,102 +3423,212 @@ morphisms: functors, profunctors and spans of functors.
 
 %%   \end{mathpar}
 %%   \caption{Substitution}
-  
-%% \end{figure}
+%% \end{figure
+%% }
 
-%% \begin{figure}
-%%   \begin{mathpar}
-%%     \inferrule
-%%     {}
-%%     {\Gamma\pipe \cdot \vdash \Sort \isaSet}
+\begin{definition}
+  We define composition of transformation contexts $\Phi \jnctx \Psi$ by induction on $\Psi$
+  \begin{align*}
+    \Phi \jnctx \beta:\cat D &= \Phi    \\
+    \Phi \jnctx \Psi,x:R,\beta:\cat D &= (\Phi\jnctx\Psi),x:R,\beta:\cat D
+  \end{align*}
+\end{definition}
 
-%%     \inferrule
-%%     {x:S \in \Gamma}
-%%     {\Gamma \pipe \cdot \vdash x : S}
+It follows by an inductive argument that this definition is
+associative and unital.
 
-%%     \inferrule
-%%     {\Gamma\pipe\cdot \vdash C : \Sort}
-%%     {\Gamma \pipe \alpha:\cat C \vdash \alpha : \cat C}
 
-%%     \inferrule
-%%     {\Gamma \pipe \alpha:C,\beta:D \vdash R \isaSet}
-%%     {\Gamma\pipe \alpha:C, x:R, \beta: D \vdash x : R}
+\begin{definition}
+  We define the horizontal composition of transformation substitutions
+  $\phi \jnctx \psi$ whenever $d^+\phi = d^-\psi$ by induction on
+  $\psi$:
+  \begin{align*}
+    \phi \jnctx a/\alpha &= \phi\\
+    \phi \jnctx (\psi,t/x,a/\alpha) &= (\phi \jnctx \psi),t/x,a/\alpha
+  \end{align*}
+\end{definition}
 
-%%     \inferrule{\forall x:A \in \Gamma. \Delta \vdash \gamma(x) : A}{\gamma : \Delta \to \Gamma}\\
+It follows by an inductive argument that this operation is associative
+and unital.
 
-%%     \inferrule*%% [right=NullaryBoundaryMap]
-%%                {\Gamma \isadtctx}{\Gamma \vdash \cdot : \cdot \to \cdot}\and
-%%     \inferrule*{\Gamma \pipe \alpha':C' \vdash A : C}{\Gamma \vdash A/\alpha : \alpha':C' \to \alpha:C}
+\begin{lemma}[Inversion]
+  \begin{enumerate}
+  \item If $\Phi \vdash \psi :: (\alpha:\cat C)$ then $\Phi =
+    \beta:\cat D$ for some $\cat D$ and $\psi = a/\alpha$ where
+    $\beta:\cat D \vdash a : \cat C$.
+  \item If $\Phi \vdash \psi :: \Psi_1 \jnctx \Psi_2$, then there
+    exists unique $\Phi_1,\Phi_2,\psi_1,\psi_2$ such that $\Phi =
+    \Phi_1\jnctx\Phi_2$ and $\Phi_1\vdash\psi_1 :: \Psi_1$ and
+    $\Phi_2\vdash \psi_2 : \Psi_2$ and $\psi = \psi_1\jnctx\psi_2$.
+  \end{enumerate}
+\end{lemma}
 
-%%     \inferrule*
-%%     {\Gamma \pipe \alpha':C' \vdash A : C\and
-%%       \Gamma \pipe \beta':D' \vdash B : D
-%%     }
-%%     {\Gamma \vdash (A/\alpha;B/\beta) : (\alpha':C';\beta':D') \to (\alpha:C;\beta':D')}\\
+\begin{definition}
+  We define the vertical composition of transformation substitutions
+  $\phi[\psi]$ inductively on $\phi$.
+  \begin{align*}
+    (a/\alpha)[b/\beta] &= a[b/\beta]/\alpha\\
+    (\phi_1,t/x,a/\alpha)[\psi_1\jnctx\psi_2] &= \phi_1[\psi_1], t[\psi_2],a[d^+\psi_2]
+  \end{align*}
+  This covers all cases by \cref{inversion}.
 
-%%     \inferrule*%% [right=NullCtxMap]
-%%                {\Gamma \isadtctx}{\Gamma \vdash \cdot : \cdot \to \cdot}
+  We define the vertical identity $\id_\Phi$ by induction on $\Phi$
+  \begin{align*}
+    \id_{\alpha:\cat C} &= \alpha/\alpha\\
+    \id_{\Phi,x:R,\alpha:\cat C} &= \id_{\Phi},x/x,\alpha/\alpha
+  \end{align*}
+\end{definition}
+By an inductive argument, this operation is associative and unital.
 
-%%     \inferrule*{\Gamma \pipe \alpha':C' \vdash A : C}{\Gamma \vdash A/\alpha : \alpha':C' \to \alpha:C}
+\begin{lemma}{Interchange}
+  We prove the interchange law
+  $$(\phi\jnctx\psi)[\phi'\jnctx\psi'] = \phi[\phi'] \jnctx \psi[\psi']$$
+  by induction on $\psi$.
 
-%%     \inferrule
-%%     {\Psi = \Psi_1 \jnctx \Psi_M \jnctx \Psi_2\and
-%%       \Gamma \vdash \phi_1 : \Psi_1 \to \Phi_1\and
-%%       \Gamma \pipe \Psi_M \vdash M : R[d^+\phi_1;d^-\phi_2] \and
-%%       \Gamma \vdash \phi_2 : \Psi_2 \to \Phi_2
-%%       }
-%%     {\Gamma \vdash \phi_1,M/x,\phi_2 : \Psi \to \Phi_1,x:R,\Phi_2}
-%%   \end{mathpar}
-%%   \caption{Substitutions in SCT}
-%%   \label{fig:basic-rules}
-%% \end{figure}
+  \begin{enumerate}
+  \item When $\psi=a/\alpha$
+      \begin{align*}
+    (\phi\jnctx a/\alpha)[\phi'\jnctx b/\beta]
+        &= \phi[\phi']\\
+        &= \phi[\phi'] \jnctx (a[b/\beta]/\alpha)\\
+        &= \phi[\phi'] \jnctx (a/\alpha)[b/\beta]
+  \end{align*}
+    \item When $\psi=\psi,t/x,a/\alpha$
+      \begin{align*}
+        (\phi\jnctx (\psi,t/x,a/\alpha))[\phi' \jnctx (\psi'_1\jnctx\psi'_2)]
+        &= ((\phi\jnctx \psi),t/x,a/\alpha)[(\phi' \jnctx \psi'_1)\jnctx\psi'_2]\\
+        &= (\phi\jnctx \psi)[\phi' \jnctx \psi'_1],t[\psi'_2]/x,a[d^+\psi'_2]/\alpha\\
+        &= (\phi[\psi'] \jnctx \psi[\psi']),t[\psi'_2]/x,a[d^+\psi'_2]/\alpha\\
+        &= \phi[\psi'] \jnctx (\psi[\psi'],t[\psi'_2]/x,a[d^+\psi'_2]/\alpha)\\
+      \end{align*}
+  \end{enumerate}
+\end{lemma}
 
-%% \begin{figure}
-%%   \begin{mathpar}
-%%     \inferrule
-%%     {}
-%%     {\cdot : \cdot \to \cdot}
+\begin{figure}
+  \begin{mathpar}
+    % vertical arrows
+    \inferrule*[Right=VComp*]
+    {\alpha:\cat C \vdash b : \cat D \and
+     \beta:\cat D \vdash c : \cat E}
+    {\alpha:\cat C \vdash c[b/\beta] : \cat E}\\
 
-%%     \inferrule
-%%     {\gamma : \Delta \to \Gamma \and \Delta \vdash M : A[\gamma]}
-%%     {\gamma,M/X : \Delta \to \Gamma,X:A}
+    \beta[b/\beta] = b\and
+    c[\beta/\beta] = c\and
+    c[b/\beta][a/\alpha] = c[b[a/\alpha]/\beta]\\
+
+    % horizontal arrows
+    \inferrule*[Right=HComp*]
+    {\Gamma \vdash \Phi \isavectx\\\\
+      \Gamma\vdash\Psi\isavectx\\\\
+      d^+\Phi = d^-\Psi}
+    {\Gamma \vdash \Phi \jnctx \Psi \isavectx}
+
+    d^+(\Phi \jnctx \Psi) = d^+\Psi\and
+    d^-(\Phi \jnctx \Psi) = d^-\Phi\\
+
+    \Phi \jnctx (d^+\Phi) = \Phi \and
+    (d^-\Phi) \jnctx \Phi = \Phi \and
+    (\Phi \jnctx \Psi) \jnctx \Sigma = \Phi \jnctx (\Psi \jnctx \Sigma)\\
+
+    % 2-cells
+    %% vertical composition
+    \inferrule*[Right=V2Comp*]
+    {\Sigma \vdash \psi :: \Psi \and
+     \Psi \vdash \phi :: \Phi}
+    {\Sigma \vdash \phi[\psi] :: \Phi}
+
+    \inferrule*[Right=V2Id*]
+    {}
+    {\Phi \vdash \id_\Phi :: \Phi}\\
+
+    \id_\Phi[\phi] = \phi\and
+    \phi[\id_\Psi] = \phi\and
+    \phi[\psi][\sigma] = \phi[\psi[\sigma]]\\
+
+    %% Horizontal composition
+    \inferrule*[Right=H2Comp*]
+    {\Phi' \vdash \phi :: \Phi \\\\
+     \Psi' \vdash \psi :: \Psi \\\\
+     d^+\phi = d^-\psi 
+    }
+    {\Phi' \jnctx \Psi' \vdash \phi \jnctx \psi :: \Phi \jnctx \Psi}
+
+    d^-(\phi\jnctx\psi) = d^-\phi\and
+    d^+(\phi\jnctx\psi) = d^+\phi\and
     
-%%     \inferrule
-%%     {\Gamma \vdash \Phi \isavectx \and
-%%     \Gamma \vdash \Psi \isavectx \and
-%%     d^+\Phi = d^- \Psi}
-%%     {\Gamma \vdash \Phi \jnctx \Psi \isavectx}
+    \phi\jnctx d^+\phi = \phi\and
+    d^-\phi \jnctx \phi = \phi\and
+    \phi\jnctx(\psi\jnctx\sigma) = (\phi\jnctx\psi)\jnctx\sigma
 
-%%     \inferrule
-%%     {\Gamma \vdash \phi : \Phi' \to \Phi \and
-%%      \Gamma \vdash \psi : \Psi' \to \Psi\and
-%%      d^+\phi = d^- \psi}
-%%     {\Gamma \vdash \phi \jnctx \psi : \Phi' \jnctx \Psi' \to \Phi \jnctx \Psi}
+    %% Interchange
+    \inferrule*[Right=Interchange]
+    {\Phi'' \vdash \phi' :: \Phi' \and
+     \Psi'' \vdash \psi' :: \Psi' \and
+     d^+\phi' = d^-\psi'\\\\
+     \Phi' \vdash \phi :: \Phi \and
+     \Psi' \vdash \psi :: \Psi \and
+     d^+\phi = d^-\psi
+    }
+    {(\phi\jnctx\psi)[\phi'\jnctx\psi'] = \phi[\phi'] \jnctx \psi[\psi']}\\
+    
+    % Interaction with displays
+    \inferrule
+    {\Psi \vdash \phi :: \Phi\and
+     \Phi \vdash t : R[a/\alpha;b/\beta]}
+    {\Psi\vdash t[\phi] : R[a[d^-\phi]/\alpha;b[d^+\phi]/\beta]}
 
-%%     \inferrule*[right=ObSubst]
-%%     {\alpha : \cat C \vdash B : \cat D\and
-%%     \beta : \cat D \vdash A : \cat E}
-%%     {\alpha : \cat C \vdash A[B/\beta] : \cat E}\\
+    t[\id_\Phi] = t\and
+    t[\phi][\psi] = t[\phi[\psi]]
+  \end{mathpar}
+  \caption{Syntactic Double Category with Displays Structure}
+\end{figure}
 
-%%     \inferrule*[right=Everything Subst]{\gamma : \Delta \to \Gamma \and \Gamma J}{\Delta J}
+\begin{figure}
+  \begin{mathpar}
+    \inferrule
+    {}
+    {\cdot : \Gamma \to \cdot}
 
-%%     \inferrule{\Gamma \vdash \xi : Z \to \Xi\and \Gamma \pipe \Xi \vdash R \isaSet}{\Gamma \pipe Z \vdash R[\xi] \isaSet}
+    \inferrule
+    {\gamma : \Delta \to \Gamma \and \Delta \vdash M : A[\gamma]}
+    {\gamma,M/X : \Delta \to \Gamma,X:A}
+    
+    \inferrule
+    {\Gamma \vdash \Phi \isavectx \and
+    \Gamma \vdash \Psi \isavectx \and
+    d^+\Phi = d^- \Psi}
+    {\Gamma \vdash \Phi \jnctx \Psi \isavectx}
 
-%%     \inferrule{\Gamma \vdash \phi : \Psi \to \Phi\and \Gamma \pipe \Phi \vdash M : R}{\Gamma \pipe \Psi \vdash M[\phi] : R[\underline \phi]}
-%%   \end{mathpar}
-%%   \begin{align*}
-%%     (\Phi \jnctx \Psi) \jnctx \Sigma &= \Phi \jnctx (\Psi \jnctx \Sigma)\\
-%%     \Phi \jnctx \alpha:C &= \Phi\\
-%%     \alpha:C \jnctx \Psi &= \Psi\\\\
-%%     d^\pm(A/\alpha) &= A/\alpha\\
-%%     d^+(\phi_1,M/x,\phi_2) &= d^+ \phi_2\\
-%%     d^-(\phi_1,M/x,\phi_2) &= d^- \phi_1\\\\
-%%     \underline \cdot &= \cdot\\
-%%     \underline {A/\alpha} &= A/\alpha\\
-%%     \underline {\phi_1,M/x,\phi_2} &= d^-\phi_1;d^+\phi_2
-%%   \end{align*}
-%%   \caption{Admissible Rules}
-%% \end{figure}
+    \inferrule
+    {\Gamma \vdash \phi : \Phi' \to \Phi \and
+     \Gamma \vdash \psi : \Psi' \to \Psi\and
+     d^+\phi = d^- \psi}
+    {\Gamma \vdash \phi \jnctx \psi : \Phi' \jnctx \Psi' \to \Phi \jnctx \Psi}
+
+    \inferrule*[right=ObSubst]
+    {\alpha : \cat C \vdash B : \cat D\and
+    \beta : \cat D \vdash A : \cat E}
+    {\alpha : \cat C \vdash A[B/\beta] : \cat E}\\
+
+    \inferrule*[right=Everything Subst]{\gamma : \Delta \to \Gamma \and \Gamma J}{\Delta J}
+
+    \inferrule{\Gamma \vdash \xi : Z \to \Xi\and \Gamma \pipe \Xi \vdash R \isaSet}{\Gamma \pipe Z \vdash R[\xi] \isaSet}
+
+    \inferrule{\Gamma \vdash \phi : \Psi \to \Phi\and \Gamma \pipe \Phi \vdash M : R}{\Gamma \pipe \Psi \vdash M[\phi] : R[\underline \phi]}
+  \end{mathpar}
+  \begin{align*}
+    (\Phi \jnctx \Psi) \jnctx \Sigma &= \Phi \jnctx (\Psi \jnctx \Sigma)\\
+    \Phi \jnctx \alpha:C &= \Phi\\
+    \alpha:C \jnctx \Psi &= \Psi\\\\
+    d^\pm(A/\alpha) &= A/\alpha\\
+    d^+(\phi_1,M/x,\phi_2) &= d^+ \phi_2\\
+    d^-(\phi_1,M/x,\phi_2) &= d^- \phi_1\\\\
+    \underline \cdot &= \cdot\\
+    \underline {A/\alpha} &= A/\alpha\\
+    \underline {\phi_1,M/x,\phi_2} &= d^-\phi_1;d^+\phi_2
+  \end{align*}
+  \caption{Admissible Rules}
+\end{figure}
 
 %% \begin{figure}
 %%   \begin{mathpar}
