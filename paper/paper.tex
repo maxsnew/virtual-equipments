@@ -2340,7 +2340,7 @@ by elements of the set $\Gamma$.
 We build up the notion of a model in several stages.
 
 \begin{definition}
-  A strict double category is a monoid in the double category $Span(Cat)$.
+  A strict double category is a monoid in the bicategory $Span(Cat)$.
 \end{definition}
 
 This data consists of a span $C_0 \leftarrow C_1 \rightarrow C_0$
@@ -2429,8 +2429,8 @@ that display morphisms have \emph{restrictions} along vertical arrows.
 \begin{definition}
   A DCD is an Equipment with displays when
   \begin{enumerate}
-  \item The functor $(s,t) : C_d \to C_0$ is a split fibration, with
-    restriction operation written as $(f,g)^*R$.
+  \item The functor $(s,t) : C_d \to C_0 \times C_0$ is a split
+    fibration, with restriction operation written as $(f,g)^*R$.
   \item The profunctor $C_\vdash$ respects restrictions in that
     \[ C_\vdash^{f',g'}(\Phi, (f,g)^*R) \cong C_\vdash^{f\circ f',g\circ g'}(\Phi, R) \]
   \end{enumerate}
@@ -2479,9 +2479,9 @@ internally.
   A Category with Families consists of
   \begin{enumerate}
   \item A category $\textrm{Ctx}$
-  \item with a terminal object $1 \in \textrm{Ctx}$
-  \item A presheaf $\textrm{Ty} : \Set^\textrm{Ctx}$ of types in context.
-  \item A presheaf $\textrm{Tm} : \Set^{\int \textrm{Tm}}$ of terms of
+  \item with a terminal object $1 : \textrm{Ctx}$
+  \item A presheaf $\textrm{Ty} : \widehat {\textrm{Ctx}}$ of types in context.
+  \item A presheaf $\textrm{Tm} : \widehat{\int\textrm{Ty}}$ of terms of
     a given type.
   \item With a context extension functor $\textrm{ext} : \int
     \textrm{Ty} \to \textrm{Ctx}$ with universal property:
@@ -2497,24 +2497,22 @@ the double category structure as types in the CwF.
 
 \begin{definition}
   Let $(\textrm{Ctx},\textrm{Ty},\textrm{Tm},\textrm{ext})$ be a
-  category with families and let $\mathcal V$ be a DCD internal to
+  category with families and let $\mathcal V = (C,C_d)$ be a DCD internal to
   $\Set^\textrm{Ctx}$. Then
   \begin{enumerate}
   \item $\mathcal V$ objects are representable as types if there is a
     type given by a section $\textrm{Ob} \in \textrm{Ty}(1)$ with a
     natural isomorphism
-    \[ \textrm{Tm}(!_\Gamma^*\textrm{Ob}) \cong \textrm{Ob}(\mathcal V)_\Gamma \]
+    \[ \textrm{Tm}(!_\Gamma^*\textrm{Ob}) \cong C_{0}(\Gamma) \]
   \item $\mathcal V$ vertical arrows are representable as types if
     there is a type
-    \[ \textrm{Tm}(((\gamma,\lceil a\rceil),\lceil b\rceil)^*\textrm{Functor} \cong
-    \textrm{VArr}(\mathcal V_{\Delta})(a,b)
+    \[ \textrm{Tm}(Functor)(\Gamma)(a,b) \cong C_0(\Gamma)(a,b)
     \]
     and similarly horizontal displays are representable as types if
-    \[ \textrm{Tm}(((\gamma,\lceil a\rceil),\lceil b\rceil)^*\textrm{Profunctor} \cong
-    \textrm{Disp}(\mathcal V_{\Delta})(a,b)
+    \[ \textrm{Tm}(Prof)(\Gamma)(a,b) \cong \{ R \in C_d(\Gamma) \,|\, s(R) = a \wedge t(R) = b \}
     \]
   \item Closed $\mathcal V$ transformations are representable as types if
-    \[ \textrm{Tm}() \]
+    \[ \textrm{Tm}(\textrm{End})(\Gamma)(a,R) \cong C_\vdash^{\id,\id}(r(a),R) \]
   \end{enumerate}
 \end{definition}
 
