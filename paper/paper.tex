@@ -2234,7 +2234,90 @@ TODO: example of applying the principle in our calculus.
 
 Since many type theories are given semantics by free structured
 categories, we can use SCT as a logical framework in which to do
-``formal type theory''.
+``formal type theory'' by axiomatizing the structure of the categories
+involved. The theories we can define are limited because we do not
+have access to opposite categories, but we can define some modal and
+monoidal structures.
+
+\begin{definition}
+  An \emph{SCT-signature} is a well-formed context $\Gamma \isadtctx$.
+\end{definition}
+
+\begin{lemma}
+  Any \emph{unary mode theory} can be defined as an SCT-signature as follows.
+  \begin{enumerate}
+  \item For each mode $m$ add an assumption $m : \Cat$
+  \item For each 1-morphism $f : m \to n$ add an assumption $R_f :
+    \harr m n$ and assumptions $F_f : \varr m n$ with and $G_f : \varr
+    n m$ with assumptions that they represent $R_f$.
+  \item For each 2-morphism $\alpha : f \Rightarrow g$ add an assumption $\alpha : R_f \multimap R_g$
+  \item Add each equality as an assumption using the identity type Id.
+  \end{enumerate}
+\end{lemma}
+
+This translation illustrates some ways the notion of SCT-signature is
+more flexible than a mode theory. For instance, in an SCT-signature we
+can add a profunctor assumption $R_f : \harr m n$ without saying
+whether it is representable as $F_f$ or $G_f$, and we can add more
+complex 2-morphisms.
+
+\begin{definition}
+  The \emph{theory of a strict monoidal category} consists of
+  \begin{enumerate}
+  \item A category $C : \Cat$
+  \item A unit $I : \varr 1 C$
+  \item A tensor product $\otimes : \varr {(C \times C)} C$
+  \item Such that $\alpha:(C \times C) \times C \vdash (\pi_2\pi_1\alpha \otimes \pi_2\pi_1 \alpha) \otimes \pi_2 \alpha = \pi_2\pi_1\alpha \otimes (\pi_2\pi_1 \alpha \otimes \pi_2 \alpha)$
+    and $\alpha \otimes I() = \alpha = I() \otimes \alpha$
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}
+  The theory of a cartesian strict monoidal category is an extension
+  of the theory of a strict monoidal category with representability
+  data
+  \[ \punitinXfromYtoZ {C} {\Gamma}{\Delta \otimes \Sigma} \cong (\punitinXfromYtoZ C \Gamma \Delta)\times (\punitinXfromYtoZ C \Gamma \Sigma) \]
+  and
+  \[ \punitinXfromYtoZ {C} {\Gamma} I \cong 1 \]
+\end{definition}
+
+\begin{definition}
+  The theory of a simple type theory is an extension of the theory of
+  a strict cartesian monoidal category with a
+  \begin{enumerate}
+  \item A category $\text{Ty}$ of types
+  \item A profunctor $\vdash : \harr C {\textrm{Ty}}$
+  \item A functor $\text{var} : \varr{\textrm{Ty}} C$ representing $\vdash$ :
+    \[ \Gamma \vdash A \cong \punitinXfromYtoZ {} \Gamma {\text{var} A} \]
+  \item As assumption that $\text{var}$ is fully faithful:
+     \[ \punitinXfromYtoZ {} {\text{var} A} {\text{var} B} \cong \punitinXfromYtoZ {} A B \]
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}
+  The theory of CBPV is an extension of the theory of a simple type
+  theory $(\text{VCtx},\times,1,\text{VTy},\vdash_V,\text{var}_V)$ with
+  \begin{enumerate}
+  \item A category $\text{CCtx}$
+  \item An object $I : \varr 1 {\text{CCtx}}$
+  \item An action of $\text{VCtx}$ on $\text{CCtx}$, i.e.,
+    \begin{enumerate}
+    \item A functor $\oslash : \text{VCtx}\times \text{CCtx} \to \text{CCtx}$
+    \item Such that $1 \oslash \underline\Delta = \underline\Delta$
+    \item And $(\Gamma \times \Delta) \oslash \underline\Sigma = \Gamma \oslash \Delta \oslash \underline\Sigma$
+    \end{enumerate}
+  \item A category $\text{CTy}$ with a profunctor $\vdash_C : \harr
+    {\text{CCtx}}{\text{CTy}}$ and a fully faithful functor $\text{var}_C$ that represents it
+    \[ \underline\Delta \vdash_C \underline B \cong \punitinXfromYtoZ {} {\underline\Delta}{\text{var}_C\underline B}\]
+  \end{enumerate}
+  Furthermore we can add in the universal properties of any
+  non-contravariant CBPV connectives. For instance:
+  \begin{enumerate}
+  \item $F : \varr {VTy} {CTy}$ satisfying
+    \[ \Gamma \oslash \text{var}_C F A \vdash_C \underline B \cong \Gamma \times \text{var}_V A \oslash I \vdash_C \underline B  \]
+    \[ \Gamma \vdash_V U \underline B \cong \Gamma \oslash I \vdash_C \underline B  \]
+  \end{enumerate}
+\end{definition}
 
 \begin{definition}[Theory of unary Computational lambda calculus with booleans]
   \begin{enumerate}
