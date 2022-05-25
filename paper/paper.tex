@@ -2673,31 +2673,74 @@ $\Gamma$.
   \item The equipment is defined as $\mathcal U\Gamma = \mathcal V^\Gamma$.
   \item Restriction by a function $\gamma : \Delta \to \Gamma$ is
     given pointwise.
-  \item The representing object for objects is simply
-    $\textrm{Ob}_\Gamma = \textrm{Ob}(\mathcal V)^\Gamma$ and
-    similarly for the other universe objects.
+  \item The representing object for objects is $\textrm{Ob}_\Gamma =
+    \textrm{Ob}(\mathcal V)^\Gamma$ and similarly for the other
+    universe objects.
   \end{enumerate}
 \end{definition}
 
 \section{Discussion}
 
-\paragraph{Calculi for Presheaves/Profunctors}
+\paragraph{Calculi for 2-dimensional category theory}
 
-David Jaz Myers String Diagrams
+\citet{djm-string-diagrams} provides a string diagram calculus for
+double categories and pro-arrow equipments, generalizing string
+diagrams for monoidal categories \citet{joyal?}. These are an
+alternative approach to type theoretic calculi, with the string
+diagrams typically making tensor products simpler to work with, while
+a type theoretic calculus like SCT makes the closed structure
+$\homrallXYtoZ \alpha P Q$ simpler to work with by using bound
+variables.
 
-Coend calculus
+One alternative to proarrow equipments is to axiomatize the bicategory
+of categories and profunctors rather than the double category of
+categories functors and profunctors. One abstract structure along
+these lines is a \emph{Cartesian bicategory}\footnote{which is not the
+same as a bicategory with products/finite limits, for which a syntax
+was developed \citet{fioresaville}} is given in
+\citet{carboni-walters,carboni-walters-someonelese}. Some preliminary
+work on a proof system for Cartesian bicateogires was presented at
+\citet{jonasfreycartesianbicategories}. This bears strong similarities
+to our calculus SCT, except that (1) their profunctors may have 0, 1
+or more covariant or contravariant variables but (2) they do not have
+a term syntax like our natural transformation syntax and (3) they do
+not have functors and restriction of profunctors by functors (since
+this structure is not present in a Cartesian
+bicategory). Semantically, Cartesian bicategories are somewhat less
+general than pro-arrow equipments because in general the set of
+functors between two categories can only be recovered from the set of
+profunctors if the codomain category is Cauchy complete, in which case
+functors are equivalent to adjoint pairs of profunctors.
 
-Cartesian Bicategories.
+Our type-theoretic syntax for virtual double categories is intended to
+be a formal notation for the manipulation of profunctors. As such it
+has similarities to informal syntax for manipulating profunctors
+involving ends and coends, such as the coend calculus of
+\citet{coend-calculus}.
 
-Double-cat-like syntax: Gradual Type Theory, System P of parametricity, cubical stuff?
+Finally, some variations on double categories have been used to model
+the structure of certain program logics. \citet{newlicata20} present a
+logic for \emph{vertically thin} pro-arrow equipments, i.e., pro-arrow
+equipments where the functor and natural transformation judgments are
+posetal. This calculus is quite different from ours in that the
+horizontal morphisms are terms of a programming language, and so they
+are not presented as having co-variant and contravariant variables,
+and the equipment structure is modeled by explicit coercions rather
+than by syntactic substitution of vertical arrows in horizontal
+arrows. Another similar calculus is System P \citep{systemP} which is
+an internal language of \emph{reflexive graph categories}, which are
+like double categories without horizontal composition. 
 
-\paragraph{Directed Type Theory}
+Double-cat-like syntax:
+Gradual Type Theory, System P of parametricity, cubical stuff?
+
+\subsection{Directed Type Theory}
 
 Directed Type theory
 
 Fibrational approaches to logical relations
 
-\paragraph{Category Theoretic Extensions}
+\subsection{Category Theoretic Extensions}
 
 While we have demonstrated that many common constructions in category
 theory can be expressed using the simple combination of homs, tensors
@@ -2789,7 +2832,7 @@ substructural type theories \citep{atkey-woods}.
 %% universal property, i.e., to define when the multicategory is
 %% \emph{representable}.
 
-\paragraph{Semantics}
+\subsection{Semantics}
 
 Our definition of a double category with displays is suggestive of a
 simple generalization. A double category is a monoid object in the
