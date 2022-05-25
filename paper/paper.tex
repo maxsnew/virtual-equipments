@@ -822,7 +822,7 @@ $\punitinXfromYtoZ {\cat C} \alpha {\alpha'}$, and we can define
 objects $a$ and $a'$ in the category $\cat C$, then we can substitute
 those in to form the hom set between $a$ and $a'$: $\punitinXfromYtoZ
 {\cat C} a {a'}$. This semantically is a ``restriction'' of a
-profunctor along two functors, and modeling this operation simply as a
+profunctor along two functors, and modeling this operation as a
 substitution considerably simplifies reasoning using profunctors.
 %
 Finally we have the action of substitution on natural
@@ -1051,6 +1051,7 @@ agree with the ordered use of variables, this time we place the
 argument to the left and the function to the right.
 
 \begin{figure}
+  % TODO: formalize the one-place substitution
   \begin{mathpar}
       \inferrule*[right=Covariant Hom formation]
       {\Gamma \pipe d^+\Xi; \alpha : \cat C \vdash  R \and \Gamma \pipe  d^-\Xi; \alpha : \cat C \vdash P}
@@ -2199,14 +2200,14 @@ are swapped and composition is flipped.
 %
 A similar duality principle holds in SCT.
 %
-The basic idea is to simply reverse the orientation of all \emph{set}
+The basic idea is to reverse the orientation of all \emph{set}
 expressions by swapping which variable is covariant and which is
 contravariant.
 %
 This has the effect of reversing the order of the context $\Phi$.
 
-We can define this as a simple translation $\cdot^* : SCT \to SCT$
-defined on syntactic forms of SCT.
+We can define this as a translation $\cdot^* : SCT \to SCT$ defined on
+syntactic forms of SCT.
 
 \begin{figure}
     \begin{align*}
@@ -2307,7 +2308,7 @@ category that interprets dependent type theory. We call such a
 structure a \emph{VDC-hyperdoctrine}. We then show how to construct a
 from any VDC, a VDC-hyperdoctrine indexed by the category of sets,
 which has the intuitive reading that any of the VDC judgments $\Gamma
-\vdash J$ is interpreted as simply a family of $J$-data parameterized
+\vdash J$ is interpreted as a family of $J$-data parameterized
 by elements of the set $\Gamma$.
 
 %% The first component of this is \emph{soundness}: every category,
@@ -2420,7 +2421,7 @@ straightforward to describe as a Generalized Algebraic Theory in the
 sense of \citet{CartmellGAT}. This is because we don't \emph{require}
 that our profunctor contexts are lists, but instead merely the fact
 that their concatenation forms a strict category. Then the
-associativity/identity equations for a DCD are simply those of a
+associativity/identity equations for a DCD are precisely those of a
 double category.
 
 The final notion of composition that we require for our structure is
@@ -2641,9 +2642,9 @@ can construct a DCD:
 \end{definition}
 
 Next, we can upgrade any DCD in $\Set$ to a DCD internal to
-$\Set^\Set$ by taking the presheaf of objects, vertical arrows, etc as
+$\Set^{\Set^o}$ by taking the presheaf of objects, vertical arrows, etc as
 families of objects, vertical arrows etc indexed by the indexing set
-$\Gamma$.
+$\Gamma$ as follows:
 \begin{definition}[Powers of Virtual Equipments]
   Let $\mathcal V$ be a virtual equipment and let $X$ be a set.
   Define a virtual equipment, the ``power'' $\mathcal V^X$ as follows.
@@ -2657,7 +2658,7 @@ $\Gamma$.
   \item A 2-cell from $\Phi$ to $R$ is a family $\Pi_{x\in X} \mathcal
     V^X_h(\Phi x,R x)$.
   \end{enumerate}
-  All operations are simply lifted pointwise.
+  All operations are lifted pointwise.
 \end{definition}
 
 This defines the ``natural'' interpretation of SCT in a virtual
