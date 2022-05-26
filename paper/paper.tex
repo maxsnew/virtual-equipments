@@ -3087,19 +3087,78 @@ morphisms: functors, profunctors and spans of functors.
 %% \end{figure
 %% }
 
+In this section we establish the most significant portion of the
+completeness proof:
+\begin{construction}[Double category completeness]
+  For any $\Gamma$, define a strict double category as follows
+  \begin{enumerate}
+  \item Objects are categories $\Gamma \vdash \cat C \isaCat$
+  \item Vertical morphisms from $\cat C$ to $\cat D$ are functor/open
+    object terms $\Gamma \pipe\alpha:\cat C \vdash B : \cat D$ modulo
+    $\alpha$-equivalence.
+  \item Horizontal morphisms from $\cat C$ to $\cat D$ are profunctor
+    contexts $\Gamma\vdash \Phi \isavectx$ with $d^-\Phi = \cat C$ and
+    $d^+\Phi = \cat D$ modulo $\alpha$-equivalence.
+  \item Squares from $\Psi$ to $\Phi$ along $A$ and $B$ are
+    substitutions $\Gamma \vdash \phi : \Psi \to \Phi$ with $d^-\phi =
+    A$ and $d^+\phi = B$ modulo $\alpha$-equivalence.
+  \end{enumerate}
+\end{construction}
+\begin{proof}
+  The details are in the linked lemmas. Here we give an overview of
+  the relevant structure and properties.
+  \begin{enumerate}
+  \item Vertical composition is given by substitution of object terms
+    and is associative and unital with the variable as the identity
+    (Lemma \ref{lem:vertical-cat}).
+  \item Horizontal composition is given by the gluing of contexts
+    $\Phi\jnctx \Psi$ and is associative and unital with the single
+    category variable as the identity (Lemma
+    \ref{lem:horizontal-cat}).
+  \item Vertical composition of substitutions is given by substitution
+    $\phi[\psi]$ and is associative and unital with the identity
+    substitution given by a substitution of variables for themselves
+    (Lemma \ref{lem:vertical-sq-cat}).
+  \item Horizontal composition of substitutions is given by gluing of
+    substitutions $\phi \jnctx \psi$ and is associative and unital
+    with the identity substitution given by a single functor/open
+    object substitution (Lemma \ref{lem:horizontal-sq-cat}).
+  \item The process of constructing horizontal identity substitutions
+    is functorial in that the horizontal identity of a vertical
+    identity arrow is the vertical identity
+    (Lemma~\ref{lem:hor-vert-id-id}) and the vertical composition of
+    horizontal identities is a horizontal identity
+    (Lemma~\ref{lemma:lem-hor-sq-id}).
+  \item The process of horizontal composition of substitutions is
+    functorial in that the horizontal composition of vertical identity
+    squares is the identity (Lemma~\ref{lem:lem-vert-sq-id}) and the
+    interchange law holds (Lemma~\ref{lem:interchange}).
+  \end{enumerate}
+\end{proof}
+
+\begin{lemma}[Vertical category]
+  \label{lem:vertical-cat}
+  Substitution of object terms $A[B/\beta]$ is associative with
+  identity given by the variable $\alpha:\cat C \vdash \alpha:\cat C$.
+\end{lemma}
+
 \begin{definition}
+  \label{lem:horizontal-cat}
   We define composition of transformation contexts $\Phi \jnctx \Psi$ by induction on $\Psi$
   \begin{align*}
     \Phi \jnctx \beta:\cat D &= \Phi    \\
     \Phi \jnctx \Psi,x:R,\beta:\cat D &= (\Phi\jnctx\Psi),x:R,\beta:\cat D
   \end{align*}
+  By induction, this is seen to be associative
+  \[ (\Phi \jnctx \Psi) \jnctx \Sigma = \Phi \jnctx (\Psi \jnctx \Sigma) \]
+  and unital with identity for $\cat C$ given by the single category
+  variable context $\alpha:\cat C$
+  \[ \alpha:\cat C \jnctx \Phi = \Phi = \Phi \jnctx \beta:\cat D\]
+  when $d^-\Phi = \alpha:\cat C$ and $d^+\Phi = \beta:\cat D$.
 \end{definition}
 
-It follows by an inductive argument that this definition is
-associative and unital.
-
-
 \begin{definition}
+  \label{lem:horizontal-sq-cat}
   We define the horizontal composition of transformation substitutions
   $\phi \jnctx \psi$ whenever $d^+\phi = d^-\psi$ by induction on
   $\psi$:
@@ -3107,11 +3166,15 @@ associative and unital.
     \phi \jnctx a/\alpha &= \phi\\
     \phi \jnctx (\psi,t/x,a/\alpha) &= (\phi \jnctx \psi),t/x,a/\alpha
   \end{align*}
+  By induction, this is seen to be associative
+  \[ \phi \jnctx (\psi \jnctx \sigma) = (\phi \jnctx \psi) \jnctx \sigma \]
+  and unital with identity given by a single object substitution
+  $a/\alpha : \alpha:\cat C \to \beta:\cat D$
+  \[ a/\alpha \jnctx \phi = \phi = \phi \jnctx b/\beta \]
+  when $d^-\phi = a/\alpha$ and $d^+\phi = b/\beta$.
 \end{definition}
 
-It follows by an inductive argument that this operation is associative
-and unital.
-
+To define vertical composition of squares, we need the following lemma.
 \begin{lemma}[Inversion]
   \begin{enumerate}
   \item If $\Phi \vdash \psi :: (\alpha:\cat C)$ then $\Phi =
@@ -3125,6 +3188,7 @@ and unital.
 \end{lemma}
 
 \begin{definition}
+  \label{lem:vertical-sq-cat}
   We define the vertical composition of transformation substitutions
   $\phi[\psi]$ inductively on $\phi$.
   \begin{align*}
@@ -3138,10 +3202,37 @@ and unital.
     \id_{\alpha:\cat C} &= \alpha/\alpha\\
     \id_{\Phi,x:R,\alpha:\cat C} &= \id_{\Phi},x/x,\alpha/\alpha
   \end{align*}
+
+  By induction this is seen to be associative:
+  \[ \phi[\psi][\sigma] = \phi[\psi[\sigma]] \]
+  and unital
+  \[ \id_{\Phi}[\phi] = \phi = \phi[\id_{\Psi}] \]
 \end{definition}
-By an inductive argument, this operation is associative and unital.
+
+\begin{lemma}
+  \label{lem:sq-vid-hid}
+  For any $\cat C$, $\alpha/\alpha : \alpha:\cat C \to \alpha:\cat C$
+  is both a horizontal and vertical identity.
+\end{lemma}
+
+\begin{lemma}
+  \label{lem:sq-vcomp-hid}
+  For any $\beta:\cat D \vdash a : \cat C$ and $\alpha:\cat C \vdash a': \cat C'$
+  the substitution
+  \[ (a'/\alpha')[a/\alpha] : \beta:\cat D \to \alpha':\cat C' \]
+  satisfies
+  \[ (a'/\alpha')[a/\alpha] = a'[a/\alpha]/\alpha' \]
+\end{lemma}
+
+\begin{lemma}
+  \label{lem:sq-vid-hcomp}
+  For any $\Phi$ and $\Psi$ with $\Phi\jnctx \Psi$ well-defined,
+  \[ \id_\Phi \jnctx \id_\Psi = \id_{\Phi\jnctx\Psi} \]
+  follows by induction.
+\end{lemma}
 
 \begin{lemma}{Interchange}
+  \label{lem:sq-vcomp-hcomp}
   We prove the interchange law
   $$(\phi\jnctx\psi)[\phi'\jnctx\psi'] = \phi[\phi'] \jnctx \psi[\psi']$$
   by induction on $\psi$.
