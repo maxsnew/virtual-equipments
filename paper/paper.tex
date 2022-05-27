@@ -822,7 +822,7 @@ $\punitinXfromYtoZ {\cat C} \alpha {\alpha'}$, and we can define
 objects $a$ and $a'$ in the category $\cat C$, then we can substitute
 those in to form the hom set between $a$ and $a'$: $\punitinXfromYtoZ
 {\cat C} a {a'}$. This semantically is a ``restriction'' of a
-profunctor along two functors, and modeling this operation simply as a
+profunctor along two functors, and modeling this operation as a
 substitution considerably simplifies reasoning using profunctors.
 %
 Finally we have the action of substitution on natural
@@ -1051,6 +1051,7 @@ agree with the ordered use of variables, this time we place the
 argument to the left and the function to the right.
 
 \begin{figure}
+  % TODO: formalize the one-place substitution
   \begin{mathpar}
       \inferrule*[right=Covariant Hom formation]
       {\Gamma \pipe d^+\Xi; \alpha : \cat C \vdash  R \and \Gamma \pipe  d^-\Xi; \alpha : \cat C \vdash P}
@@ -2199,14 +2200,14 @@ are swapped and composition is flipped.
 %
 A similar duality principle holds in SCT.
 %
-The basic idea is to simply reverse the orientation of all \emph{set}
+The basic idea is to reverse the orientation of all \emph{set}
 expressions by swapping which variable is covariant and which is
 contravariant.
 %
 This has the effect of reversing the order of the context $\Phi$.
 
-We can define this as a simple translation $\cdot^* : SCT \to SCT$
-defined on syntactic forms of SCT.
+We can define this as a translation $\cdot^* : SCT \to SCT$ defined on
+syntactic forms of SCT.
 
 \begin{figure}
     \begin{align*}
@@ -2233,7 +2234,90 @@ TODO: example of applying the principle in our calculus.
 
 Since many type theories are given semantics by free structured
 categories, we can use SCT as a logical framework in which to do
-``formal type theory''.
+``formal type theory'' by axiomatizing the structure of the categories
+involved. The theories we can define are limited because we do not
+have access to opposite categories, but we can define some modal and
+monoidal structures.
+
+\begin{definition}
+  An \emph{SCT-signature} is a well-formed context $\Gamma \isadtctx$.
+\end{definition}
+
+\begin{lemma}
+  Any \emph{unary mode theory} can be defined as an SCT-signature as follows.
+  \begin{enumerate}
+  \item For each mode $m$ add an assumption $m : \Cat$
+  \item For each 1-morphism $f : m \to n$ add an assumption $R_f :
+    \harr m n$ and assumptions $F_f : \varr m n$ with and $G_f : \varr
+    n m$ with assumptions that they represent $R_f$.
+  \item For each 2-morphism $\alpha : f \Rightarrow g$ add an assumption $\alpha : R_f \multimap R_g$
+  \item Add each equality as an assumption using the identity type Id.
+  \end{enumerate}
+\end{lemma}
+
+This translation illustrates some ways the notion of SCT-signature is
+more flexible than a mode theory. For instance, in an SCT-signature we
+can add a profunctor assumption $R_f : \harr m n$ without saying
+whether it is representable as $F_f$ or $G_f$, and we can add more
+complex 2-morphisms.
+
+\begin{definition}
+  The \emph{theory of a strict monoidal category} consists of
+  \begin{enumerate}
+  \item A category $C : \Cat$
+  \item A unit $I : \varr 1 C$
+  \item A tensor product $\otimes : \varr {(C \times C)} C$
+  \item Such that $\alpha:(C \times C) \times C \vdash (\pi_2\pi_1\alpha \otimes \pi_2\pi_1 \alpha) \otimes \pi_2 \alpha = \pi_2\pi_1\alpha \otimes (\pi_2\pi_1 \alpha \otimes \pi_2 \alpha)$
+    and $\alpha \otimes I() = \alpha = I() \otimes \alpha$
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}
+  The theory of a cartesian strict monoidal category is an extension
+  of the theory of a strict monoidal category with representability
+  data
+  \[ \punitinXfromYtoZ {C} {\Gamma}{\Delta \otimes \Sigma} \cong (\punitinXfromYtoZ C \Gamma \Delta)\times (\punitinXfromYtoZ C \Gamma \Sigma) \]
+  and
+  \[ \punitinXfromYtoZ {C} {\Gamma} I \cong 1 \]
+\end{definition}
+
+\begin{definition}
+  The theory of a simple type theory is an extension of the theory of
+  a strict cartesian monoidal category with a
+  \begin{enumerate}
+  \item A category $\text{Ty}$ of types
+  \item A profunctor $\vdash : \harr C {\textrm{Ty}}$
+  \item A functor $\text{var} : \varr{\textrm{Ty}} C$ representing $\vdash$ :
+    \[ \Gamma \vdash A \cong \punitinXfromYtoZ {} \Gamma {\text{var} A} \]
+  \item As assumption that $\text{var}$ is fully faithful:
+     \[ \punitinXfromYtoZ {} {\text{var} A} {\text{var} B} \cong \punitinXfromYtoZ {} A B \]
+  \end{enumerate}
+\end{definition}
+
+\begin{definition}
+  The theory of CBPV is an extension of the theory of a simple type
+  theory $(\text{VCtx},\times,1,\text{VTy},\vdash_V,\text{var}_V)$ with
+  \begin{enumerate}
+  \item A category $\text{CCtx}$
+  \item An object $I : \varr 1 {\text{CCtx}}$
+  \item An action of $\text{VCtx}$ on $\text{CCtx}$, i.e.,
+    \begin{enumerate}
+    \item A functor $\oslash : \text{VCtx}\times \text{CCtx} \to \text{CCtx}$
+    \item Such that $1 \oslash \underline\Delta = \underline\Delta$
+    \item And $(\Gamma \times \Delta) \oslash \underline\Sigma = \Gamma \oslash \Delta \oslash \underline\Sigma$
+    \end{enumerate}
+  \item A category $\text{CTy}$ with a profunctor $\vdash_C : \harr
+    {\text{CCtx}}{\text{CTy}}$ and a fully faithful functor $\text{var}_C$ that represents it
+    \[ \underline\Delta \vdash_C \underline B \cong \punitinXfromYtoZ {} {\underline\Delta}{\text{var}_C\underline B}\]
+  \end{enumerate}
+  Furthermore we can add in the universal properties of any
+  non-contravariant CBPV connectives. For instance:
+  \begin{enumerate}
+  \item $F : \varr {VTy} {CTy}$ satisfying
+    \[ \Gamma \oslash \text{var}_C F A \vdash_C \underline B \cong \Gamma \times \text{var}_V A \oslash I \vdash_C \underline B  \]
+    \[ \Gamma \vdash_V U \underline B \cong \Gamma \oslash I \vdash_C \underline B  \]
+  \end{enumerate}
+\end{definition}
 
 \begin{definition}[Theory of unary Computational lambda calculus with booleans]
   \begin{enumerate}
@@ -2307,7 +2391,7 @@ category that interprets dependent type theory. We call such a
 structure a \emph{VDC-hyperdoctrine}. We then show how to construct a
 from any VDC, a VDC-hyperdoctrine indexed by the category of sets,
 which has the intuitive reading that any of the VDC judgments $\Gamma
-\vdash J$ is interpreted as simply a family of $J$-data parameterized
+\vdash J$ is interpreted as a family of $J$-data parameterized
 by elements of the set $\Gamma$.
 
 %% The first component of this is \emph{soundness}: every category,
@@ -2420,7 +2504,7 @@ straightforward to describe as a Generalized Algebraic Theory in the
 sense of \citet{CartmellGAT}. This is because we don't \emph{require}
 that our profunctor contexts are lists, but instead merely the fact
 that their concatenation forms a strict category. Then the
-associativity/identity equations for a DCD are simply those of a
+associativity/identity equations for a DCD are precisely those of a
 double category.
 
 The final notion of composition that we require for our structure is
@@ -2641,9 +2725,9 @@ can construct a DCD:
 \end{definition}
 
 Next, we can upgrade any DCD in $\Set$ to a DCD internal to
-$\Set^\Set$ by taking the presheaf of objects, vertical arrows, etc as
+$\Set^{\Set^o}$ by taking the presheaf of objects, vertical arrows, etc as
 families of objects, vertical arrows etc indexed by the indexing set
-$\Gamma$.
+$\Gamma$ as follows:
 \begin{definition}[Powers of Virtual Equipments]
   Let $\mathcal V$ be a virtual equipment and let $X$ be a set.
   Define a virtual equipment, the ``power'' $\mathcal V^X$ as follows.
@@ -2657,7 +2741,7 @@ $\Gamma$.
   \item A 2-cell from $\Phi$ to $R$ is a family $\Pi_{x\in X} \mathcal
     V^X_h(\Phi x,R x)$.
   \end{enumerate}
-  All operations are simply lifted pointwise.
+  All operations are lifted pointwise.
 \end{definition}
 
 This defines the ``natural'' interpretation of SCT in a virtual
@@ -2672,31 +2756,74 @@ $\Gamma$.
   \item The equipment is defined as $\mathcal U\Gamma = \mathcal V^\Gamma$.
   \item Restriction by a function $\gamma : \Delta \to \Gamma$ is
     given pointwise.
-  \item The representing object for objects is simply
-    $\textrm{Ob}_\Gamma = \textrm{Ob}(\mathcal V)^\Gamma$ and
-    similarly for the other universe objects.
+  \item The representing object for objects is $\textrm{Ob}_\Gamma =
+    \textrm{Ob}(\mathcal V)^\Gamma$ and similarly for the other
+    universe objects.
   \end{enumerate}
 \end{definition}
 
 \section{Discussion}
 
-\paragraph{Calculi for Presheaves/Profunctors}
+\paragraph{Calculi for 2-dimensional category theory}
 
-David Jaz Myers String Diagrams
+\citet{djm-string-diagrams} provides a string diagram calculus for
+double categories and pro-arrow equipments, generalizing string
+diagrams for monoidal categories \citet{joyal?}. These are an
+alternative approach to type theoretic calculi, with the string
+diagrams typically making tensor products simpler to work with, while
+a type theoretic calculus like SCT makes the closed structure
+$\homrallXYtoZ \alpha P Q$ simpler to work with by using bound
+variables.
 
-Coend calculus
+One alternative to proarrow equipments is to axiomatize the bicategory
+of categories and profunctors rather than the double category of
+categories functors and profunctors. One abstract structure along
+these lines is a \emph{Cartesian bicategory}\footnote{which is not the
+same as a bicategory with products/finite limits, for which a syntax
+was developed \citet{fioresaville}} is given in
+\citet{carboni-walters,carboni-walters-someonelese}. Some preliminary
+work on a proof system for Cartesian bicateogires was presented at
+\citet{jonasfreycartesianbicategories}. This bears strong similarities
+to our calculus SCT, except that (1) their profunctors may have 0, 1
+or more covariant or contravariant variables but (2) they do not have
+a term syntax like our natural transformation syntax and (3) they do
+not have functors and restriction of profunctors by functors (since
+this structure is not present in a Cartesian
+bicategory). Semantically, Cartesian bicategories are somewhat less
+general than pro-arrow equipments because in general the set of
+functors between two categories can only be recovered from the set of
+profunctors if the codomain category is Cauchy complete, in which case
+functors are equivalent to adjoint pairs of profunctors.
 
-Cartesian Bicategories.
+Our type-theoretic syntax for virtual double categories is intended to
+be a formal notation for the manipulation of profunctors. As such it
+has similarities to informal syntax for manipulating profunctors
+involving ends and coends, such as the coend calculus of
+\citet{coend-calculus}.
 
-Double-cat-like syntax: Gradual Type Theory, System P of parametricity, cubical stuff?
+Finally, some variations on double categories have been used to model
+the structure of certain program logics. \citet{newlicata20} present a
+logic for \emph{vertically thin} pro-arrow equipments, i.e., pro-arrow
+equipments where the functor and natural transformation judgments are
+posetal. This calculus is quite different from ours in that the
+horizontal morphisms are terms of a programming language, and so they
+are not presented as having co-variant and contravariant variables,
+and the equipment structure is modeled by explicit coercions rather
+than by syntactic substitution of vertical arrows in horizontal
+arrows. Another similar calculus is System P \citep{systemP} which is
+an internal language of \emph{reflexive graph categories}, which are
+like double categories without horizontal composition. 
 
-\paragraph{Directed Type Theory}
+Double-cat-like syntax:
+Gradual Type Theory, System P of parametricity, cubical stuff?
+
+\subsection{Directed Type Theory}
 
 Directed Type theory
 
 Fibrational approaches to logical relations
 
-\paragraph{Category Theoretic Extensions}
+\subsection{Category Theoretic Extensions}
 
 While we have demonstrated that many common constructions in category
 theory can be expressed using the simple combination of homs, tensors
@@ -2788,7 +2915,7 @@ substructural type theories \citep{atkey-woods}.
 %% universal property, i.e., to define when the multicategory is
 %% \emph{representable}.
 
-\paragraph{Semantics}
+\subsection{Semantics}
 
 Our definition of a double category with displays is suggestive of a
 simple generalization. A double category is a monoid object in the
@@ -2960,19 +3087,78 @@ morphisms: functors, profunctors and spans of functors.
 %% \end{figure
 %% }
 
+In this section we establish the most significant portion of the
+completeness proof:
+\begin{construction}[Double category completeness]
+  For any $\Gamma$, define a strict double category as follows
+  \begin{enumerate}
+  \item Objects are categories $\Gamma \vdash \cat C \isaCat$
+  \item Vertical morphisms from $\cat C$ to $\cat D$ are functor/open
+    object terms $\Gamma \pipe\alpha:\cat C \vdash B : \cat D$ modulo
+    $\alpha$-equivalence.
+  \item Horizontal morphisms from $\cat C$ to $\cat D$ are profunctor
+    contexts $\Gamma\vdash \Phi \isavectx$ with $d^-\Phi = \cat C$ and
+    $d^+\Phi = \cat D$ modulo $\alpha$-equivalence.
+  \item Squares from $\Psi$ to $\Phi$ along $A$ and $B$ are
+    substitutions $\Gamma \vdash \phi : \Psi \to \Phi$ with $d^-\phi =
+    A$ and $d^+\phi = B$ modulo $\alpha$-equivalence.
+  \end{enumerate}
+\end{construction}
+\begin{proof}
+  The details are in the linked lemmas. Here we give an overview of
+  the relevant structure and properties.
+  \begin{enumerate}
+  \item Vertical composition is given by substitution of object terms
+    and is associative and unital with the variable as the identity
+    (Lemma \ref{lem:vertical-cat}).
+  \item Horizontal composition is given by the gluing of contexts
+    $\Phi\jnctx \Psi$ and is associative and unital with the single
+    category variable as the identity (Lemma
+    \ref{lem:horizontal-cat}).
+  \item Vertical composition of substitutions is given by substitution
+    $\phi[\psi]$ and is associative and unital with the identity
+    substitution given by a substitution of variables for themselves
+    (Lemma \ref{lem:vertical-sq-cat}).
+  \item Horizontal composition of substitutions is given by gluing of
+    substitutions $\phi \jnctx \psi$ and is associative and unital
+    with the identity substitution given by a single functor/open
+    object substitution (Lemma \ref{lem:horizontal-sq-cat}).
+  \item The process of constructing horizontal identity substitutions
+    is functorial in that the horizontal identity of a vertical
+    identity arrow is the vertical identity
+    (Lemma~\ref{lem:hor-vert-id-id}) and the vertical composition of
+    horizontal identities is a horizontal identity
+    (Lemma~\ref{lemma:lem-hor-sq-id}).
+  \item The process of horizontal composition of substitutions is
+    functorial in that the horizontal composition of vertical identity
+    squares is the identity (Lemma~\ref{lem:lem-vert-sq-id}) and the
+    interchange law holds (Lemma~\ref{lem:interchange}).
+  \end{enumerate}
+\end{proof}
+
+\begin{lemma}[Vertical category]
+  \label{lem:vertical-cat}
+  Substitution of object terms $A[B/\beta]$ is associative with
+  identity given by the variable $\alpha:\cat C \vdash \alpha:\cat C$.
+\end{lemma}
+
 \begin{definition}
+  \label{lem:horizontal-cat}
   We define composition of transformation contexts $\Phi \jnctx \Psi$ by induction on $\Psi$
   \begin{align*}
     \Phi \jnctx \beta:\cat D &= \Phi    \\
     \Phi \jnctx \Psi,x:R,\beta:\cat D &= (\Phi\jnctx\Psi),x:R,\beta:\cat D
   \end{align*}
+  By induction, this is seen to be associative
+  \[ (\Phi \jnctx \Psi) \jnctx \Sigma = \Phi \jnctx (\Psi \jnctx \Sigma) \]
+  and unital with identity for $\cat C$ given by the single category
+  variable context $\alpha:\cat C$
+  \[ \alpha:\cat C \jnctx \Phi = \Phi = \Phi \jnctx \beta:\cat D\]
+  when $d^-\Phi = \alpha:\cat C$ and $d^+\Phi = \beta:\cat D$.
 \end{definition}
 
-It follows by an inductive argument that this definition is
-associative and unital.
-
-
 \begin{definition}
+  \label{lem:horizontal-sq-cat}
   We define the horizontal composition of transformation substitutions
   $\phi \jnctx \psi$ whenever $d^+\phi = d^-\psi$ by induction on
   $\psi$:
@@ -2980,11 +3166,15 @@ associative and unital.
     \phi \jnctx a/\alpha &= \phi\\
     \phi \jnctx (\psi,t/x,a/\alpha) &= (\phi \jnctx \psi),t/x,a/\alpha
   \end{align*}
+  By induction, this is seen to be associative
+  \[ \phi \jnctx (\psi \jnctx \sigma) = (\phi \jnctx \psi) \jnctx \sigma \]
+  and unital with identity given by a single object substitution
+  $a/\alpha : \alpha:\cat C \to \beta:\cat D$
+  \[ a/\alpha \jnctx \phi = \phi = \phi \jnctx b/\beta \]
+  when $d^-\phi = a/\alpha$ and $d^+\phi = b/\beta$.
 \end{definition}
 
-It follows by an inductive argument that this operation is associative
-and unital.
-
+To define vertical composition of squares, we need the following lemma.
 \begin{lemma}[Inversion]
   \begin{enumerate}
   \item If $\Phi \vdash \psi :: (\alpha:\cat C)$ then $\Phi =
@@ -2998,6 +3188,7 @@ and unital.
 \end{lemma}
 
 \begin{definition}
+  \label{lem:vertical-sq-cat}
   We define the vertical composition of transformation substitutions
   $\phi[\psi]$ inductively on $\phi$.
   \begin{align*}
@@ -3011,10 +3202,37 @@ and unital.
     \id_{\alpha:\cat C} &= \alpha/\alpha\\
     \id_{\Phi,x:R,\alpha:\cat C} &= \id_{\Phi},x/x,\alpha/\alpha
   \end{align*}
+
+  By induction this is seen to be associative:
+  \[ \phi[\psi][\sigma] = \phi[\psi[\sigma]] \]
+  and unital
+  \[ \id_{\Phi}[\phi] = \phi = \phi[\id_{\Psi}] \]
 \end{definition}
-By an inductive argument, this operation is associative and unital.
+
+\begin{lemma}
+  \label{lem:sq-vid-hid}
+  For any $\cat C$, $\alpha/\alpha : \alpha:\cat C \to \alpha:\cat C$
+  is both a horizontal and vertical identity.
+\end{lemma}
+
+\begin{lemma}
+  \label{lem:sq-vcomp-hid}
+  For any $\beta:\cat D \vdash a : \cat C$ and $\alpha:\cat C \vdash a': \cat C'$
+  the substitution
+  \[ (a'/\alpha')[a/\alpha] : \beta:\cat D \to \alpha':\cat C' \]
+  satisfies
+  \[ (a'/\alpha')[a/\alpha] = a'[a/\alpha]/\alpha' \]
+\end{lemma}
+
+\begin{lemma}
+  \label{lem:sq-vid-hcomp}
+  For any $\Phi$ and $\Psi$ with $\Phi\jnctx \Psi$ well-defined,
+  \[ \id_\Phi \jnctx \id_\Psi = \id_{\Phi\jnctx\Psi} \]
+  follows by induction.
+\end{lemma}
 
 \begin{lemma}{Interchange}
+  \label{lem:sq-vcomp-hcomp}
   We prove the interchange law
   $$(\phi\jnctx\psi)[\phi'\jnctx\psi'] = \phi[\phi'] \jnctx \psi[\psi']$$
   by induction on $\psi$.
