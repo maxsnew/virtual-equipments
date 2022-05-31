@@ -51,16 +51,13 @@ module Ordered where
           → ϕ2 ⊢s ϕ3 
           → ϕ1 ⊢s ϕ3 
     -- TODO associativity, unit, interchange, def id and comp
-{-
-    ,,s-assoc  : ∀ {ℂ 𝔻 𝔼 ℂ' 𝔻' 𝔼' 𝔽 𝔽'}
-                 {ϕ1 : Ctx ℂ 𝔻} {ϕ2 : Ctx 𝔻 𝔼} {ϕ3 : Ctx 𝔼 𝔽}
-                 {Ψ1 : Ctx ℂ' 𝔻'} {Ψ2 : Ctx 𝔻' 𝔼'} {Ψ3 : Ctx 𝔼' 𝔽'}
-                 {c : Fun ℂ ℂ'} (d : Fun 𝔻 𝔻') {e : Fun 𝔼 𝔼'} {f : Fun 𝔽 𝔽'}
-                 → (f1 : ϕ1 ⊢s Ψ1 [ c ∣ d ])
-                 → (f2 : ϕ2 ⊢s Ψ2 [ d ∣ e ])
-                 → (f3 : ϕ3 ⊢s Ψ3 [ e ∣ f ])
-                 → (,,s _ (,,s _ f1 f2) f3) == (,,s _ f1 (,,s _ f2 f3))
--}
+    ,,s-assoc  : ∀ 
+                 {ϕ1 : Ctx} {ϕ2 : Ctx} {ϕ3 : Ctx}
+                 {Ψ1 : Ctx} {Ψ2 : Ctx} {Ψ3 : Ctx}
+                 → (f1 : ϕ1 ⊢s Ψ1)
+                 → (f2 : ϕ2 ⊢s Ψ2)
+                 → (f3 : ϕ3 ⊢s Ψ3)
+                 → (,,s (,,s f1 f2) f3) == (,,s f1 (,,s f2 f3))
     ,,s-unitr  : 
              {ϕ1 : Ctx} 
              {Ψ1 : Ctx}
@@ -73,6 +70,9 @@ module Ordered where
            → (,,s (vs) f) == f
     ids-vc : ids {vc} == vs
 
+    ids-,, : ∀ {ϕ1 ϕ2} → ids {ϕ1 ,, ϕ2} == (,,s (ids{ϕ1}) (ids{ϕ2}))
+    ids-[] : ∀ {R} → ids {[ R ]} == [ vt ]s
+
     comps-unit-r : {ϕ1 : Ctx} {ϕ2 : Ctx}  
           → (s : ϕ1 ⊢s ϕ2)
           → comps s ids == s
@@ -84,7 +84,16 @@ module Ordered where
     comps-vs : {ϕ1 : Ctx}
              → (s : ϕ1 ⊢s vc)
              → comps s vs == s
-           
+
+    ,,s-comp : ∀ {ϕ1 : Ctx} {ϕ2 : Ctx}
+             {Ψ1 : Ctx} {Ψ2 : Ctx}
+             {Ξ1 : Ctx} {Ξ2 : Ctx}
+             (s1 : ϕ1 ⊢s Ψ1)
+             (s2 : ϕ2 ⊢s Ψ2)
+             (t1 : Ξ1 ⊢s ϕ1)
+             (t2 : Ξ2 ⊢s ϕ2)
+           → (comps (,,s t1 t2) (,,s s1 s2)) == (,,s (comps t1 s1) (comps t2 s2))
+
   -- --------------------------------------------------------------------
   -- substitution into a term
 
@@ -124,6 +133,12 @@ module Ordered where
       subst-ident-vs : {R : Rel} 
                      → (s : vc ⊢ R )
                      → subst-tr s vs == s
+
+      comps-[] : {ϕ1 : Ctx} {ϕ2 : Ctx}  {R : Rel}
+               → (t : ϕ1 ⊢s ϕ2 )
+               → (s : ϕ2 ⊢ R )
+               → comps t [ s ]s == [ subst-tr s t ]s
+          
 
   -- --------------------------------------------------------------------
   -- hom types 
@@ -181,6 +196,31 @@ module Ordered where
                      (subst-tr (app▹ s t) (,,s ϕ1 ϕ2))
                      ( (app▹ (s [ ϕ1 ]tr) (t [ ϕ2 ]tr)) )
 
+    app▹subst-lassoc-ctx : {ϕf  : Ctx} {R : Rel} {P : Rel} {ϕa : Ctx}
+                (s : ϕf ⊢ (R ▹ P))
+                (t : ϕa ⊢ (R))
+              → {ϕf' ϕf'' : Ctx } {ϕa' : Ctx }
+              → (ϕ1 : (ϕf' ,, ϕf'') ⊢s ϕf )
+              → (ϕ2 : ϕa' ⊢s ϕa )
+              → _==_ {_}{(ϕf' ,, (ϕf'' ,, ϕa')) ⊢ (P)}
+                     (subst-tr (app▹ s t) (,,s ϕ1 ϕ2))
+                     ( (app▹ (s [ ϕ1 ]tr) (t [ ϕ2 ]tr)) )
+
+    app▹subst-lassoc-subst : {ϕf ϕf2 : Ctx} {R : Rel} {P : Rel} {ϕa : Ctx}
+                (s : (ϕf ,, ϕf2) ⊢ (R ▹ P))
+                (t : ϕa ⊢ (R))
+              → {ϕf' ϕf2' : Ctx } {ϕa' : Ctx }
+              → (ϕ1 : ϕf' ⊢s ϕf )
+              → (ϕ2 : ϕf2' ⊢s ϕf2 )
+              → (ϕ3 : ϕa' ⊢s ϕa )
+              → _==_ {_}{(ϕf' ,, (ϕf2' ,, ϕa')) ⊢ (P)}
+                     (subst-tr (app▹ s t) (,,s ϕ1 (,,s ϕ2 ϕ3)))
+                     ( (app▹ (s [ ,,s ϕ1 ϕ2 ]tr) (t [ ϕ3 ]tr)) )
+
+
+  -- not sure why adding these specifically as rewrites helps -- they are just uses of the above
+  -- so *should* be implied by them?
+
   app▹subst-arg : {R : Rel} {P : Rel} {ϕa : Ctx}
                 (s : vc ⊢ (R ▹ P))
                 (t : ϕa ⊢ (R))
@@ -200,17 +240,6 @@ module Ordered where
                      (subst-tr {ϕf'} {ϕf} {P} (app▹ s t) (,,s {ϕ1 = ϕf'} {ϕ2 = vc} ϕ1 ids))
                      ( (app▹ (s [ ϕ1 ]tr) (t [ ids ]tr)) )
   app▹subst-fun s t ϕ1 = app▹subst-unitl s t ϕ1 ids
-{-
-  -- app▹subst1 : {ℂ 𝔼 𝔼'' : Cat} {R : Rel ℂ 𝔼} {P : Rel ℂ 𝔼} 
-  --               (s : (vc ℂ) ⊢ (R ▹ P))
-  --               (a : Fun ℂ 𝔼 )
-  --               (t : (vc ℂ) ⊢ (R [ v ∣ a ]))
-  --             → ∀ {h4 : Fun 𝔼'' ℂ}
-  --             → _==_ {_}
-  --                    (subst-tr (app▹ s a t) (vs h4))
-  --                    ( (app▹ (s [ vs h4 ]tr) (a · h4) (t [ vs h4 ]tr)) )
-  -- app▹subst1 s a t {h4} = app▹subst s a t (vs h4) (vs h4) ∘ {!!}
--}
 
   postulate
     _◃_  : (R : Rel) (P : Rel) → Rel
@@ -283,6 +312,28 @@ module Ordered where
               → _==_ {_}{(ϕa') ⊢ (P)}
                      (subst-tr (app◃ t s) (,,s ϕ2 ϕ1))
                      ( (app◃ (t [ ϕ2 ]tr) (s [ ϕ1 ]tr)) )
+
+    app◃subst-lassoc-ctx : {ϕf  : Ctx} {R : Rel} {P : Rel} {ϕa : Ctx}
+                (s : ϕf ⊢ (R ◃ P))
+                (t : ϕa ⊢ (P))
+              → {ϕa' ϕa'' : Ctx } {ϕf' : Ctx }
+              → (ϕ1 : (ϕa' ,, ϕa'') ⊢s ϕa )
+              → (ϕ2 : ϕf' ⊢s ϕf )
+              → _==_ {_}{(ϕa' ,, (ϕa'' ,, ϕf')) ⊢ (R)}
+                     (subst-tr (app◃ t s) (,,s ϕ1 ϕ2))
+                     ( (app◃ (t [ ϕ1 ]tr) (s [ ϕ2 ]tr)) )
+
+    app◃subst-lassoc-subst : {ϕf : Ctx} {R : Rel} {P : Rel} {ϕa ϕa2 : Ctx}
+                (s : ϕf ⊢ (R ◃ P))
+                (t : (ϕa ,, ϕa2) ⊢ (P))
+              → {ϕf' : Ctx } {ϕa' ϕa2' : Ctx }
+              → (ϕ1 : ϕa' ⊢s ϕa )
+              → (ϕ2 : ϕa2' ⊢s ϕa2 )
+              → (ϕ3 : ϕf' ⊢s ϕf )
+              → _==_ {_}
+                     (subst-tr (app◃ t s) (,,s ϕ1 (,,s ϕ2 ϕ3)))
+                     ( (app◃ (t [ ,,s ϕ1 ϕ2 ]tr) (s [ ϕ3 ]tr)) )
+
 
 {-        
     -- FIXME: 
@@ -365,65 +416,50 @@ module Ordered where
               → t == s
   ind-mor-ext Q t s p = (isIso.gf (ind-mor-iso Q) _) ∘ ap (ind-mor Q) p ∘ ! (isIso.gf (ind-mor-iso Q) _)
 
-{-
-  ind-morη : {ℂ 𝔻 : Cat} (Q : Rel ℂ ℂ)
-             (t : ∀e {ℂ} (mor ℂ v v ▹ Q ))
-           → t == ind-mor Q (λe (app▹ (appe t v) v (ident v) ))
-  ind-morη Q  t = ! (isIso.gf (ind-mor-iso Q) t)
--}
-
-{-
   -- ----------------------------------------------------------------------
   -- tensor types
 
   postulate
-    _⊙_  : ∀ {ℂ  𝔻 𝔼 : Cat} (P : Rel ℂ 𝔼) (Q : Rel 𝔼 𝔻) → Rel ℂ 𝔻
+    _⊙_  : (P : Rel) (Q : Rel) → Rel
 
   postulate
-    ⊙i* : ∀ {ℂ  𝔻 𝔼 : Cat} {P : Rel ℂ 𝔼} {Q : Rel 𝔼 𝔻} → ([ P ] ,, [ Q ]) ⊢ (P ⊙ Q)
+    ⊙i* : ∀ {P : Rel} {Q : Rel} → vc ⊢ (P ▹ (Q ▹ (P ⊙ Q)))
 
-  ⊙i : ∀ {ℂ  𝔻 𝔼 : Cat} {P : Rel ℂ 𝔼} {Q : Rel 𝔼 𝔻} {ϕ1 : Ctx ℂ 𝔼 } {ϕ2 : Ctx 𝔼 𝔻 } 
+  ⊙i : ∀ {P : Rel} {Q : Rel} {ϕ1 : Ctx } {ϕ2 : Ctx } 
      → ϕ1 ⊢ P
      → ϕ2 ⊢ Q
      → (ϕ1 ,, ϕ2) ⊢ (P ⊙ Q)
-  ⊙i t s = ⊙i* [ ,,s { c = v} v {e = v} [ t ]s  [ s ]s ]tr
+  ⊙i t s = app▹ (app▹ ⊙i* t) s
 
-    -- ind-⊙η 
-           
-  apply-to-pair : ∀ {ℂ  𝔻 𝔼 : Cat} {P : Rel ℂ 𝔼} {Q : Rel 𝔼 𝔻} {R : Rel ℂ 𝔻}
+  apply-to-pair : ∀ {P : Rel} {Q : Rel} {R : Rel}
           → ((P ⊙ Q) ⊸ R)
           → (P ⊸ (Q ▹ R))
-  apply-to-pair t = λe (λ▹ (λ▹ (app▹ (appe t v) v ⊙i*)))
+  apply-to-pair t = (λ▹ (λ▹ (app▹ t (⊙i vt vt))))
 
   postulate 
-    ind-⊙-iso : ∀ {ℂ  𝔻 𝔼 : Cat} {P : Rel ℂ 𝔼} {Q : Rel 𝔼 𝔻} {R : Rel ℂ 𝔻}
+    ind-⊙-iso : ∀ {P : Rel} {Q : Rel} {R : Rel}
               → isIso _ _ (apply-to-pair {P = P} {Q} {R})
 
-  ind-⊙ : ∀ {ℂ  𝔻 𝔼 : Cat} {P : Rel ℂ 𝔼} {Q : Rel 𝔼 𝔻} {R : Rel ℂ 𝔻}
+  ind-⊙ : ∀ {P : Rel} {Q : Rel} {R : Rel}
           → (P ⊸ (Q ▹ R))
           → ((P ⊙ Q) ⊸ R)
   ind-⊙ t = isIso.g ind-⊙-iso t
 
-  ind-⊙β : ∀ {ℂ  𝔻 𝔼 : Cat} {P : Rel ℂ 𝔼} {Q : Rel 𝔼 𝔻} {R : Rel ℂ 𝔻}
+  ind-⊙β : ∀ {P : Rel} {Q : Rel} {R : Rel}
              (s : (P ⊸ (Q ▹ R)))
-           → _==_{_}{∀e {ℂ} (P ▹ (Q ▹ R))} (λe (λ▹ (λ▹ (app▹ (appe (ind-⊙ s) v) v ⊙i*)))) s
+           → _==_{_} (λ▹ (λ▹ (app▹ (ind-⊙ s) (⊙i vt vt)))) s
   ind-⊙β s = isIso.fg ind-⊙-iso s
 
-  {-# REWRITE ind-⊙β #-}
-
-{-
-  ind-⊙η : ∀ {ℂ  𝔻 𝔼 : Cat} {P : Rel ℂ 𝔼} {Q : Rel 𝔼 𝔻} {R : Rel ℂ 𝔻}
+  ind-⊙η : ∀ {P : Rel} {Q : Rel} {R : Rel}
              (s : ((P ⊙ Q) ⊸ R))
-           → _==_{_}{∀e {ℂ} ((P ⊙ Q) ▹ R)} (ind-⊙ (apply-to-pair s)) s
+           → _==_{_} (ind-⊙ (apply-to-pair s)) s
   ind-⊙η s = isIso.gf ind-⊙-iso s
 
-  ⊙⊸ext : ∀ {ℂ 𝔻 𝔼} {P : Rel ℂ 𝔻} {Q : Rel 𝔻 𝔼} {R : Rel ℂ 𝔼}
+  ⊙⊸ext : ∀ {P : Rel} {Q : Rel} {R : Rel}
           (f g : (P ⊙ Q) ⊸ R)
        → apply-to-pair f == apply-to-pair g
        → f == g
   ⊙⊸ext f g p = (ind-⊙η g) ∘ ap (ind-⊙) p ∘ ! (ind-⊙η f) 
--}
--}
 
   -- ----------------------------------------------------------------------
   -- reductions
@@ -432,7 +468,7 @@ module Ordered where
   {-# REWRITE subst-ident #-}
   {-# REWRITE subst-ident-vs #-}
 
-  -- {-# REWRITE ,,s-assoc #-}
+  {-# REWRITE ,,s-assoc #-}
   {-# REWRITE ,,s-unitl #-}
   {-# REWRITE ,,s-unitr #-}
   {-# REWRITE comps-unit-l #-}
@@ -440,6 +476,10 @@ module Ordered where
   {-# REWRITE comps-vs #-}
   {-# REWRITE ids-vc #-}
   {-# REWRITE subst-vt #-}
+  {-# REWRITE ,,s-comp #-}
+  {-# REWRITE ids-,, #-}
+  {-# REWRITE ids-[] #-}
+  {-# REWRITE comps-[] #-}
 
   {-# REWRITE β▹ #-}
   {-# REWRITE app▹subst #-}
@@ -447,6 +487,8 @@ module Ordered where
   {-# REWRITE app▹subst-unitr #-}
   {-# REWRITE app▹subst-fun #-}
   {-# REWRITE app▹subst-arg #-}
+  {-# REWRITE app▹subst-lassoc-ctx #-}
+  {-# REWRITE app▹subst-lassoc-subst #-}
   {-# REWRITE λ▹subst #-}
 
   {-# REWRITE ind-morβ #-}
@@ -460,9 +502,50 @@ module Ordered where
   {-# REWRITE app◃subst-fun #-}
   {-# REWRITE app◃subst-unitr #-}
   {-# REWRITE app◃subst-unitl #-}
+  {-# REWRITE app◃subst-lassoc-ctx #-}
+  {-# REWRITE app◃subst-lassoc-subst #-}
   {-# REWRITE λ◃subst #-}
-  -- {-# REWRITE λ◃subst #-}
 
+  ind-⊙β' : ∀ {P : Rel} {Q : Rel} {R : Rel}
+             (s : (P ⊸ (Q ▹ R)))
+             {ϕ1 ϕ2 : Ctx} → 
+             (x : ϕ1 ⊢ P)
+             (y : ϕ2 ⊢ Q)
+           → _==_ {_}{(ϕ1 ,, ϕ2) ⊢ R}
+                  (app▹ (isIso.g ind-⊙-iso s) (app▹ (app▹ ⊙i* x) y))
+                  (app▹ (app▹ s x) y)
+  ind-⊙β' s x y =  ap (\ H → (app▹ (app▹ H x) y)) (ind-⊙β s)
+
+  ind-⊙β'-unitr : ∀ {P : Rel} {Q : Rel} {R : Rel}
+             (s : (P ⊸ (Q ▹ R)))
+             {ϕ1 : Ctx} → 
+             (x : ϕ1 ⊢ P)
+             (y : vc ⊢ Q)
+           → _==_ {_}{(ϕ1) ⊢ R} (app▹ (isIso.g ind-⊙-iso s) (app▹ (app▹ ⊙i* x) y)) (app▹ (app▹ s x) y)
+  ind-⊙β'-unitr s x y =   ind-⊙β' s x y
+
+  ind-⊙β'-unitl : ∀ {P : Rel} {Q : Rel} {R : Rel}
+             (s : (P ⊸ (Q ▹ R)))
+             {ϕ2 : Ctx} → 
+             (x : vc ⊢ P)
+             (y : ϕ2 ⊢ Q)
+           → _==_ {_}{(ϕ2) ⊢ R} (app▹ (isIso.g ind-⊙-iso s) (app▹ (app▹ ⊙i* x) y)) (app▹ (app▹ s x) y)
+  ind-⊙β'-unitl s x y =  ind-⊙β' s x y
+
+  ind-⊙β'-lassoc : ∀ {P : Rel} {Q : Rel} {R : Rel}
+             (s : (P ⊸ (Q ▹ R)))
+             {ϕ1 ϕ2 ϕ3 : Ctx} → 
+             (x : (ϕ1 ,, ϕ2) ⊢ P)
+             (y : ϕ3 ⊢ Q)
+           → _==_ {_}{(ϕ1 ,, (ϕ2 ,, ϕ3)) ⊢ R}
+                  (app▹ (isIso.g ind-⊙-iso s) (app▹ (app▹ ⊙i* x) y))
+                  (app▹ (app▹ s x) y)
+  ind-⊙β'-lassoc s x y =  ind-⊙β' s x y
+
+  {-# REWRITE ind-⊙β' #-}
+  {-# REWRITE ind-⊙β'-unitl #-}
+  {-# REWRITE ind-⊙β'-unitr #-}
+  {-# REWRITE ind-⊙β'-lassoc #-}
 
 
   -- ----------------------------------------------------------------------
@@ -475,49 +558,57 @@ module Ordered where
   exchange : ∀ {P : Rel} {Q : Rel} {R : Rel}
            → isIso (P ⊸ (Q ▹ R)) ((Q ⊸ (R ◃ P))) exchange-map
   exchange = iso (\ f → λ▹ (λ▹ (app◃ vt (app▹ f vt))) )
-                 (\ h → ! (η▹ _) ∘ ap λ▹ (! (η▹ _) ∘ id) )
-                 (\ h → ! (η▹ _) ∘ ap λ▹ (! (η◃ _) ∘ id))
+                 (\ h →  ! (η▹ h)  ∘  ap λ▹ (! (η▹ (app▹ h vt)))   )
+                 (\ h → ! (η▹ _) ∘ ap λ▹ (! (η◃ _)))
 
-  exchange-ext : {P : Rel} {Q : Rel} {R : Rel}
-          (f g : (P ⊸ (Q ▹ R)))
-       → exchange-map f == exchange-map g
-       → f == g
-  exchange-ext f g p = (isIso.gf exchange _) ∘ ap (isIso.g exchange) p ∘ ! (isIso.gf exchange _) 
-
-  yoneda : ∀ (P : Rel) → (mor0 ▹ P) ≅i P
-  yoneda P = (λ▹ ( app▹ vt (ident))) ,
-              isIso.g exchange (ind-mor (P ◃ P) (λ◃ vt))  ,
-             exchange-ext _ _ (ind-mor-ext _ _ _ id) ,
+  yoneda-r : ∀ (P : Rel) → (mor0 ▹ P) ≅i P
+  yoneda-r P = (λ▹ ( app▹ vt (ident))) ,
+             isIso.g exchange (ind-mor (P ◃ P) (λ◃ vt))  ,
+             induct-iso-lr exchange (ind-mor-ext _ _ _ id) ,
              id
 
+  yoneda-l : ∀ (P : Rel) → (P ◃ mor0 ) ≅i P
+  yoneda-l P = λ▹ (app◃ ident vt) ,
+               exchange-map (ind-mor _ (λ▹ vt)) ,
+               induct-iso-rl exchange (ind-mor-ext _ _ _ id) ,
+               id
 
-{-
-  ⊙assoc : ∀ {ℂ 𝔻 𝔼 𝔽} → (P : Rel ℂ 𝔻) (Q : Rel 𝔻 𝔼) (R : Rel 𝔼 𝔽)
-         → ((P ⊙ Q) ⊙ R) ≅i (P ⊙ (Q ⊙ R))
-  ⊙assoc P Q R = to ,
-                (from ,
-                ⊙⊸ext _ _ (⊙⊸ext _ _ {!!}) ,
-                ⊙⊸ext _ _ ((exchange-ext _ _ (⊙⊸ext _ _ {!!})))) where
-     to-matched : ∀e (P ▹ (Q ▹ (R ▹ (P ⊙ (Q ⊙ R)))))
-     to-matched = λe (λ▹ (λ▹ (λ▹ ((transport ( \ H → H ⊢ (P ⊙ (Q ⊙ R))) id -- (! (cassoc [ P ] [ Q ] [ R ])) -- wouldn't be there if contexts were strictly associative
-                                              (⊙i {ϕ1 = [ P ]  } {ϕ2 = [ Q ] ,, [ R ]}
-                                                  vt
-                                                  ⊙i* )))) ))
+  coyoneda-l : ∀ (P : Rel) → (mor0 ⊙ P) ≅i P
+  coyoneda-l P = ind-⊙ (ind-mor _ (λ▹ vt)) ,
+                 λ▹ (⊙i ident vt) ,
+                 (⊙⊸ext _ _ (ind-mor-ext _ _ _ id)) ,
+                 id
 
-     to = ind-⊙ (ind-⊙ to-matched)
+  coyoneda-r : ∀ (P : Rel) → (P ⊙ mor0) ≅i P
+  coyoneda-r P = ind-⊙ (isIso.g exchange (ind-mor _ (λ◃ vt))) ,
+                 λ▹ (⊙i vt ident) ,
+                 ⊙⊸ext _ _ (induct-iso-lr exchange (ind-mor-ext _ _ _ id)) ,
+                 id
 
-     from-matched : ∀e (Q ▹ (R ▹ (((P ⊙ Q) ⊙ R) ◃ P)))
-     from-matched = λe (λ▹ (λ▹ (λ◃ (transport ( \ H → H ⊢ ((P ⊙ Q) ⊙ R)) id -- (cassoc [ P ] [ Q ] [ R ]) -- wouldn't be there if contexts were strictly associative
-                                              (⊙i {ϕ1 = [ P ] ,, [ Q ] } {ϕ2 = [ R ]}
-                                                  ⊙i*
-                                                  vt )))))
-  
-     from =  ind-⊙ (isIso.g exchange (ind-⊙ from-matched)) 
-     -- (λe (λ▹ (λ▹ (unλ◃ {ϕ = [ Q ⊙ R ]} (unλ⊸ (ind-⊙ from-matched) )))))
-                 
-  
+  fubini1 : ∀ {P Q R} → ((P ⊙ Q) ⊙ R) ≅i (P ⊙ (Q ⊙ R))
+  fubini1 {P}{Q}{R} = ind-⊙ (ind-⊙ (λ▹ (λ▹ (λ▹ (⊙i vt (⊙i vt vt)))))) ,
+            ind-⊙ (isIso.g exchange (ind-⊙ (λ▹ (λ▹ (λ◃ (⊙i (⊙i vt vt) vt )))))) ,
+            ⊙⊸ext _ _ (⊙⊸ext _ _ id) ,
+            ⊙⊸ext _ _ (induct-iso-lr exchange (⊙⊸ext _ _ id))
 
+  fubini2 : ∀ {P Q R} → ((P ⊙ Q) ▹ R) ≅i (P ▹ (Q ▹ R))
+  fubini2 {P} {Q} {R} = λ▹ (λ▹ (λ▹ (app▹ {ϕf = [ (P ⊙ Q) ▹ R ]} {ϕa = [ P ] ,, [ Q ]} vt (⊙i vt vt)))) ,
+                        isIso.g exchange (ind-⊙ (λ▹ (λ▹ (λ◃ (app▹ {ϕa = [ Q ]} (app▹ {ϕf = [ P ▹ (Q ▹ R) ]} {ϕa = [ P ]} vt vt) vt))))) ,
+                        induct-iso-lr exchange (⊙⊸ext _ _ id) ,
+                        ap λ▹ (! (η▹ _) ∘ ap λ▹ (! (η▹ _)))
 
+  fubini3 : ∀ {P Q R} → (R ◃ (P ⊙ Q)) ≅i ((R ◃ P) ◃ Q)
+  fubini3 {P}{Q}{R} = λ▹ (λ◃ (λ◃ (app◃ {ϕa = [ P ] ,, [ Q ]} (⊙i vt vt) vt))) ,
+                      (exchange-map (ind-⊙ (λ▹ (λ▹ (λ▹ (app◃ {ϕa = [ P ]} vt (app◃ {ϕa = [ Q ]}{ϕf = [ (R ◃ P) ◃ Q ]} vt vt))))))) ,
+                      induct-iso-rl exchange (⊙⊸ext _ _ id) ,
+                      ap λ▹ (! (η◃ _) ∘ ap λ◃ (! (η◃ _)))
 
+  fubini4 : ∀ {P Q R} → (Q ▹ (R ◃ P)) ≅i ((Q ▹ R) ◃ P)
+  fubini4 {P}{Q}{R} = λ▹ (λ◃ (λ▹ (app◃  {ϕa = [ P ]} {ϕf = ([ Q ▹ (R ◃ P) ] ,, [ Q ])} vt (app▹ {ϕf = [ Q ▹ (R ◃ P) ]} {ϕa = [ Q ]} vt vt)))) ,
+                      λ▹ (λ▹ (λ◃ (app▹ (app◃ {ϕa = [ P ] } {ϕf = [ (Q ▹ R) ◃ P ]} vt vt) vt))) ,
+                      (ap λ▹ (! (η▹ _) ∘ ap λ▹ (! (η◃ _)))) ,
+                      (ap λ▹ (! (η◃ _) ∘ ap λ◃ (! (η▹ _))))
 
--}
+  -- external!
+  fubini5 : ∀ {P Q : Rel} → Iso (vc ⊢ (P ▹ Q)) (vc ⊢ (Q ◃ P))
+  fubini5 = iso (\ t → λ◃ (app▹ t vt)) ((\ t → λ▹ (app◃ vt t))) (\ x → ! (η▹ x)) (\ x → ! (η◃ _))
