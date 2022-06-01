@@ -453,6 +453,10 @@ module Ordered where
 
     subst-ind-mor : ∀ Q (t : vc ⊢ Q) → subst-tr (ind-mor Q t) vs == (ind-mor Q t) 
   -}
+  -- implied 
+  -- {-# REWRITE subst-id0 #-}
+  -- {-# REWRITE subst-ind-mor #-}
+
   
   ind-mor-ext : (Q : Rel ) (t s : mor0 ⊸ Q)
               → apply-to-id Q t == apply-to-id Q s
@@ -511,10 +515,6 @@ module Ordered where
   -- because eta-expansion is manual
   {-# REWRITE ind-morβ #-}
 
-  -- implied 
-  -- {-# REWRITE subst-id0 #-}
-  -- {-# REWRITE subst-ind-mor #-}
-
   ind-⊙β' : ∀ {P : Rel} {Q : Rel} {R : Rel}
              (s : (P ⊸ (Q ▹ R)))
              {ϕ1 ϕ2 : Ctx} → 
@@ -525,12 +525,17 @@ module Ordered where
                   (app▹ (app▹ s x) y)
   ind-⊙β' s x y =  ap (\ H → (app▹ (app▹ H x) y)) (ind-⊙β s)
 
+
+  -- it seems like a bug that these need to be added as separate rewrites.  
+  -- maybe it's because Agda is matching on the context in the type of the equation
+  -- to see if the rewrite applies?
+  
   ind-⊙β'-unitr : ∀ {P : Rel} {Q : Rel} {R : Rel}
              (s : (P ⊸ (Q ▹ R)))
              {ϕ1 : Ctx} → 
              (x : ϕ1 ⊢ P)
              (y : vc ⊢ Q)
-           → _==_ {_}{(ϕ1) ⊢ R} (app▹ (isIso.g ind-⊙-iso s) (app▹ (app▹ ⊙i* x) y)) (app▹ (app▹ s x) y)
+           → _==_ {_}{(ϕ1 ,, vc) ⊢ R} (app▹ (isIso.g ind-⊙-iso s) (app▹ (app▹ ⊙i* x) y)) (app▹ (app▹ s x) y)
   ind-⊙β'-unitr s x y =   ind-⊙β' s x y
 
   ind-⊙β'-unitl : ∀ {P : Rel} {Q : Rel} {R : Rel}
@@ -538,7 +543,7 @@ module Ordered where
              {ϕ2 : Ctx} → 
              (x : vc ⊢ P)
              (y : ϕ2 ⊢ Q)
-           → _==_ {_}{(ϕ2) ⊢ R} (app▹ (isIso.g ind-⊙-iso s) (app▹ (app▹ ⊙i* x) y)) (app▹ (app▹ s x) y)
+           → _==_ {_}{(vc ,, ϕ2) ⊢ R} (app▹ (isIso.g ind-⊙-iso s) (app▹ (app▹ ⊙i* x) y)) (app▹ (app▹ s x) y)
   ind-⊙β'-unitl s x y =  ind-⊙β' s x y
 
   ind-⊙β'-lassoc : ∀ {P : Rel} {Q : Rel} {R : Rel}
