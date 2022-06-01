@@ -46,11 +46,13 @@ module Ordered where
            → ϕ2 ⊢s Ψ2 
            → (ϕ1 ,, ϕ2) ⊢s (Ψ1 ,, Ψ2) 
     ids   :  {ϕ : Ctx} → ϕ ⊢s ϕ 
-    comps : {ϕ1 : Ctx} {ϕ2 : Ctx}  {ϕ3 : Ctx}
-          → ϕ1 ⊢s ϕ2 
-          → ϕ2 ⊢s ϕ3 
-          → ϕ1 ⊢s ϕ3 
-    -- TODO associativity, unit, interchange, def id and comp
+    -- comps : {ϕ1 : Ctx} {ϕ2 : Ctx}  {ϕ3 : Ctx}
+    --       → ϕ1 ⊢s ϕ2 
+    --       → ϕ2 ⊢s ϕ3 
+    --       → ϕ1 ⊢s ϕ3 
+
+    -- ----------------------------------------------------------------------
+    -- horizontal associativity and unit
     ,,s-assoc  : ∀ 
                  {ϕ1 : Ctx} {ϕ2 : Ctx} {ϕ3 : Ctx}
                  {Ψ1 : Ctx} {Ψ2 : Ctx} {Ψ3 : Ctx}
@@ -68,31 +70,59 @@ module Ordered where
              {Ψ1 : Ctx}
            → (f : ϕ1 ⊢s Ψ1)
            → (,,s (vs) f) == f
+
+    -- ---------------------------------------------------------------------- 
+    -- vertical associativity and unit (not used in these examples)
+    -- comps-unit-r : {ϕ1 : Ctx} {ϕ2 : Ctx}  
+    --       → (s : ϕ1 ⊢s ϕ2)
+    --       → comps s ids == s
+
+    -- comps-unit-l : {ϕ1 : Ctx} {ϕ2 : Ctx}  
+    --       → (s : ϕ1 ⊢s ϕ2)
+    --       → comps ids s == s
+
+    -- ----------------------------------------------------------------------
+    -- "definition" of identity based on the context 
+    
     ids-vc : ids {vc} == vs
 
     ids-,, : ∀ {ϕ1 ϕ2} → ids {ϕ1 ,, ϕ2} == (,,s (ids{ϕ1}) (ids{ϕ2}))
-    ids-[] : ∀ {R} → ids {[ R ]} == [ vt ]s
 
-    comps-unit-r : {ϕ1 : Ctx} {ϕ2 : Ctx}  
-          → (s : ϕ1 ⊢s ϕ2)
-          → comps s ids == s
+    -- not used  
+    -- ids-[] : ∀ {R} → ids {[ R ]} == [ vt ]s
 
-    comps-unit-l : {ϕ1 : Ctx} {ϕ2 : Ctx}  
-          → (s : ϕ1 ⊢s ϕ2)
-          → comps ids s == s
+    -- ----------------------------------------------------------------------
+    -- "definition" of vertical composition based on the
+    -- substitution being substituted into
 
-    comps-vs : {ϕ1 : Ctx}
-             → (s : ϕ1 ⊢s vc)
-             → comps s vs == s
+    -- comps-vs : {ϕ1 : Ctx}
+    --          → (s : ϕ1 ⊢s vc)
+    --          → comps s vs == s
 
-    ,,s-comp : ∀ {ϕ1 : Ctx} {ϕ2 : Ctx}
-             {Ψ1 : Ctx} {Ψ2 : Ctx}
-             {Ξ1 : Ctx} {Ξ2 : Ctx}
-             (s1 : ϕ1 ⊢s Ψ1)
-             (s2 : ϕ2 ⊢s Ψ2)
-             (t1 : Ξ1 ⊢s ϕ1)
-             (t2 : Ξ2 ⊢s ϕ2)
-           → (comps (,,s t1 t2) (,,s s1 s2)) == (,,s (comps t1 s1) (comps t2 s2))
+    -- see below for comps s [ t ]s
+
+    -- interchange = definition of composition for horizontal composition
+    -- (not used)
+    -- ,,s-comp : ∀ {ϕ1 : Ctx} {ϕ2 : Ctx}
+    --          {Ψ1 : Ctx} {Ψ2 : Ctx}
+    --          {Ξ1 : Ctx} {Ξ2 : Ctx}
+    --          (s1 : ϕ1 ⊢s Ψ1)
+    --          (s2 : ϕ2 ⊢s Ψ2)
+    --          (t1 : Ξ1 ⊢s ϕ1)
+    --          (t2 : Ξ2 ⊢s ϕ2)
+    --        → (comps (,,s t1 t2) (,,s s1 s2)) == (,,s (comps t1 s1) (comps t2 s2))
+
+
+  {-# REWRITE ,,s-assoc #-}
+  {-# REWRITE ,,s-unitl #-}
+  {-# REWRITE ,,s-unitr #-}
+  {-# REWRITE ids-vc #-}
+  {-# REWRITE ids-,, #-}
+
+  -- {-# REWRITE comps-unit-l #-}
+  -- {-# REWRITE comps-unit-r #-}
+  -- {-# REWRITE comps-vs #-}
+  -- {-# REWRITE ,,s-comp #-}
 
   -- --------------------------------------------------------------------
   -- substitution into a term
@@ -115,12 +145,12 @@ module Ordered where
   _[_]tr = subst-tr
 
   postulate
-      fuse :{ϕ1 : Ctx} {ϕ2 : Ctx}  {ϕ3 : Ctx}
-          → (s1 : ϕ1 ⊢s ϕ2 )
-          → (s2 : ϕ2 ⊢s ϕ3 )
-          → {R : Rel }
-          → (t : ϕ3 ⊢ R)
-          → (subst-tr (subst-tr t s2) s1) == (t [ comps s1 s2 ]tr)
+      -- fuse :{ϕ1 : Ctx} {ϕ2 : Ctx}  {ϕ3 : Ctx}
+      --     → (s1 : ϕ1 ⊢s ϕ2 )
+      --     → (s2 : ϕ2 ⊢s ϕ3 )
+      --     → {R : Rel }
+      --     → (t : ϕ3 ⊢ R)
+      --     → (subst-tr (subst-tr t s2) s1) == (t [ comps s1 s2 ]tr)
 
       subst-ident : {ϕ1 : Ctx} {R : Rel} 
                   → (s : ϕ1 ⊢ R )
@@ -134,11 +164,18 @@ module Ordered where
                      → (s : vc ⊢ R )
                      → subst-tr s vs == s
 
-      comps-[] : {ϕ1 : Ctx} {ϕ2 : Ctx}  {R : Rel}
-               → (t : ϕ1 ⊢s ϕ2 )
-               → (s : ϕ2 ⊢ R )
-               → comps t [ s ]s == [ subst-tr s t ]s
+      -- comps-[] : {ϕ1 : Ctx} {ϕ2 : Ctx}  {R : Rel}
+      --          → (t : ϕ1 ⊢s ϕ2 )
+      --          → (s : ϕ2 ⊢ R )
+      --          → comps t [ s ]s == [ subst-tr s t ]s
           
+  -- {-# REWRITE fuse #-} 
+  -- {-# REWRITE ids-[] #-}
+  -- {-# REWRITE comps-[] #-}
+
+  {-# REWRITE subst-vt #-}
+  {-# REWRITE subst-ident #-}
+  {-# REWRITE subst-ident-vs #-}
 
   -- --------------------------------------------------------------------
   -- hom types 
@@ -241,6 +278,16 @@ module Ordered where
                      ( (app▹ (s [ ϕ1 ]tr) (t [ ids ]tr)) )
   app▹subst-fun s t ϕ1 = app▹subst-unitl s t ϕ1 ids
 
+  {-# REWRITE β▹ #-}
+  {-# REWRITE app▹subst #-}
+  {-# REWRITE app▹subst-unitl #-}
+  {-# REWRITE app▹subst-unitr #-}
+  {-# REWRITE app▹subst-fun #-}
+  {-# REWRITE app▹subst-arg #-}
+  {-# REWRITE app▹subst-lassoc-ctx #-}
+  {-# REWRITE app▹subst-lassoc-subst #-}
+  {-# REWRITE λ▹subst #-}
+
   postulate
     _◃_  : (R : Rel) (P : Rel) → Rel
     λ◃ : {ϕ : Ctx} {R : Rel} {P : Rel}
@@ -334,21 +381,15 @@ module Ordered where
                      (subst-tr (app◃ t s) (,,s ϕ1 (,,s ϕ2 ϕ3)))
                      ( (app◃ (t [ ,,s ϕ1 ϕ2 ]tr) (s [ ϕ3 ]tr)) )
 
-
-{-        
-    -- FIXME: 
-    -- η◃ : {ℂ 𝔻 𝔼 : Cat} {ϕ : Ctx ℂ 𝔻} {R : Rel 𝔻 𝔼} {P : Rel ℂ 𝔼}
-    --    → (f : ϕ ⊢ (R ◃ P))
-    --    → f == λ◃ (app◃ {ϕf = ϕ} {ϕa = [ R ]} f v vt )
-    -- ◃subst : ∀ {ℂ' 𝔻' ℂ 𝔻 𝔼 : Cat} (R : Rel 𝔼 ℂ) (P : Rel 𝔼 𝔻)
-    --            → (f : Fun ℂ' ℂ) (g : Fun 𝔻' 𝔻)
-    --        → ( (R ◃ P) ) [ f ∣ g ] == ((R [ v ∣ f ]) ◃ (P [ v ∣ g ]))
-
-  unλ◃ : {ℂ 𝔻 𝔼 : Cat} {ϕ : Ctx 𝔻 𝔼} {R : Rel ℂ 𝔼} {P : Rel ℂ 𝔻}
-       → ϕ ⊢ (R ◃ P)
-       → ([ P ] ,, ϕ) ⊢ R
-  unλ◃ t =  app◃ v vt t 
--}
+  {-# REWRITE β◃ #-}
+  {-# REWRITE app◃subst #-}
+  {-# REWRITE app◃subst-arg #-}
+  {-# REWRITE app◃subst-fun #-}
+  {-# REWRITE app◃subst-unitr #-}
+  {-# REWRITE app◃subst-unitl #-}
+  {-# REWRITE app◃subst-lassoc-ctx #-}
+  {-# REWRITE app◃subst-lassoc-subst #-}
+  {-# REWRITE λ◃subst #-}
 
   -- ----------------------------------------------------------------------
   -- n.t. of profunctors
@@ -406,11 +447,13 @@ module Ordered where
            →  (app▹ ((ind-mor Q t) ) (ident)) ==  t
   ind-morβ Q t = isIso.fg (ind-mor-iso Q) t
 
+  {- implied by subst-ident-vs
   postulate
     subst-id0 : subst-tr id0 vs == id0
 
     subst-ind-mor : ∀ Q (t : vc ⊢ Q) → subst-tr (ind-mor Q t) vs == (ind-mor Q t) 
-
+  -}
+  
   ind-mor-ext : (Q : Rel ) (t s : mor0 ⊸ Q)
               → apply-to-id Q t == apply-to-id Q s
               → t == s
@@ -464,47 +507,13 @@ module Ordered where
   -- ----------------------------------------------------------------------
   -- reductions
 
-  {-# REWRITE fuse #-}
-  {-# REWRITE subst-ident #-}
-  {-# REWRITE subst-ident-vs #-}
-
-  {-# REWRITE ,,s-assoc #-}
-  {-# REWRITE ,,s-unitl #-}
-  {-# REWRITE ,,s-unitr #-}
-  {-# REWRITE comps-unit-l #-}
-  {-# REWRITE comps-unit-r #-}
-  {-# REWRITE comps-vs #-}
-  {-# REWRITE ids-vc #-}
-  {-# REWRITE subst-vt #-}
-  {-# REWRITE ,,s-comp #-}
-  {-# REWRITE ids-,, #-}
-  {-# REWRITE ids-[] #-}
-  {-# REWRITE comps-[] #-}
-
-  {-# REWRITE β▹ #-}
-  {-# REWRITE app▹subst #-}
-  {-# REWRITE app▹subst-unitl #-}
-  {-# REWRITE app▹subst-unitr #-}
-  {-# REWRITE app▹subst-fun #-}
-  {-# REWRITE app▹subst-arg #-}
-  {-# REWRITE app▹subst-lassoc-ctx #-}
-  {-# REWRITE app▹subst-lassoc-subst #-}
-  {-# REWRITE λ▹subst #-}
-
+  -- convenient to have the eta-contracted version as a rewrite too
+  -- because eta-expansion is manual
   {-# REWRITE ind-morβ #-}
 
+  -- implied 
   -- {-# REWRITE subst-id0 #-}
   -- {-# REWRITE subst-ind-mor #-}
-
-  {-# REWRITE β◃ #-}
-  {-# REWRITE app◃subst #-}
-  {-# REWRITE app◃subst-arg #-}
-  {-# REWRITE app◃subst-fun #-}
-  {-# REWRITE app◃subst-unitr #-}
-  {-# REWRITE app◃subst-unitl #-}
-  {-# REWRITE app◃subst-lassoc-ctx #-}
-  {-# REWRITE app◃subst-lassoc-subst #-}
-  {-# REWRITE λ◃subst #-}
 
   ind-⊙β' : ∀ {P : Rel} {Q : Rel} {R : Rel}
              (s : (P ⊸ (Q ▹ R)))
