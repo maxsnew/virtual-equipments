@@ -362,4 +362,12 @@ module Lib where
             → ap g (ap f p) == ap (\x → g (f x)) p
   ap-o f g id = id
 
+  induct-iso-lr : {l1 l2 : Level} {A : Set l1} {B : Set l2} {f : A → B}
+                → isIso A B f
+                → {x y : A} → f x == f y → x == y
+  induct-iso-lr i p  = isIso.gf i _ ∘ ap (isIso.g i) p ∘ ! (isIso.gf i _)
 
+  induct-iso-rl : {l1 l2 : Level} {A : Set l1} {B : Set l2} {f : A → B}
+                → (i : isIso A B f)
+                → {x y : B} → isIso.g i x == isIso.g i y → x == y
+  induct-iso-rl {f = f} i p  = isIso.fg i _ ∘ ap (f) p ∘ ! (isIso.fg i _)

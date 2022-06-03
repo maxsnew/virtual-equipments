@@ -27,6 +27,8 @@ module Examples where
        → f == g
   exchange-ext p = induct-iso-lr exchange p 
 
+{- work but slow
+
   yoneda-l : ∀ {ℂ 𝔻} (P : Rel ℂ 𝔻) → (mor 𝔻 v v ▹ P) ≅i P
   yoneda-l {ℂ} {𝔻} P = (λe (λ▹ ( app▹ vt v (ident v)))) ,
                        isIso.g exchange (mor-rec _ (λe (λ◃ vt)))  ,
@@ -50,43 +52,14 @@ module Examples where
                  λe (λ▹ (pair⊙ v vt (ident v))) ,
                  ⊙-ext (exchange-ext (mor-ext id)) ,
                  id
+-}
 
   fubini1 : ∀ {ℂ 𝔻 𝔼 𝔽} {P : Rel ℂ 𝔻} {Q : Rel 𝔻 𝔼} {R : Rel 𝔼 𝔽}
           → ((P ⊙ Q) ⊙ R) ≅i (P ⊙ (Q ⊙ R))
   fubini1 = ⊙-rec (⊙-rec (λe (λ▹ (λ▹ (λ▹ (pair⊙ v vt (pair⊙ v vt vt))))))) ,
             ⊙-rec (isIso.g exchange (⊙-rec (λe (λ▹ (λ▹ (λ◃ (pair⊙ v (pair⊙ v vt vt) vt))))))) ,
-            ⊙-ext (⊙-ext {!!}) ,
-            ⊙-ext {!!}
-
-
-{-
-  ⊙assoc : ∀ {ℂ 𝔻 𝔼 𝔽} → (P : Rel ℂ 𝔻) (Q : Rel 𝔻 𝔼) (R : Rel 𝔼 𝔽)
-         → ((P ⊙ Q) ⊙ R) ≅i (P ⊙ (Q ⊙ R))
-  ⊙assoc P Q R = to ,
-                (from ,
-                ⊙⊸ext _ _ (⊙⊸ext _ _ {!!}) ,
-                ⊙⊸ext _ _ ((exchange-ext _ _ (⊙⊸ext _ _ {!!})))) where
-     to-matched : ∀e (P ▹ (Q ▹ (R ▹ (P ⊙ (Q ⊙ R)))))
-     to-matched = λe (λ▹ (λ▹ (λ▹ ((transport ( \ H → H ⊢ (P ⊙ (Q ⊙ R))) id -- (! (cassoc [ P ] [ Q ] [ R ])) -- wouldn't be there if contexts were strictly associative
-                                              (⊙i {ϕ1 = [ P ]  } {ϕ2 = [ Q ] ,, [ R ]}
-                                                  vt
-                                                  ⊙i* )))) ))
-
-     to = ind-⊙ (ind-⊙ to-matched)
-
-     from-matched : ∀e (Q ▹ (R ▹ (((P ⊙ Q) ⊙ R) ◃ P)))
-     from-matched = λe (λ▹ (λ▹ (λ◃ (transport ( \ H → H ⊢ ((P ⊙ Q) ⊙ R)) id -- (cassoc [ P ] [ Q ] [ R ]) -- wouldn't be there if contexts were strictly associative
-                                              (⊙i {ϕ1 = [ P ] ,, [ Q ] } {ϕ2 = [ R ]}
-                                                  ⊙i*
-                                                  vt )))))
-  
-     from =  ind-⊙ (isIso.g exchange (ind-⊙ from-matched)) 
-     -- (λe (λ▹ (λ▹ (unλ◃ {ϕ = [ Q ⊙ R ]} (unλ⊸ (ind-⊙ from-matched) )))))
-                 
-  
-
-
--}
+            ⊙-ext (⊙-ext id) ,
+            ⊙-ext (exchange-ext (⊙-ext id))
 
 
 -- map in one dir but not the other?
