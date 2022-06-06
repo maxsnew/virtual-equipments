@@ -86,6 +86,7 @@ module Examples where
                 (\ g → λe (λ▹ (app◃ v vt (appe g v))))
                 (\x → ! (∀eη _) ∘ ap λe (! (η▹ _)))
                 (\x → ! (∀eη _) ∘ ap λe (! (η◃ _)))  
+
 -}
   
   ap-mor : ∀ {ℂ 𝔻} → (f : Fun ℂ 𝔻) → ∀e ((mor ℂ v v) ▹ mor 𝔻 (f · v) (f · v))
@@ -101,6 +102,7 @@ module Examples where
   compose1=2 : ∀ {ℂ} → compose1 {ℂ} == compose2 
   compose1=2 = mor-ext (mor-ext id)
 
+{- works but slow
   top-right : ∀ {ℂ} {𝔻} (F G : Fun ℂ 𝔻) (α : ∀e (mor 𝔻 F G)) → ∀e (mor ℂ v v ▹ mor 𝔻 F G)
   top-right F G α = λe (λ▹ (app▹ (app▹ (appe compose1 F) G (appe α v)) G (app▹ (appe (ap-mor G) v) v vt)  ))
 
@@ -110,8 +112,45 @@ module Examples where
   naturality : ∀ {ℂ 𝔻} (F G : Fun ℂ 𝔻)
              → (α : ∀e (mor 𝔻 F G))
              → top-right F G α == left-bottom F G α
-  naturality F G α = mor-ext {!!}
+  naturality {ℂ}{𝔻} F G α = mor-ext (ap λe (ap (\ Q → app▹ (app▹ (appe Q F) G (appe α v)) G (appe id0 G)) compose1=2    ))
+-}
 
 -- map in one dir but not the other?
 -- Goal: (ϕ1 ,, ϕ2) ⊢ ((P [ f1 ∣ f2 ]) ⊙ (Q [ f2 ∣ f3 ]))
 -- Have: (ϕ1 ,, ϕ2) ⊢ ((P [ f1 ∣ v ]) ⊙ (Q [ v ∣ f3 ]))
+
+  BijectionAdjunction : {ℂ 𝔻 : Cat} (F : Fun 𝔻 ℂ) (G : Fun ℂ 𝔻)
+                      → Set
+  BijectionAdjunction {ℂ}{𝔻} F G = mor ℂ F v ≅i (mor 𝔻 v G)
+
+  UnitCounitAdjunction : {ℂ 𝔻 : Cat} (F : Fun 𝔻 ℂ) (G : Fun ℂ 𝔻) → Set
+  UnitCounitAdjunction F G =
+    Σ \ (unit : ∀e (mor _ v (G · F))) → 
+    Σ \ (counit : ∀e (mor _ (F · G) v)) → 
+    _==_ {_}{∀e (mor _ F F)}
+         (λe (app▹ (app▹ (appe compose1 F) (F · (G · F)) (app▹ (appe (ap-mor F) v) (G · F) (appe unit v))) F (appe counit F ))   )
+         (λe (ident F))  ×
+    _==_ {_}{∀e (mor _ G G)}
+         (λe (app▹ (app▹ (appe compose1 G) (G · (F · G)) (appe unit G)) G (app▹ (appe (ap-mor G) (F · G)) v (appe counit v ) )))
+         (λe (ident G))
+
+
+  to : {ℂ 𝔻 : Cat} (F : Fun 𝔻 ℂ) (G : Fun ℂ 𝔻)
+    → BijectionAdjunction F G
+    → UnitCounitAdjunction F G
+  to F G (l , r , lr , rl) =  λe (app▹ (appe l v) F (ident F))  ,
+                              λe (app▹ (appe r G) v (ident G)) ,
+                              {!!} ,
+                              {!!}
+
+  from : {ℂ 𝔻 : Cat} (F : Fun 𝔻 ℂ) (G : Fun ℂ 𝔻)
+    → UnitCounitAdjunction F G
+    → BijectionAdjunction F G
+  from F G (unit , counit , _) =
+    λe (λ▹ (app▹ (app▹ (appe compose1 v) (G · F) (appe unit v)) G ( (app▹ (appe (ap-mor G) F) v vt) )  )) ,
+    λe (λ▹ (app▹ (app▹ (appe compose1 F) (F · G) ( (app▹ (appe (ap-mor F) v) G vt) )) v (appe counit v)    )) ,
+    {!!} ,
+    {!!}
+
+
+

@@ -208,7 +208,13 @@ module STC where
                      → subst-tr s (vs v) == s
   subst-ident-vs s = subst-ident s
 
+  subst-ident-vt : ∀ {ℂ 𝔻} {R S : Rel ℂ 𝔻} 
+                     → (s : [ S ] ⊢ R )
+                     → subst-tr s ([_]s {f = v} {g = v} vt) == s
+  subst-ident-vt s =  subst-ident s 
+
   {-# REWRITE subst-ident-vs #-}
+  {-# REWRITE subst-ident-vt #-}
 
   -- ----------------------------------------------------------------------
   -- end
