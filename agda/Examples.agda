@@ -6,9 +6,6 @@ open import SubstitutionRewrites
 
 module Examples where
 
-  ap-mor : ∀ {ℂ 𝔻} → (Fun ℂ 𝔻) → Set 
-  ap-mor {ℂ}{𝔻} f = ∀e ((mor ℂ v v) ▹ mor 𝔻 (f · v) (f · v))
-
   exchange-map : ∀ {ℂ 𝔻 𝔼} {P : Rel ℂ 𝔻} {Q : Rel 𝔻 𝔼} {R : Rel ℂ 𝔼}
            → (P ⊸ (Q ▹ R)) --  ∀ α. P(α,β) ▹(β) (Q(β,γ) ▹(γ) R(α,γ))
            → ((Q ⊸ (R ◃ P))) -- ∀ β. Q(β,γ) ▹(γ) (R(α,γ) ◃(α) P(α,β))
@@ -52,7 +49,6 @@ module Examples where
                  λe (λ▹ (pair⊙ v vt (ident v))) ,
                  ⊙-ext (exchange-ext (mor-ext id)) ,
                  id
--}
 
   fubini1 : ∀ {ℂ 𝔻 𝔼 𝔽} {P : Rel ℂ 𝔻} {Q : Rel 𝔻 𝔼} {R : Rel 𝔼 𝔽}
           → ((P ⊙ Q) ⊙ R) ≅i (P ⊙ (Q ⊙ R))
@@ -61,6 +57,60 @@ module Examples where
             ⊙-ext (⊙-ext id) ,
             ⊙-ext (exchange-ext (⊙-ext id))
 
+  fubini2 : ∀ {ℂ 𝔻 𝔼} {P : Rel ℂ 𝔻} {Q : Rel 𝔻 𝔼} {R : Rel ℂ 𝔼}
+          → ((P ⊙ Q) ▹ R) ≅i (P ▹ (Q ▹ R))
+  fubini2{P = P}{Q}{R} =
+            λe (λ▹ (λ▹ (λ▹ (app▹ {ϕf = [ (P ⊙ Q) ▹ R ]} vt v (pair⊙ v vt vt))))) ,
+            isIso.g exchange (⊙-rec (λe (λ▹ (λ▹ (λ◃ (app▹ (app▹ {ϕf = [ P ▹ (Q ▹ R)]} vt v vt) v vt)))))) ,
+            induct-iso-lr exchange (⊙-ext id) ,
+            ap λe (ap λ▹ (! (η▹ _) ∘ ap λ▹ (! (η▹ _)))) 
+
+  fubini3 : ∀ {ℂ 𝔻 𝔼} {P : Rel ℂ 𝔻} {Q : Rel 𝔻 𝔼} {R : Rel ℂ 𝔼}
+          → (R ◃ (P ⊙ Q)) ≅i ((R ◃ P) ◃ Q)
+  fubini3 {P = P}{Q}{R} =
+          λe (λ▹ (λ◃ (λ◃ (app◃ {ϕa = [ P ] ,, [ Q ]} v (pair⊙ v vt vt) vt)))) ,
+          (exchange-map (⊙-rec (λe (λ▹ (λ▹ (λ▹ (app◃ {ϕa = [ P ]} v vt (app◃ {ϕf = [ (R ◃ P) ◃ Q ]}{ϕa = [ Q ]} v vt vt)))))))) ,
+          induct-iso-rl exchange (⊙-ext id) ,
+          ap λe (ap λ▹ (! (η◃ _) ∘ ap λ◃ (! (η◃ _)))) 
+
+    
+  fubini4 : ∀ {ℂ 𝔻 𝔼} {P : Rel ℂ 𝔻} {Q : Rel 𝔻 𝔼} {R : Rel ℂ 𝔼}
+          → (Q ▹ (R ◃ P)) ≅i ((Q ▹ R) ◃ P)
+  fubini4 {P = P}{Q}{R} = λe (λ▹ (λ◃ (λ▹ ((app◃  {ϕf = ([ Q ▹ (R ◃ P) ] ,, [ Q ])} {ϕa = [ P ]} v vt (app▹ {ϕf = [ Q ▹ (R ◃ P) ]} {ϕa = [ Q ]} vt v vt)))))) ,
+                          λe (λ▹ (λ▹ (λ◃ (app▹ (app◃  {ϕf = [ (Q ▹ R) ◃ P ]} {ϕa = [ P ] } v vt vt) v vt)))) ,
+                          ap λe (ap λ▹ (! (η▹ _) ∘ ap λ▹ (! (η◃ _)))) ,
+                          ap λe (ap λ▹ (! (η◃ _) ∘ ap λ◃ (! (η▹ _))))
+
+  fubini5 : ∀ {ℂ 𝔻} {P Q : Rel ℂ 𝔻} → Iso (∀e {ℂ} (P ▹ Q)) (∀e {𝔻} (Q ◃ P))
+  fubini5 = iso (\ f → λe (λ◃ (app▹ (appe f v) v vt)))
+                (\ g → λe (λ▹ (app◃ v vt (appe g v))))
+                (\x → ! (∀eη _) ∘ ap λe (! (η▹ _)))
+                (\x → ! (∀eη _) ∘ ap λe (! (η◃ _)))  
+-}
+  
+  ap-mor : ∀ {ℂ 𝔻} → (f : Fun ℂ 𝔻) → ∀e ((mor ℂ v v) ▹ mor 𝔻 (f · v) (f · v))
+  ap-mor {ℂ}{𝔻} f = mor-rec _ (λe (ident f))
+
+  -- diagramatic order
+  compose1 : ∀ {ℂ} → ∀e (mor ℂ v v ▹ (mor ℂ v v ▹ mor ℂ v v ))
+  compose1 = mor-rec _ (λe (λ▹ vt))
+
+  compose2 : ∀ {ℂ} → ∀e (mor ℂ v v ▹ (mor ℂ v v ▹ mor ℂ v v ))
+  compose2 = isIso.g exchange (mor-rec _ (λe (λ◃ vt)))
+
+  compose1=2 : ∀ {ℂ} → compose1 {ℂ} == compose2 
+  compose1=2 = mor-ext (mor-ext id)
+
+  top-right : ∀ {ℂ} {𝔻} (F G : Fun ℂ 𝔻) (α : ∀e (mor 𝔻 F G)) → ∀e (mor ℂ v v ▹ mor 𝔻 F G)
+  top-right F G α = λe (λ▹ (app▹ (app▹ (appe compose1 F) G (appe α v)) G (app▹ (appe (ap-mor G) v) v vt)  ))
+
+  left-bottom : ∀ {ℂ} {𝔻} (F G : Fun ℂ 𝔻) (α : ∀e (mor 𝔻 F G)) → ∀e (mor ℂ v v ▹ mor 𝔻 F G)
+  left-bottom F G α = λe (λ▹ (app▹ (app▹ (appe compose1 F) F ( app▹ (appe (ap-mor F) v) v vt )) G (appe α v )))
+
+  naturality : ∀ {ℂ 𝔻} (F G : Fun ℂ 𝔻)
+             → (α : ∀e (mor 𝔻 F G))
+             → top-right F G α == left-bottom F G α
+  naturality F G α = mor-ext {!!}
 
 -- map in one dir but not the other?
 -- Goal: (ϕ1 ,, ϕ2) ⊢ ((P [ f1 ∣ f2 ]) ⊙ (Q [ f2 ∣ f3 ]))

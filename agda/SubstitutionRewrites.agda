@@ -31,7 +31,6 @@ module SubstitutionRewrites where
                       (subst-tr (app▹ s v t) (vs h1))
                      ( (app▹ (s [ vs h1 ]tr) (h1) (t [ vs h1 ]tr)) )
   app▹subst-unit-both-v s t {h1} = app▹subst-unit-both s v t {h1}
-
   {-# REWRITE app▹subst-unit-both #-}
   {-# REWRITE app▹subst-unit-both-v #-}
   
@@ -59,32 +58,7 @@ module SubstitutionRewrites where
                      (subst-tr (app▹ s v t) ϕ2)
                      ( (app▹ (s [ vs h2 ]tr) (h4) (t [ ϕ2 ]tr)) )
   app▹subst-unitl-subst-v s t ϕ2 = app▹subst s v t (vs _) ϕ2
-{-
-  app▹subst-unitl-subst-v4 :
-                {ℂ 𝔼 𝔼' 𝔻'' : Cat} {P : Rel ℂ 𝔼} {R : Rel ℂ 𝔼} {ϕa : Ctx ℂ 𝔼'}
-                (s : vc ℂ ⊢ (P ▹ R))
-                (a : Fun 𝔼' 𝔼)
-                (t : ϕa ⊢ (P [ v ∣ a ]))
-              → {ϕa' : Ctx 𝔻'' 𝔼'}
-              → ∀ {h2}
-              → (ϕ2 : ϕa' ⊢s ϕa [ h2 ∣ v ])
-              → _==_ {_}{(ϕa') ⊢ (R [ h2 ∣ a ])}
-                     (subst-tr (app▹ s a t) ϕ2)
-                     ( (app▹ (s [ vs h2 ]tr) (a) (t [ ϕ2 ]tr)) )
-  app▹subst-unitl-subst-v4 s a t ϕ2 = app▹subst s a t (vs _) ϕ2
 
-  app▹subst-unitl-subst-v4-v :
-                {ℂ 𝔼 𝔻'' : Cat} {P : Rel ℂ 𝔼} {R : Rel ℂ 𝔼} {ϕa : Ctx ℂ 𝔼}
-                (s : vc ℂ ⊢ (P ▹ R))
-                (t : ϕa ⊢ P)
-              → {ϕa' : Ctx 𝔻'' 𝔼}
-              → ∀ {h2}
-              → (ϕ2 : ϕa' ⊢s ϕa [ h2 ∣ v ])
-              → _==_ {_}{(ϕa') ⊢ (R [ h2 ∣ v ])}
-                     (subst-tr (app▹ s v t) ϕ2)
-                     ( (app▹ (s [ vs h2 ]tr) (v) (t [ ϕ2 ]tr)) )
-  app▹subst-unitl-subst-v4-v s t ϕ2 = app▹subst s v t (vs _) ϕ2
--}
   app▹subst-unitr-subst : {ℂ 𝔻 𝔼 𝔻'' ℂ''  : Cat} {ϕf : Ctx ℂ 𝔻} {P : Rel 𝔻 𝔼} {R : Rel ℂ 𝔼} 
                 (s : ϕf ⊢ (P ▹ R))
                 (a : Fun 𝔻 𝔼)
@@ -137,8 +111,8 @@ module SubstitutionRewrites where
 
   {-# REWRITE app▹subst-lassoc-subst #-}
   {-# REWRITE app▹subst-lassoc-subst-v #-}
-  {-# REWRITE app▹subst-unitl-subst-v #-}
   {-# REWRITE app▹subst-unitl-subst #-}
+  {-# REWRITE app▹subst-unitl-subst-v #-}
   {-# REWRITE app▹subst-unitr-subst #-}
   {-# REWRITE app▹subst-unitr-subst-v #-}
 
@@ -236,51 +210,11 @@ module SubstitutionRewrites where
                      ( (app▹ (s [ ϕ1 ]tr) (h4) (t [ ϕ2 ]tr)) )
   app▹subst-lassoc-ctx-v s t ϕ1 ϕ2 = app▹subst s v t ϕ1 ϕ2 
 
-{-
-  app▹subst-unitr-ids : {ℂ 𝔻 𝔼 ℂ'' : Cat} {ϕf : Ctx ℂ 𝔻} {R : Rel 𝔻 𝔼} {P : Rel ℂ 𝔼} 
-                (s : ϕf ⊢ (R ▹ P))
-                (a : Fun 𝔻 𝔼)
-                (t : vc 𝔻 ⊢ R [ v ∣ a ])
-              → {ϕf' : Ctx ℂ'' 𝔻}
-              → {fl : Fun ℂ'' ℂ} {fr : Fun 𝔻 𝔻} 
-              → (ϕ1 : ϕf' ⊢s ϕf [ fl ∣ v ])
-              → _==_ {_}{(ϕf') ⊢ ((P [ v ∣ a ]) [ fl ∣ v ])}
-                     (subst-tr (app▹ s a t) (,,s {ϕ2 = vc 𝔻} v ϕ1 (ids)))
-                     ( (app▹ (s [ ϕ1 ]tr) (a) (t [ ids ]tr)))
-  app▹subst-unitr-ids s a t ϕ1 = app▹subst s a t ϕ1 ids
-
-  app▹subst-unitl-ids : {ℂ 𝔼 𝔼'  𝔼'' : Cat} {R : Rel ℂ 𝔼} {P : Rel ℂ 𝔼} {ϕa : Ctx ℂ 𝔼'}
-                (s : vc ℂ ⊢ (R ▹ P))
-                (a : Fun 𝔼' 𝔼)
-                (t : ϕa ⊢ (R [ v ∣ a ]))
-              → {ϕa' : Ctx ℂ 𝔼''}
-              → ∀ {h4}
-              → (ϕ2 : ϕa' ⊢s ϕa [ v ∣ h4 ])
-              → _==_ {_}{(ϕa') ⊢ (P [ v  ∣ a · h4 ])}
-                     (subst-tr (app▹ s a t) (,,s {ϕ1 = vc ℂ} _ ids ϕ2))
-                     ( (app▹ (s [ ids ]tr) (a · h4) (t [ ϕ2 ]tr)) )
-  app▹subst-unitl-ids s a t ϕ1 = app▹subst s a t ids ϕ1 
--}
-
-  {-
-  app▹subst-v-middle-right : {ℂ 𝔻 𝔼 𝔼' ℂ'' : Cat} {ϕf : Ctx ℂ 𝔻} {P : Rel 𝔻 𝔼} {R : Rel ℂ 𝔼} {ϕa : Ctx 𝔻 𝔼'}
-                (s : ϕf ⊢ (P ▹ R))
-                (a : Fun 𝔼' 𝔼)
-                (t : ϕa ⊢ (P [ v ∣ a ]))
-              → {ϕf' : Ctx ℂ'' 𝔻} {ϕa' : Ctx 𝔻 𝔼'}
-              → ∀ {h1}
-              → (ϕ1 : ϕf' ⊢s ϕf [ h1 ∣ v ])
-              → (ϕ2 : ϕa' ⊢s ϕa [ v ∣ v ])
-              → _==_ {_}{(ϕf' ,, ϕa') ⊢ (R [ h1 ∣ a ])}
-                     (subst-tr (app▹ s a t) (,,s _ ϕ1 ϕ2))
-                     ( (app▹ (s [ ϕ1 ]tr) (a) (t [ ϕ2 ]tr)) )
-  app▹subst-v-middle-right s a t ϕ1 ϕ2 = app▹subst s a t ϕ1 ϕ2
-  -}
   {-# REWRITE app▹subst-v #-}
   {-# REWRITE app▹subst-unitl #-}
+  {-# REWRITE app▹subst-unitl-v #-}
   {-# REWRITE app▹subst-unitr #-}
   {-# REWRITE app▹subst-unitr-v #-}
-  {-# REWRITE app▹subst-unitl-v #-}
   {-# REWRITE app▹subst-lassoc-ctx #-}
   {-# REWRITE app▹subst-lassoc-ctx-v #-}
 
@@ -288,6 +222,47 @@ module SubstitutionRewrites where
   -- ◃
 
   -- STRUCTURAL
+{-
+  app◃subst-unit-both : {𝔼 ℂ : Cat} {P : Rel 𝔼 ℂ} {R : Rel 𝔼 ℂ} 
+                (s : vc ℂ ⊢ (R ◃ P))
+                (a : Fun ℂ 𝔼)
+                (t : vc ℂ ⊢ (P [ a ∣ v ]))
+              → ∀ {h2}
+              → _==_ {_}{(vc ℂ) ⊢ (R [ a · h2 ∣ h2 ])}
+                     (subst-tr (app◃ a t s) (vs h2))
+                     ( (app◃ (a · h2) (t [ vs h2 ]tr) (s [ vs h2 ]tr)) )
+  app◃subst-unit-both s a t {h2 = h2} = app◃subst s a t (vs h2) (vs h2)
+-}
+
+  app◃subst-lassoc-subst : {𝔽 ℂ 𝔻 𝔼 𝔼' ℂ'' 𝔻'' 𝔼'' 𝔽'' : Cat} {ϕf : Ctx ℂ 𝔻} {P : Rel 𝔼 ℂ} {R : Rel 𝔼 𝔻} {ϕa : Ctx 𝔼' 𝔽} {ϕa2 : Ctx 𝔽 ℂ}
+                (s : ϕf ⊢ (R ◃ P))
+                (a : Fun 𝔼' 𝔼)
+                (t : (ϕa ,, ϕa2) ⊢ (P [ a ∣ v ]))
+              → {ϕf' : Ctx ℂ'' 𝔻''} {ϕa' : Ctx 𝔼'' 𝔽''} {ϕa'' : Ctx 𝔽'' ℂ''}
+              → ∀ {h1 h2 h3 h4}
+              → (ϕ1 : ϕf' ⊢s ϕf [ h1 ∣ h2 ])
+              → (ϕ2 : ϕa' ⊢s ϕa [ h4 ∣ h3 ])
+              → (ϕ3 : ϕa'' ⊢s ϕa2 [ h3 ∣ h1 ])
+              → _==_ {_}{(ϕa' ,, (ϕa'' ,, ϕf')) ⊢ (R [ a · h4 ∣ v · h2 ])}
+                     (subst-tr (app◃ a t s) (,,s _ ϕ2 (,,s _ ϕ3 ϕ1)))
+                     ( (app◃ (a · h4) (t [ (,,s _ ϕ2 ϕ3) ]tr) (s [ ϕ1 ]tr)) )
+  app◃subst-lassoc-subst s a t ϕ1 ϕ2 ϕ3 = app◃subst s a t ϕ1 (,,s _ ϕ2 ϕ3)
+
+  app◃subst-lassoc-subst-v : {𝔽 ℂ 𝔻 𝔼 ℂ'' 𝔻'' 𝔼'' 𝔽'' : Cat} {ϕf : Ctx ℂ 𝔻} {P : Rel 𝔼 ℂ} {R : Rel 𝔼 𝔻} {ϕa : Ctx 𝔼 𝔽} {ϕa2 : Ctx 𝔽 ℂ}
+                (s : ϕf ⊢ (R ◃ P))
+                (t : (ϕa ,, ϕa2) ⊢ (P ))
+              → {ϕf' : Ctx ℂ'' 𝔻''} {ϕa' : Ctx 𝔼'' 𝔽''} {ϕa'' : Ctx 𝔽'' ℂ''}
+              → ∀ {h1 h2 h3 h4}
+              → (ϕ1 : ϕf' ⊢s ϕf [ h1 ∣ h2 ])
+              → (ϕ2 : ϕa' ⊢s ϕa [ h4 ∣ h3 ])
+              → (ϕ3 : ϕa'' ⊢s ϕa2 [ h3 ∣ h1 ])
+              → _==_ {_}{(ϕa' ,, (ϕa'' ,, ϕf')) ⊢ (R [ h4 ∣ h2 ])}
+                     (subst-tr (app◃ v t s) (,,s _ ϕ2 (,,s _ ϕ3 ϕ1)))
+                     ( (app◃ (v · h4) (t [ (,,s _ ϕ2 ϕ3) ]tr) (s [ ϕ1 ]tr)) )
+  app◃subst-lassoc-subst-v s t ϕ1 ϕ2 ϕ3 = app◃subst s v t ϕ1 (,,s _ ϕ2 ϕ3)
+
+  {-# REWRITE app◃subst-lassoc-subst #-}
+  {-# REWRITE app◃subst-lassoc-subst-v #-}
 
   app◃subst-unitl-subst : {ℂ 𝔻 𝔼 ℂ'' 𝔻'' : Cat} {ϕf : Ctx ℂ 𝔻} {P : Rel 𝔼 ℂ} {R : Rel 𝔼 𝔻} 
                 (s : ϕf ⊢ (R ◃ P))
@@ -315,8 +290,34 @@ module SubstitutionRewrites where
   {-# REWRITE app◃subst-unitl-subst #-}
   {-# REWRITE app◃subst-unitl-subst-v #-}
 
-  -- SPECIAL CASES
+  app◃subst-unitr-subst : {ℂ 𝔼 𝔼' 𝔼'' ℂ'' : Cat} {P : Rel 𝔼 ℂ} {R : Rel 𝔼 ℂ} {ϕa : Ctx 𝔼' ℂ}
+                (s : vc ℂ ⊢ (R ◃ P))
+                (a : Fun 𝔼' 𝔼)
+                (t : ϕa ⊢ (P [ a ∣ v ]))
+              → {ϕa' : Ctx 𝔼'' ℂ''}
+              → ∀ {h1 h4}
+              → (ϕ2 : ϕa' ⊢s ϕa [ h4 ∣ h1 ])
+              → _==_ {_}{(ϕa') ⊢ (R [ a · h4 ∣ h1 ])}
+                     (subst-tr (app◃ a t s) (ϕ2))
+                     ( (app◃ (a · h4) (t [ ϕ2 ]tr) (s [ vs h1 ]tr)) )
+  app◃subst-unitr-subst s a t ϕ2 = app◃subst s a t (vs _) ϕ2
 
+  app◃subst-unitr-subst-v : {ℂ 𝔼 𝔼'' ℂ'' : Cat} {P : Rel 𝔼 ℂ} {R : Rel 𝔼 ℂ} {ϕa : Ctx 𝔼 ℂ}
+                (s : vc ℂ ⊢ (R ◃ P))
+                (t : ϕa ⊢ (P))
+              → {ϕa' : Ctx 𝔼'' ℂ''}
+              → ∀ {h1 h4}
+              → (ϕ2 : ϕa' ⊢s ϕa [ h4 ∣ h1 ])
+              → _==_ {_}{(ϕa') ⊢ (R [ h4 ∣ h1 ])}
+                     (subst-tr (app◃ v t s) (ϕ2))
+                     ( (app◃ (v · h4) (t [ ϕ2 ]tr) (s [ vs h1 ]tr)) )
+  app◃subst-unitr-subst-v s t ϕ2 = app◃subst s v t (vs _) ϕ2
+
+  {-# REWRITE app◃subst-unitr-subst #-}
+  {-# REWRITE app◃subst-unitr-subst-v #-}
+
+
+  -- SPECIAL CASES
 
   app◃subst-v : {ℂ 𝔻 𝔼 ℂ'' 𝔻'' 𝔼'' : Cat} {ϕf : Ctx ℂ 𝔻} {P : Rel 𝔼 ℂ} {R : Rel 𝔼 𝔻} {ϕa : Ctx 𝔼 ℂ}
                 (s : ϕf ⊢ (R ◃ P))
@@ -387,6 +388,34 @@ module SubstitutionRewrites where
 
   {-# REWRITE app◃subst-unitl #-}
   {-# REWRITE app◃subst-unitl-v #-}
+
+  app◃subst-lassoc-ctx : {𝔽'' ℂ 𝔻 𝔼 𝔼' ℂ'' 𝔻'' 𝔼'' : Cat} {ϕf : Ctx ℂ 𝔻} {P : Rel 𝔼 ℂ} {R : Rel 𝔼 𝔻} {ϕa : Ctx 𝔼' ℂ} 
+                (s : ϕf ⊢ (R ◃ P))
+                (a : Fun 𝔼' 𝔼)
+                (t : ϕa ⊢ (P [ a ∣ v ]))
+              → {ϕf' : Ctx ℂ'' 𝔻''} {ϕa' : Ctx 𝔼'' 𝔽''} {ϕa'' : Ctx 𝔽'' ℂ''} 
+              → ∀ {h1 h2 h4}
+              → (ϕ1 : ϕf' ⊢s ϕf [ h1 ∣ h2 ])
+              → (ϕ2 : (ϕa' ,, ϕa'') ⊢s ϕa [ h4 ∣ h1 ])
+              → _==_ {_}{(ϕa' ,, (ϕa'' ,, ϕf')) ⊢ (R [ a · h4 ∣ v · h2 ])}
+                     (subst-tr (app◃ a t s) (,,s _ ϕ2 ϕ1))
+                     ( (app◃ (a · h4) (t [ ϕ2 ]tr) (s [ ϕ1 ]tr)) )
+  app◃subst-lassoc-ctx s a t ϕ1 ϕ2 = app◃subst s a t ϕ1 ϕ2 
+
+  app◃subst-lassoc-ctx-v : {𝔽'' ℂ 𝔻 𝔼 ℂ'' 𝔻'' 𝔼'' : Cat} {ϕf : Ctx ℂ 𝔻} {P : Rel 𝔼 ℂ} {R : Rel 𝔼 𝔻} {ϕa : Ctx 𝔼 ℂ} 
+                (s : ϕf ⊢ (R ◃ P))
+                (t : ϕa ⊢ (P))
+              → {ϕf' : Ctx ℂ'' 𝔻''} {ϕa' : Ctx 𝔼'' 𝔽''} {ϕa'' : Ctx 𝔽'' ℂ''} 
+              → ∀ {h1 h2 h4}
+              → (ϕ1 : ϕf' ⊢s ϕf [ h1 ∣ h2 ])
+              → (ϕ2 : (ϕa' ,, ϕa'') ⊢s ϕa [ h4 ∣ h1 ])
+              → _==_ {_}{(ϕa' ,, (ϕa'' ,, ϕf')) ⊢ (R [ h4 ∣ v · h2 ])}
+                     (subst-tr (app◃ v t s) (,,s _ ϕ2 ϕ1))
+                     ( (app◃ (h4) (t [ ϕ2 ]tr) (s [ ϕ1 ]tr)) )
+  app◃subst-lassoc-ctx-v s t ϕ1 ϕ2 = app◃subst s v t ϕ1 ϕ2 
+
+  {-# REWRITE app◃subst-lassoc-ctx #-}
+  {-# REWRITE app◃subst-lassoc-ctx-v #-}
 
   -- ----------------------------------------------------------------------
   -- morphism
@@ -512,11 +541,11 @@ module SubstitutionRewrites where
   ⊙-recβ'-lassoc-allv s x y = ⊙-recβ' s x y
 
   {-# REWRITE ⊙-recβ' #-}
+  {-# REWRITE ⊙-recβ'-allv #-}
   {-# REWRITE ⊙-recβ'-unitl #-}
   {-# REWRITE ⊙-recβ'-unitl-allv #-}
   {-# REWRITE ⊙-recβ'-unitr #-}
   {-# REWRITE ⊙-recβ'-unitr-allv #-}
-  {-# REWRITE ⊙-recβ'-allv #-}
   {-# REWRITE ⊙-recβ'-lassoc-v #-}
   {-# REWRITE ⊙-recβ'-lassoc #-}
   {-# REWRITE ⊙-recβ'-lassoc-allv #-}
