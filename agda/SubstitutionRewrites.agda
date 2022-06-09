@@ -491,16 +491,27 @@ module SubstitutionRewrites where
            → _==_ {_} (app▹ (appe (mor-rec (Q ◃ Q2) t) c ) c (ident c)) (appe t c)
   mor-recβ'-◃ {ℂ}{𝔻} Q Q2 t c =  ap (\ H → appe H c) (mor-recβ (Q ◃ Q2) t) 
 
-  -- mor-recβ'-▹ : {ℂ ℂ2 𝔻 : Cat} (Q : Rel ℂ ℂ2) (Q2 : Rel ℂ ℂ2)
-  --            (t : ∀e (Q ▹ Q2))
-  --            (c : Fun 𝔻 ℂ) 
-  --          → _==_ {_}{vc 𝔻 ⊢ ((Q [ c ∣ v ]) ▹ (Q2 [ v ∣ c ])) } (app▹ (appe (mor-rec Q t) c ) c (ident c)) (appe t c)
-  -- mor-recβ'-▹ {ℂ}{𝔻} Q t c =  ap (\ H → appe H c) (mor-recβ Q t) 
+  mor-recβ'-◃-v : {ℂ 𝔻 : Cat} (Q : Rel ℂ ℂ) (Q2 : Rel ℂ ℂ)
+             (c : Fun 𝔻 ℂ) 
+             (t : ∀e (Q [ c ∣ v ] ◃ Q2 [ c ∣ v ]))
+           → _==_ {_} (app▹ (appe (mor-rec (Q [ c ∣ v ] ◃ Q2 [ c ∣ v ]) t) c ) c ( (ident c) )) ( (appe t c) )
+  mor-recβ'-◃-v {ℂ}{𝔻} Q Q2 c t =  ap (\ H → appe H c) (mor-recβ _ t) 
+
 
   {-# REWRITE mor-recβ' #-}
   {-# REWRITE mor-recβ'-v #-}
   {-# REWRITE mor-recβ'-▹ #-}
   {-# REWRITE mor-recβ'-◃ #-}
+  {-# REWRITE mor-recβ'-◃-v #-}
+
+{-
+  mor-rec-natural : ∀ {ℂ 𝔻} (Q : Rel ℂ ℂ) (t : ∀e Q)
+                  → (f : Fun 𝔻 ℂ)
+                  → _==_{_}{∀e (Q [ f ∣ f ])}
+                           (λe (app▹ (appe (mor-rec Q t) f) f (ident f)))
+                           (λe (app▹ (appe (mor-rec (Q [ f ∣ f ]) (λe (appe t f))) v) v ( (ident v) )))
+  mor-rec-natural Q t f = id
+-}
 
   -- ----------------------------------------------------------------------
   -- ⊙

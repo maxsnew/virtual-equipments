@@ -6,6 +6,27 @@ open import SubstitutionRewrites
 
 module Examples where
 
+
+  subst-≅i : ∀ {ℂ 𝔻 ℂ' 𝔻'} (P Q : Rel ℂ 𝔻) (f : Fun ℂ' ℂ) (g : Fun 𝔻' 𝔻) → P ≅i Q → P [ f ∣ g ] ≅i Q [ f ∣ g ]
+  subst-≅i P Q f g ( l , r , lr , rl) = (λe (λ▹ (app▹ (appe l f) g vt))) ,
+                                        (λe (λ▹ (app▹ (appe r f) g vt))) ,
+                                        ap (\ X → λe (λ▹ (app▹ (appe X f) g vt))) lr ,
+                                        ap (\ X → λe (λ▹ (app▹ (appe X f) g vt))) rl 
+
+{- not true... like a deduction theorem 
+  external-to-internal? : ∀ {ℂ} (P Q : Rel ℂ ℂ) → Iso (∀e P) (∀e Q) → P ≅i Q
+  external-to-internal? P Q i = λe (λ▹ {!Iso.f i !})  ,
+                                {!!} ,
+                                {!!} ,
+                                {!!}
+-}
+
+  internal-to-external : ∀ {ℂ} (P Q : Rel ℂ ℂ) → P ≅i Q → Iso (∀e P) (∀e Q) 
+  internal-to-external P Q i = iso (\ t → λe (app▹ (appe (fst i) v) v (appe t v) ))
+                                   (\ t → λe (app▹ (appe (fst (snd i)) v) v (appe t v) ))
+                                   (\ x → ! (∀eη _) ∘ ap (\ (H : ∀e (P ▹ P)) →  λe (app▹ (appe H v) v (appe x v)) ) (fst (snd (snd i))))
+                                   (\ x → ! (∀eη _) ∘ ap (\ (H ) →  λe (app▹ (appe H v) v (appe x v)) ) (snd (snd (snd i))))
+
   exchange-map : ∀ {ℂ 𝔻 𝔼} {P : Rel ℂ 𝔻} {Q : Rel 𝔻 𝔼} {R : Rel ℂ 𝔼}
            → (P ⊸ (Q ▹ R)) --  ∀ α. P(α,β) ▹(β) (Q(β,γ) ▹(γ) R(α,γ))
            → ((Q ⊸ (R ◃ P))) -- ∀ β. Q(β,γ) ▹(γ) (R(α,γ) ◃(α) P(α,β))
@@ -24,7 +45,6 @@ module Examples where
        → f == g
   exchange-ext p = induct-iso-lr exchange p 
 
-{- work but slow
 
   yoneda-l : ∀ {ℂ 𝔻} (P : Rel ℂ 𝔻) → (mor 𝔻 v v ▹ P) ≅i P
   yoneda-l {ℂ} {𝔻} P = (λe (λ▹ ( app▹ vt v (ident v)))) ,
@@ -37,6 +57,61 @@ module Examples where
                exchange-map (mor-rec _ (λe (λ▹ vt))) ,
                induct-iso-rl exchange (mor-ext id) ,
                id
+
+  based-mor-rec-left : {ℂ 𝔻 : Cat} (Q : Rel ℂ 𝔻)
+                → (f : Fun ℂ 𝔻)
+                → ∀e (Q [ v ∣ f ])
+                → ∀e {ℂ} (mor 𝔻 f v ▹ Q)
+  based-mor-rec-left Q f b = λe (λ▹ ( app◃ v (appe b v) (app▹ (appe (mor-rec (Q ◃ Q) (λe (λ◃ vt))) f) v vt)))
+
+  {- is there no direct way to do this??
+  based-mor-rec-left-iso-direct : {ℂ 𝔻 : Cat} (Q : Rel ℂ 𝔻)
+                → (f : Fun ℂ 𝔻)
+                → isIso _ _ (based-mor-rec-left Q f)
+  based-mor-rec-left-iso-direct {𝔻 = 𝔻} Q f = iso (\ t → λe (app▹ (appe t v) f (ident f)))
+                                                  (\ b → ! (∀eη _))
+                                                  (\ t → {!   (mor-rec (Q ◃ Q) (λe (λ◃ vt)))   !}   ) 
+  -}
+
+  based-mor-rec-left-iso-indirect : {ℂ 𝔻 : Cat} (Q : Rel ℂ 𝔻)
+                → (f : Fun ℂ 𝔻)
+                → Iso (∀e {ℂ} (mor 𝔻 f v ▹ Q)) (∀e {ℂ} (Q [ v ∣ f ])) 
+  based-mor-rec-left-iso-indirect Q f = internal-to-external _ _ (subst-≅i _ Q v f (yoneda-l _))
+
+  based-mor-rec-left-iso : {ℂ 𝔻 : Cat} (Q : Rel ℂ 𝔻)
+                → (f : Fun ℂ 𝔻)
+                → isIso (∀e {ℂ} (mor 𝔻 f v ▹ Q)) (∀e (Q [ v ∣ f ])) (\ t → λe (app▹ (appe t v) f (ident f)) )
+  based-mor-rec-left-iso Q f = iso (based-mor-rec-left Q f) ((Iso.gf (based-mor-rec-left-iso-indirect Q f))) ((Iso.fg(based-mor-rec-left-iso-indirect Q f)))
+
+  based-mor-rec-right : {ℂ 𝔻 : Cat} (Q : Rel 𝔻 ℂ)
+                → (f : Fun ℂ 𝔻)
+                → ∀e (Q [ f ∣ v ])
+                → ∀e (mor 𝔻 v f ▹ Q)
+  based-mor-rec-right Q f b = λe (λ▹ (app▹ (app▹ (appe (mor-rec (Q ▹ Q) (λe (λ▹ vt))) v) f vt) v (appe b v)))
+
+  based-mor-rec-right' : {ℂ 𝔻 : Cat} (Q : Rel 𝔻 ℂ)
+                → (f : Fun ℂ 𝔻)
+                → ∀e (Q [ f ∣ v ])
+                → ∀e (Q ◃ mor 𝔻 v f)
+  based-mor-rec-right' Q f b =  λe (λ◃ ((app▹ (app▹ (appe (mor-rec (Q ▹ Q) (λe (λ▹ vt))) v) f vt) v (appe b v))))
+
+  based-mor-rec-right-iso-indirect : {ℂ 𝔻 : Cat} (Q : Rel 𝔻 ℂ)
+                → (f : Fun ℂ 𝔻)
+                → Iso (∀e {ℂ} (Q ◃ mor 𝔻 v f)) (∀e {ℂ} (Q [ f ∣ v ])) 
+  based-mor-rec-right-iso-indirect Q f =  internal-to-external (Q ◃ mor _ v f) (Q [ f ∣ v ]) (subst-≅i _ Q f v (yoneda-r Q))   
+
+  based-mor-rec-right-iso : {ℂ 𝔻 : Cat} (Q : Rel 𝔻 ℂ)
+                → (f : Fun ℂ 𝔻)
+                → isIso (∀e {ℂ} (Q ◃ mor 𝔻 v f)) (∀e {ℂ} (Q [ f ∣ v ])) (\ t → λe (app◃ f (ident f) (appe t v) ) )
+  based-mor-rec-right-iso Q f =
+    iso (based-mor-rec-right' Q f)
+        ((Iso.gf (based-mor-rec-right-iso-indirect Q f)))
+        ((Iso.fg (based-mor-rec-right-iso-indirect Q f)))
+
+  
+
+{- work but slow
+
 
   coyoneda-l : ∀ {ℂ 𝔻} (P : Rel ℂ 𝔻) → (mor ℂ v v ⊙ P) ≅i P
   coyoneda-l P = ⊙-rec (mor-rec _ (λe (λ▹ vt))) ,
@@ -88,7 +163,7 @@ module Examples where
                 (\x → ! (∀eη _) ∘ ap λe (! (η◃ _)))  
 
 -}
-  
+
   ap-mor : ∀ {ℂ 𝔻} → (f : Fun ℂ 𝔻) → ∀e ((mor ℂ v v) ▹ mor 𝔻 (f · v) (f · v))
   ap-mor {ℂ}{𝔻} f = mor-rec _ (λe (ident f))
 
@@ -102,7 +177,6 @@ module Examples where
   compose1=2 : ∀ {ℂ} → compose1 {ℂ} == compose2 
   compose1=2 = mor-ext (mor-ext id)
 
-{- works but slow
   top-right : ∀ {ℂ} {𝔻} (F G : Fun ℂ 𝔻) (α : ∀e (mor 𝔻 F G)) → ∀e (mor ℂ v v ▹ mor 𝔻 F G)
   top-right F G α = λe (λ▹ (app▹ (app▹ (appe compose1 F) G (appe α v)) G (app▹ (appe (ap-mor G) v) v vt)  ))
 
@@ -112,8 +186,7 @@ module Examples where
   naturality : ∀ {ℂ 𝔻} (F G : Fun ℂ 𝔻)
              → (α : ∀e (mor 𝔻 F G))
              → top-right F G α == left-bottom F G α
-  naturality {ℂ}{𝔻} F G α = mor-ext (ap λe (ap (\ Q → app▹ (app▹ (appe Q F) G (appe α v)) G (appe id0 G)) compose1=2    ))
--}
+  naturality {ℂ}{𝔻} F G α = mor-ext (ap (\ Q → λe (app▹ (app▹ (appe Q F) G (appe α v)) G (appe id0 G))) compose1=2    )
 
 -- map in one dir but not the other?
 -- Goal: (ϕ1 ,, ϕ2) ⊢ ((P [ f1 ∣ f2 ]) ⊙ (Q [ f2 ∣ f3 ]))
@@ -134,6 +207,12 @@ module Examples where
          (λe (app▹ (app▹ (appe compose1 G) (G · (F · G)) (appe unit G)) G (app▹ (appe (ap-mor G) (F · G)) v (appe counit v ) )))
          (λe (ident G))
 
+{-  
+  adj-naturality : ∀ {ℂ 𝔻} (F : Fun ℂ 𝔻) (G : Fun 𝔻 ℂ)
+                 → (α : ∀e ((mor 𝔻 F v) ▹ (mor ℂ v G)))
+                 → {!!}
+  adj-naturality = {!!}
+-}
 
   to : {ℂ 𝔻 : Cat} (F : Fun 𝔻 ℂ) (G : Fun ℂ 𝔻)
     → BijectionAdjunction F G
@@ -143,6 +222,7 @@ module Examples where
                               {!!} ,
                               {!!}
 
+{-
   from : {ℂ 𝔻 : Cat} (F : Fun 𝔻 ℂ) (G : Fun ℂ 𝔻)
     → UnitCounitAdjunction F G
     → BijectionAdjunction F G
@@ -151,6 +231,20 @@ module Examples where
     λe (λ▹ (app▹ (app▹ (appe compose1 F) (F · G) ( (app▹ (appe (ap-mor F) v) G vt) )) v (appe counit v)    )) ,
     {!!} ,
     {!!}
+-}
+
+  from : {ℂ 𝔻 : Cat} (F : Fun 𝔻 ℂ) (G : Fun ℂ 𝔻)
+    → UnitCounitAdjunction F G
+    → BijectionAdjunction F G
+  from F G (unit , counit , triangle1 , triangle2) =
+    based-mor-rec-left (mor _ v G) F unit  , 
+    based-mor-rec-right (mor _ F v) G counit ,
+    induct-iso-lr (based-mor-rec-left-iso (mor _ F v) F) (triangle1 ∘ {!!}) , 
+    {!induct-iso-lr (based-mor-rec-right-iso (mor _ v G) G) ? !}
 
 
-
+  mor-rec-◃-subst : ∀ {ℂ 𝔼 𝔼'} (P : Rel 𝔼 ℂ) (Q : Rel 𝔼 ℂ) (t : ∀e (Q ◃ P)) (f : Fun 𝔼' 𝔼)
+            →  _==_{_}{∀e (mor ℂ v v ▹ (Q [ f ∣ v ] ◃ P [ f ∣ v ]))}
+               (λe (λ▹ (λ◃ ( app◃ f vt (app▹ (appe (mor-rec (Q ◃ P) t) v) v vt)   ))) )
+               (mor-rec (Q [ f ∣ v ] ◃ P [ f ∣ v ]) (λe (λ◃ (app◃ f vt (appe t v)))))
+  mor-rec-◃-subst P Q t f = mor-ext id
