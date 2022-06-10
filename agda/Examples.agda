@@ -53,42 +53,23 @@ module Examples where
   exchange-ext p = induct-iso-lr exchange p 
 
 
-  yoneda-l : ∀ {ℂ 𝔻} (P : Rel ℂ 𝔻) → (mor 𝔻 v v ▹ P) ≅i P
-  yoneda-l {ℂ} {𝔻} P = (λe (λ▹ ( app▹ vt v (ident v)))) ,
-                       isIso.g exchange (mor-rec _ (λe (λ◃ vt)))  ,
-                       exchange-ext (mor-ext id) ,
-                       id
-
-  yoneda-r : ∀ {ℂ 𝔻} (P : Rel ℂ 𝔻) → (P ◃ mor ℂ v v) ≅i P
-  yoneda-r P = λe (λ▹ (app◃ v (ident v) vt )) ,
-               exchange-map (mor-rec _ (λe (λ▹ vt))) ,
-               induct-iso-rl exchange (mor-ext id) ,
-               id
-
   based-mor-rec-left : {ℂ 𝔻 : Cat} (Q : Rel ℂ 𝔻)
                 → (f : Fun ℂ 𝔻)
                 → ∀e (Q [ v ∣ f ])
                 → ∀e {ℂ} (mor 𝔻 f v ▹ Q)
   based-mor-rec-left Q f b = λe (λ▹ ( app◃ v (appe b v) (app▹ (appe (mor-rec (Q ◃ Q) (λe (λ◃ vt))) f) v vt)))
 
-  {- is there no direct way to do this??
-  based-mor-rec-left-iso-direct : {ℂ 𝔻 : Cat} (Q : Rel ℂ 𝔻)
-                → (f : Fun ℂ 𝔻)
-                → isIso _ _ (based-mor-rec-left Q f)
-  based-mor-rec-left-iso-direct {𝔻 = 𝔻} Q f = iso (\ t → λe (app▹ (appe t v) f (ident f)))
-                                                  (\ b → ! (∀eη _))
-                                                  (\ t → {!   (mor-rec (Q ◃ Q) (λe (λ◃ vt)))   !}   ) 
-  -}
-
-  based-mor-rec-left-iso-indirect : {ℂ 𝔻 : Cat} (Q : Rel ℂ 𝔻)
-                → (f : Fun ℂ 𝔻)
-                → Iso (∀e {ℂ} (mor 𝔻 f v ▹ Q)) (∀e {ℂ} (Q [ v ∣ f ])) 
-  based-mor-rec-left-iso-indirect Q f = internal-to-external _ _ (subst-≅i _ Q v f (yoneda-l _))
-
   based-mor-rec-left-iso : {ℂ 𝔻 : Cat} (Q : Rel ℂ 𝔻)
                 → (f : Fun ℂ 𝔻)
-                → isIso (∀e {ℂ} (mor 𝔻 f v ▹ Q)) (∀e (Q [ v ∣ f ])) (\ t → λe (app▹ (appe t v) f (ident f)) )
-  based-mor-rec-left-iso Q f = iso (based-mor-rec-left Q f) ((Iso.gf (based-mor-rec-left-iso-indirect Q f))) ((Iso.fg(based-mor-rec-left-iso-indirect Q f)))
+                → isIso (∀e (mor 𝔻 f v ▹ Q)) (∀e (Q [ v ∣ f ]))  (\ t → λe (app▹ (appe t v) f (ident f)))
+  based-mor-rec-left-iso {𝔻 = 𝔻} Q f = iso (based-mor-rec-left Q f)
+                                                  (λ x → ! (∀eη x) ∘
+                                                     ap {M = λe (λ▹ (λ▹ (app◃ v (app▹ vt v (ident v)) (app▹ (appe (mor-rec (Q ◃ Q) (λe (λ◃ vt))) v) v vt))))}
+                                                        {N = λe (λ▹ vt)}
+                                                        -- tricky part is here!
+                                                        (λ (h : ∀e (((mor _ v v ▹ Q)) ▹ (mor _ v v ▹ Q))) → λe ((app▹ (appe h v) f (appe x v))))
+                                                        (exchange-ext (mor-ext id)  ))
+                                                  (\ b → ! (∀eη _))
 
   based-mor-rec-right : {ℂ 𝔻 : Cat} (Q : Rel 𝔻 ℂ)
                 → (f : Fun ℂ 𝔻)
@@ -96,18 +77,52 @@ module Examples where
                 → ∀e (mor 𝔻 v f ▹ Q)
   based-mor-rec-right Q f b = λe (λ▹ (app▹ (app▹ (appe (mor-rec (Q ▹ Q) (λe (λ▹ vt))) v) f vt) v (appe b v)))
 
-  based-mor-rec-right-iso-indirect : {ℂ 𝔻 : Cat} (Q : Rel 𝔻 ℂ)
-                → (f : Fun ℂ 𝔻)
-                → Iso (∀e {ℂ} (Q ◃ mor 𝔻 v f)) (∀e {ℂ} (Q [ f ∣ v ])) 
-  based-mor-rec-right-iso-indirect Q f =  internal-to-external (Q ◃ mor _ v f) (Q [ f ∣ v ]) (subst-≅i _ Q f v (yoneda-r Q))   
-
   based-mor-rec-right-iso : {ℂ 𝔻 : Cat} (Q : Rel 𝔻 ℂ)
                 → (f : Fun ℂ 𝔻)
                 → isIso (∀e {𝔻} (mor 𝔻 v f ▹ Q)) (∀e {ℂ} (Q [ f ∣ v ])) (\ t → λe (app▹  (appe t f) v (ident f) ) )
   based-mor-rec-right-iso Q f =
-    iso (based-mor-rec-right Q f) -- could make a iso compose lemma and use fubini 5
-        ( \x → (! (∀eη x) ∘ ap λe (! (η▹ _))  ) ∘ ap (\ H → λe (λ▹ (app◃ v vt (appe H v)))) ((Iso.gf (based-mor-rec-right-iso-indirect Q f) (λe (λ◃ (app▹ (appe x v) v vt))))) )
-        ( \x →  (Iso.fg (based-mor-rec-right-iso-indirect Q f) x) ∘ {!!} )
+    iso (based-mor-rec-right Q f)
+        (\ x → ! (∀eη x) ∘
+                 ap λe (! (η▹ _)) ∘ 
+                 (ap (\ z → λe (λ▹ (app◃ v vt (appe z v))))
+                 (ap {M = λe (λ▹ (λ◃ (app▹ (app▹ (appe (mor-rec (Q ▹ Q) (λe (λ▹ vt))) v) v vt) v (app◃ v (ident v) vt)) ))}  
+                     {N = λe (λ▹ vt)}
+                    -- tricky part is here!
+                    (λ (h : ∀e ((Q ◃ mor _ v v  ) ▹ (Q ◃ mor _ v v))) → λe (app▹ {ϕa = vc _}(appe h f) v (λ◃ (app▹ (appe x v) v vt))))
+                    (induct-iso-rl exchange (mor-ext id))))
+                 )
+        (\ b → ! (∀eη _) ∘ {!!})
+
+  yoneda-l : ∀ {ℂ 𝔻} (P : Rel ℂ 𝔻) → (mor 𝔻 v v ▹ P) ≅i P
+  yoneda-l {ℂ} {𝔻} P = (λe (λ▹ ( app▹ vt v (ident v)))) ,
+                       isIso.g exchange (mor-rec _ (λe (λ◃ vt)))  ,
+                       exchange-ext (mor-ext id) ,
+                       id
+
+  based-mor-rec-left-iso-indirect : {ℂ 𝔻 : Cat} (Q : Rel ℂ 𝔻)
+                → (f : Fun ℂ 𝔻)
+                → Iso (∀e {ℂ} (mor 𝔻 f v ▹ Q)) (∀e {ℂ} (Q [ v ∣ f ])) 
+  based-mor-rec-left-iso-indirect Q f = internal-to-external _ _ (subst-≅i _ Q v f (yoneda-l _))
+
+  yoneda-r : ∀ {ℂ 𝔻} (P : Rel ℂ 𝔻) → (P ◃ mor ℂ v v) ≅i P
+  yoneda-r P = λe (λ▹ (app◃ v (ident v) vt )) ,
+               exchange-map (mor-rec _ (λe (λ▹ vt))) ,
+               induct-iso-rl exchange (mor-ext id) ,
+               id
+
+  module Indirect where
+    based-mor-rec-right-iso-indirect : {ℂ 𝔻 : Cat} (Q : Rel 𝔻 ℂ)
+                  → (f : Fun ℂ 𝔻)
+                  → Iso (∀e {ℂ} (Q ◃ mor 𝔻 v f)) (∀e {ℂ} (Q [ f ∣ v ])) 
+    based-mor-rec-right-iso-indirect Q f =  internal-to-external (Q ◃ mor _ v f) (Q [ f ∣ v ]) (subst-≅i _ Q f v (yoneda-r Q))   
+  
+    based-mor-rec-right-iso' : {ℂ 𝔻 : Cat} (Q : Rel 𝔻 ℂ)
+                  → (f : Fun ℂ 𝔻)
+                  → isIso (∀e {𝔻} (mor 𝔻 v f ▹ Q)) (∀e {ℂ} (Q [ f ∣ v ])) (\ t → λe (app▹  (appe t f) v (ident f) ) )
+    based-mor-rec-right-iso' Q f =
+      iso (based-mor-rec-right Q f) -- could make a iso compose lemma and use fubini 5
+          ( \x → (! (∀eη x) ∘ ap λe (! (η▹ _))  ) ∘ ap (\ H → λe (λ▹ (app◃ v vt (appe H v)))) ((Iso.gf (based-mor-rec-right-iso-indirect Q f) (λe (λ◃ (app▹ (appe x v) v vt))))) )
+          ( \x →  (Iso.fg (based-mor-rec-right-iso-indirect Q f) x) ∘ {!!} )
 
 {- work but slow
 
@@ -189,10 +204,6 @@ module Examples where
                → top-right F G α == left-bottom F G α
     naturality {ℂ}{𝔻} F G α = mor-ext (ap (\ Q → λe (app▹ (app▹ (appe Q F) G (appe α v)) G (appe id0 G))) compose1=2    )
 
--- map in one dir but not the other?
--- Goal: (ϕ1 ,, ϕ2) ⊢ ((P [ f1 ∣ f2 ]) ⊙ (Q [ f2 ∣ f3 ]))
--- Have: (ϕ1 ,, ϕ2) ⊢ ((P [ f1 ∣ v ]) ⊙ (Q [ v ∣ f3 ]))
-
   BijectionAdjunction : {ℂ 𝔻 : Cat} (F : Fun 𝔻 ℂ) (G : Fun ℂ 𝔻)
                       → Set
   BijectionAdjunction {ℂ}{𝔻} F G = mor ℂ F v ≅i (mor 𝔻 v G)
@@ -215,12 +226,23 @@ module Examples where
   adj-naturality = {!!}
 -}
 
+  r-naturality-ident : {ℂ 𝔻 : Cat} (F : Fun 𝔻 ℂ) (G : Fun ℂ 𝔻)
+                     → (r : mor 𝔻 v G ⊸ mor ℂ F v)
+                     → _==_{_}{∀e (mor 𝔻 v G ▹ (mor _ F v))}
+                         (λe (λ▹ (app▹ (app▹ (appe compose1 F) (F · G) (  (app▹ (appe (ap-mor F) v) G vt)  )) v
+                                  (   (app▹ (appe r G) v (ident G)) ))))
+                         (λe (λ▹ (app▹ (appe r v) v vt)))
+  r-naturality-ident F G r = induct-iso-lr (based-mor-rec-right-iso (mor _ F v) G) {!!} 
+                       
+
   to : {ℂ 𝔻 : Cat} (F : Fun 𝔻 ℂ) (G : Fun ℂ 𝔻)
     → BijectionAdjunction F G
     → UnitCounitAdjunction F G
   to F G (l , r , lr , rl) =  λe (app▹ (appe l v) F (ident F))  ,
                               λe (app▹ (appe r G) v (ident G)) ,
-                              ap (\ H → λe (app▹ (appe H v) F (ident F))) lr ∘ {!!} ,
+                              (ap (\ H → λe (app▹ (appe H v) F (ident F))) lr ∘
+                               ap (\ H → λe (app▹ (appe H v) F (app▹ (appe l v) F (ident F)))) ( r-naturality-ident F G r ) ∘
+                               {!!}) ,
                               ap (\ H → λe (app▹ (appe H G) v (ident G))) rl ∘ {!!}
 
 {-
@@ -251,3 +273,9 @@ module Examples where
   mor-rec-◃-subst P Q t f = mor-ext id
 
 
+
+
+
+-- map in one dir but not the other?
+-- Goal: (ϕ1 ,, ϕ2) ⊢ ((P [ f1 ∣ f2 ]) ⊙ (Q [ f2 ∣ f3 ]))
+-- Have: (ϕ1 ,, ϕ2) ⊢ ((P [ f1 ∣ v ]) ⊙ (Q [ v ∣ f3 ]))
