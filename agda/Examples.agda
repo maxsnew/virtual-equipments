@@ -6,12 +6,19 @@ open import SubstitutionRewrites
 
 module Examples where
 
+{- not true?  
+  subst-external : ∀ {ℂ ℂ'} (P Q : Rel ℂ ℂ) (f : Fun ℂ' ℂ) → (∀e P → ∀e Q) → (∀e (P [ f ∣ f ]) → ∀e (Q [ f ∣ f ]))
+  subst-external P Q f h p = coe {!!} (h (λe {!appe p v!}))
+-}
+
+  subst-internal : ∀ {ℂ 𝔻 ℂ' 𝔻'} (P Q : Rel ℂ 𝔻) (f : Fun ℂ' ℂ) (g : Fun 𝔻' 𝔻) → P ⊸ Q → P [ f ∣ g ] ⊸ Q [ f ∣ g ]
+  subst-internal P Q f g h = (λe (λ▹ (app▹ (appe h f) g vt)))
 
   subst-≅i : ∀ {ℂ 𝔻 ℂ' 𝔻'} (P Q : Rel ℂ 𝔻) (f : Fun ℂ' ℂ) (g : Fun 𝔻' 𝔻) → P ≅i Q → P [ f ∣ g ] ≅i Q [ f ∣ g ]
-  subst-≅i P Q f g ( l , r , lr , rl) = (λe (λ▹ (app▹ (appe l f) g vt))) ,
-                                        (λe (λ▹ (app▹ (appe r f) g vt))) ,
-                                        ap (\ X → λe (λ▹ (app▹ (appe X f) g vt))) lr ,
-                                        ap (\ X → λe (λ▹ (app▹ (appe X f) g vt))) rl 
+  subst-≅i P Q f g ( l , r , lr , rl) = subst-internal P Q f g l ,
+                                        subst-internal Q P f g r ,
+                                        ap (subst-internal _ _ f g) lr ,
+                                        ap (subst-internal _ _ f g) rl 
 
 {- not true... like a deduction theorem 
   external-to-internal? : ∀ {ℂ} (P Q : Rel ℂ ℂ) → Iso (∀e P) (∀e Q) → P ≅i Q
@@ -89,12 +96,6 @@ module Examples where
                 → ∀e (mor 𝔻 v f ▹ Q)
   based-mor-rec-right Q f b = λe (λ▹ (app▹ (app▹ (appe (mor-rec (Q ▹ Q) (λe (λ▹ vt))) v) f vt) v (appe b v)))
 
-  based-mor-rec-right' : {ℂ 𝔻 : Cat} (Q : Rel 𝔻 ℂ)
-                → (f : Fun ℂ 𝔻)
-                → ∀e (Q [ f ∣ v ])
-                → ∀e (Q ◃ mor 𝔻 v f)
-  based-mor-rec-right' Q f b =  λe (λ◃ ((app▹ (app▹ (appe (mor-rec (Q ▹ Q) (λe (λ▹ vt))) v) f vt) v (appe b v))))
-
   based-mor-rec-right-iso-indirect : {ℂ 𝔻 : Cat} (Q : Rel 𝔻 ℂ)
                 → (f : Fun ℂ 𝔻)
                 → Iso (∀e {ℂ} (Q ◃ mor 𝔻 v f)) (∀e {ℂ} (Q [ f ∣ v ])) 
@@ -102,13 +103,11 @@ module Examples where
 
   based-mor-rec-right-iso : {ℂ 𝔻 : Cat} (Q : Rel 𝔻 ℂ)
                 → (f : Fun ℂ 𝔻)
-                → isIso (∀e {ℂ} (Q ◃ mor 𝔻 v f)) (∀e {ℂ} (Q [ f ∣ v ])) (\ t → λe (app◃ f (ident f) (appe t v) ) )
+                → isIso (∀e {𝔻} (mor 𝔻 v f ▹ Q)) (∀e {ℂ} (Q [ f ∣ v ])) (\ t → λe (app▹  (appe t f) v (ident f) ) )
   based-mor-rec-right-iso Q f =
-    iso (based-mor-rec-right' Q f)
-        ((Iso.gf (based-mor-rec-right-iso-indirect Q f)))
-        ((Iso.fg (based-mor-rec-right-iso-indirect Q f)))
-
-  
+    iso (based-mor-rec-right Q f) -- could make a iso compose lemma and use fubini 5
+        ( \x → (! (∀eη x) ∘ ap λe (! (η▹ _))  ) ∘ ap (\ H → λe (λ▹ (app◃ v vt (appe H v)))) ((Iso.gf (based-mor-rec-right-iso-indirect Q f) (λe (λ◃ (app▹ (appe x v) v vt))))) )
+        ( \x →  (Iso.fg (based-mor-rec-right-iso-indirect Q f) x) ∘ {!!} )
 
 {- work but slow
 
@@ -170,23 +169,25 @@ module Examples where
   -- diagramatic order
   compose1 : ∀ {ℂ} → ∀e (mor ℂ v v ▹ (mor ℂ v v ▹ mor ℂ v v ))
   compose1 = mor-rec _ (λe (λ▹ vt))
-
+  
   compose2 : ∀ {ℂ} → ∀e (mor ℂ v v ▹ (mor ℂ v v ▹ mor ℂ v v ))
   compose2 = isIso.g exchange (mor-rec _ (λe (λ◃ vt)))
-
+  
   compose1=2 : ∀ {ℂ} → compose1 {ℂ} == compose2 
   compose1=2 = mor-ext (mor-ext id)
 
-  top-right : ∀ {ℂ} {𝔻} (F G : Fun ℂ 𝔻) (α : ∀e (mor 𝔻 F G)) → ∀e (mor ℂ v v ▹ mor 𝔻 F G)
-  top-right F G α = λe (λ▹ (app▹ (app▹ (appe compose1 F) G (appe α v)) G (app▹ (appe (ap-mor G) v) v vt)  ))
-
-  left-bottom : ∀ {ℂ} {𝔻} (F G : Fun ℂ 𝔻) (α : ∀e (mor 𝔻 F G)) → ∀e (mor ℂ v v ▹ mor 𝔻 F G)
-  left-bottom F G α = λe (λ▹ (app▹ (app▹ (appe compose1 F) F ( app▹ (appe (ap-mor F) v) v vt )) G (appe α v )))
-
-  naturality : ∀ {ℂ 𝔻} (F G : Fun ℂ 𝔻)
-             → (α : ∀e (mor 𝔻 F G))
-             → top-right F G α == left-bottom F G α
-  naturality {ℂ}{𝔻} F G α = mor-ext (ap (\ Q → λe (app▹ (app▹ (appe Q F) G (appe α v)) G (appe id0 G))) compose1=2    )
+  module Naturality where
+    
+    top-right : ∀ {ℂ} {𝔻} (F G : Fun ℂ 𝔻) (α : ∀e (mor 𝔻 F G)) → ∀e (mor ℂ v v ▹ mor 𝔻 F G)
+    top-right F G α = λe (λ▹ (app▹ (app▹ (appe compose1 F) G (appe α v)) G (app▹ (appe (ap-mor G) v) v vt)  ))
+    
+    left-bottom : ∀ {ℂ} {𝔻} (F G : Fun ℂ 𝔻) (α : ∀e (mor 𝔻 F G)) → ∀e (mor ℂ v v ▹ mor 𝔻 F G)
+    left-bottom F G α = λe (λ▹ (app▹ (app▹ (appe compose1 F) F ( app▹ (appe (ap-mor F) v) v vt )) G (appe α v )))
+    
+    naturality : ∀ {ℂ 𝔻} (F G : Fun ℂ 𝔻)
+               → (α : ∀e (mor 𝔻 F G))
+               → top-right F G α == left-bottom F G α
+    naturality {ℂ}{𝔻} F G α = mor-ext (ap (\ Q → λe (app▹ (app▹ (appe Q F) G (appe α v)) G (appe id0 G))) compose1=2    )
 
 -- map in one dir but not the other?
 -- Goal: (ϕ1 ,, ϕ2) ⊢ ((P [ f1 ∣ f2 ]) ⊙ (Q [ f2 ∣ f3 ]))
@@ -219,8 +220,8 @@ module Examples where
     → UnitCounitAdjunction F G
   to F G (l , r , lr , rl) =  λe (app▹ (appe l v) F (ident F))  ,
                               λe (app▹ (appe r G) v (ident G)) ,
-                              {!!} ,
-                              {!!}
+                              ap (\ H → λe (app▹ (appe H v) F (ident F))) lr ∘ {!!} ,
+                              ap (\ H → λe (app▹ (appe H G) v (ident G))) rl ∘ {!!}
 
 {-
   from : {ℂ 𝔻 : Cat} (F : Fun 𝔻 ℂ) (G : Fun ℂ 𝔻)
@@ -240,7 +241,7 @@ module Examples where
     based-mor-rec-left (mor _ v G) F unit  , 
     based-mor-rec-right (mor _ F v) G counit ,
     induct-iso-lr (based-mor-rec-left-iso (mor _ F v) F) (triangle1 ∘ {!!}) , 
-    {!induct-iso-lr (based-mor-rec-right-iso (mor _ v G) G) ? !}
+    induct-iso-lr (based-mor-rec-right-iso (mor _ v G) G) (triangle2 ∘ {!!}) 
 
 
   mor-rec-◃-subst : ∀ {ℂ 𝔼 𝔼'} (P : Rel 𝔼 ℂ) (Q : Rel 𝔼 ℂ) (t : ∀e (Q ◃ P)) (f : Fun 𝔼' 𝔼)
@@ -248,3 +249,5 @@ module Examples where
                (λe (λ▹ (λ◃ ( app◃ f vt (app▹ (appe (mor-rec (Q ◃ P) t) v) v vt)   ))) )
                (mor-rec (Q [ f ∣ v ] ◃ P [ f ∣ v ]) (λe (λ◃ (app◃ f vt (appe t v)))))
   mor-rec-◃-subst P Q t f = mor-ext id
+
+
