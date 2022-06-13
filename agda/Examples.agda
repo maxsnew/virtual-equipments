@@ -275,6 +275,81 @@ module Examples where
 
 
 
+  module Equipment where
+
+    -- double category
+    -- vertical arrows Fun
+    -- horizontal arrows Rel, identity is mor 
+    -- squares are [ R ] ⊢ S [ f ∣ g ]
+
+    unit : ∀ {ℂ} → Rel ℂ ℂ
+    unit = mor _ v v 
+
+    Square : ∀ {ℂ 𝔻 ℂ' 𝔻'} (P : Rel ℂ 𝔻) (Q : Rel ℂ' 𝔻') (f : Fun ℂ ℂ') (g : Fun 𝔻 𝔻') →  Set
+    Square P Q f g = ∀e (P ▹ Q [ f ∣ g ])
+
+    horiz-ident : ∀ {ℂ 𝔻} (f : Fun ℂ 𝔻) → Square unit unit f f
+    horiz-ident f = ap-mor f
+
+    vert-ident : ∀ {ℂ 𝔻} (P : Rel ℂ 𝔻) → Square P P v v
+    vert-ident P = λe (λ▹ vt)
+
+    vertical-composition : ∀ {ℂ 𝔻 ℂ' 𝔻' ℂ'' 𝔻''} (P : Rel ℂ 𝔻) (Q : Rel ℂ' 𝔻') (R : Rel ℂ'' 𝔻'') (f : Fun ℂ ℂ') (g : Fun 𝔻 𝔻') (f' : Fun ℂ' ℂ'') (g' : Fun 𝔻' 𝔻'')
+                         → Square P Q f g
+                         → Square Q R f' g'
+                         → Square P R (f' · f) (g' · g)
+    vertical-composition P Q R f g f' g' s t = λe (λ▹ (app▹ (appe t f) g (app▹ (appe s v) v vt)))
+
+    horizontal-composition : ∀ {ℂ 𝔻 𝔼 ℂ' 𝔻' 𝔼'} (P : Rel ℂ 𝔻) (P' : Rel 𝔻 𝔼)
+                             (Q : Rel ℂ' 𝔻') (Q' : Rel 𝔻' 𝔼') (f : Fun ℂ ℂ') (g : Fun 𝔻 𝔻') 
+                             (h : Fun 𝔼 𝔼') 
+                           → Square P Q f g
+                           → Square P' Q' g h
+                           → Square (P ⊙ P') (Q ⊙ Q') f h
+    horizontal-composition P P' Q Q' f g h s t = ⊙-rec (λe (λ▹ (λ▹ (pair⊙ g (app▹ (appe s v) v vt) ((app▹ (appe t v) v vt))))))
+
+    companion : ∀ {ℂ 𝔻} (f : Fun ℂ 𝔻) → Rel ℂ 𝔻
+    companion {ℂ}{𝔻} f = mor 𝔻 f v
+
+    companion-square1 : ∀ {ℂ 𝔻} (f : Fun ℂ 𝔻) → Square (companion f) (unit) f v 
+    companion-square1 f = vert-ident (companion f) -- works because of the type equalities! 
+
+    companion-square2 : ∀ {ℂ 𝔻} (f : Fun ℂ 𝔻) → Square unit (companion f) v f
+    companion-square2 f = horiz-ident f -- works because of the type equalities! 
+
+    companion-equality1 : ∀ {ℂ 𝔻} (f : Fun ℂ 𝔻)
+                        → _==_{_}{Square unit unit f f}
+                          (vertical-composition unit (companion f) unit v f f v (companion-square2 f) (companion-square1 f) )
+                          (horiz-ident f)
+    companion-equality1 f = ! (∀eη _) ∘ ap λe (! (η▹ _))
+
+    companion-equality2 : ∀ {ℂ 𝔻} (f : Fun ℂ 𝔻)
+                        → _==_ (horizontal-composition unit (companion f) (companion f) unit v f v (companion-square2 f) (companion-square1 f))
+                          (⊙-rec (mor-rec _ (λe (λ▹ (pair⊙ v vt (ident v)))))) -- inlined definitions of unitors
+    companion-equality2 f = ⊙-ext (mor-ext (induct-iso-lr (based-mor-rec-left-iso _ f) {!!}))
+
+    conjoint : ∀ {ℂ 𝔻} (f : Fun ℂ 𝔻) → Rel 𝔻 ℂ
+    conjoint {ℂ}{𝔻} f = mor 𝔻 v f
+
+    conjoint-square1 : ∀ {ℂ 𝔻} (f : Fun ℂ 𝔻) → Square unit (conjoint f) f v
+    conjoint-square1 f = horiz-ident f
+
+    conjoint-square2 : ∀ {ℂ 𝔻} (f : Fun ℂ 𝔻) → Square (conjoint f) (unit) v f
+    conjoint-square2 f = vert-ident (conjoint f)
+
+    conjoint-equality1 : ∀ {ℂ 𝔻} (f : Fun ℂ 𝔻)
+                        → _==_{_}{Square unit unit f f}
+                          (vertical-composition unit (conjoint f) unit f v v f (conjoint-square1 f) (conjoint-square2 f) )
+                          (horiz-ident f)
+    conjoint-equality1 f = ! (∀eη _) ∘ ap λe (! (η▹ _))
+
+    conjoint-equality2 : ∀ {ℂ 𝔻} (f : Fun ℂ 𝔻)
+                        → _==_ (horizontal-composition ((conjoint f)) unit unit (conjoint f) v f v (conjoint-square2 f) (conjoint-square1 f))
+                               -- inlined definitions of unitors 
+                               (⊙-rec (isIso.g exchange (mor-rec _ (λe (λ◃ (pair⊙ v (ident v) vt))))))
+    conjoint-equality2 f = ⊙-ext (induct-iso-lr (based-mor-rec-right-iso _ f) (mor-ext {!!}))
+
+    
 
 -- map in one dir but not the other?
 -- Goal: (ϕ1 ,, ϕ2) ⊢ ((P [ f1 ∣ f2 ]) ⊙ (Q [ f2 ∣ f3 ]))
