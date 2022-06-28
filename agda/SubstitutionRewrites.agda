@@ -394,6 +394,19 @@ module SubstitutionRewrites where
                      ( (app◃ (a · h1) (t [ vs h1 ]tr) (s [ ϕ1 ]tr)) )
   app◃subst-unitl-subst s a t ϕ1 = app◃subst s a t ϕ1 (vs _)
 
+  app◃subst-unitl-subst-stucksubst : {ℂ 𝔻 𝔼 ℂ'' 𝔻'' ℂ2 𝔻2 : Cat} {ϕf : Ctx ℂ 𝔻} {P : Rel 𝔼 ℂ2} {R : Rel 𝔼 𝔻2}
+              → ∀ {h3 h4}
+                (s : ϕf ⊢ (R [ v ∣ h3 ] ◃ P [ v ∣ h4 ]))
+                (a : Fun ℂ 𝔼)
+                (t : vc ℂ ⊢ (P [ a ∣ h4 ]))
+              → {ϕf' : Ctx ℂ'' 𝔻''} 
+              → ∀ {h1 h2 }
+              → (ϕ1 : ϕf' ⊢s ϕf [ h1 ∣ h2 ])
+              → _==_ 
+                     (subst-tr (app◃ a t s) (ϕ1))
+                     ( (app◃ (a · h1) (t [ vs h1 ]tr) (s [ ϕ1 ]tr)) )
+  app◃subst-unitl-subst-stucksubst s a t ϕ1 = app◃subst s a t ϕ1 (vs _)
+
   app◃subst-unitl-subst-v : {ℂ 𝔻 ℂ'' 𝔻'' : Cat} {ϕf : Ctx ℂ 𝔻} {P : Rel ℂ ℂ} {R : Rel ℂ 𝔻} 
                 (s : ϕf ⊢ (R ◃ P))
                 (t : vc ℂ ⊢ (P))
@@ -407,7 +420,8 @@ module SubstitutionRewrites where
 
   {-# REWRITE app◃subst-unitl-subst #-}
   {-# REWRITE app◃subst-unitl-subst-v #-}
-
+  {-# REWRITE app◃subst-unitl-subst-stucksubst #-}
+  
   app◃subst-unitr-subst : {ℂ 𝔼 𝔼' 𝔼'' ℂ'' : Cat} {P : Rel 𝔼 ℂ} {R : Rel 𝔼 ℂ} {ϕa : Ctx 𝔼' ℂ}
                 (s : vc ℂ ⊢ (R ◃ P))
                 (a : Fun 𝔼' 𝔼)
@@ -492,6 +506,20 @@ module SubstitutionRewrites where
                      ( (app◃ (a · h4) (t [ ϕ2 ]tr) (s [ ϕ1 ]tr)) )
   app◃subst-unitl s a t ϕ1 ϕ2 = app◃subst s a t ϕ1 ϕ2
 
+  app◃subst-unitl-stucksubst : {ℂ2 𝔻2 ℂ 𝔻 𝔼 𝔼' ℂ'' 𝔻'' : Cat} {ϕf : Ctx ℂ 𝔻} {P : Rel 𝔼 ℂ2} {R : Rel 𝔼 𝔻2} {ϕa : Ctx 𝔼' ℂ}
+              → ∀ {h5 h6}
+              → (s : ϕf ⊢ (R [ v ∣ h5 ] ◃ P [ v ∣ h6 ]))
+                (a : Fun 𝔼' 𝔼)
+                (t : ϕa ⊢ (P [ a ∣ h6 ]))
+              → {ϕf' : Ctx ℂ'' 𝔻''} 
+              → ∀ {h1 h2 h4}
+              → (ϕ1 : ϕf' ⊢s ϕf [ h1 ∣ h2 ])
+              → (ϕ2 : vc ℂ'' ⊢s ϕa [ h4 ∣ h1 ])
+              → _==_ {_}
+                     (subst-tr (app◃ a t s) (,,s _ ϕ2 ϕ1))
+                     ( (app◃ (a · h4) (t [ ϕ2 ]tr) (s [ ϕ1 ]tr)) )
+  app◃subst-unitl-stucksubst s a t ϕ1 ϕ2 = app◃subst s a t ϕ1 ϕ2
+
   app◃subst-unitl-v : {ℂ 𝔻 𝔼 ℂ'' 𝔻'' : Cat} {ϕf : Ctx ℂ 𝔻} {P : Rel 𝔼 ℂ} {R : Rel 𝔼 𝔻} {ϕa : Ctx 𝔼 ℂ}
                 (s : ϕf ⊢ (R ◃ P))
                 (t : ϕa ⊢ (P))
@@ -506,6 +534,7 @@ module SubstitutionRewrites where
 
   {-# REWRITE app◃subst-unitl #-}
   {-# REWRITE app◃subst-unitl-v #-}
+  {-# REWRITE app◃subst-unitl-stucksubst #-}
 
   app◃subst-lassoc-ctx : {𝔽'' ℂ 𝔻 𝔼 𝔼' ℂ'' 𝔻'' 𝔼'' : Cat} {ϕf : Ctx ℂ 𝔻} {P : Rel 𝔼 ℂ} {R : Rel 𝔼 𝔻} {ϕa : Ctx 𝔼' ℂ} 
                 (s : ϕf ⊢ (R ◃ P))
@@ -577,16 +606,17 @@ module SubstitutionRewrites where
            → _==_ {_} (app▹ (appe (mor-rec (Q [ c ∣ v ] ◃ Q2 [ c ∣ v ]) t) c ) c ( (ident c) )) ( (appe t c) )
   mor-recβ'-◃-v {ℂ}{𝔻} Q Q2 c t =  ap (\ H → appe H c) (mor-recβ _ t) 
 
-  -- mor-recβ'-◃-2 : {ℂ 𝔻 : Cat} (Q : Rel ℂ ℂ) (Q2 : Rel ℂ ℂ)
-  --            (c : Fun 𝔻 ℂ) (d : Fun ℂ ℂ)
-  --            (t : ∀e (Q [ v ∣ d ] ◃ Q2 [ v ∣ d ]))
-  --          → _==_ {_} (app▹ (appe (mor-rec (Q [ v ∣ d ] ◃ Q2 [ v ∣ d ]) t) c ) c ( (ident c) )) ( (appe t c) )
-  -- mor-recβ'-◃-2 {ℂ}{𝔻} Q Q2 c d t = ap (\ H → appe H c) (mor-recβ _ t) 
   mor-recβ'-◃-2 : {ℂ 𝔻 𝔼 𝔽 𝔽' : Cat} (Q : Rel 𝔼 𝔽) (Q2 : Rel 𝔼 𝔽')
              (c : Fun 𝔻 ℂ) (d1 : Fun ℂ 𝔽) (d2 : Fun ℂ 𝔽')
              (t : ∀e (Q [ v ∣ d1 ] ◃ Q2 [ v ∣ d2 ]))
            → _==_ {_} (app▹ (appe (mor-rec (Q [ v ∣ d1 ] ◃ Q2 [ v ∣ d2 ]) t) c ) c ( (ident c) )) ( (appe t c) )
   mor-recβ'-◃-2 {ℂ}{𝔻} Q Q2 c d1 d2 t = ap (\ H → appe H c) (mor-recβ _ t)  
+
+  mor-recβ'-▹-2 : {ℂ 𝔻 𝔼 𝔽 𝔽' : Cat} (Q : Rel 𝔽 𝔼) (Q2 : Rel 𝔽' 𝔼)
+             (c : Fun 𝔻 ℂ) (d1 : Fun ℂ 𝔽) (d2 : Fun ℂ 𝔽')
+             (t : ∀e (Q [ d1 ∣ v ] ▹ Q2 [ d2 ∣ v ]))
+           → _==_ {_} (app▹ (appe (mor-rec (Q [ d1 ∣ v ] ▹ Q2 [ d2 ∣ v ]) t) c ) c ( (ident c) )) ( (appe t c) )
+  mor-recβ'-▹-2 {ℂ}{𝔻} Q Q2 c d1 d2 t = ap (\ H → appe H c) (mor-recβ _ t)  
 
 
   {-# REWRITE mor-recβ' #-}
@@ -595,6 +625,7 @@ module SubstitutionRewrites where
   {-# REWRITE mor-recβ'-◃ #-}
   {-# REWRITE mor-recβ'-◃-2 #-}
   {-# REWRITE mor-recβ'-◃-v #-}
+  {-# REWRITE mor-recβ'-▹-2 #-}
   {-# REWRITE mor-recβ'-stucksubst #-}
 
 {-
@@ -609,8 +640,7 @@ module SubstitutionRewrites where
   -- ----------------------------------------------------------------------
   -- ⊙
 
-  postulate
-    ⊙-recβ' : ∀ {ℂ 𝔻 𝔼 : Cat} {P : Rel ℂ 𝔼} {Q : Rel 𝔼 𝔻} {R : Rel ℂ 𝔻}
+  ⊙-recβ' : ∀ {ℂ 𝔻 𝔼 : Cat} {P : Rel ℂ 𝔼} {Q : Rel 𝔼 𝔻} {R : Rel ℂ 𝔻}
                 (s : (P ⊸ (Q ▹ R)))
              → ∀ {ℂ' 𝔻' 𝔼' f1 f2 f3}
                  {ϕ1 : Ctx ℂ' 𝔻'}  {ϕ2 : Ctx 𝔻' 𝔼'}  
@@ -619,9 +649,9 @@ module SubstitutionRewrites where
             → _==_{_}{ (ϕ1 ,, ϕ2) ⊢ R [ f1 ∣ f3 ]}
                   ((app▹ (appe (⊙-rec s) f1) f3 (pair⊙ f2 x y)))
                   ((app▹ (app▹ (appe s f1) f2 x) f3 y ))
-    -- ⊙-recβ' {ℂ} {𝔻} {𝔼} {P} {Q } {R} s {ℂ'} {𝔻'} {𝔼'} {f1} {f2} {f3} {ϕ1} {ϕ2} x y =
-    --          ap (\ s → (app▹ (app▹ (appe s f1) f2 x) f3 y )) (⊙-recβ s) ∘
-    --           -- ap (app▹ (appe (isIso.g ⊙-rec-iso s) f1) f3) ( naturality? x y )  -- 
+  ⊙-recβ' {ℂ} {𝔻} {𝔼} {P} {Q } {R} s {ℂ'} {𝔻'} {𝔼'} {f1} {f2} {f3} {ϕ1} {ϕ2} x y =
+           ap (\ s → (app▹ (app▹ (appe s f1) f2 x) f3 y )) (⊙-recβ s) ∘
+           ap (app▹ (appe (isIso.g ⊙-rec-iso s) f1) f3) ( naturality? x y )  
 
   -- SPECIAL CASES 
 
@@ -727,11 +757,38 @@ module SubstitutionRewrites where
   -- ----------------------------------------------------------------------
   -- appe
 
-  appe-subst-triple▹ : {𝔼 𝔻 ℂ ℂ2 ℂ3 : Cat} {R : Rel ℂ ℂ2} {R2 : Rel ℂ2 ℂ3} {R3 : Rel ℂ ℂ3}  
+  appe-subst-double▹ : {𝔼 𝔻 ℂ ℂ2 ℂ3 : Cat} {R : Rel ℂ ℂ2} {R2 : Rel ℂ2 ℂ3} {R3 : Rel ℂ ℂ3}  
                → (e : ∀e (R ▹ (R2 ▹ R3)))
                → (f : Fun 𝔻 ℂ)
                → (h : Fun 𝔼 𝔻 )
                → subst-tr (appe e f) (vs h) == appe e (f · h)
-  appe-subst-triple▹ e f h = appe-subst e f h
+  appe-subst-double▹ e f h = appe-subst e f h
 
-  {-# REWRITE appe-subst-triple▹ #-}
+  {-# REWRITE appe-subst-double▹ #-}
+
+  appe-subst-▹◃ : {𝔼 𝔻 ℂ ℂ2 ℂ3 : Cat} {R : Rel ℂ ℂ2} {R2 : Rel ℂ3 ℂ2} {R3 : Rel ℂ3 ℂ}  
+               → (e : ∀e (R ▹ (R2 ◃ R3)))
+               → (f : Fun 𝔻 ℂ)
+               → (h : Fun 𝔼 𝔻 )
+               → subst-tr (appe e f) (vs h) == appe e (f · h)
+  appe-subst-▹◃ e f h = appe-subst e f h
+  {-# REWRITE appe-subst-▹◃ #-}
+
+
+  appe-subst-▹◃-stucksubst : {𝔼 𝔻 ℂ ℂ2 ℂ3 ℂ2' ℂ' : Cat} {R : Rel ℂ ℂ2} {R2 : Rel ℂ3 ℂ2'} {R3 : Rel ℂ3 ℂ'}
+               → ∀ {h1 h2} 
+               → (e : ∀e (R ▹ (R2 [ v ∣ h1 ] ◃ R3 [ v ∣ h2 ])))
+               → (f : Fun 𝔻 ℂ)
+               → (h : Fun 𝔼 𝔻 )
+               → subst-tr (appe e f) (vs h) == appe e (f · h)
+  appe-subst-▹◃-stucksubst e f h = appe-subst e f h
+  {-# REWRITE appe-subst-▹◃-stucksubst #-}
+
+  appe-subst-▹-stucksubst : {𝔼 𝔻 ℂ ℂ2 ℂ3 𝔽1 𝔽2 : Cat} {R : Rel ℂ ℂ2} {R2 : Rel 𝔽1 𝔽2} 
+               → ∀ {h1 h2} 
+               → (e : ∀e (R ▹ (R2 [ h1 ∣ h2 ])))
+               → (f : Fun 𝔻 ℂ)
+               → (h : Fun 𝔼 𝔻 )
+               → subst-tr (appe e f) (vs h) == appe e (f · h)
+  appe-subst-▹-stucksubst e f h = appe-subst e f h
+  {-# REWRITE appe-subst-▹-stucksubst #-}

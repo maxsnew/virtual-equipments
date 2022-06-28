@@ -125,9 +125,6 @@ module Examples where
           ( \x →  (Iso.fg (based-mor-rec-right-iso-indirect Q f) x) ∘ {!!} )
   -}
   
-{- work but slow
-
-
   coyoneda-l : ∀ {ℂ 𝔻} (P : Rel ℂ 𝔻) → (mor ℂ v v ⊙ P) ≅i P
   coyoneda-l P = ⊙-rec (mor-rec _ (λe (λ▹ vt))) ,
                  λe (λ▹ (pair⊙ v (ident v) vt)) ,
@@ -176,8 +173,6 @@ module Examples where
                 (\ g → λe (λ▹ (app◃ v vt (appe g v))))
                 (\x → ! (∀eη _) ∘ ap λe (! (η▹ _)))
                 (\x → ! (∀eη _) ∘ ap λe (! (η◃ _)))  
-
--}
 
   ap-mor : ∀ {ℂ 𝔻} → (f : Fun ℂ 𝔻) → ∀e ((mor ℂ v v) ▹ mor 𝔻 (f · v) (f · v))
   ap-mor {ℂ}{𝔻} f = mor-rec (mor 𝔻 (f · v) (f · v)) (λe (ident f))
@@ -238,8 +233,16 @@ module Examples where
                      → _==_{_}{∀e (mor 𝔻 v G ▹ (mor _ F v))}
                          (λe (λ▹ (app▹ (app▹ (appe compose1 F) (F · G) (  (app▹ (appe (ap-mor F) v) G vt)  )) v
                                   (   (app▹ (appe r G) v (ident G)) ))))
-                         (λe (λ▹ (app▹ (appe r v) v vt)))
+                         (λe (λ▹ (app▹ (appe r v) v vt))) -- eta exanded r
   r-naturality-ident {ℂ}{𝔻} F G r = induct-iso-lr (based-mor-rec-right-iso (mor _ F v) G) id
+
+  l-naturality-ident : {ℂ 𝔻 : Cat} (F : Fun 𝔻 ℂ) (G : Fun ℂ 𝔻)
+                     → (l : mor ℂ F v ⊸ mor 𝔻 v G)
+                     → _==_{_}{∀e ((mor _ F v) ▹ mor 𝔻 v G  )}
+                           ((λe (λ▹ (app▹ (app▹ (appe compose1 v) (G · F) ( (app▹ (appe l v) F (ident F))   )) G
+                                  (   (app▹ (appe (ap-mor G) F) v vt) )))))
+                           (λe (λ▹ (app▹ (appe l v) v vt)))
+  l-naturality-ident F G l = induct-iso-lr (based-mor-rec-left-iso _ F) (ap (\ H → λe (app▹ (app▹ (appe H v) (G · F) (app▹ (appe l v) F (appe id0 F))) (G · F) (appe id0 (G · F)))) compose1=2  )
 
   to : {ℂ 𝔻 : Cat} (F : Fun 𝔻 ℂ) (G : Fun ℂ 𝔻)
     → BijectionAdjunction F G
@@ -248,9 +251,12 @@ module Examples where
                               λe (app▹ (appe r G) v (ident G)) ,
                               (ap (\ H → λe (app▹ (appe H v) F (ident F))) lr ∘
                                ap (\ H → λe (app▹ (appe H v) F (app▹ (appe l v) F (ident F)))) ( r-naturality-ident F G r )) ,
-                              ap (\ H → λe (app▹ (appe H G) v (ident G))) rl ∘ {!!}
+                              (ap (\ H → λe (app▹ (appe H G) v (ident G))) rl ∘
+                               ap (\ H → λe (app▹ (appe H G) v (app▹ (appe r G) v (ident G)))) ( l-naturality-ident F G l ) )
 
 {-
+  -- could also do a direct version
+
   from : {ℂ 𝔻 : Cat} (F : Fun 𝔻 ℂ) (G : Fun ℂ 𝔻)
     → UnitCounitAdjunction F G
     → BijectionAdjunction F G
@@ -268,7 +274,13 @@ module Examples where
     based-mor-rec-left (mor _ v G) F unit  , 
     based-mor-rec-right (mor _ F v) G counit ,
     induct-iso-lr (based-mor-rec-left-iso (mor _ F v) F) (triangle1 ∘ ap (\ (H : ∀e (mor _ v v ▹ (mor _ F v ▹ mor _ F v ))) → λe (app▹ (app▹ (appe H v) (G · F) (appe unit v)) _ (appe counit _))) (! (compose-with-ap-left-eq F))) , 
-    induct-iso-lr (based-mor-rec-right-iso (mor _ v G) G) (triangle2 ∘ {!!})
+    induct-iso-lr (based-mor-rec-right-iso (mor _ v G) G) (triangle2 ∘
+                                                            ap (\ (H :  ∀e (mor 𝔻 v G ▹ (mor ℂ v v ▹ mor 𝔻 v G ))) → λe (app▹ (app▹ (appe H G) (F · G) (appe unit G)) v ( appe counit v))) (compose-with-ap-right-eq G)) where
+         other-compose-with-ap-right : ∀ {ℂ 𝔻} (G : Fun ℂ 𝔻) → ∀e (mor 𝔻 v G ▹ (mor ℂ v v ▹ mor 𝔻 v G ))
+         other-compose-with-ap-right G = isIso.g exchange (mor-rec _ (λe (λ◃ vt)))
+
+         compose-with-ap-right-eq : ∀ {ℂ 𝔻} (G : Fun ℂ 𝔻) → (other-compose-with-ap-right G) == (compose-with-ap-right G)
+         compose-with-ap-right-eq G = induct-iso-lr (based-mor-rec-right-iso _ G) (mor-ext id) 
 
 {-
   module Equipment where
