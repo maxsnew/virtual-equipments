@@ -494,7 +494,11 @@ module STC where
 
   -- ----------------------------------------------------------------------
   -- product categories
-  postulate 
+  postulate
+    1c : Cat
+    empty : ∀ {ℂ} → Fun ℂ 1c
+    1η    : ∀ {ℂ} (f : Fun ℂ 1c) → f == empty
+
     _×c_   : Cat → Cat → Cat
     pair   : ∀{ℂ 𝔻 𝔼} → Fun 𝔼 ℂ → Fun 𝔼 𝔻 → Fun 𝔼 (ℂ ×c 𝔻)
     first  : ∀{ℂ 𝔻 𝔼} → Fun 𝔼 (ℂ ×c 𝔻) → Fun 𝔼 ℂ
