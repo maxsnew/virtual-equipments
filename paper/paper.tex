@@ -1,9 +1,9 @@
-\documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
+\documentclass{llncs}
 
 \usepackage{tikz-cd}
 \usepackage{amssymb}
 \usepackage{amsmath}
-\usepackage{amsthm}
+%% \usepackage{amsthm}
 \usepackage{mathtools}
 \usepackage{stmaryrd}
 \usepackage{mathpartir}
@@ -12,78 +12,6 @@
 \usepackage{natbib}
 
 \DeclareMathOperator*{\colim}{colim}
-
-%This is a template for producing LIPIcs articles. 
-%See lipics-v2021-authors-guidelines.pdf for further information.
-%for A4 paper format use option "a4paper", for US-letter use option "letterpaper"
-%for british hyphenation rules use option "UKenglish", for american hyphenation rules use option "USenglish"
-%for section-numbered lemmas etc., use "numberwithinsect"
-%for enabling cleveref support, use "cleveref"
-%for enabling autoref support, use "autoref"
-%for anonymousing the authors (e.g. for double-blind review), add "anonymous"
-%for enabling thm-restate support, use "thm-restate"
-%for enabling a two-column layout for the author/affilation part (only applicable for > 6 authors), use "authorcolumns"
-%for producing a PDF according the PDF/A standard, add "pdfa"
-
-%\pdfoutput=1 %uncomment to ensure pdflatex processing (mandatatory e.g. to submit to arXiv)
-%\hideLIPIcs  %uncomment to remove references to LIPIcs series (logo, DOI, ...), e.g. when preparing a pre-final version to be uploaded to arXiv or another public repository
-
-%\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
-
-\bibliographystyle{plainurl}% the mandatory bibstyle
-
-\title{A Simple Type Theory for Category Theory} %TODO Please add
-
-%\titlerunning{Dummy short title} %TODO optional, please use if title is longer than one line
-
-\author{Max S. New}
-       {University of Michigan Computer Science \& Engineering, Ann Arbor, Michigan, USA \and \url{http://www.maxsnew.com} }
-       {maxsnew@umich.edu}
-       {}
-       {}
-       %% {https://orcid.org/0000-0002-1825-0097}
-       %% {(Optional) author-specific funding acknowledgements}%TODO mandatory, please use full name
-       %% ; only 1 author per \author macro; first two parameters are mandatory, other parameters ca
-       %% n be empty. Please provide at least the name of the affiliation and the country. The full address is optional. Use additional curly braces to indicate the correct name splitting when the last name consists of multiple name parts.
-
-\author{Daniel R. Licata}{Wesleyan University, Middletown, Connecticut, USA}
-       {dlicata@wesleyan.edu}{}{}
-
-\authorrunning{M.S. New and D.R. Licata} %TODO mandatory. First: Use abbreviated first/middle names. Second (only in severe cases): Use first author plus 'et al.'
-
-\Copyright{Max S. New and Daniel R. Licata} %TODO mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
-
-\ccsdesc[100]{\textcolor{red}{Replace ccsdesc macro with valid one}} %TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
-
-\keywords{Dummy keyword} %TODO mandatory; please add comma-separated list of keywords
-
-\category{} %optional, e.g. invited paper
-
-\relatedversion{} %optional, e.g. full version hosted on arXiv, HAL, or other respository/website
-%\relatedversiondetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93]{Classification (e.g. Full Version, Extended Version, Previous Version}{URL to related version} %linktext and cite are optional
-
-%\supplement{}%optional, e.g. related research data, source code, ... hosted on a repository like zenodo, figshare, GitHub, ...
-%\supplementdetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93, subcategory={Description, Subcategory}, swhid={Software Heritage Identifier}]{General Classification (e.g. Software, Dataset, Model, ...)}{URL to related version} %linktext, cite, and subcategory are optional
-
-%\funding{(Optional) general funding statement \dots}%optional, to capture a funding statement, which applies to all authors. Please enter author specific funding statements as fifth argument of the \author macro.
-
-%% \acknowledgements{I want to thank \dots}%optional
-
-%\nolinenumbers %uncomment to disable line numbering
-
-%Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\EventEditors{John Q. Open and Joan R. Access}
-\EventNoEds{2}
-\EventLongTitle{42nd Conference on Very Important Topics (CVIT 2016)}
-\EventShortTitle{CVIT 2016}
-\EventAcronym{CVIT}
-\EventYear{2016}
-\EventDate{December 24--27, 2016}
-\EventLocation{Little Whinging, United Kingdom}
-\EventLogo{}
-\SeriesVolume{42}
-\ArticleNo{23}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 %% \newtheorem{theorem}{Theorem}
@@ -220,6 +148,11 @@
 
 \newcommand{\algVarrQt}{\textrm{FunctQt}}
 \newcommand{\algVarrUnqt}{\textrm{FunctUnQt}}
+
+
+\title{A Simple Type Theory for Category Theory}
+\author{Max S. New\inst{1,2} and Daniel R. Licata\inst{2}}
+\institute{University of Michigan \and Wesleyan University}
 
 \maketitle
 
@@ -430,6 +363,27 @@ composition says that these relations are down-closed in $C$ and
 up-closed in $D$, or that heteromorphisms can be composed with
 homomorphisms.
 %
+
+%% Embracing the analogy ``profunctors as judgments'' we can view
+%% elements of a profunctor $r \in R$ with $s(r) = A$ and $t(r) = B$ in
+%% type-theoretic notation
+%% \[ \inferrule*[right={r}]{~}{A \vdash_R B}\]
+%% Noting that every category $\cat C$ has a hom profunctor $Hom_C : \cat
+%% C \pto \cat D$, we get for each category a judgment
+%% \[ \inferrule*{}{A \vdash_{Hom_C} A'} \]
+%% and the category operations provide us with rules for use of the assumption:
+%% \[ \inferrule*[right=id]{}{A \vdash_{Hom_C} A} \]
+%% and cut
+%% \[ \inferrule*[right=cut]{A \vdash_{Hom_C} A' \and A' \vdash_{Hom_C} A''}{A \vdash_{Hom_C} A''} \]
+%% satisfying unit and associativity equations.
+%% %
+%% An arbitrary profunctor $R$ supports a kind of ``bi-cut''
+%% rule\footnote{alternatively, this can be defined as 2 cuts: left and
+%% right, with an associativity law}:
+%% \[ \inferrule*[right=bicut]{A \vdash_{Hom_C} A' \and A' \vdash_R B' \and B' \vdash_{Hom_D} B}{A \vdash_R B} \]
+%% That satisfies similar bi-unit and bi-associativity laws.
+
+
 
 \subsection{Double Categories and Pro-arrow Equipments}
 
