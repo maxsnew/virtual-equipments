@@ -156,21 +156,17 @@
 
 \maketitle
 
-%TODO mandatory: add short abstract of the document
 \begin{abstract}
   We present a domain-specific type theory for constructions and
   proofs in category theory. The type theory axiomatizes notions of
   category, functor, profunctor and a generalized form of natural
   transformations. By restricting the type theory to a form of ordered
-  logic, we guarantee that all mappings between categories are
-  functorial and all transformations are natural by construction, with
-  no separate proof necessary. Important category theoretic proofs
-  such as the Yoneda lemma and Co-yoneda lemma become simple type
-  theoretic proofs about the relationship between unit, tensor and
-  (ordered) function types. We demonstrate that this type theory can
-  be used as a kind of logical framework in which we can define common
-  categorical structures such as categories with families that serve
-  as models of type theories.
+  higher-order logic, we guarantee that all mappings between categories
+  are functorial and all transformations are natural by construction,
+  with no separate proof necessary. Important category theoretic
+  proofs such as the Yoneda lemma and Co-yoneda lemma become simple
+  type theoretic proofs about the relationship between unit, tensor
+  and (ordered) function types.
 
   Finally, we give a sound and complete notion of model of our type
   theory in a structure we call a hyperdoctrine of pro-arrow
@@ -231,18 +227,25 @@ These generalizations have long been recognized as being important in
 programming language applications: domain-,metric- and
 step-index-enriched categories have been used to model general
 recursion and internal categories have been used to model
-parametricity and gradual typing.
+parametricity and gradual
+typing\cite{order-enriched-cats,topos-of-trees,reflexive-graphs,double-cats-gradual-typing}.
 
 % TODO: Yoneda example
 Novices in category theory are often overwhelmed by the number of
 naturality and functoriality side conditions that abound in otherwise
 simple proofs in category theory. For instance consider the proof of
 the Yoneda lemma, often the first ``big'' proof in an introductory
-category theory text. ... Here the reader is left to themselves to
-show that the ``evaluation at identity'' morphism and its inverse are
-actually natural transformations. They will then work through a
-diagram chase to determine that this naturality condition indeed
-holds.
+category theory text. The Yoneda lemma states that for any functor $P
+: C^o \to \Set$ and object $A \in C$, that the set of natural
+transformations $C(-,A) \to P$ is in bijection with the elements
+$P(A)$. Furthermore, this bijection is natural in both $A$ and $P$. In
+the authors' experience teaching category theory the sheer amount of
+naturality side conditions in this result can be very intimidating to
+learners, while experienced practitioners will observe that these
+naturality conditions are tedious to carry out but routine. In our
+type theory, none of these naturality conditions need to be explicitly
+proven. Instead, all terms expressible in the type theory are
+automatically natural by construction.
 
 Fortunately, the tools of category theory itself can be employed to
 simplify these constructions, specifically the tools of \emph{higher}
@@ -258,12 +261,11 @@ continuous.
 %
 Similar principles apply to category theory itself: a composition of
 functors is functorial, a composition of natural transformations is
-natual, etc.
+natural, etc.
 %
 In the case of category theory, these principles can be formalized
-using category-like algebraic structures such as 2-categories,
-bicategories, (virtual) double categories and pro-arrow
-equipments\cite{}.
+using algebraic structures such as 2-categories, bicategories,
+(virtual) double categories and pro-arrow equipments\cite{}.
 %
 This approach has the advantage of avoiding the need to prove
 the side conditions of naturality or enrichment.
@@ -382,8 +384,6 @@ homomorphisms.
 %% right, with an associativity law}:
 %% \[ \inferrule*[right=bicut]{A \vdash_{Hom_C} A' \and A' \vdash_R B' \and B' \vdash_{Hom_D} B}{A \vdash_R B} \]
 %% That satisfies similar bi-unit and bi-associativity laws.
-
-
 
 \subsection{Double Categories and Pro-arrow Equipments}
 
@@ -534,6 +534,42 @@ willingness to understand profunctors and (co-)ends.
 The semantics section is by necessity more advanced and may be skipped
 or skimmed by readers who are willing to trust the mathematical
 foundations of the system.
+
+In Figure~\ref{fig:hol-cats} we give a table summarizing the
+relationship between the judgments and connectives of higher-order
+logic with our category logic. Since category logic is an ordered
+variant of higher-order logic, some notions splinter into
+multiple. For instance, covariant and contravariant presheaf
+categories generalize the power set. Further, because we only have
+binary relations rather than relations of arbitrary arity, we have
+only restricted forms of universal and existential quantification
+which combined with implications and conjunctions.
+
+\begin{figure}
+  \begin{center}
+    \begin{tabular}{ |c|c| } 
+      \hline
+      Higher-Order Logic & Category Logic \\
+      \hline
+      Set $X$ & Category $\mathbb{C}$\\
+      $X \times Y$ & $\mathbb C \times \mathbb D$ \\ 
+      1 & $1$ \\
+      $\mathcal P X$ & $\mathcal P^+ X, \mathcal P^- X$ \\
+      $\{ (x,y) \in X \times Y | R(x,y) \}$ & $\sum_{\alpha:C;\beta:D} R$\\
+      Function $f(x:X) : Y$ & Functor $F(\alpha:\cat C): \cat B$\\
+      Relation $R(x,y)$ & Profunctor $R(\alpha:\cat C; \beta: \cat D)$\\
+      $R \wedge Q$ & $R \times Q$\\
+      $\top$ & $1$\\
+      $\forall x. P \Rightarrow Q$ & $\homrallXYtoZ {\alpha:\cat C} P Q, \homlallXYtoZ {\alpha:\cat C} P Q$ \\
+      $\exists x. P \wedge Q$ & $\tensorexistsXwithYandZ {\alpha:\cat C} P Q$\\
+      $x =_X y$ & $\punitinXfromYtoZ {\cat C} \alpha \beta$\\
+      Proof $R_1 \wedge \cdots \Rightarrow Q$ & Natural Transformation $x_1: R_1,\ldots \vdash t : Q$\\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{Analogy between Higher-Order Logic and Category Logic
+    Judgments and Connectives}
+\end{figure}
 
 \section{Syntax of SCT}
 
@@ -1322,33 +1358,41 @@ Semantically, the tensor product is the composition of profunctors,
 which is typically written as a coend
 \[ \int_{\beta} P(-,\beta) \times Q(\beta,=) \]
 
-\subsection{Category of Elements}
+\subsection{Graph of a profunctor}
 
-One final multiplicative we can define is the \emph{category of
-elements} of a profunctor. Given a profunctor $\alpha:\cat
-C;\beta:\cat D \vdash R$, the ``category of elements'' of $R$ is a
-category $\Sigma_{\alpha:\cat C;\beta:\cat D}. R$. In detail, its
-objects are triples $(a:\cat C, r : R, b : \cat D)$ and morphism from
-$(a,r,b)$ to $(a', r', b')$ consists of a pair of morphisms $g : b \to
-b'$ and a backwards $f : a' \to a$ such that $r' = g\circ r \circ f$.
+One final multiplicative we can define is the \emph{graph} of a
+profunctor. Given a profunctor $\alpha:\cat C;\beta:\cat D \vdash R$,
+the ``graph'' of $R$ is a category $\Sigma_{\alpha:\cat C;\beta:\cat
+  D}. R$. In detail, its objects are triples $(a:\cat C, r : R, b :
+\cat D)$ and morphism from $(a,r,b)$ to $(a', r', b')$ consists of a
+pair of morphisms $g : b \to b'$ and a backwards $f : a' \to a$ such
+that $r' = g\circ r \circ f$.
+%
+Intuitively this generalizes the ``graph'' of a relation $R : A\times
+B \to \Omega$, where we think of the graph as the corresponding subset
+$gr(R) \subseteq A\times B$
 %
 By picking $R = \punitinXfromYtoZ {\cat C} {\alpha}{\alpha'}$ we
 recover the \emph{arrow} category $\exists
 (\alpha;\alpha'). \punitinXfromYtoZ {\cat C}{\alpha}{\alpha'}$, by
 composing these with functors, we recover the notion of \emph{comma}
-category $\exists \alpha;\beta. \punitinXfromYtoZ {\cat
+category $\Sigma \alpha;\beta. \punitinXfromYtoZ {\cat
   E}{(F\alpha)}{(G\beta)}$ and by picking either $F$ or $G$ to have
 domain the terminal category $1$, we recover the notion of a
 \emph{slice} category.
 
 This is unique among the multiplicatives in that it defines a
-\emph{category} rather than a profunctor. Also note that while similar
-to the tensor in that we use existential notation, the graph of a
-profunctor is a \emph{negative} multiplicative, analogous to a
-$\Sigma$-type. The universal property says that a functor from $\cat
-E$ into the graph $\exists (\alpha; \beta). R$ is equivalent to a
+\emph{category} rather than a profunctor. The graph of a profunctor is
+a \emph{negative} multiplicative, a kind of $\Sigma$-type for
+profunctors. The universal property says that a functor from $\cat E$
+into the graph $\Sigma (\alpha; \beta). R$ is equivalent to a
 transformation from $\cat E$ into the functor $R$, including functors
 from $\cat E$ to $\cat C$ and $\cat D$.
+%
+The graph of a profunctor is a joint generalization of several common
+constructions in category theory: the arrow category, slice
+categories, comma categories and the covariant and the covariant and
+contravariant category of elements.
 
 \begin{figure}
   \begin{mathpar}
@@ -3018,8 +3062,12 @@ morphisms: functors, profunctors and spans of functors.
 %% %%
 
 %% %% Please use bibtex, 
+\subsubsection*{Acknowledgements}
+Grants stuff...? The authors would like to thank Emily Riehl, Mike
+Shulman,...for helpful feedback on this work
 
-\bibliography{lipics-v2021-sample-article}
+\bibliography{cats}
+
 
 \appendix
 
