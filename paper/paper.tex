@@ -1861,6 +1861,54 @@ syntactic forms of SCT in Figure~\ref{fig:duality}.
   \label{fig:duality}
 \end{figure}
 
+\subsection{Extensionality Axioms}
+
+Finally, we discuss some non-theorems that would be desirable to add
+as axioms to the theory of \ohol{}.
+%
+Chief among these are principles about the hom type $\punitinXfromYtoZ
+{\cat C} \alpha \beta$ when $\cat C$ is a connective.
+%
+Since the hom type is defined as a kind of unit type, rather than
+defined inductively, we are not guaranteed that the hom type for the
+product category $\cat C \times \cat D$ or the presheaf categories are
+what we expect.
+%
+For the product type, we expect there should be an isomorphism
+$\punitinXfromYtoZ {\cat C \times \cat D} \alpha \beta \cong
+(\punitinXfromYtoZ {\cat C} {\pi_1 \alpha} {\pi_1 \beta}) \times
+(\punitinXfromYtoZ {\cat D} {\pi_2 \alpha} {\pi_2 \beta})$ saying an
+arrow in a product category is a pair of arrows.
+%
+Similarly, the hom type in the presheaf category should be given by
+the end formula $\punitinXfromYtoZ {\negPresheaf {\cat C}} \alpha
+\beta \cong \homlallXYtoZ {\gamma}{\negPresheafApp \alpha
+  \gamma}{\negPresheafApp \beta \gamma}$. This would allow us to
+relate the Yoneda Lemma \ref{lem:yoneda} to the morphisms of
+presheaves, and prove that the Yoneda embedding is fully faithful.
+%
+We call these extensionality principles because they are analogous to
+principles such as function extensionality but for the directed hom
+type rather than equality.
+
+The presheaf extensionality principle is independent from the existing
+axioms of \ohol{}: it is true in the ordinary category theoretic
+model, but it is false in the set theoretic model. That is, in the set
+theoretic model, the presheaf category is simply the powerset, the hom
+type is \emph{equality} and the function profunctor is interpreted as
+a universally quantified \emph{implication}, but equality in the
+powerset should be \emph{bi-implication}, so the theorem is false. We
+expect the product extensionality is independent as well, but a
+counter-model would likely be quite exotic as we expect it to be
+provable in a system with functor categories, in analogy with the
+proof for the identity type in MLTT.
+%
+Note that these axioms can easily be added as assumptions in the
+dependently typed context, though this will break the constructive
+character of the system. We expect techniques from type theory might
+be applied to incorporate these as computationally meaningful
+principles rather than assumed as axioms \cite{obs-tt,xtt,cubical-type-theory}.
+
 \section{Semantics}
 
 Next, we develop the basics of the model theory for \ohol{}.
@@ -2390,7 +2438,7 @@ ongoing \cite{riehl-shulman,north}. Directed dependent type theories
 should generalize \ohol{} in the same way that dependent type theory
 generalizes higher order logic: internally there should be a type that
 models the category of sets, and terms of this type should model the
-profunctors of \ohol{}. As a foundation for a domain-specific proof
+profunctors of \ohol{}.  As a foundation for a domain-specific proof
 assistant for category theory, \ohol{} may provide a foundation for a
 proof assistant in the style of Isabelle/HOL \cite{isabelle-hol},
 whereas directed type theory would provide a foundation for a proof
