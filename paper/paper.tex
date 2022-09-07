@@ -2360,7 +2360,41 @@ $\Gamma$.
 
 \section{Discussion}
 
-\paragraph{Calculi for 2-dimensional category theory}
+\paragraph{Calculi for formal category theory}
+
+In their book on $\infty$-category theory, Riehl and Verity use the
+formal language of virtual equipments to prove results valid for
+$\infty$-categories without concrete manipulation of model
+categories. They formalize this language using Makkai's FOLDS
+framework of first-order logic with dependent sorts. The approach is
+similar in spirit to our \ohol{}, and has the same models. The main
+difference is that their theory is built on top of first-order logic,
+whereas ours is built on a custom-made variant of higher-order logic
+over a (unary) simple type theory. For this reason, statements in
+their theory are quite complex as they have to be encoded into
+first-order logic, whereas we argue our type-theoretic approach
+formalizes informal arguments much more directly, as shown in
+Section~\ref{sec:examples}.
+%
+An informal syntax for manipulating profunctors involving ends and
+coends, called the coend calculus is closely related, an extension of
+\ohol{} to treat profunctors of many variables of different variances
+should provide a formal treatment for the coend calculus
+\citet{coend-calculus}.
+
+Another approach to formal category theory is to develop a
+\emph{directed dependent type theory}, a type theory where the
+identity type is interpreted as morphisms in a (possibly
+$\infty$-)category. Research on directed dependent type theories is
+ongoing \cite{riehl-shulman,north}. Directed dependent type theories
+should generalize \ohol{} in the same way that dependent type theory
+generalizes higher order logic: internally there should be a type that
+models the category of sets, and terms of this type should model the
+profunctors of \ohol{}. As a foundation for a domain-specific proof
+assistant for category theory, \ohol{} may provide a foundation for a
+proof assistant in the style of Isabelle/HOL \cite{isabelle-hol},
+whereas directed type theory would provide a foundation for a proof
+assistant in the style of Agda or Coq \cite{agda,coq}.
 
 \citet{djm-string-diagrams} provides a string diagram calculus for
 double categories and pro-arrow equipments, generalizing string
@@ -2391,12 +2425,6 @@ functors between two categories can only be recovered from the set of
 profunctors if the codomain category is Cauchy complete, in which case
 functors are equivalent to adjoint pairs of profunctors.
 
-Our type-theoretic syntax for virtual double categories is intended to
-be a formal notation for the manipulation of profunctors. As such it
-has similarities to informal syntax for manipulating profunctors
-involving ends and coends, such as the coend calculus of
-\citet{coend-calculus}.
-
 Finally, some variations on double categories have been used to model
 the structure of certain program logics. \citet{newlicata20} present a
 logic for \emph{vertically thin} pro-arrow equipments, i.e., pro-arrow
@@ -2409,15 +2437,6 @@ than by syntactic substitution of vertical arrows in horizontal
 arrows. Another similar calculus is System P \citep{systemP} which is
 an internal language of \emph{reflexive graph categories}, which are
 like double categories without horizontal composition. 
-
-Double-cat-like syntax:
-Gradual Type Theory, System P of parametricity, cubical stuff?
-
-\subsection{Directed Type Theory}
-
-Directed Type theory
-
-Fibrational approaches to logical relations
 
 \subsection{Category Theoretic Extensions}
 
