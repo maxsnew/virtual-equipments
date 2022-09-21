@@ -16,6 +16,7 @@
 %% \newtheorem{lemma}{Lemma}
 \newtheorem{construction}{Construction}
 %% \newtheorem{definition}{Definition}
+\newcommand{\vett}{VETT}
 \newcommand{\ohol}{OHol}
 \newcommand{\sem}[1]{\llbracket{#1}\rrbracket}
 \newcommand{\pto}{\nrightarrow}
@@ -112,8 +113,11 @@
 \newcommand{\posPresheaf}{\paramPresheaf+}
 \newcommand{\negPresheaf}{\paramPresheaf-}
 \newcommand{\negPresheafApp}[2]{#1\,#2}
-\newcommand{\negPresheafAppPtoX}[2]{#2\,#1}
+\newcommand{\negPresheafAppPtoX}[2]{#2\in #1}
+\newcommand{\posPresheafAppPtoX}[2]{#1 \ni #2}
 \newcommand{\posPresheafApp}[2]{#1\,#2}
+
+\newcommand{\graphProf}[3]{\sum_{{#1};{#2}} #3}
 
 % Algebraic notation
 \newcommand{\algCtx}{\textrm{Ctx}}
@@ -156,7 +160,7 @@
 \newcommand{\algVarrUnqt}{\textrm{FunctUnQt}}
 
 
-\title{An Ordered Logic for Category Theory}
+\title{A Constructive Ordered Predicate Logic for Category Theory}
 \author{Max S. New\inst{1,2} and Daniel R. Licata\inst{2}}
 \institute{University of Michigan \and Wesleyan University}
 
@@ -176,12 +180,12 @@
   function types, and can be seen to be ordered refinements of
   theorems in predicate logic.
 
-  We develop a sound and complete notion of categorical model and give
-  a model construction that shows that the theorems are valid in
-  enriched and internal categories. This means that while the proofs
-  in our type theory look like standard set-based arguments, the
-  substructural syntactic restrictions ensure that the proofs carry
-  over to enriched and internal settings as well.
+  We develop a sound and complete notion of categorical model for the
+  type theory based on virtual equipments, which are known to model
+  both internal and enriched category theory. This means that while
+  the proofs in our type theory look like standard set-based
+  arguments, the syntactic discipline ensure that all proofs and
+  constructions carry over to enriched and internal settings as well.
 \end{abstract}
 
 \section{Introduction}
@@ -190,22 +194,21 @@ Category theory is a branch of mathematics that gives a systematic
 theory of typed, ``higher-dimensional'' algebraic structures.
 %
 Originally developed for applications to homological algebra, it was
-quickly discovered that these categorical structures were common in
-logic and computer science, and that formal systems like logics, type
-theories and programming languages can be modeled by sound and
-complete semantic models given by notions of structured
-category\cite{lawvere,goguen,lambek,moggi}, a phenomenon sometimes
-referred to as the Curry-Howard-Lambek correspondence
-\cite{curry-howard-lambek}.
+quickly discovered that (among many other applications) these
+categorical structures were common in logic and computer science, and
+that formal systems like logics, type theories and programming
+languages can be modeled by sound and complete semantic models given
+by notions of structured category\cite{lawvere,goguen,lambek,moggi}, a
+phenomenon sometimes referred to as the Curry-Howard-Lambek
+nncorrespondence \cite{curry-howard-lambek}.
 %
 Examples include the simply typed lambda calculus \cite{lambekscott},
 computational lambda calculus \cite{moggi}, linear logic \cite{girard}
 and dependent type theory\cite{not-sure}.
 %
 These seminal works have led to a fruitful field of research known as
-categorical logic, where
-new type theories are designed based directly on category-theoretic
-semantics.
+categorical logic, where new type theories are designed based directly
+on category-theoretic semantics.
 %
 The slogan is that the syntax of a type theory should present an
 initial object in its category of models, a category-theoretic
@@ -237,7 +240,8 @@ programming language applications: domain-,metric- and
 step-index-enriched categories have been used to model general
 recursion and internal categories have been used to model
 parametricity and gradual
-typing\cite{order-enriched-cats,topos-of-trees,reflexive-graphs,double-cats-gradual-typing}.
+typing\cite{order-enriched-cats,topos-of-trees,reflexive-graphs,double-cats-gradual-typing},
+to name a few.
 
 % TODO: Yoneda example
 Novices in category theory are often overwhelmed by the number of
@@ -287,12 +291,12 @@ described in terms of a concrete notion of sets or types.
 
 In this work, we apply the technique of categorical logic to these
 algebraic structures to design a formal logic, which we call
-\emph{ordered predicate logic}, that can be soundly interpreted in
-virtual equipments.
+\emph{virtual equipment type theory}, that can be soundly interpreted
+in virtual equipments.
 %
-In ordered predicate logic, the sorts are interpreted as categories,
-functions as functors, relations as profunctors and implications of
-relations as natural transformations.
+In \vett{}, the sorts are interpreted as categories, functions as
+functors, relations as profunctors and implications of relations as
+profunctor homomorphisms, a generalization of natural transformations.
 %
 The type theoretic syntax allows us to write all of our constructions
 as if they were ordinary functors and profunctors in set-based
@@ -306,13 +310,13 @@ restricting to intuitionistic reasoning, the constructions can all be
 interpreted in models where types are spaces and terms are continuous
 functions ``for free''.
 
-Ordered predicate logic is a kind of \emph{ordered},
-\emph{constructive} variant of predicate logic over a unary type
-theory.
+\vett{} is a kind of \emph{ordered}, \emph{constructive} variant of
+predicate logic over a unary type theory.
 %
 It is \emph{ordered} in that our notion of predicate is that of a
 binary relation $R(\alpha;\beta)$ where the $\alpha$ is thought of as
-a contravariant dependence and the $\beta$ has a covariant dependence.
+a contravariant dependence and the $\beta$ has a covariant dependence,
+and the rules of the logic distinguish between these two variances.
 %
 Proofs in the predicate logic $R_1, R_2,\ldots \vdash S$ are
 restricted as in ordered linear logic \cite{lambek-calculus, ordered-linear-logic} in
@@ -336,8 +340,16 @@ profunctors. However, the restriction is natural in that it
 corresponds to a well-understood notion of model (virtual equipments)
 and so we leave the extension to future work.
 %
-We show that a great deal of fundamental results in category theory
-are already expressible in this fragment.
+It is well known that a great deal of fundamental results and
+constructions in category theory such as Yoneda and co-Yoneda lemmas,
+adjoint functors and Kan extensions are already expressible in virtual
+equipments, for instance virtual equipments are used for this purpose
+in a text on $\infty$-category theory to avoid explicit manipulation
+of model categories \cite{elements-of-oo-category-theory}.
+%
+We demonstrate some of these standard constructions
+in \ref{sec:synthetic} to show that \vett{} gives a syntax in which
+these formal constructions look like standard set-theoretic arguments.
 
 Due to the restriction to unary functors and binary profunctors, it is
 difficult to state some theorems internally to the theory. For
@@ -350,14 +362,15 @@ theory. Then all of our ordered predicate logic judgments will also be
 indexed by a context from this dependent type theory, and the type
 theory includes types for categories, functors, profunctors and
 natural transformations that allow us to formalize theorems the logic
-is too restrictive to encode.
+is too restrictive to encode. This is analogous to the notion of a
+\emph{2-level type theory}: we add a dependent type theory for
+reasoning about the terms of our virtual equipment type theory.
 
 The dependent type theory layer also has an additional purpose: since
-we can quantify over the structures in ordered predicate logic, we can
-additionally encode \emph{signatures} for ordered predicate logic as
-simply contexts of the dependent type theory. This allows for a clean
-formalization of many categorical structures such as monoidal
-categories, or strong monads.
+we can quantify over the structures in \vett{}, we can additionally
+encode \emph{signatures} for \vett{} as simply contexts of the
+dependent type theory. This allows for a clean formalization of many
+categorical structures such as monoidal categories, or strong monads.
 
 While we emphasize the applications to enriched and internal category
 theory in this work, there is potential for more direct application to
@@ -365,16 +378,20 @@ programming language semantics.
 %
 Ordinary predicate logic has been used to develop logics in which
 logical relations proofs can be developed such as Abadi-Plotkin logic
-for parametricity and LSLR for step-indexed logical relations proofs
-\cite{abadi-plotkin,lslr}.
+for parametricity and LSLR and Iris for step-indexed logical relations
+proofs \cite{abadi-plotkin,lslr,iris}.
 %
-Many \emph{binary} logical relations are based on ordered structures,
-such as logical relations for approximation in non-deterministic or
-partial languages or logical relations for graduality in gradual
-typing.
+We conjecture that \vett{} might similarly serve as the foundation for
+a logic of \emph{ordered} structures, which abound in applications:
+rewriting and approximation relations can both be modeled as orderings
+and logical relations involving these structures are proven to respect
+orderings: operational logical relations must be downward-closed and
+approximation relations should satisfy transitivity.
 %
-We conjecture that some extension of the ordered predicate logic
-defined here will be useful for describing these relations as well.
+Just as LSLR and Iris release the user from the syntactic burden of
+explicit step-indexing, \vett{} may be used to release the user from
+the syntactic burden of proving downward-closure or transitivity
+side-conditions.
 
 \subsection{Basics of Profunctors}
 
@@ -470,108 +487,169 @@ binary relations rather than relations of arbitrary arity, we have
 only restricted forms of universal and existential quantification
 which come combined with implications and conjunctions.
 
-The syntactic forms of Simple Category Theory (SCT) are given in
+\begin{figure}
+  \begin{center}
+    \begin{tabular}{ |c|c| } 
+      \hline
+      Higher-Order Logic & Virtual Equipment Type Theory \\
+      \hline
+      Set $X$ & Category $\mathbb{C}$\\
+      $X \times Y$ & $\mathbb C \times \mathbb D$ \\ 
+      1 & $1$ \\
+      $\mathcal P X$ & $\mathcal P^+ X, \mathcal P^- X$ \\
+      $\{ (x,y) \in X \times Y | R(x,y) \}$ & $\sum_{\alpha:C;\beta:D} R$\\
+      Function $f(x:X) : Y$ & Functor/Object $\alpha:\cat C \vdash A : \cat D$\\
+      Relation $R(x,y)$ & Profunctor/Set $\alpha:\cat C; \beta:\cat D \vdash R$\\
+      $R \wedge Q$ & $R \times Q$\\
+      $\top$ & $1$\\
+      $\forall x. P \Rightarrow Q$ & $\homrallXYtoZ {\alpha:\cat C} P Q, \homlallXYtoZ {\alpha:\cat C} P Q$ \\
+      $\exists x. P \wedge Q$ & $\tensorexistsXwithYandZ {\alpha:\cat C} P Q$\\
+      $x =_X y$ & $\punitinXfromYtoZ {\cat C} \alpha \beta$\\
+      Proof $\forall \overrightarrow \alpha. R_1(\alpha_1,\alpha_2) \wedge \cdots \Rightarrow Q$ & Nat. Trans./Element $\alpha_1,x_1: R_1(\alpha_1,\alpha_2),\ldots \vdash t : Q$\\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{Analogy between Higher-Order Logic and \vett{} Judgments and Connectives}
+\end{figure}
+
+The syntactic forms of \vett{} are given in
 \cref{fig:syntax}.
 %
-First, we have the types and terms of the logic over our category
-theory. Types include the usual dependent sum, product and identity
-types of dependent type theory, as well as several forms that allow us
-to abstract over the category theoretic constructions: a type $\Cat$
-of categories, a type $\varr{\cat C}{\cat D}$ for functors from $\cat
-C$ to $\cat D$, a type $\harr{\cat C}{\cat D}$ for profunctors
-contravariant in $\cat C$ and covariant in $\cat D$, and finally a
-type $\pendallXdotY {\alpha:{\cat C}} R$ that, when combined with
-other constructions on profunctors, allows for abstraction over
-arbitrary natural transformations.
+First, we have categories, which are analogous to sorts in a
+first-order theory. We have $M$ a base sort, product and unit sorts,
+as well as the graph of a profunctor and the negative and positive
+presheaf categories.
 %
-Terms $L,M,N$ describe the elements of our logic's types, and include
-the usual constructions as well as forms for defining categories,
-functors, profunctors and natural transformations.
+Next, objects $a,b,c$ are the syntax for the \emph{functors} between
+categories. We call them objects rather than functors, because in
+type-theoretic style, a functor is viewed as a ``generalized object''
+parameterized by an input variable $\alpha : \cat C$.
 %
-Next, we have a syntax for categories, which are written using a
-blackboard font $\cat C, \cat D, \cat E$. Categories include terms $M$
-of the category type (allowing for abstraction), in addition to
-primitives for product and unit categories.
-%
-Next, we have a syntax for objects of a category, which, because they
-are typed with respect to an input variable, provide a syntax for
-functors.
-%
-The objects we can define are object variables, application of a
-functor $M a$, and pairs of objects (for the product category) and the
-unique object of the unit category.
-%
-Next, $P,Q,R$ stand for \emph{sets}, but similar to objects, they are
-always typed with respect to a contravariant and covariant variable,
-and so denote profunctors.
-%
-These include first the multiplicatives: the hom set
-$\punitinXfromYtoZ {\cat C} a b$ representing the morphisms from $a$
-to $b$ in $\cat C$, a tensor product $\tensorexistsXwithYandZ
-{\beta:\cat D} P Q$, and two kinds of ``ordered function types''
-$\homrallXYtoZ \beta P Q$ and $\homlallXYtoZ \alpha R S$. 
-%
-We also include application of a profunctor term $M$ to two objects,
-and cartesian product and unit sets.
-%
-Next, we have transformations $s,t,u$, which are typed with respect
-to (0 or more) input and (one) output set.
+Next, sets $P,Q,R$ are the syntax for \emph{sets}. These sets denote
+\emph{profunctors}, i.e., a categorification of relations. Similar to
+functors, rather than writing profunctors as functions ${\cat
+  C}^o\times {\cat D} \to \Set$, we write them as sets with a
+contravariant variable $\alpha:\cat C$ and a covariant variable
+$\beta:\cat D$. The sets we can define are the Hom-set, the tensor and
+internal hom, as well as products of sets, profunctors applied to two
+objects and elements of positive and negative presheaves. Finally we
+have elements of sets, which correspond to natural transformations of
+multiple inputs, where again we view natural transformations valued in
+a profunctor as generalized elements of profunctors.
 
-Finally, we have three forms of contexts, type contexts $\Gamma$, set
-contexts $\Xi$ and transformation contexts $\Phi$. A type context
-$\Gamma$ is the familiar notion of context from dependent type
-theory. We use uppercase $X,Y,Z$ for term variables to distinguish
-them from set variables. Every set expression $P$ must depend on an
-object of one category covariantly and an object of one category
-contravariantly, however these are allowed to be the same
-object. These two scenarios are captured by the notion of set context
-$\Xi$. The set context $\alpha:\cat C; \beta: \cat D$ gives the common
-case where the contravariant variable $\alpha$ is different from the
-covariant variable $\beta$, and the set context $\alpha: \cat C$ alone
-gives the case where the profunctor depends on the same variable both
-covariantly and contravariantly. Note that we write object variables
-as greek letters $\alpha, \beta$. Transformation contexts $\Phi$
-describe the inputs to a natural transformation. The input variables
-of a natural transformation $x: R$ stand for elements of sets, but as
-just described, sets always have covariant and contravariant
-dependencies. For this reason, transformation contexts include
-category variables $\alpha: \cat C$ interleaved with the set variables
-$x : R$, a typical context $\Phi$ would look like $\alpha_1:\cat C_1,
-x_1:R_1, \alpha_2: \cat C_2, x_2 : R_2, \alpha_3: \cat C_3$, where
-$R_1$ is parameterized by $\alpha_1$ contravariantly and $\alpha_2$
-covariantly and $R_2$ is similarly parameterized by
-$\alpha_2;\alpha_3$. Note that we consider transformation contexts up
-to associativity in that $(\Phi, x:R, \Psi), y : S, \Sigma$ should be
-considered equal to $\Phi, x:R, (\Psi, y: S, \Sigma)$.  In this
-calculus there is no single ``empty'' transformation context, but
-rather the empty context is one that consists of a single category
-variable $\alpha:\cat C$ and no set variables. Each form of context
-has a corresponding form of substitution, denoted using the lower-case
-form of the same greek letters.
+After these forms we have types and terms, which are for the most part
+the same as in dependent type theory, except that we have universe
+objects for classifying categories, functors, profunctors and natural
+transformations.
+%
+Finally we have several forms of context which are used in the theory:
+contexts $\Gamma$ of term variables with their types, contexts $\Xi$
+of object variables with their categories, and contexts $\Phi$ of
+element variables with their sets, alternating with those sets' object
+variables.
+
+
+
+%% %
+%% First, we have the types and terms of the logic over our category
+%% theory. Types include the usual dependent sum, product and identity
+%% types of dependent type theory, as well as several forms that allow us
+%% to abstract over the category theoretic constructions: a type $\Cat$
+%% of categories, a type $\varr{\cat C}{\cat D}$ for functors from $\cat
+%% C$ to $\cat D$, a type $\harr{\cat C}{\cat D}$ for profunctors
+%% contravariant in $\cat C$ and covariant in $\cat D$, and finally a
+%% type $\pendallXdotY {\alpha:{\cat C}} R$ that, when combined with
+%% other constructions on profunctors, allows for abstraction over
+%% arbitrary natural transformations.
+%% %
+%% Terms $L,M,N$ describe the elements of our logic's types, and include
+%% the usual constructions as well as forms for defining categories,
+%% functors, profunctors and natural transformations.
+%% %
+%% Next, we have a syntax for categories, which are written using a
+%% blackboard font $\cat C, \cat D, \cat E$. Categories include terms $M$
+%% of the category type (allowing for abstraction), in addition to
+%% primitives for product and unit categories.
+%% %
+%% Next, we have a syntax for objects of a category, which, because they
+%% are typed with respect to an input variable, provide a syntax for
+%% functors.
+%% %
+%% The objects we can define are object variables, application of a
+%% functor $M a$, and pairs of objects (for the product category) and the
+%% unique object of the unit category.
+%% %
+%% Next, $P,Q,R$ stand for \emph{sets}, but similar to objects, they are
+%% always typed with respect to a contravariant and covariant variable,
+%% and so denote profunctors.
+%% %
+%% These include first the multiplicatives: the hom set
+%% $\punitinXfromYtoZ {\cat C} a b$ representing the morphisms from $a$
+%% to $b$ in $\cat C$, a tensor product $\tensorexistsXwithYandZ
+%% {\beta:\cat D} P Q$, and two kinds of ``ordered function types''
+%% $\homrallXYtoZ \beta P Q$ and $\homlallXYtoZ \alpha R S$. 
+%% %
+%% We also include application of a profunctor term $M$ to two objects,
+%% and cartesian product and unit sets.
+%% %
+%% Next, we have transformations $s,t,u$, which are typed with respect
+%% to (0 or more) input and (one) output set.
+
+%% Finally, we have three forms of contexts, type contexts $\Gamma$, set
+%% contexts $\Xi$ and transformation contexts $\Phi$. A type context
+%% $\Gamma$ is the familiar notion of context from dependent type
+%% theory. We use uppercase $X,Y,Z$ for term variables to distinguish
+%% them from set variables. Every set expression $P$ must depend on an
+%% object of one category covariantly and an object of one category
+%% contravariantly, however these are allowed to be the same
+%% object. These two scenarios are captured by the notion of set context
+%% $\Xi$. The set context $\alpha:\cat C; \beta: \cat D$ gives the common
+%% case where the contravariant variable $\alpha$ is different from the
+%% covariant variable $\beta$, and the set context $\alpha: \cat C$ alone
+%% gives the case where the profunctor depends on the same variable both
+%% covariantly and contravariantly. Note that we write object variables
+%% as greek letters $\alpha, \beta$. Transformation contexts $\Phi$
+%% describe the inputs to a natural transformation. The input variables
+%% of a natural transformation $x: R$ stand for elements of sets, but as
+%% just described, sets always have covariant and contravariant
+%% dependencies. For this reason, transformation contexts include
+%% category variables $\alpha: \cat C$ interleaved with the set variables
+%% $x : R$, a typical context $\Phi$ would look like $\alpha_1:\cat C_1,
+%% x_1:R_1, \alpha_2: \cat C_2, x_2 : R_2, \alpha_3: \cat C_3$, where
+%% $R_1$ is parameterized by $\alpha_1$ contravariantly and $\alpha_2$
+%% covariantly and $R_2$ is similarly parameterized by
+%% $\alpha_2;\alpha_3$. Note that we consider transformation contexts up
+%% to associativity in that $(\Phi, x:R, \Psi), y : S, \Sigma$ should be
+%% considered equal to $\Phi, x:R, (\Psi, y: S, \Sigma)$.  In this
+%% calculus there is no single ``empty'' transformation context, but
+%% rather the empty context is one that consists of a single category
+%% variable $\alpha:\cat C$ and no set variables. Each form of context
+%% has a corresponding form of substitution, denoted using the lower-case
+%% form of the same greek letters.
 
 \begin{figure}
   \begin{mathpar}
     \begin{array}{rccl}
+      \textrm{Categories} &\cat C, \cat D, \cat E & ::= & M \pipe \cat C \times \cat D \pipe \cat 1
+      \pipe \graphProf \alpha \beta P \pipe \negPresheaf {\cat C} \pipe \posPresheaf {\cat C}
+      \\
+      \textrm{Objects} & a, b, c & ::= & \alpha \pipe M a \pipe (a,b) \pipe () \ldots\\
+      \textrm{Sets} & P,Q,R & ::= & \punitinXfromYtoZ {\cat C} a b \pipe \tensorexistsXwithYandZ {\beta} P Q \pipe \homrallXYtoZ \beta P Q \pipe \homlallXYtoZ \alpha R S \\
+      &&& 1 \pipe P \times Q\\
+      &&& \pipe \harrapp M a b \pipe \negPresheafAppPtoX a b \pipe \posPresheafAppPtoX a b\\
+      \textrm{Elements} & s,t,u & ::= & \ldots \\
+      \\
       \textrm{Type} & A,B,C & ::= &
       \sum_{X:A} B \pipe \prod_{X:A} B \pipe \Id A M N \\
       &&& \Cat \pipe \varr{\cat C}{\cat D}\pipe \harr {\cat C} {\cat D}\pipe \pendallXdotY {\alpha:{\cat C}} R\\
       \textrm{Term} & L,M,N & ::= & X \pipe \lambda X:M. N \pipe M\,N \pipe (M,N) \pipe \pi_1 M \pipe \pi_2 M\\
       &&&\lceil \cat C \rceil \pipe \vlambda {\alpha:\cat C} a \pipe \hlambda {\alpha:\cat C}{\beta: \cat D} R \ldots \\
-      \textrm{Categories} &\cat C, \cat D, \cat E & ::= & M \pipe \cat C \times \cat D \pipe \cat 1\\
-      \textrm{Objects} & a, b, c & ::= & \alpha \pipe M a \pipe (a,b) \pipe () \ldots\\
-      \textrm{Sets} & P,Q,R & ::= & \punitinXfromYtoZ {\cat C} a b \pipe \tensorexistsXwithYandZ {\beta} P Q \pipe \homrallXYtoZ \beta P Q \pipe \homlallXYtoZ \alpha R S \\
-      &&& M(a,b) \pipe 1 \pipe P \times Q\\
-      \textrm{Transformations} & s,t,u & ::= & \ldots \\
-      \\
       \textrm{Type Context} & \Gamma, \Delta & ::= & \cdot \pipe \Gamma, X : A\\
       \textrm{Category Context} & \Xi, Z & ::= & \alpha:\cat C \pipe \alpha:\cat C;\beta: \cat D\\
-      \textrm{Set Context} & \Phi,\Psi & ::= & \alpha : \cat C \pipe \Phi , x : P , \Psi\\
-      \textrm{Term Substitution} & \gamma, \delta & ::= & \cdot \pipe \gamma, M/X\\
-      \textrm{Object Substitution} & \xi, \zeta & ::= & a/\alpha \pipe a/\alpha;b/\beta\\
-      \textrm{Transformation Substitution} & \phi, \psi & ::= & a/\alpha \pipe \phi,s/x, \psi      
+      \textrm{Set Context} & \Phi,\Psi & ::= & \alpha : \cat C \pipe \Phi , x : P,\beta:\cat D\\
     \end{array}
   \end{mathpar}
-  \caption{Simple Category Theory Syntactic Forms}
+  \caption{\vett{} Syntactic Forms}
   \label{fig:syntax}
 \end{figure}
 
@@ -591,10 +669,6 @@ context but the left-most and right-most object variables.
 
 \begin{figure}
   \begin{mathpar}
-    \inferrule*[right=TyCtxForm]
-        {}
-        {\Gamma \isadtctx}
-
     \inferrule*[right=Cat-form]
     {\Gamma \isadtctx}
     {\Gamma\vdash \cat C \isaCat}
@@ -603,36 +677,16 @@ context but the left-most and right-most object variables.
     {\Gamma \vdash \cat C\isaCat\and \Gamma \vdash \cat D \isaCat}
     {\Gamma \pipe \alpha : \cat C \vdash a : \cat D}\\
 
-    \inferrule*[right=SetCtxForm]
-    {\Gamma \isadtctx}
-    {\Gamma \vdash \Xi \boundary}
-
     \inferrule*[right=SetForm]
     {\Gamma \isadtctx \and \Gamma \vdash \Xi \boundary}
     {\Gamma \pipe \Xi \vdash S \isaSet}
-
-    \inferrule*[right=TransCtxForm]
-    {\Gamma \isadtctx}
-     {\Gamma \vdash \Phi \isavectx}
 
     \inferrule*[right=TransFormation]
     {\Gamma \vdash \Phi \isavectx\and
      \Gamma\pipe \underline \Phi \vdash R \isaSet}
     {\Gamma \pipe \Phi \vdash s : R}
-
-    \inferrule
-    {\Delta \isadtctx \and \Gamma \isadtctx}
-    {\gamma : \Delta \to \Gamma}
-    
-    \inferrule*[right=Boundary Map formation]
-    {\Gamma \vdash Z \boundary \and \Gamma \vdash \Xi \boundary}
-    {\Gamma \vdash \xi : Z \to \Xi}
-
-    \inferrule*[right=Cat Subst formation]
-    {\Gamma \vdash \Psi \isavectx \and \Gamma \vdash \Phi \isavectx}
-    {\Gamma \vdash \phi : \Psi \to \Phi}
   \end{mathpar}
-  \caption{Formation Rules}
+  \caption{Selected Formation Rules}
   \label{fig:formation}
 \end{figure}
 
@@ -2602,6 +2656,44 @@ Shulman, Dominic Verity,...for helpful feedback on this work
 
 
 \appendix
+
+\section{Syntactic Details}
+
+\begin{figure}
+  \begin{mathpar}
+    \begin{array}{rccl}
+      \textrm{Term Substitution} & \gamma, \delta & ::= & \cdot \pipe \gamma, M/X\\
+      \textrm{Object Substitution} & \xi, \zeta & ::= & a/\alpha \pipe a/\alpha;b/\beta\\
+      \textrm{Transformation Substitution} & \phi, \psi & ::= & a/\alpha \pipe \phi,s/x, \psi      
+    \end{array}
+
+      \inferrule*[right=TyCtxForm]
+        {}
+        {\Gamma \isadtctx}
+
+    \inferrule*[right=SetCtxForm]
+    {\Gamma \isadtctx}
+    {\Gamma \vdash \Xi \boundary}
+
+    \inferrule*[right=TransCtxForm]
+    {\Gamma \isadtctx}
+     {\Gamma \vdash \Phi \isavectx}
+    \inferrule
+    {\Delta \isadtctx \and \Gamma \isadtctx}
+    {\gamma : \Delta \to \Gamma}
+    
+    \inferrule*[right=Boundary Map formation]
+    {\Gamma \vdash Z \boundary \and \Gamma \vdash \Xi \boundary}
+    {\Gamma \vdash \xi : Z \to \Xi}
+
+    \inferrule*[right=Cat Subst formation]
+    {\Gamma \vdash \Psi \isavectx \and \Gamma \vdash \Phi \isavectx}
+    {\Gamma \vdash \phi : \Psi \to \Phi}
+
+  \end{mathpar}
+  \caption{Substitution}
+  
+\end{figure}
 
 \section{Completeness}
 
