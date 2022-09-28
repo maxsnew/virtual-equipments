@@ -1,0 +1,19 @@
+We present a type theory for constructions and proofs in category
+theory. The type theory axiomatizes notions of category, functor,
+profunctor and a generalized form of natural transformations. By
+restricting the type theory to an ordered linear variant of predicate
+logic, we guarantee that all functions between categories are
+functorial, all relations are profunctorial, and all transformations
+are natural by construction, with no separate proof
+necessary. Important category theoretic proofs such as the Yoneda
+lemma become simple type theoretic proofs about the relationship
+between unit, tensor and function types, and can be seen to be ordered
+refinements of familiar theorems in predicate logic.
+
+The type theory comes with a sound and complete notion of categorical
+model based on virtual equipments, a known setting for formal category
+theory that has been shown to model internal, enriched and indexed
+category theory. This means that while the proofs in our type theory
+look like standard set-based arguments, the syntactic discipline
+ensures that all proofs and constructions carry over to these
+generalized settings as well.
