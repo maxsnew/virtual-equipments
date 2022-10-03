@@ -31,8 +31,11 @@
 \newcommand{\vtkmnd}{\mathbb{K}\text{Mod} (\vcat{V},T)}
 \newcommand{\rmod}{\text{RMod}}
 \newcommand{\lmod}{\text{LMod}}
-\newcommand{\varr}[2]{\text{Fun}{#1}{#2}}
-\newcommand{\harr}[2]{\text{Rel}{#1}{#2}}
+
+\newcommand{\smallCats}{\text{SmallCat}}
+\newcommand{\Cats}{\text{Cat}}
+\newcommand{\varr}[2]{\text{Fun}\,{#1}\,{#2}}
+\newcommand{\harr}[2]{\text{Prof}\,{#1}\,{#2}}
 \newcommand{\harrapp}[3]{#1(#2;#3)}
 
 \newcommand{\defaultObCtx}{\Gamma\pipe\alpha:\cat C}
@@ -58,6 +61,7 @@
 \newcommand{\punitinXfromYtoZ}[3]{#2 \mathop{\to_{#1}} #3}
 \newcommand{\punitrefl}[1]{\textrm{id}_{#1}}
 \newcommand{\punitelimtoYwithkontZ}[2]{\textrm{ind}_{\to}(#1,#2)}
+\newcommand{\punitelimkontZatABC}[4]{\textrm{ind}_{\to}(#1,#2, #3, #4)}
 
 \newcommand{\odotexists}[1]{\mathop{\overset{\exists #1}\odot}}
 \newcommand{\tensorexistsXwithYandZ}[3]{#2 \odotexists{#1} #3}
@@ -65,7 +69,8 @@
 \newcommand{\tensorintroatXwithYandZ}[3]{(#2,#1,#3)}
 \newcommand{\tensorelimXtoYwithkontZ}[3]{\textrm{ind}_{\to}(#1,#2,#3)}
 \newcommand{\tensorelimfromWXtoYwithkontZ}[4]{\textrm{ind}_{\odot}(#1,#2,#3,#4)}
-\newcommand{\tensorelimVatWtoXtoYwithkontZ}[5]{\textrm{ind}_{\to}(#4,#2,#1,#3,#5)}
+\newcommand{\tensorelimVatWtoXtoYwithkontZ}[5]{\textrm{ind}_{\odot}(#4,#2,#1,#3,#5)}
+\newcommand{\tensorelimWfromXtoYkontZ}[4]{\textrm{ind}_{\odot}(#4;#1,#2,#3)}
 
 \newcommand{\tlwith}[1]{\mathop{\prescript{#1}{}\triangleleft}}
 \newcommand{\tlforall}[1]{\tlwith{\forall #1}}
@@ -919,7 +924,115 @@ Next, we cover the connectives for the sets, i.e., constructions on
 profunctors in Figure~\ref{fig:set-connectives}.
 
 \begin{figure}
-  TODO
+  \begin{mathpar}
+    % unit,
+
+    \inferrule
+    {\Gamma \pipe d^-\Xi; \beta:D\vdash P \isaSet\\\\
+     \Gamma \pipe \beta:D;d^+\Xi \vdash Q \isaSet}
+    {\Gamma \pipe \Xi \vdash \tensorexistsXwithYandZ {\beta:D} P Q}
+    
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C; d^-\Xi\vdash R \\\\ \Gamma \pipe \alpha : \cat C; d^+\Xi\vdash P}
+    {\Gamma \pipe \Xi \vdash \homlallXYtoZ \alpha R P}
+
+  \inferrule
+  {\Gamma \pipe d^+\Xi; \alpha : \cat C \vdash  R \\\\ \Gamma \pipe  d^-\Xi; \alpha : \cat C \vdash P}
+  {\Gamma \pipe \Xi \vdash \homrallXYtoZ \alpha R P}\\
+
+  \inferrule
+    {\Gamma \pipe d^-\Xi \vdash a_1 : \cat C\\\\ \Gamma \pipe d^+ \Xi \vdash a_2 : \cat C}
+    {\Gamma \pipe \Xi \vdash \punitinXfromYtoZ {\cat C} {a_1} {a_2}}
+
+    \inferrule{}{\Gamma\pipe \Xi \vdash 1 \isaSet}
+
+    \inferrule{\Gamma\pipe\Xi \vdash R \isaSet \\\\ \Gamma\pipe\Xi \vdash S\isaSet}
+              {\Gamma\pipe\Xi \vdash R \times S\isaSet}\\
+
+    \inferrule
+    {\Gamma\pipe\beta: \cat D \vdash a : \cat C}
+    {\Gamma \pipe\cdot \vdash \punitrefl a : \punitinXfromYtoZ {\cat C} a a}
+
+%%     \inferrule*[right=Unit Elim]
+%%     {\Gamma\vdash Q : \harr {\cat C} {\cat C}\and
+%%      \Gamma\vdash t : \pendallXdotY {\alpha:\cat C} {\harrapp Q \alpha \alpha}}
+%%     {\Gamma \vdash \punitelimtoYwithkontZ Q N :
+%%       \pendallXdotY {\alpha_1} {\homrallXYtoZ {\alpha_2} {\punitinXfromYtoZ {\cat C} {\alpha_1}{\alpha_2}} {\harrapp Q {\alpha_1}{\alpha_2}}}}
+
+    \inferrule
+    {\Gamma\pipe \alpha:\cat C\vdash t : P[\alpha/\alpha^-;\alpha/\alpha^+]\\\\
+     \Gamma\pipe\Phi \vdash s : \punitinXfromYtoZ {\cat C} A B}
+    {\Gamma \vdash \punitelimkontZatABC {\alpha. t} A s B : P[A/\alpha^-;B/\alpha^+]}
+
+  %% \inferrule*[right=Tensor intro function]
+  %% {}
+  %% {\alpha : \cat C, q : Q, \beta : \cat D, r : R, \gamma : \cat E \vdash (q, \beta,r) : \exists \beta : \cat D. Q \odot R}
+
+  %% \inferrule*[right=Tensor introduction]
+  %% {\Gamma \vdash P : \harr C D \and
+  %%   \Gamma \vdash Q : \harr D E}
+  %% {\Gamma\pipe\cdot\vdash \tensorintroofXandY P Q : \pendallXdotY {\alpha} \homrallXYtoZ \beta {\harrapp P \alpha \beta} {\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta}{\harrapp Q \beta \gamma})}}}
+
+  \inferrule
+  {\Gamma \pipe d^+\Psi_s \vdash b : \cat D\\\\
+   \Gamma \pipe \Psi_s \vdash s : P[b/\beta] \\\\
+   \Gamma \pipe \Psi_t \vdash t : Q[b/\beta]}
+  {\Gamma\pipe\Psi_s \jnctx \Psi_t\vdash \tensorintroatXwithYandZ b s t : \tensorexistsXwithYandZ {\beta : \cat D} P Q}
+
+  \inferrule
+  {
+   \Gamma\pipe \alpha:\cat C, x:P, \beta:\cat D, y:Q, \gamma:\cat E \vdash t : R\\\\
+   \Gamma \pipe\Phi \vdash s : \tensorexistsXwithYandZ {\beta} {P[a/\alpha]}{Q[c/\gamma]}}
+  {\Gamma \vdash \tensorelimWfromXtoYkontZ a s b {\alpha.x.\beta.y.\gamma. t} : R[a/\alpha;c/\gamma]}
+
+  %% \tensorintroatXwithYandZ B M N [\phi,B'/\beta',\psi] = \tensorintroatXwithYandZ {B[B'\beta]} {M[\phi]} {N[\psi]}
+
+  %% \inferrule*[right=Tensor simpl]
+  %% {\Gamma\pipe\cdot \vdash R : \harr {C} {E}\and
+  %%  \Gamma\pipe\cdot \vdash N : \pendallXdotY {\alpha:C} {\homrallXYtoZ {\beta:D} P {\homrallXYtoZ {\gamma:E} Q {\harrapp R \alpha\gamma}}}}
+  %% {\Gamma\pipe\alpha:C,p:\tensorexistsXwithYandZ {\beta:D} P Q,\gamma:E \vdash\tensorelimVatWtoXtoYwithkontZ p \alpha \gamma R N : \harrapp R A G}
+
+%%   \inferrule*[right=Tensor-elim]
+%%   {\Gamma \pipe \vdash P : \harr {\cat C} {\cat D}\and\Gamma \vdash Q : \harr {\cat D}{\cat E}\and
+%%    \Gamma \vdash R : \harr {\cat C}{\cat E}\and
+%%    \Gamma \vdash N : \hombinary \alpha {\harrapp P \alpha \beta} \beta {\harrapp Q \beta \gamma} \gamma {\harrapp R \alpha \gamma}}
+%%   {\Gamma \vdash \tensorelimfromWXtoYwithkontZ P Q R N : \homunary \alpha {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta} {\harrapp Q \beta \gamma})} {\gamma} {\harrapp R \alpha \gamma}}
+  \inferrule
+  {\Gamma \pipe \Phi, x : R, \alpha : \cat C \vdash t : P}
+  {\Gamma \pipe \Phi \vdash
+   \homrlambdaXatYdotZ {x : R} {\alpha : \cat C} t : \homrallXYtoZ \alpha R P}
+
+      %% \inferrule*[right=Covar Hom elim simple]
+      %% {}
+      %% {\alpha: \cat C, f:\forall \gamma. P \triangleleft R, \beta : \cat D, x : R, \gamma : \cat E \vdash f\triangleleft (x, \gamma) : P}
+
+  \inferrule
+  {\Gamma\pipe\Phi_f \vdash s : \homrallXYtoZ {\alpha:\cat C} R P \\\\
+    d^+\Phi_a \vdash a : \cat C\\\\
+    \Phi_a \vdash t : R[a/\alpha]
+  }
+  {\Gamma\pipe \Phi_f \jnctx \Phi_a \vdash \homrappXtoYatZ s t a : P[a/\alpha]}\\
+
+  \inferrule
+  {\Gamma\pipe\alpha:\cat C, x : R, \Phi \vdash t : P}
+  {\Gamma\pipe\Phi \vdash \homllambdaXatYdotZ {x : R} {\alpha : \cat C} t : \homlallXYtoZ \alpha R P}
+
+  \inferrule
+  {\Gamma \pipe d^-\Phi_a \vdash a : \cat C\\\\
+   \Gamma \pipe \Phi_a \vdash s : R[a/\alpha] \\\\
+   \Gamma \pipe \Phi_f \vdash t : \homlallXYtoZ {\alpha:\cat C} R P}
+  {\Gamma \pipe \Phi_a \jnctx \Phi_f \vdash \homlappXtoYatZ t s a : P[a/\alpha]}\\
+  % tensor,
+  % hom,
+  % cartesian products,
+  % 
+
+  \inferrule{}{\Gamma\pipe \Phi \vdash () :  1}
+
+    \inferrule{\forall i \in \{1,2\}.~ \Gamma \pipe\Phi \vdash M_i : R_i}{\Gamma \pipe\Phi \vdash (M_1,M_2) : R_1 \times R_2}
+
+    \inferrule{\Gamma \pipe\Phi\vdash M : R_1 \times R_2}{\Gamma \pipe\Phi \vdash \pi_i M : R_i}
+  \end{mathpar}
   \caption{Set Connectives}
 \end{figure}
 
@@ -938,32 +1051,46 @@ categorical logic: types of small categories and locally small
 categories, functors, profunctors and natural transformations.
 
 \begin{figure}
-  
-  \caption{Type Connectives}
-\end{figure}
-
-Finally, we describe the \emph{end}, $\pendallXdotY {\alpha} P$, which
-when combined with the left or right hom types described in the next
-section allows for us to internalize arbitrary transformation sequents
-$\Phi \vdash P$ as a type.
-%
-This type is well formed when $\alpha$ is the covariant \emph{and}
-contravariant variable of $P$.
-%
-An element of the type is a polymorphic element of $P$, varying in
-$\alpha$.
-%
-The introduction form is naturally a $\lambda$ abstracting over
-$\alpha:\cat C$ and the elimination form instantiates $\alpha$ with an
-arbitrary object $a : \cat C$.
-%
-We also include the necessary $\beta\eta$ equalities.
-
-\begin{figure}
   \begin{mathpar}
+    \inferrule
+    {}
+    {\Gamma\vdash \smallCats}
+
+    \inferrule
+    {}
+    {\Gamma\vdash \Cats}
+    
+    \inferrule
+    {\Gamma \vdash \cat C \isaCat \and\Gamma \vdash \cat D \isaCat}
+    {\Gamma\pipe\cdot \vdash \varr{\cat C}{\cat D} \isaSet}
+
+    \inferrule
+    {\Gamma \vdash \cat C \isaCat \and\Gamma \vdash \cat D \isaCat}
+    {\Gamma\pipe\cdot \vdash \harr{\cat C}{\cat D} \isaSet}
+
     \inferrule
     {\Gamma \pipe \alpha:\cat C\vdash P \isaSet}
     {\Gamma \vdash \pendallXdotY {\alpha:{\cat C}} P \isaTy}
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C \vdash A : \cat D}
+    {\Gamma \vdash \lambda \alpha:\cat C. A : \varr{\cat C}{\cat D}}
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C \vdash A : \cat D\and
+      \Gamma\pipe\cdot \vdash M : \varr{\cat D}{\cat E}}
+    {\Gamma\pipe \alpha:\cat C \vdash M A : \cat E}
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R \,\isaSet}
+    {\Gamma \vdash \lambda \alpha:\cat C;\beta:\cat D. R : \harr{\cat C}{\cat D}}
+
+    \inferrule
+    {\Gamma \vdash M : \harr{\cat C}{\cat D}\and
+     \Gamma \pipe d^- \Xi \vdash A : \cat C\and
+     \Gamma \pipe d^+ \Xi \vdash B : \cat C}
+    {\Gamma \pipe \Xi \vdash M A; B \isaSet}
+
 
     \inferrule
     {\Gamma \pipe \alpha:\cat C\vdash t : P}
@@ -973,20 +1100,732 @@ We also include the necessary $\beta\eta$ equalities.
     {\Gamma \vdash M : \pendallXdotY \alpha P\and
      \Gamma \pipe \beta:\cat D \vdash a : \cat C}
     {\Gamma \pipe \beta:\cat D \vdash \pendappXtoY M a : P[a/\alpha]}
-
-    \pendappXtoY {(\pendlambdaXdotY \alpha t)} a = t[a/\alpha]
-
-    \inferrule*[right=2Cell$\eta$]
-    {\Gamma \vdash M : \pendallXdotY \alpha P }
-    {\Gamma \vdash M = \pendlambdaXdotY \alpha {\pendappXtoY M \alpha} : \pendallXdotY \alpha P}
   \end{mathpar}
-  \caption{End}
-  \label{fig:end}
+  \caption{Type Connectives}
 \end{figure}
 
-Semantically, this type corresponds to taking the end of a profunctor
-$P : {\cat C}^{op} \times {\cat C} \to \Set$, typically written
-\[ \int^{\alpha:\cat C} P \alpha \alpha \]
+\section{Synthetic Category Theory in Ordered Higher-order Logic}
+
+To demonstrate that \ohol{} provides a setting in which to carry out
+synthetic category theory, we demonstrate some basic definitions and
+theorems in category theory in \ohol{}. We emphasize throughout the
+interpretations as tautologies in higher order-logic, as well as the
+relation to ordered linear logic.
+
+First, we fix some terminology: TODO, isomorphism of profunctors, anything else we'll need?
+%% \begin{definition}{Isomorphism of Profunctors}
+  
+%% \end{definition}
+
+We can witness the fact that all constructions are (pro-)functorial by
+using the hom type $\punitinXfromYtoZ {\cat C}{\alpha}{\alpha'}$.
+\begin{lemma}
+  \begin{enumerate}
+  \item Identity: $\pendallXdotY {\alpha} {\punitinXfromYtoZ {\cat C}{\alpha}{\alpha'}}$
+  \item Composition: $\hombinary {\alpha_1} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_3} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_3}}$
+  \item Functoriality: for any $F : \varr {\cat C}{\cat D}$, $\homunary {\alpha_1} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {} {F(\alpha_1)}{F(\alpha_2)}}$.
+   \item Profunctoriality: for any $R : \harr {\cat C}{\cat D}$ $\homtrinary {\alpha_1} {\punitinXfromYtoZ{} {\alpha_1}{\alpha_2}} {\alpha_2} {R{\alpha_2}{\beta_2}} {\beta_2} {\punitinXfromYtoZ{} {\beta_2} {\beta_1}} {\beta_1} {R\alpha_1\beta_1}$
+  \end{enumerate}
+\end{lemma}
+Reflexivity and transitivity generalize the corresponding properties
+of equality, with the lack of symmetry being a key feature of the
+generalization.
+%
+In addition, we can prove that the (pro)-functoriality axioms commute
+with the composition proof by the $\eta$ principle for the unit.
+%
+(Pro-)Functoriality generalizes the statement that all functions and
+relations respect equality.
+
+Naturality is more complex to state, and it is a statement about the
+\emph{proofs} so it has no analogue in ordinary higher-order
+logic. The following version is stated for any \emph{profunctor}, with
+the usual case of naturality arising when $R \alpha \beta =
+\punitinXfromYtoZ {\cat C}{F \alpha}{G \beta}$.
+\begin{lemma}[Naturality]
+  For any $t : \pendallXdotY {\alpha:\cat C}{\harrapp R \alpha
+    \alpha}$, by composing with profunctoriality, we can construct
+  terms
+  \[ \alpha_1, f : \punitinXfromYtoZ {\cat C} {\alpha_1} {\alpha_2}, \alpha_2 \vdash \textrm{lcomp}(f,\pendappXtoY t {\alpha_2}) \quad \textrm{and} \quad \textrm{rcomp}(\pendappXtoY t {\alpha_1}, f) : \harrapp R {\alpha_1}{\alpha_2}\]
+  These are both equal to $\punitelimtoYwithkontZ f {t}$.
+\end{lemma}
+
+Next, we turn to some of the central theorems of category theory, the
+Yoneda and Co-Yoneda lemmas. Despite being ulimately quite elementary,
+these are notoriously abstract. In \ohol{}, we can view these as
+ordered generalizations of some very simple tautologies about
+equality. For instance, the Yoneda lemma (and its proof) generalizes
+the equivalence between the formulae $\forall x. \forall y. x = y
+\Rightarrow P y$ and $P x$.
+\begin{lemma}
+  Let $\alpha^o : \cat C$ and $\pi : \negPresheaf {\cat C}$. Then
+  \begin{enumerate}
+  \item (Yoneda) The profunctor $\homrallXYtoZ {\alpha'} {\punitinXfromYtoZ {\cat C} {\alpha'}{\alpha}} {\negPresheafAppPtoX \pi {\alpha'}}$ is isomorphic to $\negPresheafAppPtoX \pi \alpha$
+  \item (Co-Yoneda) The profunctor $\tensorexistsXwithYandZ {\alpha'}{\punitinXfromYtoZ{}{\alpha}{\alpha'}} {\negPresheafAppPtoX \pi \alpha}$ is isomorphic to $\negPresheafAppPtoX \pi \alpha$
+  \end{enumerate}
+\end{lemma}
+
+Next, we have the ``Fubini'' theorems. These correspond to quantifier
+re-ordering and associativity of conjunction and implication in
+higher-order logic.
+\emph{Fubini} theorems about interchange of (co)-ends.
+\begin{lemma}[{Fubini}]
+  \label{lem:fubini}
+  The following isomorphisms hold when the corresponding profunctors
+  are well typed.
+  \begin{enumerate}
+  \item $\tensorexistsXwithYandZ {\beta} {\harrapp P \alpha \beta} {(\tensorexistsXwithYandZ \gamma {\harrapp Q \beta \gamma} {\harrapp R \gamma \delta})} \cong \tensorexistsXwithYandZ {\gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta} {\harrapp Q \beta \gamma})} {\harrapp R \gamma \delta}$
+  \item $\homrallXYtoZ {\gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta} {\harrapp Q \beta \gamma})} {\harrapp S \alpha \gamma} \cong \homrallXYtoZ \beta {\harrapp P \alpha \beta} {\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {\harrapp S \alpha \gamma}}$
+  \item $\homlallXYtoZ {\alpha} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta} {\harrapp Q \beta \gamma})} {\harrapp S \alpha \gamma} \cong \homlallXYtoZ \beta {\harrapp Q \beta \gamma} {\homlallXYtoZ \alpha {\harrapp P \alpha \beta} {\harrapp S \alpha \gamma}}$
+  \item $\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {(\homlallXYtoZ \alpha {\harrapp P \alpha \beta} {\harrapp S \alpha \gamma})} \cong \homlallXYtoZ \alpha {\harrapp P \alpha \beta} {(\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {\harrapp S \alpha \gamma})}$
+  \item $\pendallXdotY \alpha \homrallXYtoZ \beta P {P'} \cong \pendallXdotY \beta \homlallXYtoZ \alpha P {P'}$
+  \end{enumerate}  
+\end{lemma}
+Note that the last item here is different from the others in that it
+is an equivalence of sets rather than profunctors.
+
+Next, we turn to basic universal properties. While there are many
+equivalent definitions of a universal property in category theory, the
+one most natural in \ohol{} is the notion of a functor representing a
+profunctor, a mild generalization of the more common notion of
+representable presheaf. We say a functor $F : \varr {\cat C}{\cat D}$
+left represents a profunctor $R : \harr {\cat C}{\cat D}$ when
+$\punitinXfromYtoZ {}{\beta}{F \alpha} \cong \harrapp R \alpha
+\beta$. This is an ordered generalization of the notion of a relation
+$R$ being the \emph{graph} of a function $F$. Due to the asymmetry,
+there is a dual notion of a functor $G : \varr {\cat D}{\cat C}$
+right-representing a profunctor $\punitinXfromYtoZ {\alpha}{G\beta}
+\cong \harrapp R \alpha \beta$. Then $F$ and $G$ are adjoint functors
+when $F$ left represents a profunctor that $G$ right-represents. This
+generalizes the formulation that a function $g$ is an inverse to $f$
+if its corresponding relation is the converse of the relation
+corresponding to $f$.
+
+The definition we gave for adjoint functors is the one in terms of
+``hom-isomorphism''. The equivalent in terms of unit and co-unit is a
+simple corollary of the Yoneda lemma, because for instance the unit
+can be extracted from the transformation $\homunary \alpha
+{\punitinXfromYtoZ {}{F \alpha}{\beta}} \beta {\punitinXfromYtoZ
+  {}{\alpha}{G\beta}}$. The formulation in terms of unit and co-unit
+generalizes the formulation of inverses that each composition is equal
+to the identity.
+%% \begin{lemma}[Formulations of Representability]
+%%   The following are equivalent
+%%   \begin{enumerate}
+%%   \item An isomorphism between $\punitinXfromYtoZ {}{F \alpha}{\beta}$ and $\harrapp R \alpha \beta$
+%%   \item A term $\pendallXdotY \alpha {\harrapp R \alpha {F \alpha}}$
+%%     such that the induced morphism from $\punitinXfromYtoZ {}{F
+%%       \alpha}{\beta}$ to $\harrapp R \alpha \beta$ is an isomorphism.
+%%   \end{enumerate}
+%% \end{lemma}
+
+Next, we turn to limits, or more generally, Kan extensions.
+%
+Given functors $J : \varr {\cat C}{\cat C'}$ and $F : \varr{\cat
+  C}{\cat D}$, a right Kan extension is functor $\ran J F : \varr{\cat
+  C'}{\cat D}$ such that the composition $\ran J F \circ J$ has a
+universal natural transformation to $F$.
+\begin{lemma}
+  A right Kan extension of $F$ along $J$ is a functor $\ran J F$ that
+  right-represents the profunctor $\homrallXYtoZ {\alpha} {\punitinXfromYtoZ {} {\alpha'}{J \alpha}}{\punitinXfromYtoZ {} \beta {F \alpha}}$
+\end{lemma}
+Viewing this in higher-order logic, this says that $\beta = (\ran J
+F)\alpha'$ if and only if $\forall \alpha. \alpha' = J \alpha
+\Rightarrow \beta = F \alpha$. If $J$ is surjective this says that
+$\ran J F$ composed with $J$ is equal to $F$, but if $J$ is not
+surjective then this is impossible to satisfy for ordinary
+functions. Kan extensions generalize limits in that the limit of a
+diagram $F : \varr {\cat C}{\cat D}$ is the same as a right Kan
+extension along the unique $! : \varr{\cat C}{1}$.
+
+Then we can prove the famous theorem that right adjoints preserve
+right Kan extensions, and so in particular, limits.
+\begin{theorem}
+  If $\ran J F$ is a right Kan extension and $G : \varr{\cat D}{\cat
+    E}$ has a left adjoint $L$, then $G \circ (\ran J F)$ is the right
+  Kan extension of $G \circ F$ along $J$.
+\end{theorem}
+\begin{proof}
+  \begin{align*}
+    \punitinXfromYtoZ {} {\gamma} {G (\ran J F \alpha')}
+    &\cong \punitinXfromYtoZ {}{L \gamma} {\ran J F \alpha'}\\
+    &\cong \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {}{\alpha'}{J\alpha})} {\punitinXfromYtoZ {}{L \gamma}{F \alpha}}\\
+    &\cong \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {}{\alpha'}{J\alpha})} {\punitinXfromYtoZ {}{\gamma}{G (F \alpha)}}
+  \end{align*}  
+\end{proof}
+
+\subsection{Ordered Theories}
+
+Just as we can define theories in first-order logic or higher-order
+logic by assuming base sorts, function and relation symbols and
+axioms, we can define ordered, or categorical theories in \ohol{}
+easily by using the two-level type theory structure.
+%
+We can define an \emph{ordered theory} to be any context $\Gamma$ and
+a translation of theories to be a substitution.
+%
+Then we can define theories for cartesian categories, monoidal
+categories, bicartesian categories, strong monads, (strong)
+adjunctions.
+%
+However the utility for applications to programming language semantics
+is limited due to the lack of opposite categories.
+
+\subsection{Duality Principle}
+One common source of category theoretic arguments is the duality
+principle: since the opposite of any category is also a category, any
+statement that quantifies over all categories is equally true of their
+opposites. Furthermore in a formal language of categories, any
+statement can be dualized to a statement where domains and codomains
+are swapped and composition is flipped.
+%
+A similar duality principle holds in SCT.
+%
+The basic idea is to reverse the orientation of all \emph{set}
+expressions by swapping which variable is covariant and which is
+contravariant.
+%
+This has the effect of reversing the order of the context $\Phi$.
+%
+We can define this as a translation $\cdot^* : SCT \to SCT$ defined on
+syntactic forms of SCT in Figure~\ref{fig:duality}.
+\begin{figure}
+    \begin{align*}
+      (\harr {\cat C} {\cat D})^* &= \harr {\cat D^*} {\cat C^*}\\
+      (\alpha:\cat C)^* &= \alpha: \cat C^*\\
+      (\alpha:\cat C; \beta:\cat D)^* &= \beta:\cat D^*; \alpha:\cat C^*\\
+      (\Phi,x:R,\Psi)^* &= \Psi^*,x:R^*, \Phi^*\\
+      (\homrallXYtoZ \alpha P Q)^* &= \homlallXYtoZ \alpha {P^*} {Q^*}\\
+      (\homlallXYtoZ \alpha P Q)^* &= \homrallXYtoZ \alpha {P^*} {Q^*}\\
+      (\homrlambdaXatYdotZ x \alpha s)^* &= \homllambdaXatYdotZ x \alpha s^*\\
+      (\homrappXtoYatZ s t a)^* &= \homlappXtoYatZ {s^*} {t^*} {a^*}\\
+      (\tensorexistsXwithYandZ \beta P Q)^* &=
+      \tensorexistsXwithYandZ \beta {Q^*}{P^*}\\
+      (\tensorintroatXwithYandZ b s t)^* &= \tensorintroatXwithYandZ {b^*} {t^*} {s^*}\\
+      (\punitinXfromYtoZ {\cat C} {a_1}{a_2})^* &= \punitinXfromYtoZ {\cat C^*} {a_2^*}{a_1^*}
+    \end{align*}
+  \caption{Duality Involution}
+  \label{fig:duality}
+\end{figure}
+
+\subsection{Extensionality Axioms}
+
+Finally, we discuss some non-theorems that would be desirable to add
+as axioms to the theory of \ohol{}.
+%
+Chief among these are principles about the hom type $\punitinXfromYtoZ
+{\cat C} \alpha \beta$ when $\cat C$ is a connective.
+%
+Since the hom type is defined as a kind of unit type, rather than
+defined inductively, we are not guaranteed that the hom type for the
+product category $\cat C \times \cat D$ or the presheaf categories are
+what we expect.
+%
+For the product type, we expect there should be an isomorphism
+$\punitinXfromYtoZ {\cat C \times \cat D} \alpha \beta \cong
+(\punitinXfromYtoZ {\cat C} {\pi_1 \alpha} {\pi_1 \beta}) \times
+(\punitinXfromYtoZ {\cat D} {\pi_2 \alpha} {\pi_2 \beta})$ saying an
+arrow in a product category is a pair of arrows.
+%
+Similarly, the hom type in the presheaf category should be given by
+the end formula $\punitinXfromYtoZ {\negPresheaf {\cat C}} \alpha
+\beta \cong \homlallXYtoZ {\gamma}{\negPresheafApp \alpha
+  \gamma}{\negPresheafApp \beta \gamma}$. This would allow us to
+relate the Yoneda Lemma \ref{lem:yoneda} to the morphisms of
+presheaves, and prove that the Yoneda embedding is fully faithful.
+%
+We call these extensionality principles because they are analogous to
+principles such as function extensionality but for the directed hom
+type rather than equality.
+
+The presheaf extensionality principle is independent from the existing
+axioms of \ohol{}: it is true in the ordinary category theoretic
+model, but it is false in the set theoretic model. That is, in the set
+theoretic model, the presheaf category is simply the powerset, the hom
+type is \emph{equality} and the function profunctor is interpreted as
+a universally quantified \emph{implication}, but equality in the
+powerset should be \emph{bi-implication}, so the theorem is false. We
+expect the product extensionality is independent as well, but a
+counter-model would likely be quite exotic as we expect it to be
+provable in a system with functor categories, in analogy with the
+proof for the identity type in MLTT.
+%
+Note that these axioms can easily be added as assumptions in the
+dependently typed context, though this will break the constructive
+character of the system. We expect techniques from type theory might
+be applied to incorporate these as computationally meaningful
+principles rather than assumed as axioms \cite{obs-tt,xtt,cubical-type-theory}.
+
+\section{Semantics}
+
+Next, we develop the basics of the model theory for \ohol{}.
+%
+First, we demonstrate that a hyperdoctrine of virtual double
+categories with split restrictions provides a sound and complete
+notion of categorical model.
+%
+Then we instantiate this general notion of model to show that the
+\ohol{} can be interpreted in ordinary category theory as well as
+enriched and internal category theory, and more trivially, in terms of
+sets and relations or preordered sets and ordered relations.
+
+\subsection{Categorical Models}
+
+First, we can model the judgmental structure of the unary type theory
+and predicate logic in certain\emph{virtual double categories}
+\cite{leinster,crutwell-shulman}. We briefly recount the structure
+present in a virtual double category, but see \citet{crutwell-shulman}
+for a precise definition.
+The following definition is
+equivalent to the formulation as a ``normalized $T$-monoid'' in
+\citet{crutwell-shulman}, and we direct the reader there for the full
+description.
+%
+
+\begin{definition}[Virtual Double Category]
+  A virtual double category $\mathcal V$ consists of
+  \begin{enumerate}
+  \item A category $V_o$ of ``objects and vertical arrows''
+  \item A set ${\mathcal V}_h$ of ``horizontal arrows'' with source
+    and target functions $s,t : {\mathcal V}_h \to {\mathcal V_o}^2$
+  \item Sets of 2-cells of the following form:
+% https://q.uiver.app/?q=WzAsNixbMCwwLCJDXzAiXSxbMCwyLCJEXzAiXSxbMiwwLCJDX3tufSJdLFsxLDAsIlxcY2RvdHMiXSxbMiwyLCJEXzEiXSxbMSwxLCJcXHBoaSJdLFszLDIsIlJfbiIsMCx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImJhcnJlZCJ9fX1dLFswLDEsIkYiLDJdLFsyLDQsIkciXSxbMSw0LCJTIiwyLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV0sWzAsMywiUl8wIiwwLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV1d
+\[\begin{tikzcd}
+	{C_0} & \cdots & {C_{n}} \\
+	& \phi \\
+	{D_0} && {D_1}
+	\arrow["{R_n}", "\shortmid"{marking}, from=1-2, to=1-3]
+	\arrow["F"', from=1-1, to=3-1]
+	\arrow["G", from=1-3, to=3-3]
+	\arrow["S"', "\shortmid"{marking}, from=3-1, to=3-3]
+	\arrow["{R_0}", "\shortmid"{marking}, from=1-1, to=1-2]
+\end{tikzcd}\]
+  \end{enumerate}
+  We say a virtual double category has \emph{split restrictions} when
+  for any horizontal arrow $R : C \pto D$ and vertical arrows $f : C'
+  \to C$ and $g : D' \to D$ there is a chosen profunctor $R(f,g) : C'
+  \pto D'$ with a cartesian 2-cell to $R$ framed by $f,g$ and these
+  chosen cartesian lifts are functorial in $f,g$.  A functor of
+  virtual double categories preserves split restrictions if it
+  preserves these specified cartesian lifts.  
+\end{definition}
+
+Each component of this definition has a direct correspondence to a
+syntactic structure in \ohol{}. The category $\mathcal V_o$ models the
+category and functor judgments. The set $\mathcal V_h$ models the
+profunctor judgment. A composable string $R_0 \cdots R_n$ models the
+profunctor contexts. The 2-cells correspond to the natural
+transformation judgment where we have taken the restriction $S(F,G)$
+of the codomain.
+
+To model the dependent type theory and fact that the \ohol{} judgments
+are all under a dependent type theory context, we use a variation on
+Lawvere's notion of \emph{hyperdoctrine} for modeling predicate logic:
+\begin{definition}[Hyperdoctrine of Virtual Double Categories with Restrictions]
+  A hyperdoctrine of virtual double categories with restrictions is a
+  pair of a category with families $\mathcal C$ and a functor $L :
+  \mathcal C^o \to \text{vDbl}_r$ to the category of virtual double
+  categories with split restrictions and restriction-preserving
+  functors.
+\end{definition}
+Categories with families $\mathcal C$ model dependent type theory
+\citep{cwf} and for each semantic context $\Gamma$, $L(\Gamma)$ models
+the \ohol{} judgments in context $\Gamma$, with the functoriality
+modeling the fact that all of these judgments admit a well-behaved
+action of substitution.
+
+\begin{construction}[Soundness and Completeness]
+  For any choice of connectives, the syntax of parameterized \ohol{}
+  defines a hyperdoctrine of VDCrs that is an initial object in the
+  category of hyperdoctrines of VDCrs with chosen universal
+  constructions and functors preserving those universal constructions.
+\end{construction}
+\begin{proof}
+  Most of the details of the proof are straightforward. In the
+  appendix we demonstrate the syntactic elements of the proof which
+  are that the syntax itself is a hyperdoctrine of VDCrs, i.e., that
+  the notions of substitution are appropriately functorial.
+\end{proof}
+
+\subsection{Concrete Models}
+
+Now that we have a category-theoretic notion of model, we give some
+model construction theorems that can be used to justify our intuitive
+notion of semantics in (enriched, internal) category theory.
+
+First, we can extend any model of \ohol{} to a model of \ohol{}
+parameterized by dependent type theory as follows:
+\begin{construction}
+  Given a virtual double category with restrictions $\mathcal V$, we
+  can construct a functor $\mathcal V^{-}: \Set \to \text{vDbl}_r$ by
+  defining the objects of $\mathcal V^\Gamma$ to be functions $\Gamma
+  \to \mathcal V_o$, and similarly for morphisms and 2-cells with all
+  operations given pointwise.
+\end{construction}
+% NOTE: this should be some kind of general theorem right?
+% Sketch:
+% 1. VDCrs are a finite limit theory
+% 2. A hyperdoctrine L : C -> VDCr is the same as a VDCr in Pr(C)
+% 3. The Yoneda embedding preserves finite limits 
+
+TODO: find a reference that proves things have all the UMPs we want
+lol.
+
+\section{Discussion}
+
+\paragraph{Calculi for formal category theory}
+
+In their book on $\infty$-category theory, Riehl and Verity use the
+formal language of virtual equipments to prove results valid for
+$\infty$-categories without concrete manipulation of model
+categories. They formalize this language using Makkai's FOLDS
+framework of first-order logic with dependent sorts. The approach is
+similar in spirit to our \ohol{}, and has the same models. The main
+difference is that their theory is built on top of first-order logic,
+whereas ours is built on a custom-made variant of higher-order logic
+over a (unary) simple type theory. For this reason, statements in
+their theory are quite complex as they have to be encoded into
+first-order logic, whereas we argue our type-theoretic approach
+formalizes informal arguments much more directly, as shown in
+Section~\ref{sec:examples}.
+%
+An informal syntax for manipulating profunctors involving ends and
+coends, called the coend calculus is closely related, an extension of
+\ohol{} to treat profunctors of many variables of different variances
+should provide a formal treatment for the coend calculus
+\citet{coend-calculus}.
+
+Another approach to formal category theory is to develop a
+\emph{directed dependent type theory}, a type theory where the
+identity type is interpreted as morphisms in a (possibly
+$\infty$-)category. Research on directed dependent type theories is
+ongoing \cite{riehl-shulman,north}. Directed dependent type theories
+should generalize \ohol{} in the same way that dependent type theory
+generalizes higher order logic: internally there should be a type that
+models the category of sets, and terms of this type should model the
+profunctors of \ohol{}.  As a foundation for a domain-specific proof
+assistant for category theory, \ohol{} may provide a foundation for a
+proof assistant in the style of Isabelle/HOL \cite{isabelle-hol},
+whereas directed type theory would provide a foundation for a proof
+assistant in the style of Agda or Coq \cite{agda,coq}.
+
+\citet{djm-string-diagrams} provides a string diagram calculus for
+double categories and pro-arrow equipments, generalizing string
+diagrams for monoidal categories \citet{joyal?}. These are an
+alternative approach to type theoretic calculi, with the string
+diagrams typically making tensor products simpler to work with, while
+a type theoretic calculus like SCT makes the closed structure
+$\homrallXYtoZ \alpha P Q$ simpler to work with by using bound
+variables.
+
+One alternative to proarrow equipments is to axiomatize the bicategory
+of categories, profunctors and natural transformations rather than the
+virtual double category of categories, functors, profunctors and
+natural transformations. An abstract structure along
+these lines is a \emph{Cartesian bicategory}\footnote{which is not the
+same as a bicategory with products/finite limits, for which a syntax
+was developed \citet{fioresaville}} is given in
+\citet{carboni-walters,carboni-walters-someonelese}. 
+Some preliminary work on a proof system for Cartesian bicateogires was
+presented at \citet{jonasfreycartesianbicategories}. This bears strong
+similarities to our calculus VETT, except that (1) their profunctors
+may have 0, 1 or more covariant or contravariant variables but (2)
+they do not have a term syntax like our natural transformation syntax
+and (3) they do not have functors and restriction of profunctors by
+functors (since this structure is not present in a Cartesian
+bicategory). Semantically, Cartesian bicategories are somewhat less
+general than virtual equipments because in general the set of
+functors between two categories can only be recovered from the set of
+profunctors if the codomain category is Cauchy complete, in which case
+functors are equivalent to adjoint pairs of profunctors.
+
+Finally, some variations on double categories have been used to model
+the structure of certain program logics. \citet{newlicata20} present a
+logic for \emph{vertically thin} pro-arrow equipments, i.e., pro-arrow
+equipments where the functor and natural transformation judgments are
+posetal. This calculus is quite different from ours in that the
+horizontal morphisms are terms of a programming language, and so they
+are not presented as having co-variant and contravariant variables,
+and the equipment structure is modeled by explicit coercions rather
+than by syntactic substitution of vertical arrows in horizontal
+arrows. Another similar calculus is System P \citep{systemP} which is
+an internal language of \emph{reflexive graph categories}, which are
+like double categories without horizontal composition. 
+
+\subsection{Category Theoretic Extensions}
+
+While we have demonstrated that some common constructions in category
+theory can be expressed using the simple combination of homs, tensors
+and units, there are several that are out of reach for SCT due to its
+restrictive judgmental structure. These require extensions to the
+judgmental structure that would move beyond virtual equipments.
+
+First, while we can add products to the calculus, adding in a
+\emph{functor category} ${\cat C}^{\cat D}$ would necessitate adding a
+syntax for functors of multiple arguments, to allow for the lambda rule:
+\[ \inferrule {\alpha:\cat C, \beta:\cat D \vdash e : \cat E} {\alpha:\cat C \vdash \lambda \beta:\cat D. e : \cat E} \]
+This would then require also some extension to profunctors for
+allowing 0 or more covariant/contravariant dependencies as well.
+%
+Semantically, this would correspond to generalizing from virtual
+equipments to some kind of (possibly cartesian) \emph{monoidal closed}
+virtual equipments.
+
+In addition, we could consider extending our semantics with a notion
+of \emph{opposite category}, with the property that a covariant
+dependence of a profunctor on a variable in a category should be
+equivalent to a contravariant dependence on a variable in the opposite
+category.
+%
+This could possibly be done by introducing a modal distinction
+$\alpha:^{+}\cat C$ for covariant dependence and $\alpha:^{-}\cat C$
+for contravariant dependence, with the opposite category being a
+modality that internalizes flipping the variance as a type
+constructor.
+%
+With these two extensions, possibly, the category contexts for
+functors and profunctors could be unified as one notion of a sequence
+of object variables with variances.
+%
+With this unification, it would then be simpler to incorporate a third
+extension: a universe object, corresponding to an object
+$\textrm{Set}$, which would allow us to internalize the profunctor
+judgment in the functor judgment, modeling that in classical category
+theory, profunctors are the same as certain functors to the category
+of Sets.
+%
+While all of these extensions seem plausible, they all move away to
+the simple ordered type theory structure that allowed us to define
+units, tensor and hom profunctors so easily. It is unclear how to
+define these types in this extended structure. As a simple example, if
+profunctors have many variables of mixed variance, rather than exactly
+one of each variance, it is unclear what the appropriate
+generalization of the transformation context $\Phi$ should be.
+
+An orthogonal extension to these would be to consider adding a
+\emph{discretization} modality $\Delta\cat C$ that gives the discrete
+category on the underlying set of objects of $\cat C$. This would give
+us the ability to formalize concepts like ``function on objects'' or
+``unnatural transformation'' without the need to define internal
+categories. This could be modeled by adding a modal distinction
+$\alpha:^{\#}\cat C$ for ``crisp'' dependence on an object of $\cat
+C$, i.e., dependence merely on the object of $\cat C$ with no
+functoriality/naturality conditions. This would then be internalized
+by the discretization modality.
+
+A third approach would be to extend the calculus to model general
+monoidal closed structures and more generally multicategories, which
+provides semantics of modal substructural type theories.
+%
+This can be modeled by extending the ``universe'' $\Set$ to be a
+monoidal closed category, which induces a monoidal closed structure on
+profunctors by the Day convolution product \cite{...}.
+%
+Similar developments along these lines have already been done for
+coend calculus \citep{coend-calculus} and in formalization of
+substructural type theories \citep{atkey-woods}.
+
+%% A recent development in the formalization of substructural type
+%% theories is to use monoidal connectives at the meta-level when
+%% defining multiplicative connectives\cite{woodsatkeyesop2022}. This
+%% suggest one approach to extending the theory to support the
+%% formalization of multiplicative universal properties would be, in
+%% adherence to the microcosm principle, to add linear judgments and
+%% multiplicative connectives to the metalevel.
+
+%% \paragraph{As a tool for Formal Type Theory}
+
+%% While we can model ``unary'' type theories using profunctors, to model
+%% theories like simple intuitionistic, linear or bunched type theories
+%% we need a way to talk about ``profunctors of many arguments''. This
+%% can be accomplished using \emph{multicategory} theory, which models
+%% the structure of the context with its structural rules as a monad of
+%% ``contexts and substitutions''. A suitable notion of monad on a
+%% virtual double category has been developed and was in fact the
+%% original motivation for the concept of a virtual double
+%% category. However while an abstract monad of contexts $T$ is enough to
+%% define what a $T$-multicategory internal to a virtual equipment is, it
+%% does not appear possible to define the multiplicative connectives as a
+%% universal property, i.e., to define when the multicategory is
+%% \emph{representable}.
+
+\subsection{Semantics}
+
+Our definition of a double category with displays is suggestive of a
+simple generalization. A double category is a monoid object in the
+double category of $Span(Cat)$, and a double category with displays
+furthermore uses certain diagrams involving profunctors, which also
+form a double category $Prof$. This suggests that the algebraic
+structure of a double category with displays is naturally modeled in
+some kind of \emph{triple category}, modeling the three types of
+morphisms: functors, profunctors and spans of functors.
+   
+%% %%
+%% %% Bibliography
+%% %%
+
+%% %% Please use bibtex, 
+\subsubsection*{Acknowledgements}
+Grants stuff...? The authors would like to thank David Jaz Myers, Emily Riehl, Mike
+Shulman, Dominic Verity,...for helpful feedback on this work
+
+\bibliography{cats}
+
+
+\appendix
+
+\section{Syntactic Details}
+
+\begin{figure}
+  \begin{mathpar}
+    \begin{array}{rccl}
+      \textrm{Term Substitution} & \gamma, \delta & ::= & \cdot \pipe \gamma, M/X\\
+      \textrm{Object Substitution} & \xi, \zeta & ::= & a/\alpha \pipe a/\alpha;b/\beta\\
+      \textrm{Transformation Substitution} & \phi, \psi & ::= & a/\alpha \pipe \phi,s/x, \psi      
+    \end{array}
+
+      \inferrule*[right=TyCtxForm]
+        {}
+        {\Gamma \isadtctx}
+
+    \inferrule*[right=SetCtxForm]
+    {\Gamma \isadtctx}
+    {\Gamma \vdash \Xi \boundary}
+
+    \inferrule*[right=TransCtxForm]
+    {\Gamma \isadtctx}
+     {\Gamma \vdash \Phi \isavectx}
+    \inferrule
+    {\Delta \isadtctx \and \Gamma \isadtctx}
+    {\gamma : \Delta \to \Gamma}
+    
+    \inferrule*[right=Boundary Map formation]
+    {\Gamma \vdash Z \boundary \and \Gamma \vdash \Xi \boundary}
+    {\Gamma \vdash \xi : Z \to \Xi}
+
+    \inferrule*[right=Cat Subst formation]
+    {\Gamma \vdash \Psi \isavectx \and \Gamma \vdash \Phi \isavectx}
+    {\Gamma \vdash \phi : \Psi \to \Phi}
+
+  \end{mathpar}
+  \caption{Substitution}
+  
+\end{figure}
+
+\cref{fig:contexts} details the typing rules for contexts and the
+typing for variables and the admissible actions of substitution (the
+definition of substitution is straightforward and found in the
+appendix). the rules for term and object variables are as usual.
+%
+An object substitution into a single object context $\alpha:\cat C$
+consists of an object $a : \cat C$ parameterized by an object of
+another category.
+%
+An object substitution into a pair of co- and contra-variant variables
+$\alpha:\cat C;\beta:\cat D$ is a pair of an object substituted for
+$\alpha$ and one for $\beta$, each typed with respect to the
+appropriate variable of an object context $\Xi$.
+%
+Note that this allows for $\Xi$ to consist of either two variables or
+a single variable.
+%
+When
+constructing a transformation context $\Phi, x : R, \Psi$, we need to
+ensure that the contravariant dependence of $R$ matches the covariant
+dependence of $\Phi$ and vice-versa for $\Psi$. We define this with
+auxiliary metafunctions $d^+,d^-$ which extract the covariant and
+contravariant object variable of a transformation context.
+%
+The rules for transformation variables and substitutions define the
+use of variables to be \emph{linear} (each variables is used exactly
+once) and \emph{ordered}, they occur in the term in the same order
+that they appear in the context.
+%
+The rule for a transformation variables says a variable $x$ can only
+be used when it is the sole variable in the context.
+%
+A transformation subsitution into an ``empty'' transformation context
+$\alpha: \cat C$ is the same as an object substitution into
+$\alpha:\cat C$.
+%
+The rule for constructing a transformation substitution into a
+non-empty context $\Phi_1,x:R,\Phi_2$ says we can construct a
+substitution by constructing substitutions $\phi_1,\phi_2$ for
+$\Phi_1$ and $\Phi_2$ as well as a transformation $s$ into an
+instantiation of $R$ where the input contexts come from splitting the
+input context $\Psi$ into three components, and ensuring that the
+instantiation of $R$ agrees with how $\phi_1,\phi_2$ instantiate the
+variables. This uses two new metafunctions. First, $\Phi \jnctx \Psi$
+is an operation for concatenating two contexts when $d^+(\Phi) =
+d^-(\Psi)$. Next, we extend the boundary maps $d^\pm$ to substitutions
+to extract their object substitutions.
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule{}{\cdot \isadtctx}
+
+    \inferrule
+    {\Gamma \isadtctx \and \Gamma \vdash A \isaTy}
+    {\Gamma , X : A \isadtctx}\\
+
+    \inferrule
+    {X : A \in \Gamma}
+    {\Gamma \vdash X : A}
+
+    \inferrule
+    {}
+    {\alpha: \cat C \vdash \alpha: \cat C}
+
+    \inferrule
+    {\Gamma \vdash \cat C : \isaCat}
+    {\Gamma \vdash \alpha: \cat C \isavectx}
+
+    \inferrule
+    {\Gamma \vdash \Phi \isavectx\and
+    \Gamma \pipe d^+\Phi; \beta:\cat D \vdash R \isaSet}
+    {\Gamma \vdash \Phi, x:R, \beta:\cat D \isavectx}
+
+    \inferrule
+    {}
+    {\Gamma \pipe \alpha:\cat C, x : R, \beta: \cat D \vdash x : R}
+
+    % horizontal identity
+    \inferrule
+    {\Gamma\pipe \beta:\cat C \vdash a : \cat C}
+    {\Gamma \pipe \beta:\cat C \vdash a/\alpha : (\alpha : \cat C)}
+
+    \inferrule
+    {\Psi = \Psi_1 \jnctx \Psi_2\and
+      \Gamma\pipe\Psi_1 \vdash \phi : \Phi\and
+      \Gamma \pipe \Psi_2 \vdash t : R[d^+\phi;b/\beta] \and
+      \Gamma \vdash \phi_2 : \Psi_2 \to \Phi_2
+      }
+    {\Gamma\pipe\Psi \vdash \phi,t/x,b/\beta :: (\Phi,x:R,\beta:\cat D)}
+  \end{mathpar}
+  \begin{align*}
+    \underline{\alpha:C} &= \alpha:C\\
+    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
+  \end{align*}
+  \begin{align*}
+    d^{\pm}(\alpha:\cat C) &= \alpha : \cat C\\
+    d^{-}(\Phi,x:R,\Psi) &= d^-\Phi\\
+    d^{+}(\Phi,x:R,\Psi) &= d^-\Psi
+  \end{align*}
+  \begin{align*}
+    d^{\pm}(a/\alpha) &= a/\alpha\\
+    d^{-}(\phi,t/x,\psi) &= d^-\phi\\
+    d^{+}(\phi,t/x,\psi) &= d^+\psi\\
+  \end{align*}
+  \caption{Basic Rules of Judgment Theory}
+  \label{fig:contexts}
+\end{figure}
+
+Now that we have established a judgmental structure, in typical type
+theoretic fashion, our type constructs follow naturally as
+internalizing the judgments. Though the positive multiplicatives are
+more familiar, we start by describing the negative multiplicatives,
+since they are better behaved, and are useful to have already defined
+when discussing the positives.
 
 \subsection{Negative Multiplicatives}
 
@@ -1534,13 +2373,23 @@ and identity types.
   \caption{Ordinary Dependent Type Structure}
 \end{figure}
 
-\subsection{Internalizing Virtual Equipment Structure}
-
 \begin{figure}
   \begin{mathpar}
     \inferrule
+    {}
+    {\Gamma\vdash \smallCats}
+
+    \inferrule
+    {}
+    {\Gamma\vdash \Cats}
+    
+    \inferrule
     {\Gamma \vdash \cat C : \Sort \and\Gamma \vdash \cat D : \Sort}
     {\Gamma\pipe\cdot \vdash \varr{\cat C}{\cat D} \isaSet}
+
+    \inferrule
+    {\Gamma \vdash \cat C : \Sort \and\Gamma \vdash \cat D : \Sort}
+    {\Gamma\pipe\cdot \vdash \harr{\cat C}{\cat D} \isaSet}
 
     \inferrule
     {\Gamma \pipe \alpha:\cat C \vdash A : \cat D}
@@ -1550,17 +2399,6 @@ and identity types.
     {\Gamma \pipe \alpha:\cat C \vdash A : \cat D\and
       \Gamma\pipe\cdot \vdash M : \varr{\cat D}{\cat E}}
     {\Gamma\pipe \alpha:\cat C \vdash M A : \cat E}
-
-    (\lambda\alpha:C. A) B = A[B/\alpha]
-
-    \inferrule*[right=VArr $\eta$]
-    {\Gamma \pipe\cdot \vdash M : \varr C D}
-    {\Gamma \pipe\cdot \vdash M = (\lambda \alpha:C. M \alpha) : \varr C D}
-    \\
-
-    \inferrule
-    {\Gamma \vdash \cat C : \Sort \and\Gamma \vdash \cat D : \Sort}
-    {\Gamma\pipe\cdot \vdash \harr{\cat C}{\cat D} \isaSet}
 
     \inferrule
     {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R \,\isaSet}
@@ -1572,562 +2410,45 @@ and identity types.
      \Gamma \pipe d^+ \Xi \vdash B : \cat C}
     {\Gamma \pipe \Xi \vdash M A; B \isaSet}
 
-    (\lambda \alpha:C;\beta:D. R)A;B = R[A/\alpha;B/\beta]
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C\vdash P \isaSet}
+    {\Gamma \vdash \pendallXdotY {\alpha:{\cat C}} P \isaTy}
 
-    \inferrule*[right=HArr $\eta$]
-    {\Gamma \pipe \cdot \vdash M : \harr C D}
-    {\Gamma \pipe \cdot \vdash M = (\lambda \alpha;\beta. M \alpha;\beta) : \harr C D}\\
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C\vdash t : P}
+    {\Gamma \vdash \pendlambdaXdotY \alpha t : \pendallXdotY \alpha P}
 
+    \inferrule
+    {\Gamma \vdash M : \pendallXdotY \alpha P\and
+     \Gamma \pipe \beta:\cat D \vdash a : \cat C}
+    {\Gamma \pipe \beta:\cat D \vdash \pendappXtoY M a : P[a/\alpha]}
   \end{mathpar}
-  \caption{Internalizing VE Structure}
+  \caption{Type Connectives}
 \end{figure}
-
-%% \subsection{Equalizers}
-
-%% To encode the concept of internal hom of profunctors, kan extensions
-%% and (co-)limits, we need to define the \emph{equalizer} of horizontal
-%% arrows. Specifically, the universal property that we need is an
-%% equalizer in the category whose objects are horizontal arrows (for
-%% fixed endpoints) and whose arrows are the 2-cells.
-
-%% \begin{figure}
-%%   \begin{mathpar}
-%%     \inferrule*[right=Equalizer-formation]
-%%     {\Gamma \pipe \cdot \vdash P : \harr\, C\,D\and
-%%      \Gamma \pipe \cdot \vdash Q : \harr\, C \, D\\\\
-%%      \Gamma \pipe \cdot \vdash \phi : \homunary \alpha {\harrapp P \alpha \beta} \beta {\harrapp Q \alpha \beta}\and
-%%      \Gamma \pipe \cdot \vdash \psi : \homunary \alpha {\harrapp P \alpha \beta} \beta {\harrapp Q \alpha \beta}\and}
-%%     {\Gamma \pipe \cdot \vdash \textrm{Equalizer}(C,D,P,\phi,\psi) : \harr\, C\, D}\and
-
-%%     \inferrule
-%%     {\Gamma \pipe \Phi \vdash M : \harrapp{\textrm{Equalizer}(C,D,P,\phi,\psi)} A B}
-%%     {\Gamma \pipe \Phi \vdash \textrm{forget}(M) : \harrapp P A B}
-
-%%     \inferrule
-%%     {\Gamma \pipe \Phi \vdash M : \harrapp P A B \and \appunary \phi A M B = \appunary \psi A M B}
-%%     {\Gamma \pipe \Phi \vdash \textrm{equalizing}_{\phi,\psi}(M) : \harrapp{\textrm{Equalizer}(C,D,P,\phi,\psi)} A B}
-
-%%     TODO: obvious equations
-%%   \end{mathpar}
-%%   \caption{Equalizers (Logical Framework style)}
-%% \end{figure}
-
-
-%% \begin{figure}
-%%   \begin{mathpar}
-%%     \inferrule*[right=Equalizer-formation]
-%%     {\Gamma \pipe \Xi \vdash P \isaSet\and\Gamma \pipe \Xi \vdash Q \isaSet\and
-%%       \Gamma\pipe d^-\Xi, p : P, d^+ \Xi \vdash \phi : Q\and
-%%       \Gamma\pipe d^-\Xi, p : P, d^+ \Xi \vdash \psi : Q }
-%%     {\Gamma \pipe \Xi \vdash \equalizeVofWbyXeqYatZ p P \phi \psi Q : \harr\, C\, D}\and
-
-%%     \inferrule*[right=Equalizer-formation]
-%%     {\Gamma \pipe \alpha:C;\beta:D \vdash P \isaSet\and\Gamma \pipe \alpha:C;\beta:D \vdash Q \isaSet\and
-%%       \Gamma \pipe d^-\Xi \vdash A : C\and
-%%       \Gamma \pipe d^+\Xi \vdash B : D\\\\
-%%       \Gamma\pipe \cdot \vdash \phi : \homunary \alpha P \beta Q\and
-%%       \Gamma\pipe \cdot \vdash \psi : \homunary \alpha P \beta Q
-%%     }
-%%     {\Gamma \pipe \Xi \vdash \equalizeVofWbyXeqYatZ p {P[A/\alpha;B/\beta]} {\appunary \phi A p B} {\appunary \psi A p B} {Q[A/\alpha;B/\beta]} : \harr\, C\, D}\and
-
-%%     \inferrule
-%%     {\Gamma \pipe \Phi \vdash M : \equalizeVofWbyXeqYatZ p P \phi \psi Q}
-%%     {\Gamma \pipe \Phi \vdash \pi_{eq}\,M : P}
-
-%%     \inferrule
-%%     {\Gamma \pipe \Phi \vdash M : \harrapp P A B \and \appunary \phi A M B = \appunary \psi A M B}
-%%     {\Gamma \pipe \Phi \vdash \textrm{equalizing}_{\phi,\psi}(M) : \harrapp{\textrm{Equalizer}(C,D,P,\phi,\psi)} A B}
-
-%%     TODO: equations
-%%   \end{mathpar}
-%%   \caption{Equalizers (Natural Deduction Style)}
-%% \end{figure}
-
-\subsection{Products}
-
-We add in parallel two different notions of product: products of sorts
-and products of spans, which have the universal property in their
-respective categories.
-
 \begin{figure}
   \begin{mathpar}
-    \inferrule{}{\Gamma \vdash 1 : \Sort}\and
-    \inferrule*{}{\Gamma\pipe\alpha:C \vdash () : 1}\and
-    \inferrule*{\Gamma\pipe\alpha:C \vdash A : 1}{A = ()}
-    \inferrule{}{\Gamma\pipe \Xi \vdash 1 \isaSet}\and
-    \inferrule{}{\Gamma\pipe \Phi \vdash () :  1}\and
-    \inferrule{\Gamma\pipe \Phi \vdash M :  1}{M = ()}\\\\
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C\vdash P \isaSet}
+    {\Gamma \vdash \pendallXdotY {\alpha:{\cat C}} P \isaTy}
 
-    \inferrule{\Gamma \vdash C : \Sort \and \Gamma \vdash D : \Sort}
-              {\Gamma \vdash C \times D : \Sort}\and
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C\vdash t : P}
+    {\Gamma \vdash \pendlambdaXdotY \alpha t : \pendallXdotY \alpha P}
 
-    \inferrule{\forall i \in \{1,2\}.~ \Gamma \pipe \alpha:C \vdash A_i : D_i}{\Gamma \pipe \alpha:C \vdash (A_1,A_2) : D_1 \times D_2}
+    \inferrule
+    {\Gamma \vdash M : \pendallXdotY \alpha P\and
+     \Gamma \pipe \beta:\cat D \vdash a : \cat C}
+    {\Gamma \pipe \beta:\cat D \vdash \pendappXtoY M a : P[a/\alpha]}
 
-    \inferrule{\Gamma \pipe \alpha:C \vdash A : D_1 \times D_2}{\Gamma \pipe \alpha:C \vdash \pi_i A : D_i}
+    \pendappXtoY {(\pendlambdaXdotY \alpha t)} a = t[a/\alpha]
 
-    \pi_i(A_1,A_2) = A_i\\
-    \inferrule{\Gamma\pipe \alpha:C \vdash A :  D_1\times D_2}{A = (\pi_1 A,\pi_2 A)}\\\\
-
-    \inferrule{\Gamma\pipe\Xi \vdash R \isaSet \and \Gamma\pipe\Xi \vdash S\isaSet}
-              {\Gamma\pipe\Xi \vdash R \times S\isaSet}\and
-
-    \inferrule{\forall i \in \{1,2\}.~ \Gamma \pipe\Phi \vdash M_i : R_i}{\Gamma \pipe\Phi \vdash (M_1,M_2) : R_1 \times R_2}
-
-    \inferrule{\Gamma \pipe\Phi\vdash M : R_1 \times R_2}{\Gamma \pipe\Phi \vdash \pi_i M : R_i}
-
-    \pi_i(M_1,M_2) = M_i\\
-    \inferrule{\Gamma\pipe\Phi \vdash M :  R_1\times R_2}{M = (\pi_1 M,\pi_2 M)}
+    \inferrule*[right=2Cell$\eta$]
+    {\Gamma \vdash M : \pendallXdotY \alpha P }
+    {\Gamma \vdash M = \pendlambdaXdotY \alpha {\pendappXtoY M \alpha} : \pendallXdotY \alpha P}
   \end{mathpar}
-  \caption{Products}
-  \label{fig:products}
+  \caption{End}
+  \label{fig:end}
 \end{figure}
-
-One additional connective we might desire is a ``parallel'' product of
-sets $R \times' S : \harr {C_1 \times C_2} {D_1 \times D_2}$ where $R
-: \harr {C_1} {D_1}$ and $R : \harr {C_2} {D_2}$. We don't need to
-define this as a primitive though because it is expressible in terms
-of the two kinds of products we have above:
-
-\[
-\inferrule
-{\Gamma \pipe \alpha : C_i; \beta : D_i \vdash R_i \isaSet}
-{\Gamma \pipe \alpha : C_1\times C_2; \beta : D_1 \times D_2
-  R_1[\pi_1\alpha/\alpha;\pi_1\beta/\beta] \times R_2[\pi_2\alpha/\alpha;\pi_2\beta/\beta]\isaSet}
-\]
-
-The empty products give us access now to several traditional notions
-of category theory that we couldn't before define, such as objects and
-presheaves of either variance:
-
-$$\textrm{Object}\,C = \varr 1 C$$
-$$\textrm{Presheaf}\,C = \harr 1 C$$
-$$\textrm{coPresheaf}\,C = \harr C 1$$
-
-However, we find that in practice we don't have much use for these
-concepts as most theorems about them easily generalize to more general
-theorems about arbitrary functors or profunctors.
-
-%% %% To define internal ends and coends, we need to go beyond the usual
-%% %% simple types and add equalizers (a form of subsets) and co-equalizers
-%% %% (a form of quotients) of judgments. Here's a sketch of the syntax for
-%% %% each. These make type checking very difficult as they result in
-%% %% obligations for proving equality of certain terms, which may or may
-%% %% not be decidable.
-
-%% %% \begin{mathpar}
-%% %%   \inferrule*[right=Equalizer Formation]
-%% %%   {\alpha;\beta\,|\, R \and
-%% %%   x : R \vdash t : S x:R \vdash u : S}
-%% %%   {\alpha;\beta\,|\,\{ x : R \,|\, t = u \}}
-
-%% %%   \inferrule*[right=Equalizer Intro]
-%% %%   {\Phi \vdash r : R \and t[r/x] = u[r/x]}
-%% %%   {\Phi \vdash \textrm{assert}(x.t = u)(r) : \{ x : R \,|\, t = u \}}
-
-%% %%   \inferrule*[right=Equalizer Elim]
-%% %%   {\Phi \vdash r : \{ x : R \,|\, t = u \}}
-%% %%   {\Phi \vdash \textrm{forget}(r) : R}
-
-%% %%   t[\textrm{forget}(r)/x] = u[\textrm{forget(r)}/x]
-
-%% %%   \textrm{assert}(x.t = u)(\textrm{forget}(r)) = r
-%% %%   \textrm{forget}(\textrm{assert}(x.t = u)(r)) = r
-%% %% \end{mathpar}
-
-%% %% \begin{mathpar}
-%% %%   \inferrule*[right=Co-equalizer Formation]
-%% %%   {\alpha;\beta\,|\, R \and
-%% %%   x : S \vdash t : R x:S \vdash u : R}
-%% %%   {\alpha;\beta\,|\,R/(\forall x:S. t = u)}
-
-%% %%   \inferrule*[right=Coequalizer Intro]
-%% %%   {\Phi \vdash r : R}
-%% %%   {\Phi \vdash \textrm{equate}(x:S.t=u)(r) : R/(\forall x.t=u)}
-
-%% %%   \inferrule*[right=Coequalizer Elim]
-%% %%   {\Psi \vdash r : R/(x.t = u) \and
-%% %%     \Phi,y:R,\Phi' \vdash s : S \and
-%% %%     s[t/y] = s[u/y]}
-%% %%   {\Phi,\Psi,\Phi' \vdash \textrm{lett} \textrm{equate}(y) = r.~s : S}
-
-%% %%   \textrm{equate}(x:S.t = u)(t[\gamma]) = \textrm{equate}(x:S.t = u)(u[\gamma])
-
-%% %%   \cdots
-%% %% \end{mathpar}
-
-%% %% \subsection{Positive Multiplicatives}
-
-%% %% \subsection{Negative Multiplicatives}
-
-%% %% \subsection{Additives}
-
-\section{Synthetic Category Theory in Ordered Higher-order Logic}
-
-To demonstrate that \ohol{} provides a setting in which to carry out
-synthetic category theory, we demonstrate some basic definitions and
-theorems in category theory in \ohol{}. We emphasize throughout the
-interpretations as tautologies in higher order-logic, as well as the
-relation to ordered linear logic.
-
-First, we fix some terminology: TODO, isomorphism of profunctors, anything else we'll need?
-%% \begin{definition}{Isomorphism of Profunctors}
-  
-%% \end{definition}
-
-We can witness the fact that all constructions are (pro-)functorial by
-using the hom type $\punitinXfromYtoZ {\cat C}{\alpha}{\alpha'}$.
-\begin{lemma}
-  \begin{enumerate}
-  \item Identity: $\pendallXdotY {\alpha} {\punitinXfromYtoZ {\cat C}{\alpha}{\alpha'}}$
-  \item Composition: $\hombinary {\alpha_1} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_3} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_3}}$
-  \item Functoriality: for any $F : \varr {\cat C}{\cat D}$, $\homunary {\alpha_1} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {} {F(\alpha_1)}{F(\alpha_2)}}$.
-   \item Profunctoriality: for any $R : \harr {\cat C}{\cat D}$ $\homtrinary {\alpha_1} {\punitinXfromYtoZ{} {\alpha_1}{\alpha_2}} {\alpha_2} {R{\alpha_2}{\beta_2}} {\beta_2} {\punitinXfromYtoZ{} {\beta_2} {\beta_1}} {\beta_1} {R\alpha_1\beta_1}$
-  \end{enumerate}
-\end{lemma}
-Reflexivity and transitivity generalize the corresponding properties
-of equality, with the lack of symmetry being a key feature of the
-generalization.
-%
-In addition, we can prove that the (pro)-functoriality axioms commute
-with the composition proof by the $\eta$ principle for the unit.
-%
-(Pro-)Functoriality generalizes the statement that all functions and
-relations respect equality.
-
-Naturality is more complex to state, and it is a statement about the
-\emph{proofs} so it has no analogue in ordinary higher-order
-logic. The following version is stated for any \emph{profunctor}, with
-the usual case of naturality arising when $R \alpha \beta =
-\punitinXfromYtoZ {\cat C}{F \alpha}{G \beta}$.
-\begin{lemma}[Naturality]
-  For any $t : \pendallXdotY {\alpha:\cat C}{\harrapp R \alpha
-    \alpha}$, by composing with profunctoriality, we can construct
-  terms
-  \[ \alpha_1, f : \punitinXfromYtoZ {\cat C} {\alpha_1} {\alpha_2}, \alpha_2 \vdash \textrm{lcomp}(f,\pendappXtoY t {\alpha_2}) \quad \textrm{and} \quad \textrm{rcomp}(\pendappXtoY t {\alpha_1}, f) : \harrapp R {\alpha_1}{\alpha_2}\]
-  These are both equal to $\punitelimtoYwithkontZ f {t}$.
-\end{lemma}
-
-Next, we turn to some of the central theorems of category theory, the
-Yoneda and Co-Yoneda lemmas. Despite being ulimately quite elementary,
-these are notoriously abstract. In \ohol{}, we can view these as
-ordered generalizations of some very simple tautologies about
-equality. For instance, the Yoneda lemma (and its proof) generalizes
-the equivalence between the formulae $\forall x. \forall y. x = y
-\Rightarrow P y$ and $P x$.
-\begin{lemma}
-  Let $\alpha^o : \cat C$ and $\pi : \negPresheaf {\cat C}$. Then
-  \begin{enumerate}
-  \item (Yoneda) The profunctor $\homrallXYtoZ {\alpha'} {\punitinXfromYtoZ {\cat C} {\alpha'}{\alpha}} {\negPresheafAppPtoX \pi {\alpha'}}$ is isomorphic to $\negPresheafAppPtoX \pi \alpha$
-  \item (Co-Yoneda) The profunctor $\tensorexistsXwithYandZ {\alpha'}{\punitinXfromYtoZ{}{\alpha}{\alpha'}} {\negPresheafAppPtoX \pi \alpha}$ is isomorphic to $\negPresheafAppPtoX \pi \alpha$
-  \end{enumerate}
-\end{lemma}
-
-Next, we have the ``Fubini'' theorems. These correspond to quantifier
-re-ordering and associativity of conjunction and implication in
-higher-order logic.
-\emph{Fubini} theorems about interchange of (co)-ends.
-\begin{lemma}[{Fubini}]
-  \label{lem:fubini}
-  The following isomorphisms hold when the corresponding profunctors
-  are well typed.
-  \begin{enumerate}
-  \item $\tensorexistsXwithYandZ {\beta} {\harrapp P \alpha \beta} {(\tensorexistsXwithYandZ \gamma {\harrapp Q \beta \gamma} {\harrapp R \gamma \delta})} \cong \tensorexistsXwithYandZ {\gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta} {\harrapp Q \beta \gamma})} {\harrapp R \gamma \delta}$
-  \item $\homrallXYtoZ {\gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta} {\harrapp Q \beta \gamma})} {\harrapp S \alpha \gamma} \cong \homrallXYtoZ \beta {\harrapp P \alpha \beta} {\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {\harrapp S \alpha \gamma}}$
-  \item $\homlallXYtoZ {\alpha} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta} {\harrapp Q \beta \gamma})} {\harrapp S \alpha \gamma} \cong \homlallXYtoZ \beta {\harrapp Q \beta \gamma} {\homlallXYtoZ \alpha {\harrapp P \alpha \beta} {\harrapp S \alpha \gamma}}$
-  \item $\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {(\homlallXYtoZ \alpha {\harrapp P \alpha \beta} {\harrapp S \alpha \gamma})} \cong \homlallXYtoZ \alpha {\harrapp P \alpha \beta} {(\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {\harrapp S \alpha \gamma})}$
-  \item $\pendallXdotY \alpha \homrallXYtoZ \beta P {P'} \cong \pendallXdotY \beta \homlallXYtoZ \alpha P {P'}$
-  \end{enumerate}  
-\end{lemma}
-Note that the last item here is different from the others in that it
-is an equivalence of sets rather than profunctors.
-
-Next, we turn to basic universal properties. While there are many
-equivalent definitions of a universal property in category theory, the
-one most natural in \ohol{} is the notion of a functor representing a
-profunctor, a mild generalization of the more common notion of
-representable presheaf. We say a functor $F : \varr {\cat C}{\cat D}$
-left represents a profunctor $R : \harr {\cat C}{\cat D}$ when
-$\punitinXfromYtoZ {}{\beta}{F \alpha} \cong \harrapp R \alpha
-\beta$. This is an ordered generalization of the notion of a relation
-$R$ being the \emph{graph} of a function $F$. Due to the asymmetry,
-there is a dual notion of a functor $G : \varr {\cat D}{\cat C}$
-right-representing a profunctor $\punitinXfromYtoZ {\alpha}{G\beta}
-\cong \harrapp R \alpha \beta$. Then $F$ and $G$ are adjoint functors
-when $F$ left represents a profunctor that $G$ right-represents. This
-generalizes the formulation that a function $g$ is an inverse to $f$
-if its corresponding relation is the converse of the relation
-corresponding to $f$.
-
-The definition we gave for adjoint functors is the one in terms of
-``hom-isomorphism''. The equivalent in terms of unit and co-unit is a
-simple corollary of the Yoneda lemma, because for instance the unit
-can be extracted from the transformation $\homunary \alpha
-{\punitinXfromYtoZ {}{F \alpha}{\beta}} \beta {\punitinXfromYtoZ
-  {}{\alpha}{G\beta}}$. The formulation in terms of unit and co-unit
-generalizes the formulation of inverses that each composition is equal
-to the identity.
-%% \begin{lemma}[Formulations of Representability]
-%%   The following are equivalent
-%%   \begin{enumerate}
-%%   \item An isomorphism between $\punitinXfromYtoZ {}{F \alpha}{\beta}$ and $\harrapp R \alpha \beta$
-%%   \item A term $\pendallXdotY \alpha {\harrapp R \alpha {F \alpha}}$
-%%     such that the induced morphism from $\punitinXfromYtoZ {}{F
-%%       \alpha}{\beta}$ to $\harrapp R \alpha \beta$ is an isomorphism.
-%%   \end{enumerate}
-%% \end{lemma}
-
-Next, we turn to limits, or more generally, Kan extensions.
-%
-Given functors $J : \varr {\cat C}{\cat C'}$ and $F : \varr{\cat
-  C}{\cat D}$, a right Kan extension is functor $\ran J F : \varr{\cat
-  C'}{\cat D}$ such that the composition $\ran J F \circ J$ has a
-universal natural transformation to $F$.
-\begin{lemma}
-  A right Kan extension of $F$ along $J$ is a functor $\ran J F$ that
-  right-represents the profunctor $\homrallXYtoZ {\alpha} {\punitinXfromYtoZ {} {\alpha'}{J \alpha}}{\punitinXfromYtoZ {} \beta {F \alpha}}$
-\end{lemma}
-Viewing this in higher-order logic, this says that $\beta = (\ran J
-F)\alpha'$ if and only if $\forall \alpha. \alpha' = J \alpha
-\Rightarrow \beta = F \alpha$. If $J$ is surjective this says that
-$\ran J F$ composed with $J$ is equal to $F$, but if $J$ is not
-surjective then this is impossible to satisfy for ordinary
-functions. Kan extensions generalize limits in that the limit of a
-diagram $F : \varr {\cat C}{\cat D}$ is the same as a right Kan
-extension along the unique $! : \varr{\cat C}{1}$.
-
-Then we can prove the famous theorem that right adjoints preserve
-right Kan extensions, and so in particular, limits.
-\begin{theorem}
-  If $\ran J F$ is a right Kan extension and $G : \varr{\cat D}{\cat
-    E}$ has a left adjoint $L$, then $G \circ (\ran J F)$ is the right
-  Kan extension of $G \circ F$ along $J$.
-\end{theorem}
-\begin{proof}
-  \begin{align*}
-    \punitinXfromYtoZ {} {\gamma} {G (\ran J F \alpha')}
-    &\cong \punitinXfromYtoZ {}{L \gamma} {\ran J F \alpha'}\\
-    &\cong \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {}{\alpha'}{J\alpha})} {\punitinXfromYtoZ {}{L \gamma}{F \alpha}}\\
-    &\cong \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {}{\alpha'}{J\alpha})} {\punitinXfromYtoZ {}{\gamma}{G (F \alpha)}}
-  \end{align*}  
-\end{proof}
-
-\subsection{Ordered Theories}
-
-Just as we can define theories in first-order logic or higher-order
-logic by assuming base sorts, function and relation symbols and
-axioms, we can define ordered, or categorical theories in \ohol{}
-easily by using the two-level type theory structure.
-%
-We can define an \emph{ordered theory} to be any context $\Gamma$ and
-a translation of theories to be a substitution.
-%
-Then we can define theories for cartesian categories, monoidal
-categories, bicartesian categories, strong monads, (strong)
-adjunctions.
-%
-However the utility for applications to programming language semantics
-is limited due to the lack of opposite categories.
-
-\subsection{Duality Principle}
-One common source of category theoretic arguments is the duality
-principle: since the opposite of any category is also a category, any
-statement that quantifies over all categories is equally true of their
-opposites. Furthermore in a formal language of categories, any
-statement can be dualized to a statement where domains and codomains
-are swapped and composition is flipped.
-%
-A similar duality principle holds in SCT.
-%
-The basic idea is to reverse the orientation of all \emph{set}
-expressions by swapping which variable is covariant and which is
-contravariant.
-%
-This has the effect of reversing the order of the context $\Phi$.
-%
-We can define this as a translation $\cdot^* : SCT \to SCT$ defined on
-syntactic forms of SCT in Figure~\ref{fig:duality}.
-\begin{figure}
-    \begin{align*}
-      (\harr {\cat C} {\cat D})^* &= \harr {\cat D^*} {\cat C^*}\\
-      (\alpha:\cat C)^* &= \alpha: \cat C^*\\
-      (\alpha:\cat C; \beta:\cat D)^* &= \beta:\cat D^*; \alpha:\cat C^*\\
-      (\Phi,x:R,\Psi)^* &= \Psi^*,x:R^*, \Phi^*\\
-      (\homrallXYtoZ \alpha P Q)^* &= \homlallXYtoZ \alpha {P^*} {Q^*}\\
-      (\homlallXYtoZ \alpha P Q)^* &= \homrallXYtoZ \alpha {P^*} {Q^*}\\
-      (\homrlambdaXatYdotZ x \alpha s)^* &= \homllambdaXatYdotZ x \alpha s^*\\
-      (\homrappXtoYatZ s t a)^* &= \homlappXtoYatZ {s^*} {t^*} {a^*}\\
-      (\tensorexistsXwithYandZ \beta P Q)^* &=
-      \tensorexistsXwithYandZ \beta {Q^*}{P^*}\\
-      (\tensorintroatXwithYandZ b s t)^* &= \tensorintroatXwithYandZ {b^*} {t^*} {s^*}\\
-      (\punitinXfromYtoZ {\cat C} {a_1}{a_2})^* &= \punitinXfromYtoZ {\cat C^*} {a_2^*}{a_1^*}
-    \end{align*}
-  \caption{Duality Involution}
-  \label{fig:duality}
-\end{figure}
-
-\subsection{Extensionality Axioms}
-
-Finally, we discuss some non-theorems that would be desirable to add
-as axioms to the theory of \ohol{}.
-%
-Chief among these are principles about the hom type $\punitinXfromYtoZ
-{\cat C} \alpha \beta$ when $\cat C$ is a connective.
-%
-Since the hom type is defined as a kind of unit type, rather than
-defined inductively, we are not guaranteed that the hom type for the
-product category $\cat C \times \cat D$ or the presheaf categories are
-what we expect.
-%
-For the product type, we expect there should be an isomorphism
-$\punitinXfromYtoZ {\cat C \times \cat D} \alpha \beta \cong
-(\punitinXfromYtoZ {\cat C} {\pi_1 \alpha} {\pi_1 \beta}) \times
-(\punitinXfromYtoZ {\cat D} {\pi_2 \alpha} {\pi_2 \beta})$ saying an
-arrow in a product category is a pair of arrows.
-%
-Similarly, the hom type in the presheaf category should be given by
-the end formula $\punitinXfromYtoZ {\negPresheaf {\cat C}} \alpha
-\beta \cong \homlallXYtoZ {\gamma}{\negPresheafApp \alpha
-  \gamma}{\negPresheafApp \beta \gamma}$. This would allow us to
-relate the Yoneda Lemma \ref{lem:yoneda} to the morphisms of
-presheaves, and prove that the Yoneda embedding is fully faithful.
-%
-We call these extensionality principles because they are analogous to
-principles such as function extensionality but for the directed hom
-type rather than equality.
-
-The presheaf extensionality principle is independent from the existing
-axioms of \ohol{}: it is true in the ordinary category theoretic
-model, but it is false in the set theoretic model. That is, in the set
-theoretic model, the presheaf category is simply the powerset, the hom
-type is \emph{equality} and the function profunctor is interpreted as
-a universally quantified \emph{implication}, but equality in the
-powerset should be \emph{bi-implication}, so the theorem is false. We
-expect the product extensionality is independent as well, but a
-counter-model would likely be quite exotic as we expect it to be
-provable in a system with functor categories, in analogy with the
-proof for the identity type in MLTT.
-%
-Note that these axioms can easily be added as assumptions in the
-dependently typed context, though this will break the constructive
-character of the system. We expect techniques from type theory might
-be applied to incorporate these as computationally meaningful
-principles rather than assumed as axioms \cite{obs-tt,xtt,cubical-type-theory}.
-
-\section{Semantics}
-
-Next, we develop the basics of the model theory for \ohol{}.
-%
-First, we demonstrate that a hyperdoctrine of virtual double
-categories with split restrictions provides a sound and complete
-notion of categorical model.
-%
-Then we instantiate this general notion of model to show that the
-\ohol{} can be interpreted in ordinary category theory as well as
-enriched and internal category theory, and more trivially, in terms of
-sets and relations or preordered sets and ordered relations.
-
-\subsection{Categorical Models}
-
-First, we can model the judgmental structure of the unary type theory
-and predicate logic in certain\emph{virtual double categories}
-\cite{leinster,crutwell-shulman}. We briefly recount the structure
-present in a virtual double category, but see \citet{crutwell-shulman}
-for a precise definition.
-The following definition is
-equivalent to the formulation as a ``normalized $T$-monoid'' in
-\citet{crutwell-shulman}, and we direct the reader there for the full
-description.
-%
-
-\begin{definition}[Virtual Double Category]
-  A virtual double category $\mathcal V$ consists of
-  \begin{enumerate}
-  \item A category $V_o$ of ``objects and vertical arrows''
-  \item A set ${\mathcal V}_h$ of ``horizontal arrows'' with source
-    and target functions $s,t : {\mathcal V}_h \to {\mathcal V_o}^2$
-  \item Sets of 2-cells of the following form:
-% https://q.uiver.app/?q=WzAsNixbMCwwLCJDXzAiXSxbMCwyLCJEXzAiXSxbMiwwLCJDX3tufSJdLFsxLDAsIlxcY2RvdHMiXSxbMiwyLCJEXzEiXSxbMSwxLCJcXHBoaSJdLFszLDIsIlJfbiIsMCx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImJhcnJlZCJ9fX1dLFswLDEsIkYiLDJdLFsyLDQsIkciXSxbMSw0LCJTIiwyLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV0sWzAsMywiUl8wIiwwLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV1d
-\[\begin{tikzcd}
-	{C_0} & \cdots & {C_{n}} \\
-	& \phi \\
-	{D_0} && {D_1}
-	\arrow["{R_n}", "\shortmid"{marking}, from=1-2, to=1-3]
-	\arrow["F"', from=1-1, to=3-1]
-	\arrow["G", from=1-3, to=3-3]
-	\arrow["S"', "\shortmid"{marking}, from=3-1, to=3-3]
-	\arrow["{R_0}", "\shortmid"{marking}, from=1-1, to=1-2]
-\end{tikzcd}\]
-  \end{enumerate}
-  We say a virtual double category has \emph{split restrictions} when
-  for any horizontal arrow $R : C \pto D$ and vertical arrows $f : C'
-  \to C$ and $g : D' \to D$ there is a chosen profunctor $R(f,g) : C'
-  \pto D'$ with a cartesian 2-cell to $R$ framed by $f,g$ and these
-  chosen cartesian lifts are functorial in $f,g$.  A functor of
-  virtual double categories preserves split restrictions if it
-  preserves these specified cartesian lifts.  
-\end{definition}
-
-Each component of this definition has a direct correspondence to a
-syntactic structure in \ohol{}. The category $\mathcal V_o$ models the
-category and functor judgments. The set $\mathcal V_h$ models the
-profunctor judgment. A composable string $R_0 \cdots R_n$ models the
-profunctor contexts. The 2-cells correspond to the natural
-transformation judgment where we have taken the restriction $S(F,G)$
-of the codomain.
-
-To model the dependent type theory and fact that the \ohol{} judgments
-are all under a dependent type theory context, we use a variation on
-Lawvere's notion of \emph{hyperdoctrine} for modeling predicate logic:
-\begin{definition}[Hyperdoctrine of Virtual Double Categories with Restrictions]
-  A hyperdoctrine of virtual double categories with restrictions is a
-  pair of a category with families $\mathcal C$ and a functor $L :
-  \mathcal C^o \to \text{vDbl}_r$ to the category of virtual double
-  categories with split restrictions and restriction-preserving
-  functors.
-\end{definition}
-Categories with families $\mathcal C$ model dependent type theory
-\citep{cwf} and for each semantic context $\Gamma$, $L(\Gamma)$ models
-the \ohol{} judgments in context $\Gamma$, with the functoriality
-modeling the fact that all of these judgments admit a well-behaved
-action of substitution.
-
-\begin{construction}[Soundness and Completeness]
-  For any choice of connectives, the syntax of parameterized \ohol{}
-  defines a hyperdoctrine of VDCrs that is an initial object in the
-  category of hyperdoctrines of VDCrs with chosen universal
-  constructions and functors preserving those universal constructions.
-\end{construction}
-\begin{proof}
-  Most of the details of the proof are straightforward. In the
-  appendix we demonstrate the syntactic elements of the proof which
-  are that the syntax itself is a hyperdoctrine of VDCrs, i.e., that
-  the notions of substitution are appropriately functorial.
-\end{proof}
-
-\subsection{Concrete Models}
-
-Now that we have a category-theoretic notion of model, we give some
-model construction theorems that can be used to justify our intuitive
-notion of semantics in (enriched, internal) category theory.
-
-First, we can extend any model of \ohol{} to a model of \ohol{}
-parameterized by dependent type theory as follows:
-\begin{construction}
-  Given a virtual double category with restrictions $\mathcal V$, we
-  can construct a functor $\mathcal V^{-}: \Set \to \text{vDbl}_r$ by
-  defining the objects of $\mathcal V^\Gamma$ to be functions $\Gamma
-  \to \mathcal V_o$, and similarly for morphisms and 2-cells with all
-  operations given pointwise.
-\end{construction}
-% NOTE: this should be some kind of general theorem right?
-% Sketch:
-% 1. VDCrs are a finite limit theory
-% 2. A hyperdoctrine L : C -> VDCr is the same as a VDCr in Pr(C)
-% 3. The Yoneda embedding preserves finite limits 
-
-TODO: find a reference that proves things have all the UMPs we want
-lol.
-
 \section{Semantics}
 
 Next, we develop the basics of the model theory for SCT. Because SCT
@@ -2509,356 +2830,6 @@ $\Gamma$.
     universe objects.
   \end{enumerate}
 \end{definition}
-
-\section{Discussion}
-
-\paragraph{Calculi for formal category theory}
-
-In their book on $\infty$-category theory, Riehl and Verity use the
-formal language of virtual equipments to prove results valid for
-$\infty$-categories without concrete manipulation of model
-categories. They formalize this language using Makkai's FOLDS
-framework of first-order logic with dependent sorts. The approach is
-similar in spirit to our \ohol{}, and has the same models. The main
-difference is that their theory is built on top of first-order logic,
-whereas ours is built on a custom-made variant of higher-order logic
-over a (unary) simple type theory. For this reason, statements in
-their theory are quite complex as they have to be encoded into
-first-order logic, whereas we argue our type-theoretic approach
-formalizes informal arguments much more directly, as shown in
-Section~\ref{sec:examples}.
-%
-An informal syntax for manipulating profunctors involving ends and
-coends, called the coend calculus is closely related, an extension of
-\ohol{} to treat profunctors of many variables of different variances
-should provide a formal treatment for the coend calculus
-\citet{coend-calculus}.
-
-Another approach to formal category theory is to develop a
-\emph{directed dependent type theory}, a type theory where the
-identity type is interpreted as morphisms in a (possibly
-$\infty$-)category. Research on directed dependent type theories is
-ongoing \cite{riehl-shulman,north}. Directed dependent type theories
-should generalize \ohol{} in the same way that dependent type theory
-generalizes higher order logic: internally there should be a type that
-models the category of sets, and terms of this type should model the
-profunctors of \ohol{}.  As a foundation for a domain-specific proof
-assistant for category theory, \ohol{} may provide a foundation for a
-proof assistant in the style of Isabelle/HOL \cite{isabelle-hol},
-whereas directed type theory would provide a foundation for a proof
-assistant in the style of Agda or Coq \cite{agda,coq}.
-
-\citet{djm-string-diagrams} provides a string diagram calculus for
-double categories and pro-arrow equipments, generalizing string
-diagrams for monoidal categories \citet{joyal?}. These are an
-alternative approach to type theoretic calculi, with the string
-diagrams typically making tensor products simpler to work with, while
-a type theoretic calculus like SCT makes the closed structure
-$\homrallXYtoZ \alpha P Q$ simpler to work with by using bound
-variables.
-
-One alternative to proarrow equipments is to axiomatize the bicategory
-of categories and profunctors rather than the double category of
-categories functors and profunctors. One abstract structure along
-these lines is a \emph{Cartesian bicategory}\footnote{which is not the
-same as a bicategory with products/finite limits, for which a syntax
-was developed \citet{fioresaville}} is given in
-\citet{carboni-walters,carboni-walters-someonelese}. Some preliminary
-work on a proof system for Cartesian bicateogires was presented at
-\citet{jonasfreycartesianbicategories}. This bears strong similarities
-to our calculus SCT, except that (1) their profunctors may have 0, 1
-or more covariant or contravariant variables but (2) they do not have
-a term syntax like our natural transformation syntax and (3) they do
-not have functors and restriction of profunctors by functors (since
-this structure is not present in a Cartesian
-bicategory). Semantically, Cartesian bicategories are somewhat less
-general than pro-arrow equipments because in general the set of
-functors between two categories can only be recovered from the set of
-profunctors if the codomain category is Cauchy complete, in which case
-functors are equivalent to adjoint pairs of profunctors.
-
-Finally, some variations on double categories have been used to model
-the structure of certain program logics. \citet{newlicata20} present a
-logic for \emph{vertically thin} pro-arrow equipments, i.e., pro-arrow
-equipments where the functor and natural transformation judgments are
-posetal. This calculus is quite different from ours in that the
-horizontal morphisms are terms of a programming language, and so they
-are not presented as having co-variant and contravariant variables,
-and the equipment structure is modeled by explicit coercions rather
-than by syntactic substitution of vertical arrows in horizontal
-arrows. Another similar calculus is System P \citep{systemP} which is
-an internal language of \emph{reflexive graph categories}, which are
-like double categories without horizontal composition. 
-
-\subsection{Category Theoretic Extensions}
-
-While we have demonstrated that many common constructions in category
-theory can be expressed using the simple combination of homs, tensors
-and units, there are several that are out of reach for SCT due to its
-restrictive judgmental structure.
-
-First, while we can add products to the calculus, adding in a
-\emph{functor category} ${\cat C}^{\cat D}$ would necessitate adding a
-syntax for functors of multiple arguments, to allow for the lambda rule:
-\[ \inferrule {\alpha:\cat C, \beta:\cat D \vdash e : \cat E} {\alpha:\cat C \vdash \lambda \beta:\cat D. e : \cat E} \]
-This would then require also some extension to profunctors for
-allowing 0 or more covariant/contravariant dependencies as well.
-%
-In addition, we could consider extending our semantics with a notion
-of \emph{opposite category}, with the property that a covariant
-dependence of a profunctor on a variable in a category should be
-equivalent to a contravariant dependence on a variable in the opposite
-category.
-%
-This could possibly be done by introducing a modal distinction
-$\alpha:^{+}\cat C$ for covariant dependence and $\alpha:^{-}\cat C$
-for contravariant dependence, with the opposite category being a
-modality that internalizes flipping the variance as a type
-constructor.
-%
-With these two extensions, possibly, the category contexts for
-functors and profunctors could be unified as one notion of a sequence
-of object variables with variances.
-%
-With this unification, it would then be simpler to incorporate a third
-extension: a universe object, corresponding to an object
-$\textrm{Set}$, which would allow us to internalize the profunctor
-judgment in the functor judgment, modeling that in classical category
-theory, profunctors are the same as certain functors to the category
-of Sets.
-%
-While all of these extensions seem plausible, they all move away to
-the simple ordered type theory structure that allowed us to define
-units, tensor and hom profunctors so easily. It is unclear how to
-define these types in this extended structure. As a simple example, if
-profunctors have many variables of mixed variance, rather than exactly
-one of each variance, it is unclear what the appropriate
-generalization of the transformation context $\Phi$ should be.
-
-An orthogonal extension to these would be to consider adding a
-\emph{discretization} modality $\Delta\cat C$ that gives the discrete
-category on the underlying set of objects of $\cat C$. This would give
-us the ability to formalize concepts like ``function on objects'' or
-``unnatural transformation'' without the need to define internal
-categories. This could be modeled by adding a modal distinction
-$\alpha:^{\#}\cat C$ for ``crisp'' dependence on an object of $\cat
-C$, i.e., dependence merely on the object of $\cat C$ with no
-functoriality/naturality conditions. This would then be internalized
-by the discretization modality.
-
-A third approach would be to extend the calculus to model general
-monoidal closed structures and more generally multicategories, which
-provides semantics of modal substructural type theories.
-%
-This can be modeled by extending the ``universe'' $\Set$ to be a
-monoidal closed category, which induces a monoidal closed structure on
-profunctors by the Day convolution product \cite{...}.
-%
-Similar developments along these lines have already been done for
-coend calculus \citep{coend-calculus} and in formalization of
-substructural type theories \citep{atkey-woods}.
-
-%% A recent development in the formalization of substructural type
-%% theories is to use monoidal connectives at the meta-level when
-%% defining multiplicative connectives\cite{woodsatkeyesop2022}. This
-%% suggest one approach to extending the theory to support the
-%% formalization of multiplicative universal properties would be, in
-%% adherence to the microcosm principle, to add linear judgments and
-%% multiplicative connectives to the metalevel.
-
-%% \paragraph{As a tool for Formal Type Theory}
-
-%% While we can model ``unary'' type theories using profunctors, to model
-%% theories like simple intuitionistic, linear or bunched type theories
-%% we need a way to talk about ``profunctors of many arguments''. This
-%% can be accomplished using \emph{multicategory} theory, which models
-%% the structure of the context with its structural rules as a monad of
-%% ``contexts and substitutions''. A suitable notion of monad on a
-%% virtual double category has been developed and was in fact the
-%% original motivation for the concept of a virtual double
-%% category. However while an abstract monad of contexts $T$ is enough to
-%% define what a $T$-multicategory internal to a virtual equipment is, it
-%% does not appear possible to define the multiplicative connectives as a
-%% universal property, i.e., to define when the multicategory is
-%% \emph{representable}.
-
-\subsection{Semantics}
-
-Our definition of a double category with displays is suggestive of a
-simple generalization. A double category is a monoid object in the
-double category of $Span(Cat)$, and a double category with displays
-furthermore uses certain diagrams involving profunctors, which also
-form a double category $Prof$. This suggests that the algebraic
-structure of a double category with displays is naturally modeled in
-some kind of \emph{triple category}, modeling the three types of
-morphisms: functors, profunctors and spans of functors.
-   
-%% %%
-%% %% Bibliography
-%% %%
-
-%% %% Please use bibtex, 
-\subsubsection*{Acknowledgements}
-Grants stuff...? The authors would like to thank David Jaz Myers, Emily Riehl, Mike
-Shulman, Dominic Verity,...for helpful feedback on this work
-
-\bibliography{cats}
-
-
-\appendix
-
-\section{Syntactic Details}
-
-\begin{figure}
-  \begin{mathpar}
-    \begin{array}{rccl}
-      \textrm{Term Substitution} & \gamma, \delta & ::= & \cdot \pipe \gamma, M/X\\
-      \textrm{Object Substitution} & \xi, \zeta & ::= & a/\alpha \pipe a/\alpha;b/\beta\\
-      \textrm{Transformation Substitution} & \phi, \psi & ::= & a/\alpha \pipe \phi,s/x, \psi      
-    \end{array}
-
-      \inferrule*[right=TyCtxForm]
-        {}
-        {\Gamma \isadtctx}
-
-    \inferrule*[right=SetCtxForm]
-    {\Gamma \isadtctx}
-    {\Gamma \vdash \Xi \boundary}
-
-    \inferrule*[right=TransCtxForm]
-    {\Gamma \isadtctx}
-     {\Gamma \vdash \Phi \isavectx}
-    \inferrule
-    {\Delta \isadtctx \and \Gamma \isadtctx}
-    {\gamma : \Delta \to \Gamma}
-    
-    \inferrule*[right=Boundary Map formation]
-    {\Gamma \vdash Z \boundary \and \Gamma \vdash \Xi \boundary}
-    {\Gamma \vdash \xi : Z \to \Xi}
-
-    \inferrule*[right=Cat Subst formation]
-    {\Gamma \vdash \Psi \isavectx \and \Gamma \vdash \Phi \isavectx}
-    {\Gamma \vdash \phi : \Psi \to \Phi}
-
-  \end{mathpar}
-  \caption{Substitution}
-  
-\end{figure}
-
-\cref{fig:contexts} details the typing rules for contexts and the
-typing for variables and the admissible actions of substitution (the
-definition of substitution is straightforward and found in the
-appendix). the rules for term and object variables are as usual.
-%
-An object substitution into a single object context $\alpha:\cat C$
-consists of an object $a : \cat C$ parameterized by an object of
-another category.
-%
-An object substitution into a pair of co- and contra-variant variables
-$\alpha:\cat C;\beta:\cat D$ is a pair of an object substituted for
-$\alpha$ and one for $\beta$, each typed with respect to the
-appropriate variable of an object context $\Xi$.
-%
-Note that this allows for $\Xi$ to consist of either two variables or
-a single variable.
-%
-When
-constructing a transformation context $\Phi, x : R, \Psi$, we need to
-ensure that the contravariant dependence of $R$ matches the covariant
-dependence of $\Phi$ and vice-versa for $\Psi$. We define this with
-auxiliary metafunctions $d^+,d^-$ which extract the covariant and
-contravariant object variable of a transformation context.
-%
-The rules for transformation variables and substitutions define the
-use of variables to be \emph{linear} (each variables is used exactly
-once) and \emph{ordered}, they occur in the term in the same order
-that they appear in the context.
-%
-The rule for a transformation variables says a variable $x$ can only
-be used when it is the sole variable in the context.
-%
-A transformation subsitution into an ``empty'' transformation context
-$\alpha: \cat C$ is the same as an object substitution into
-$\alpha:\cat C$.
-%
-The rule for constructing a transformation substitution into a
-non-empty context $\Phi_1,x:R,\Phi_2$ says we can construct a
-substitution by constructing substitutions $\phi_1,\phi_2$ for
-$\Phi_1$ and $\Phi_2$ as well as a transformation $s$ into an
-instantiation of $R$ where the input contexts come from splitting the
-input context $\Psi$ into three components, and ensuring that the
-instantiation of $R$ agrees with how $\phi_1,\phi_2$ instantiate the
-variables. This uses two new metafunctions. First, $\Phi \jnctx \Psi$
-is an operation for concatenating two contexts when $d^+(\Phi) =
-d^-(\Psi)$. Next, we extend the boundary maps $d^\pm$ to substitutions
-to extract their object substitutions.
-
-\begin{figure}
-  \begin{mathpar}
-    \inferrule{}{\cdot \isadtctx}
-
-    \inferrule
-    {\Gamma \isadtctx \and \Gamma \vdash A \isaTy}
-    {\Gamma , X : A \isadtctx}\\
-
-    \inferrule
-    {X : A \in \Gamma}
-    {\Gamma \vdash X : A}
-
-    \inferrule
-    {}
-    {\alpha: \cat C \vdash \alpha: \cat C}
-
-    \inferrule
-    {\Gamma \vdash \cat C : \isaCat}
-    {\Gamma \vdash \alpha: \cat C \isavectx}
-
-    \inferrule
-    {\Gamma \vdash \Phi \isavectx\and
-    \Gamma \pipe d^+\Phi; \beta:\cat D \vdash R \isaSet}
-    {\Gamma \vdash \Phi, x:R, \beta:\cat D \isavectx}
-
-    \inferrule
-    {}
-    {\Gamma \pipe \alpha:\cat C, x : R, \beta: \cat D \vdash x : R}
-
-    % horizontal identity
-    \inferrule
-    {\Gamma\pipe \beta:\cat C \vdash a : \cat C}
-    {\Gamma \pipe \beta:\cat C \vdash a/\alpha : (\alpha : \cat C)}
-
-    \inferrule
-    {\Psi = \Psi_1 \jnctx \Psi_2\and
-      \Gamma\pipe\Psi_1 \vdash \phi : \Phi\and
-      \Gamma \pipe \Psi_2 \vdash t : R[d^+\phi;b/\beta] \and
-      \Gamma \vdash \phi_2 : \Psi_2 \to \Phi_2
-      }
-    {\Gamma\pipe\Psi \vdash \phi,t/x,b/\beta :: (\Phi,x:R,\beta:\cat D)}
-  \end{mathpar}
-  \begin{align*}
-    \underline{\alpha:C} &= \alpha:C\\
-    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
-  \end{align*}
-  \begin{align*}
-    d^{\pm}(\alpha:\cat C) &= \alpha : \cat C\\
-    d^{-}(\Phi,x:R,\Psi) &= d^-\Phi\\
-    d^{+}(\Phi,x:R,\Psi) &= d^-\Psi
-  \end{align*}
-  \begin{align*}
-    d^{\pm}(a/\alpha) &= a/\alpha\\
-    d^{-}(\phi,t/x,\psi) &= d^-\phi\\
-    d^{+}(\phi,t/x,\psi) &= d^+\psi\\
-  \end{align*}
-  \caption{Basic Rules of Judgment Theory}
-  \label{fig:contexts}
-\end{figure}
-
-Now that we have established a judgmental structure, in typical type
-theoretic fashion, our type constructs follow naturally as
-internalizing the judgments. Though the positive multiplicatives are
-more familiar, we start by describing the negative multiplicatives,
-since they are better behaved, and are useful to have already defined
-when discussing the positives.
 
 
 
@@ -5441,5 +5412,7 @@ judgmental structure of dependent type theory:
 %%   \forall \beta. 
 %%   (\forall \alpha. Hom_C(\alpha,\alpha') \triangleright R[\alpha;\beta]) \triangleleft Hom_D(\beta',\beta)) \]
 %% \end{definition}
+
+
 
 \end{document}

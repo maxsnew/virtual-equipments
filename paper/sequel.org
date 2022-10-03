@@ -1,0 +1,13 @@
+Add support for monoidal category theory
+
+Focus on an application: Operational Logical Relations(!)
+
+Define, say, a "formal" CBPV LR and get many models:
+
+1. Ordinary categories: normalization proof
+2. Internal to Topos of trees: guarded normalization proof
+3. Enriched version: subtyping?!?
+4. Internal version: gradual typing?
+5. Indexed verions??
+
+
