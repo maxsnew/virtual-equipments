@@ -26,6 +26,7 @@
 \newcommand{\isaSet}{\,\,\textrm{Set}}
 \newcommand{\isaTy}{\,\,\textrm{Type}}
 \newcommand{\isaCat}{\,\,\textrm{Cat}}
+\newcommand{\isSmall}{\,\,\textrm{Small}}
 \newcommand{\Set}{\textrm{Set}}
 \newcommand{\vtkmnd}{\mathbb{K}\text{Mod} (\vcat{V},T)}
 \newcommand{\rmod}{\text{RMod}}
@@ -33,6 +34,8 @@
 \newcommand{\varr}[2]{\text{Fun}{#1}{#2}}
 \newcommand{\harr}[2]{\text{Rel}{#1}{#2}}
 \newcommand{\harrapp}[3]{#1(#2;#3)}
+
+\newcommand{\defaultObCtx}{\Gamma\pipe\alpha:\cat C}
 
 \newcommand{\jnctx}{\curlyveedownarrow}
 
@@ -283,11 +286,12 @@ using algebraic structures such as 2-categories, bicategories,
 This approach has the advantage of avoiding the need to prove
 the side conditions of naturality or enrichment.
 %
-The downside is that these algebraic structures are quite complicated,
-with a 2-dimensional diagrammatic language that can be quite beautiful
-and elegant, but is also seems very far removed from the traditional
-formulation of category theory that while complex is at least
-described in terms of a concrete notion of sets or types.
+A downside is that these algebraic structures are quite complicated,
+and practitioners typically employ either an algebraic combinator
+syntax or a 2-dimensional diagrammatic language that can be quite
+beautiful and elegant, but is also seems very far removed from the
+traditional formulation of category theory in terms of sets and
+functions.
 
 In this work, we apply the technique of categorical logic to these
 algebraic structures to design a formal logic, which we call
@@ -309,6 +313,12 @@ where the syntax is similar to that of informal set theory, but by
 restricting to intuitionistic reasoning, the constructions can all be
 interpreted in models where types are spaces and terms are continuous
 functions ``for free''.
+%
+The syntax provides an alternative to algebraic and
+string-diagrammatic syntaxes for working with virtual equipments,
+similar to how the lambda calculus provides an alternative to
+categorical combinators and string diagram calculi for cartesian
+closed categories.
 
 \vett{} is a kind of \emph{ordered}, \emph{constructive} variant of
 predicate logic over a unary type theory.
@@ -475,7 +485,7 @@ properties such a representable functors and adjunctions.
   categorical constructions.
 \end{enumerate}
 
-\section{Syntax of SCT}
+\section{Syntax of VETT}
 
 In Figure~\ref{fig:hol-cats} we give a table summarizing the
 relationship between the judgments and connectives of higher-order
@@ -753,18 +763,21 @@ context but the left-most and right-most object variables.
 %% restriction of a judgment to more specific types, which is given by
 %% substitution of types for the judgment's parameter variables. Next, we
 %% have rules for constructing an ``empty'' context, which is just a
+
 In typical natural-deduction style, all syntactic forms typed in
 context admit an action of substitution. For terms, this is the
 ordinary type theoretic substitution. Naturally objects $\alpha:\cat C
 \vdash a : \cat D$ can be substituted for object variables $\beta :
 \cat D$ in other objects. We can also substitute objects into
-\emph{sets}. For instance, if we have a hom set in a category
-$\punitinXfromYtoZ {\cat C} \alpha {\alpha'}$, and we can define
-objects $a$ and $a'$ in the category $\cat C$, then we can substitute
-those in to form the hom set between $a$ and $a'$: $\punitinXfromYtoZ
-{\cat C} a {a'}$. This semantically is a ``restriction'' of a
-profunctor along two functors, and modeling this operation as a
-substitution considerably simplifies reasoning using profunctors.
+\emph{sets}, that is, if we have a set $P$ parameterized by a
+contravariant variable $\alpha : \cat C$ and a covariant variable
+$\beta: \cat D$, then we can substitute objects $a : \cat C$ and $b :
+\cat D$ for these variables $P[a/\alpha;b\beta]$. This generalizes the
+ordinary precomposition of a relation by a function.  Semantically
+this is the ``restriction'' of a profunctor along two functors, which
+is just composition of functors if a profunctor is viewed as a functor
+to $\Set$. Modeling this operation as a substitution considerably
+simplifies reasoning using profunctors.
 %
 Finally we have the action of substitution on natural
 transformations. A natural transformation is indexed by set variables
@@ -774,123 +787,160 @@ transformations as \emph{polymorphic} in the categories involved, and
 so when we make a transformation substitution, we substitute not just
 the set variables, but we also \emph{instantiate} the polymorphic
 category variables with objects.
+%
+The full syntactic details of substitution are included in the appendix.
 
-\cref{fig:contexts} details the typing rules for contexts and the
-typing for variables and the admissible actions of substitution (the
-definition of substitution is straightforward and found in the
-appendix). the rules for term and object variables are as usual.
+\subsection{Category Connectives}
+
+We introduce the connectives for defining categories in
+Figure~\ref{fig:category-connectives}. We show the formation,
+introduction and elimination rules, but additionally there are rules
+for $\beta\eta$ equality and substitution, which are included in the
+appendix.
 %
-An object substitution into a single object context $\alpha:\cat C$
-consists of an object $a : \cat C$ parameterized by an object of
-another category.
+First we introduce the additives: the unit category $1$ and product
+category $\cat C \times \cat D$ with their usual introduction and
+elimination rules.
 %
-An object substitution into a pair of co- and contra-variant variables
-$\alpha:\cat C;\beta:\cat D$ is a pair of an object substituted for
-$\alpha$ and one for $\beta$, each typed with respect to the
-appropriate variable of an object context $\Xi$.
+Next, we introduce the \emph{graph of a profunctor} $\graphProf \alpha
+\beta P$. Just as a relation $R : A \times B \to \Set$ can be viewed
+as a subset $\{ (a,b) \in A\times B | R(a,b)\}$, any profunctor $P :
+C_-^o\times C_+ \to \Set$ can be viewed as a category with a functor
+to $C_- \times C_+$ (no op), specifically a two-sided discrete
+fibration. In set-based category theory, the objects are triples
+$(a_-, a_+, s : P(a_-,a_+))$ and morphisms from $(a_-,a_+, s)$ to
+$(a_-',a_+', s')$ are pairs of morphisms $f_- : a_- \to a_-'$ and $f_+
+: a_+ \to a_+'$ such that $P(\id,f_+)(s) = P(f_-,\id)(s')$.
 %
-Note that this allows for $\Xi$ to consist of either two variables or
-a single variable.
+With various choices of $P$, this connective can be used to define the
+arrow category, slice category and comma category constructions.
 %
-When
-constructing a transformation context $\Phi, x : R, \Psi$, we need to
-ensure that the contravariant dependence of $R$ matches the covariant
-dependence of $\Phi$ and vice-versa for $\Psi$. We define this with
-auxiliary metafunctions $d^+,d^-$ which extract the covariant and
-contravariant object variable of a transformation context.
+In our syntax we define it as the universal category $\cat C$ equipped
+with functors to $\cat C_-$ and $\cat C_+$ and a morphism to $P$.
+
+Lastly, we define the \emph{negative} and \emph{positive} presheaf
+categories $\negPresheaf \cat C$ and $\posPresheaf \cat D$. These are
+given a syntax suggestive of the fact that they generalize the notion
+of a powerset, and so can be thought of as ``power categories''.
 %
-The rules for transformation variables and substitutions define the
-use of variables to be \emph{linear} (each variables is used exactly
-once) and \emph{ordered}, they occur in the term in the same order
-that they appear in the context.
+Note that we include a restriction that the input category is
+\emph{small}, which is an inductively defined by saying all base
+categories are small, the unit is small, product of small categories
+is small and the graph of a profunctor over small categories is
+small. Notably, the presheaf categories themselves are not small.
 %
-The rule for a transformation variables says a variable $x$ can only
-be used when it is the sole variable in the context.
+The negative presheaf category is defined by its universal property
+that a functor into it $\cat D \to \negPresheaf \cat C$ is equivalent
+to a profunctor $\cat C^o \times \cat D \to \Set$.
 %
-A transformation subsitution into an ``empty'' transformation context
-$\alpha: \cat C$ is the same as an object substitution into
-$\alpha:\cat C$.
+The introduction rule constructs an object of the negative presheaf
+category from such a profunctor and the elimination rule inverts
+it. We use the notation $\negPresheafApp a p$ for the elements of the
+induced profunctor.
 %
-The rule for constructing a transformation substitution into a
-non-empty context $\Phi_1,x:R,\Phi_2$ says we can construct a
-substitution by constructing substitutions $\phi_1,\phi_2$ for
-$\Phi_1$ and $\Phi_2$ as well as a transformation $s$ into an
-instantiation of $R$ where the input contexts come from splitting the
-input context $\Psi$ into three components, and ensuring that the
-instantiation of $R$ agrees with how $\phi_1,\phi_2$ instantiate the
-variables. This uses two new metafunctions. First, $\Phi \jnctx \Psi$
-is an operation for concatenating two contexts when $d^+(\Phi) =
-d^-(\Psi)$. Next, we extend the boundary maps $d^\pm$ to substitutions
-to extract their object substitutions.
+The positive presheaf category is then the dual. In ordinary
+set-theoretic category theory the negative presheaf category is the
+usual presheaf category $\Set^{\cat C^o}$, and the positive presheaf
+category is the opposite of the dual presheaf category $(\Set^{\cat
+  D})^o$.
 
 \begin{figure}
   \begin{mathpar}
-    \inferrule{}{\cdot \isadtctx}
+    \inferrule{}{\Gamma \vdash 1 \isaCat}\and
+    \inferrule*{}{\Gamma\pipe\alpha:C \vdash () : 1}\and
 
     \inferrule
-    {\Gamma \isadtctx \and \Gamma \vdash A \isaTy}
-    {\Gamma , X : A \isadtctx}\\
+        {\Gamma \vdash \cat C_1 \isaCat \and \cat C_2 \isaCat}
+        {\Gamma \vdash {\cat C_1} \times {\cat C_2} \isaCat}
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C \vdash a_1 : \cat C_1 \and \Gamma \pipe \alpha:\cat C \vdash a_2 : \cat C_2}
+    {\Gamma \pipe\alpha:\cat C \vdash (a_1,a_2) : {\cat C_1} \times {\cat C_2}}
 
     \inferrule
-    {X : A \in \Gamma}
-    {\Gamma \vdash X : A}
+    {\Gamma \pipe\alpha:\cat C \vdash a : {\cat C_1} \times {\cat C_2}}
+    {\Gamma\pipe\alpha:\cat C\vdash \pi_i a : \cat C_i}
 
     \inferrule
-    {}
-    {\alpha: \cat C \vdash \alpha: \cat C}
+    {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash P \isaSet}
+    {\Gamma \vdash \graphProf{\alpha}{\beta} P \isaCat}
 
     \inferrule
-    {\Gamma \vdash \cat C : \isaCat}
-    {\Gamma \vdash \alpha: \cat C \isavectx}
+    {\defaultObCtx \vdash a : \graphProf{\alpha:\cat C_-}{\beta} P}
+    {\defaultObCtx \vdash \pi_- a : \cat C_-}
 
     \inferrule
-    {\Gamma \vdash \Phi \isavectx\and
-    \Gamma \pipe d^+\Phi; \beta:\cat D \vdash R \isaSet}
-    {\Gamma \vdash \Phi, x:R, \beta:\cat D \isavectx}
+    {\defaultObCtx \vdash a : \graphProf{\alpha}{\beta:C_+} P}
+    {\defaultObCtx \vdash \pi_+ a : \cat C_+}
 
     \inferrule
-    {}
-    {\Gamma \pipe \alpha:\cat C, x : R, \beta: \cat D \vdash x : R}
-
-    % horizontal identity
-    \inferrule
-    {\Gamma\pipe \beta:\cat C \vdash a : \cat C}
-    {\Gamma \pipe \beta:\cat C \vdash a/\alpha : (\alpha : \cat C)}
+    {\defaultObCtx \vdash a : \graphProf{\alpha}{\beta} P}
+    {\defaultObCtx \vdash \pi_e a : P[\pi_-a/\alpha;\pi_+a/\beta]}
 
     \inferrule
-    {\Psi = \Psi_1 \jnctx \Psi_2\and
-      \Gamma\pipe\Psi_1 \vdash \phi : \Phi\and
-      \Gamma \pipe \Psi_2 \vdash t : R[d^+\phi;b/\beta] \and
-      \Gamma \vdash \phi_2 : \Psi_2 \to \Phi_2
-      }
-    {\Gamma\pipe\Psi \vdash \phi,t/x,b/\beta :: (\Phi,x:R,\beta:\cat D)}
+    {\defaultObCtx \vdash a_- : C_-\and
+      \defaultObCtx \vdash a_+ : C_+\and
+      \defaultObCtx \vdash s : P[a_-/\alpha;a_+/\beta]}
+    {\defaultObCtx \vdash (a_-,a_+,s) : \graphProf{\alpha:\cat C_-}{\beta:\cat C_+} P}
+
+    \inferrule
+    {\Gamma \vdash \cat C \isaCat \and \cat C \isSmall}
+    {\Gamma \vdash \negPresheaf {\cat C} \isaCat}
+
+    \inferrule
+    {\Gamma \pipe d^-\Xi \vdash a : \cat C \and
+     \Gamma \pipe d^+\Xi \vdash p : \negPresheaf {\cat C}
+    }
+    {\Gamma \pipe \Xi \vdash \negPresheafAppPtoX p a \isaSet}
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R : \isaSet}
+    {\Gamma \pipe \beta:\cat D \vdash \lambda \alpha:\cat C. R : \negPresheaf {\cat C}}
+
+    \inferrule
+    {\Gamma \vdash \cat D \isaCat \and \cat D \isSmall}
+    {\Gamma \vdash \posPresheaf {\cat D} \isaCat}
+
+    \inferrule
+    {\Gamma \pipe d^-\Xi \vdash p : \posPresheaf {\cat D}\and
+     \Gamma \pipe d^+\Xi \vdash a : \cat D
+    }
+    {\Gamma \pipe \Xi \vdash \posPresheafAppPtoX p a \isaSet}
+
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R : \isaSet}
+    {\Gamma \pipe \alpha:\cat C \vdash \lambda \beta:\cat D. R : \posPresheaf {\cat D}}
   \end{mathpar}
-  \begin{align*}
-    \underline{\alpha:C} &= \alpha:C\\
-    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
-  \end{align*}
-  \begin{align*}
-    d^{\pm}(\alpha:\cat C) &= \alpha : \cat C\\
-    d^{-}(\Phi,x:R,\Psi) &= d^-\Phi\\
-    d^{+}(\Phi,x:R,\Psi) &= d^-\Psi
-  \end{align*}
-  \begin{align*}
-    d^{\pm}(a/\alpha) &= a/\alpha\\
-    d^{-}(\phi,t/x,\psi) &= d^-\phi\\
-    d^{+}(\phi,t/x,\psi) &= d^+\psi\\
-  \end{align*}
-  \caption{Basic Rules of Judgment Theory}
-  \label{fig:contexts}
+  \caption{Category Conectives}
 \end{figure}
 
-Now that we have established a judgmental structure, in typical type
-theoretic fashion, our type constructs follow naturally as
-internalizing the judgments. Though the positive multiplicatives are
-more familiar, we start by describing the negative multiplicatives,
-since they are better behaved, and are useful to have already defined
-when discussing the positives.
+\subsection{Set Connectives}
 
-\subsection{Types}
+Next, we cover the connectives for the sets, i.e., constructions on
+profunctors in Figure~\ref{fig:set-connectives}.
+
+\begin{figure}
+  TODO
+  \caption{Set Connectives}
+\end{figure}
+
+
+\subsection{Type Connectives}
+
+Finally, we briefly describe the connectives for the
+``meta-logic''. These include the standard rules for Martin-L\"of type
+theory with Pi/Sigma and extensional identity types, whose rules we
+elide as they are standard \cite{emltt}. We use extensional identity
+types so that the description of models is simpler, but there is no
+obstacle to including models with intensional identity types.
+%
+The types we include are what we call \emph{universes} for the object
+categorical logic: types of small categories and locally small
+categories, functors, profunctors and natural transformations.
+
+\begin{figure}
+  
+  \caption{Type Connectives}
+\end{figure}
 
 Finally, we describe the \emph{end}, $\pendallXdotY {\alpha} P$, which
 when combined with the left or right hom types described in the next
@@ -2694,6 +2744,123 @@ Shulman, Dominic Verity,...for helpful feedback on this work
   \caption{Substitution}
   
 \end{figure}
+
+\cref{fig:contexts} details the typing rules for contexts and the
+typing for variables and the admissible actions of substitution (the
+definition of substitution is straightforward and found in the
+appendix). the rules for term and object variables are as usual.
+%
+An object substitution into a single object context $\alpha:\cat C$
+consists of an object $a : \cat C$ parameterized by an object of
+another category.
+%
+An object substitution into a pair of co- and contra-variant variables
+$\alpha:\cat C;\beta:\cat D$ is a pair of an object substituted for
+$\alpha$ and one for $\beta$, each typed with respect to the
+appropriate variable of an object context $\Xi$.
+%
+Note that this allows for $\Xi$ to consist of either two variables or
+a single variable.
+%
+When
+constructing a transformation context $\Phi, x : R, \Psi$, we need to
+ensure that the contravariant dependence of $R$ matches the covariant
+dependence of $\Phi$ and vice-versa for $\Psi$. We define this with
+auxiliary metafunctions $d^+,d^-$ which extract the covariant and
+contravariant object variable of a transformation context.
+%
+The rules for transformation variables and substitutions define the
+use of variables to be \emph{linear} (each variables is used exactly
+once) and \emph{ordered}, they occur in the term in the same order
+that they appear in the context.
+%
+The rule for a transformation variables says a variable $x$ can only
+be used when it is the sole variable in the context.
+%
+A transformation subsitution into an ``empty'' transformation context
+$\alpha: \cat C$ is the same as an object substitution into
+$\alpha:\cat C$.
+%
+The rule for constructing a transformation substitution into a
+non-empty context $\Phi_1,x:R,\Phi_2$ says we can construct a
+substitution by constructing substitutions $\phi_1,\phi_2$ for
+$\Phi_1$ and $\Phi_2$ as well as a transformation $s$ into an
+instantiation of $R$ where the input contexts come from splitting the
+input context $\Psi$ into three components, and ensuring that the
+instantiation of $R$ agrees with how $\phi_1,\phi_2$ instantiate the
+variables. This uses two new metafunctions. First, $\Phi \jnctx \Psi$
+is an operation for concatenating two contexts when $d^+(\Phi) =
+d^-(\Psi)$. Next, we extend the boundary maps $d^\pm$ to substitutions
+to extract their object substitutions.
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule{}{\cdot \isadtctx}
+
+    \inferrule
+    {\Gamma \isadtctx \and \Gamma \vdash A \isaTy}
+    {\Gamma , X : A \isadtctx}\\
+
+    \inferrule
+    {X : A \in \Gamma}
+    {\Gamma \vdash X : A}
+
+    \inferrule
+    {}
+    {\alpha: \cat C \vdash \alpha: \cat C}
+
+    \inferrule
+    {\Gamma \vdash \cat C : \isaCat}
+    {\Gamma \vdash \alpha: \cat C \isavectx}
+
+    \inferrule
+    {\Gamma \vdash \Phi \isavectx\and
+    \Gamma \pipe d^+\Phi; \beta:\cat D \vdash R \isaSet}
+    {\Gamma \vdash \Phi, x:R, \beta:\cat D \isavectx}
+
+    \inferrule
+    {}
+    {\Gamma \pipe \alpha:\cat C, x : R, \beta: \cat D \vdash x : R}
+
+    % horizontal identity
+    \inferrule
+    {\Gamma\pipe \beta:\cat C \vdash a : \cat C}
+    {\Gamma \pipe \beta:\cat C \vdash a/\alpha : (\alpha : \cat C)}
+
+    \inferrule
+    {\Psi = \Psi_1 \jnctx \Psi_2\and
+      \Gamma\pipe\Psi_1 \vdash \phi : \Phi\and
+      \Gamma \pipe \Psi_2 \vdash t : R[d^+\phi;b/\beta] \and
+      \Gamma \vdash \phi_2 : \Psi_2 \to \Phi_2
+      }
+    {\Gamma\pipe\Psi \vdash \phi,t/x,b/\beta :: (\Phi,x:R,\beta:\cat D)}
+  \end{mathpar}
+  \begin{align*}
+    \underline{\alpha:C} &= \alpha:C\\
+    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
+  \end{align*}
+  \begin{align*}
+    d^{\pm}(\alpha:\cat C) &= \alpha : \cat C\\
+    d^{-}(\Phi,x:R,\Psi) &= d^-\Phi\\
+    d^{+}(\Phi,x:R,\Psi) &= d^-\Psi
+  \end{align*}
+  \begin{align*}
+    d^{\pm}(a/\alpha) &= a/\alpha\\
+    d^{-}(\phi,t/x,\psi) &= d^-\phi\\
+    d^{+}(\phi,t/x,\psi) &= d^+\psi\\
+  \end{align*}
+  \caption{Basic Rules of Judgment Theory}
+  \label{fig:contexts}
+\end{figure}
+
+Now that we have established a judgmental structure, in typical type
+theoretic fashion, our type constructs follow naturally as
+internalizing the judgments. Though the positive multiplicatives are
+more familiar, we start by describing the negative multiplicatives,
+since they are better behaved, and are useful to have already defined
+when discussing the positives.
+
+
 
 \section{Completeness}
 

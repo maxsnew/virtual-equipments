@@ -1,0 +1,19 @@
+* FoSSaCs rewrite
+
+1. Shorten it to 18 pages, with full figures moved into appendices.
+2. What technical stuff is left to do?
+
+   The model stuff needs to be re-written in terms of virtual
+   equipments and needs to incorporate small and locally small
+   categories
+
+* New Outline
+
+** Intro (currently 5 pages) (shorter)
+** Syntax (currently 14) (much shorter)
+
+** Synthetic Category Theory (currently 10)    (much shorter)
+** Model Theory (currently 6) (much shorter)
+** Discussion (currently 2.5) (shorter)
+
+** References (currently 0 oops)
