@@ -71,6 +71,7 @@
 \newcommand{\tensorelimfromWXtoYwithkontZ}[4]{\textrm{ind}_{\odot}(#1,#2,#3,#4)}
 \newcommand{\tensorelimVatWtoXtoYwithkontZ}[5]{\textrm{ind}_{\odot}(#4,#2,#1,#3,#5)}
 \newcommand{\tensorelimWfromXtoYkontZ}[4]{\textrm{ind}_{\odot}(#4;#1,#2,#3)}
+\newcommand{\tensorelimWkontZ}[2]{\textrm{ind}_{\odot}(#2;#1)}
 
 \newcommand{\tlwith}[1]{\mathop{\prescript{#1}{}\triangleleft}}
 \newcommand{\tlforall}[1]{\tlwith{\forall #1}}
@@ -922,27 +923,124 @@ category is the opposite of the dual presheaf category $(\Set^{\cat
 
 Next, we cover the connectives for the sets, i.e., constructions on
 profunctors in Figure~\ref{fig:set-connectives}.
+%
+The top of the figure includes the formation rules for tensor products
+$\tensorexistsXwithYandZ \beta P Q$, the covariant $\homrallXYtoZ
+\alpha R P$ and contravariant homs $\homlallXYtoZ {\alpha} R P$ and
+the unit type $\punitinXfromYtoZ {\cat C} {a_1}{a_2}$.
+%
+First, the unit set is our syntax for the profunctor of morphisms of a
+category $\cat C$.
+%
+Its introduction and elimination rules are like those of an
+\emph{ordered} variant of equality: the introduction rule is the
+identity morphism (reflexivity) and the elimination rule is an
+induction principle that is a variant of the J rule of equality
+elimination: we can use a term of $s : \punitinXfromYtoZ {\cat C} a b$
+by specifying the behavior when $s$ is of the form $\punitrefl \alpha$
+in the form of a continuation $\alpha. t$. Again we elide all
+$\beta\eta$ rules, which are standard. Next, the tensor product of
+sets is a kind of combined existential quantifier and monoidal
+product, which we combine into a single notation
+$\tensorexistsXwithYandZ \beta P Q$, where $\beta$ is the covariant
+variable of $P$ and the contravariant variable of $Q$. Then the
+covariant variable of the tensor product is the covariant variable of
+$Q$ and the contravariant variable similarly comes from $P$.
+%
+In ordinary category theory, this is the \emph{composition} of
+profunctors, and is defined by a coend of a product. We require that
+the variable $\beta$ quantifies over a small category $\cat D$, as in
+general this composite doesn't exist for large categories.
+%
+The introduction and elimination are like those for a combined tensor
+product and existential type: the introduction rule is a pair of
+terms, with an appropriate instantiation of $\beta$, and the
+elimination rule says to use a term of a tensor product, it is
+sufficient to specify the behavior on two elements typed with an
+arbitrary middle object $\beta$.
+%
+Note that in the unit elimination, the continuation is typed with a
+context consisting of only a single object $\alpha$, in contrast with
+normal rules for a unit type in natural deduction for ordered linear
+logic such as \cite{polakawpfenning}, which would split the context
+$\Phi$ into $\Phi_l \jnctx \Phi_m \jnctx \Phi_r$ where $\Phi_m$ is
+used by the scrutinee and $\Phi_l \jnctx \Phi_r$ is used by the
+continuation. However, unlike in ordered linear logic, the $\Phi_l
+\jnctx \Phi_r$ is not, necessarily well formed because there is no
+reason in general that $\Phi_m$ has contravariant and covariant
+dependence on the same category.
+%
+This is analogous to a similar situation in dependent type theory for
+identity types: TODO: Dan please help with this explanation!!
+
+Next, we introduce the contravariant ($\homlallXYtoZ \alpha R P$) and
+covariant ($\homrallXYtoZ \alpha R P$) homs of sets, which are
+different because we are in an orderd logic.
+%
+These are a kind of universally quantified
+function type, where the universally quantified variable must occur
+with the same variance in domain and codomain. In the contravariant
+case, it occurs as the contravariant variable in both, and vice-versa
+for the covariant case.
+%
+To highlight this, the notation for the contravariant dependence puts
+the quantified variable on the \emph{left} of the triangle, as
+contravariant variables occur to the left of the covariant variable,
+and similarly the covariant hom has the quantified variable on the
+right.
+%
+Then the
+covariant variable of the contravariant hom set is the covariant
+variable of the codomain and, and the contravariant variable of the
+hom set is the \emph{covariant} variable of the domain, as the two
+contravariances cancel. The covariant hom is dual.
+%
+Semantically, in ordinary category theory these are known as the
+\emph{hom} of profunctors and are constructed using a combination of
+an end and a function set.
+%
+The two connectives have similar introduction and elimination rules in
+the form of $\lambda$ terms abstracting over both the object of the
+category and the element of the set, and appropriate application
+forms.
+%
+To keep with our invariant that the variable occurrences occur left to
+right in the term syntax in a manner matching the context, we write
+the covariant application in the usual order $\homrappXtoYatZ s t a$
+where the function is on the left and the argument is on the right,
+and the contravariant application in the flipped order.
+
+Finally, we have the cartesian unit and product sets, which are
+analogous to the normal unit and product of types. The most notable
+point to emphasize is that in the formation rule for the product, the
+two subformulae should have the same covariant and contravariant
+dependence. So as with linear logic, the cartesian unit and product
+complicate the syntactic formulation of linearity: the unit
+constructor ``uses'' all variables and the product ``uses'' all
+variables in both cases.
 
 \begin{figure}
   \begin{mathpar}
     % unit,
 
     \inferrule
-    {\Gamma \pipe d^-\Xi; \beta:D\vdash P \isaSet\\\\
+    {\cat D \isSmall\\\\
+      \Gamma \pipe d^-\Xi; \beta:D\vdash P \isaSet\\\\
      \Gamma \pipe \beta:D;d^+\Xi \vdash Q \isaSet}
     {\Gamma \pipe \Xi \vdash \tensorexistsXwithYandZ {\beta:D} P Q}
     
     \inferrule
-    {\Gamma \pipe \alpha:\cat C; d^-\Xi\vdash R \\\\ \Gamma \pipe \alpha : \cat C; d^+\Xi\vdash P}
-    {\Gamma \pipe \Xi \vdash \homlallXYtoZ \alpha R P}
+    {d^-\Xi \isSmall\\\\
+      \Gamma \pipe \alpha:\cat C; d^-\Xi\vdash R \\\\ \Gamma \pipe \alpha : \cat C; d^+\Xi\vdash P}
+    {\Gamma \pipe \Xi \vdash \homlallXYtoZ {\alpha: \cat C} R P}
 
   \inferrule
-  {\Gamma \pipe d^+\Xi; \alpha : \cat C \vdash  R \\\\ \Gamma \pipe  d^-\Xi; \alpha : \cat C \vdash P}
-  {\Gamma \pipe \Xi \vdash \homrallXYtoZ \alpha R P}\\
+  {d^+\Xi \isSmall\\\\ \Gamma \pipe d^+\Xi; \alpha : \cat C \vdash  R \\\\ \Gamma \pipe  d^-\Xi; \alpha : \cat C \vdash P}
+  {\Gamma \pipe \Xi \vdash \homrallXYtoZ {\alpha:\cat C} R P}\\
 
   \inferrule
-    {\Gamma \pipe d^-\Xi \vdash a_1 : \cat C\\\\ \Gamma \pipe d^+ \Xi \vdash a_2 : \cat C}
-    {\Gamma \pipe \Xi \vdash \punitinXfromYtoZ {\cat C} {a_1} {a_2}}
+  {\Gamma \pipe d^-\Xi \vdash a_1 : \cat C\\\\ \Gamma \pipe d^+ \Xi \vdash a_2 : \cat C}
+  {\Gamma \pipe \Xi \vdash \punitinXfromYtoZ {\cat C} {a_1} {a_2}}
 
     \inferrule{}{\Gamma\pipe \Xi \vdash 1 \isaSet}
 
@@ -981,9 +1079,9 @@ profunctors in Figure~\ref{fig:set-connectives}.
 
   \inferrule
   {
-   \Gamma\pipe \alpha:\cat C, x:P, \beta:\cat D, y:Q, \gamma:\cat E \vdash t : R\\\\
-   \Gamma \pipe\Phi \vdash s : \tensorexistsXwithYandZ {\beta} {P[a/\alpha]}{Q[c/\gamma]}}
-  {\Gamma \vdash \tensorelimWfromXtoYkontZ a s b {\alpha.x.\beta.y.\gamma. t} : R[a/\alpha;c/\gamma]}
+   \Gamma\pipe \Phi_m \jnctx x:P, \beta:\cat D, y:Q \jnctx \Phi_r \vdash t : R\\\\
+   \Gamma \pipe\Phi_m \vdash s : \tensorexistsXwithYandZ {\beta} P Q}
+  {\Gamma\pipe\Phi_l\jnctx \Phi_m \jnctx \Phi_r \vdash \tensorelimWkontZ s {x.\beta.y. t} : R}
 
   %% \tensorintroatXwithYandZ B M N [\phi,B'/\beta',\psi] = \tensorintroatXwithYandZ {B[B'\beta]} {M[\phi]} {N[\psi]}
 
@@ -1035,7 +1133,6 @@ profunctors in Figure~\ref{fig:set-connectives}.
   \end{mathpar}
   \caption{Set Connectives}
 \end{figure}
-
 
 \subsection{Type Connectives}
 
@@ -1090,7 +1187,6 @@ categories, functors, profunctors and natural transformations.
      \Gamma \pipe d^- \Xi \vdash A : \cat C\and
      \Gamma \pipe d^+ \Xi \vdash B : \cat C}
     {\Gamma \pipe \Xi \vdash M A; B \isaSet}
-
 
     \inferrule
     {\Gamma \pipe \alpha:\cat C\vdash t : P}
@@ -1360,7 +1456,7 @@ principles rather than assumed as axioms \cite{obs-tt,xtt,cubical-type-theory}.
 
 Next, we develop the basics of the model theory for \ohol{}.
 %
-First, we demonstrate that a hyperdoctrine of virtual double
+First, we demonstrate that a hyperdoctrine of virtual equipments
 categories with split restrictions provides a sound and complete
 notion of categorical model.
 %
