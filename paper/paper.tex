@@ -28,6 +28,8 @@
 \newcommand{\isaCat}{\,\,\textrm{Cat}}
 \newcommand{\isSmall}{\,\,\textrm{Small}}
 \newcommand{\Set}{\textrm{Set}}
+\newcommand{\MonCat}{\textrm{MonCat}}
+\newcommand{\SymMonCat}{\textrm{SymMonCat}}
 \newcommand{\vtkmnd}{\mathbb{K}\text{Mod} (\vcat{V},T)}
 \newcommand{\rmod}{\text{RMod}}
 \newcommand{\lmod}{\text{LMod}}
@@ -1009,6 +1011,9 @@ right in the term syntax in a manner matching the context, we write
 the covariant application in the usual order $\homrappXtoYatZ s t a$
 where the function is on the left and the argument is on the right,
 and the contravariant application in the flipped order.
+%
+We also write the instantiating object as a superscript to
+de-emphasize it, as in practice it can often be inferred.
 
 Finally, we have the cartesian unit and product sets, which are
 analogous to the normal unit and product of types. The most notable
@@ -1146,6 +1151,36 @@ obstacle to including models with intensional identity types.
 The types we include are what we call \emph{universes} for the object
 categorical logic: types of small categories and locally small
 categories, functors, profunctors and natural transformations.
+%
+The rule for the types of small categories and categories are very
+similar: any definable category defines an element of type $\Cats$,
+and any element of that type can be reflected back into a
+category. The only difference for $\smallCats$ is that the categories
+involved additionally satisfy $\cat C \isSmall$. Again we elide the
+standard $\beta\eta$ principles.
+%
+Since every small category $\cat C \isSmall$ is a category $\cat C
+\isaCat$, there is a definable inclusion function from $\smallCats$ to
+$\Cat$ and the $\beta\eta$ properties ensure that this is a
+monomorphism.
+
+Next, we have the types of all functors and profunctors between any
+two fixed categories.
+%
+The introduction and elimination forms are those for unary and binary
+function types respectively.
+%
+Finally we include a type $\pendallXdotY {\alpha:\cat C} P$ which we
+call the set of ``natural elements'' of $P$.
+%
+The name comes from the case that $P$ is of the form
+$\punitinXfromYtoZ {}{F(\alpha)}{G(\alpha)}$ in which case the type
+$\pendallXdotY {\alpha:\cat C} \punitinXfromYtoZ
+{}{F(\alpha)}{G(\alpha)}$ can be interpreted as the set of all natural
+transformations from $F$ to $G$.
+%
+More generally this is modeled as an end, and matching our notation
+for hom types we use a universal quantifier to notate this.
 
 \begin{figure}
   \begin{mathpar}
@@ -1159,11 +1194,11 @@ categories, functors, profunctors and natural transformations.
     
     \inferrule
     {\Gamma \vdash \cat C \isaCat \and\Gamma \vdash \cat D \isaCat}
-    {\Gamma\pipe\cdot \vdash \varr{\cat C}{\cat D} \isaSet}
+    {\Gamma\pipe\cdot \vdash \varr{\cat C}{\cat D} \isaTy}
 
     \inferrule
     {\Gamma \vdash \cat C \isaCat \and\Gamma \vdash \cat D \isaCat}
-    {\Gamma\pipe\cdot \vdash \harr{\cat C}{\cat D} \isaSet}
+    {\Gamma\pipe\cdot \vdash \harr{\cat C}{\cat D} \isaTy}
 
     \inferrule
     {\Gamma \pipe \alpha:\cat C\vdash P \isaSet}
@@ -1200,7 +1235,7 @@ categories, functors, profunctors and natural transformations.
   \caption{Type Connectives}
 \end{figure}
 
-\section{Synthetic Category Theory in Ordered Higher-order Logic}
+\section{Synthetic Category Theory in VETT}
 
 To demonstrate that \ohol{} provides a setting in which to carry out
 synthetic category theory, we demonstrate some basic definitions and
@@ -1367,6 +1402,8 @@ adjunctions.
 However the utility for applications to programming language semantics
 is limited due to the lack of opposite categories.
 
+
+
 \subsection{Duality Principle}
 One common source of category theoretic arguments is the duality
 principle: since the opposite of any category is also a category, any
@@ -1465,23 +1502,28 @@ Then we instantiate this general notion of model to show that the
 enriched and internal category theory, and more trivially, in terms of
 sets and relations or preordered sets and ordered relations.
 
-\subsection{Categorical Models}
+\subsection{Notion of Model}
 
 First, we can model the judgmental structure of the unary type theory
-and predicate logic in certain\emph{virtual double categories}
-\cite{leinster,crutwell-shulman}. We briefly recount the structure
-present in a virtual double category, but see \citet{crutwell-shulman}
-for a precise definition.
-The following definition is
-equivalent to the formulation as a ``normalized $T$-monoid'' in
-\citet{crutwell-shulman}, and we direct the reader there for the full
-description.
+and predicate logic in certain\emph{virtual equipments}
+\cite{leinster,crutwell-shulman}, i.e., virtual double categories with
+restrictions. We briefly recount the structure present in a virtual
+double category, but see \citet{crutwell-shulman} for a precise
+definition of the composition rules for 2-cells and functor of virtual
+double categories.
 %
+Our notion here differs from \citet{crutwell-shulman} in several ways
+to more closely match our judgmental structure: (1) we require that
+restrictions are given as coherent structure rather than mere
+existence (2) we include a notion of ``small'' object and (3) we don't
+yet require the existence of unit horizontal arrows, as these are
+modeled by a connective rather than judgmental structure.
 
-\begin{definition}[Virtual Double Category]
-  A virtual double category $\mathcal V$ consists of
+\begin{definition}[Virtual Equipment]
+  A virtual equipment $\mathcal V$ consists of
   \begin{enumerate}
   \item A category $V_o$ of ``objects and vertical arrows''
+  \item A chosen subset of the objects $V_s \subseteq V_o$ of ``small objects''
   \item A set ${\mathcal V}_h$ of ``horizontal arrows'' with source
     and target functions $s,t : {\mathcal V}_h \to {\mathcal V_o}^2$
   \item Sets of 2-cells of the following form:
@@ -1491,44 +1533,59 @@ description.
 	& \phi \\
 	{D_0} && {D_1}
 	\arrow["{R_n}", "\shortmid"{marking}, from=1-2, to=1-3]
-	\arrow["F"', from=1-1, to=3-1]
-	\arrow["G", from=1-3, to=3-3]
+	\arrow["f"', from=1-1, to=3-1]
+	\arrow["g", from=1-3, to=3-3]
 	\arrow["S"', "\shortmid"{marking}, from=3-1, to=3-3]
 	\arrow["{R_0}", "\shortmid"{marking}, from=1-1, to=1-2]
 \end{tikzcd}\]
+    With appropriate ``multi-categorical'' notions of identity and
+    composition.
+
+    We say that the 2-cell $\phi$ has $S$ as codomain, the sequence
+    $R_0 \ldots R_n$ as domain and call $f$ and $g$ the left and right
+    ``frames'', or that $\phi$ is framed by $f$ and $g$.
   \end{enumerate}
   We say a virtual double category has \emph{split restrictions} when
   for any horizontal arrow $R : C \pto D$ and vertical arrows $f : C'
-  \to C$ and $g : D' \to D$ there is a chosen profunctor $R(f,g) : C'
-  \pto D'$ with a cartesian 2-cell to $R$ framed by $f,g$ and these
-  chosen cartesian lifts are functorial in $f,g$.  A functor of
-  virtual double categories preserves split restrictions if it
-  preserves these specified cartesian lifts.  
+  \to C$ and $g : D' \to D$ there is a chosen horizontal arrow $R(f,g)
+  : C' \pto D'$ with a cartesian 2-cell to $R$ framed by $f,g$ and
+  these chosen cartesian lifts are functorial in $f,g$.
+  
+  A functor of virtual equipments is a functor of the virtual double
+  categories that additionally preserves the restrictions and
+  smallness of objects.
 \end{definition}
 
+In the presence of restrictions, every 2-cell can be represented as a
+``globular'' 2-cell where the left and right frame are identities. For
+example the 2-cell $\phi$ above can be represented as one with the
+same domain but whose codomain is $S(f,g)$. This property is crucial
+for the completeness of our semantics as we only include a syntax for these globular terms 
+%
 Each component of this definition has a direct correspondence to a
-syntactic structure in \ohol{}. The category $\mathcal V_o$ models the
-category and functor judgments. The set $\mathcal V_h$ models the
-profunctor judgment. A composable string $R_0 \cdots R_n$ models the
-profunctor contexts. The 2-cells correspond to the natural
-transformation judgment where we have taken the restriction $S(F,G)$
-of the codomain.
+syntactic structure in \ohol{}. The objects of $\mathcal V_o$ models
+the category judgment and the morphisms model the functor
+judgment. The set $\mathcal V_h$ models the profunctor judgment. A
+composable string $R_0 \cdots R_n$ models the profunctor contexts. The
+2-cells correspond to the natural transformation judgment where we
+have taken the restriction $S(F,G)$ of the codomain.
 
-To model the dependent type theory and fact that the \ohol{} judgments
-are all under a dependent type theory context, we use a variation on
-Lawvere's notion of \emph{hyperdoctrine} for modeling predicate logic:
-\begin{definition}[Hyperdoctrine of Virtual Double Categories with Restrictions]
-  A hyperdoctrine of virtual double categories with restrictions is a
-  pair of a category with families $\mathcal C$ and a functor $L :
-  \mathcal C^o \to \text{vDbl}_r$ to the category of virtual double
-  categories with split restrictions and restriction-preserving
-  functors.
+To model the dependent type theory and fact that the categorical
+judgments are all typed under a context $\Gamma$ with an action of
+substitution, we use a variation on Lawvere's notion of
+\emph{hyperdoctrine} for modeling predicate logic:
+\begin{definition}[Hyperdoctrine of Virtual Equipments]
+  A hyperdoctrine of virtual equipments is a pair of a category with
+  families $\mathcal C$ and a functor $V^{(-)} : \mathcal C^o \to
+  \text{vEq}$ to the category of virtual equipments and functors.
 \end{definition}
 Categories with families $\mathcal C$ model dependent type theory
-\citep{cwf} and for each semantic context $\Gamma$, $L(\Gamma)$ models
-the \ohol{} judgments in context $\Gamma$, with the functoriality
+\citep{cwf} and for each semantic context $\Gamma$, $V^\Gamma$ models
+the VETT judgments in context $\Gamma$, with the functoriality
 modeling the fact that all of these judgments admit a well-behaved
 action of substitution.
+
+
 
 \begin{construction}[Soundness and Completeness]
   For any choice of connectives, the syntax of parameterized \ohol{}
@@ -1543,20 +1600,23 @@ action of substitution.
   the notions of substitution are appropriately functorial.
 \end{proof}
 
-\subsection{Concrete Models}
+\subsection{Examples of Models}
 
 Now that we have a category-theoretic notion of model, we give some
 model construction theorems that can be used to justify our intuitive
-notion of semantics in (enriched, internal) category theory.
+notion of semantics in (enriched, internal, indexed) category theory.
+
+First, we can extend any virtual equipment to a hyperdoctrine of
+virtual equipments
 
 First, we can extend any model of \ohol{} to a model of \ohol{}
 parameterized by dependent type theory as follows:
 \begin{construction}
-  Given a virtual double category with restrictions $\mathcal V$, we
+  Given a virtual equipment $\mathcal V$, we
   can construct a functor $\mathcal V^{-}: \Set \to \text{vDbl}_r$ by
   defining the objects of $\mathcal V^\Gamma$ to be functions $\Gamma
   \to \mathcal V_o$, and similarly for morphisms and 2-cells with all
-  operations given pointwise.
+  operations given pointwise. 
 \end{construction}
 % NOTE: this should be some kind of general theorem right?
 % Sketch:
@@ -1564,8 +1624,60 @@ parameterized by dependent type theory as follows:
 % 2. A hyperdoctrine L : C -> VDCr is the same as a VDCr in Pr(C)
 % 3. The Yoneda embedding preserves finite limits 
 
-TODO: find a reference that proves things have all the UMPs we want
-lol.
+%% Semantic Qs:
+%
+%% (1) The virtual equipment of locally small categories is a model of everything.
+%% (2) Are Shulman's enriched indexed categories strict enough?
+
+Then to define a model of VETT with a collection of connectives is is
+sufficient to construct a virtual equipment with the universal
+properties corresponding to those connectives.
+%
+\begin{construction}
+  Fix a cardinal $\kappa$. The virtual equipment $\Cat_{\kappa}$ is
+  defined to have as objects locally $\kappa$-small categories, small
+  objects as $\kappa$-small categories, vertical morphisms as functors,
+  horizontal arrows as functors $\cat C^o \times \cat D \to \kappa Set$ and
+  2-cells as morphisms of profunctors. Restriction of profunctors is
+  given by composition, which is strictly associative and unital.
+  $\Cat_{U}$ has objects satisfying the universal properties of all
+  connectives in VETT.
+\end{construction}
+
+More generally, categories internal to, enriched in and/or indexed by
+sufficiently nice categories define a virtual equipment that model
+most of the connectives of our type theory. We highlight one example
+from the literature that is highly general: Shulman's enriched indexed
+categories. Shulman's construction defines a virtual double categories
+of large and small $\mathcal V$-categories for any pseudofunctor
+$\mathcal V : S^o \to \MonCat$ where $S$ is a category with finite
+products. He gives examples that show that this internal, enriched and
+indexed categories for suitable choices of $\mathcal V$.
+%
+This is slightly weaker then what we require: to have
+\emph{split} restrictions, we need that $\mathcal V$ be a
+\emph{strict} functor, not merely a pseudo-functor.
+%
+This is analogous to the situation for dependent type theory where
+substitution is strictly associative but in models is typically
+modeled by pullback which is only associative up to unique
+isomorphism. In fact, one of the main examples is only a
+pseudo-functor for precisely this reason that the action on morphisms
+is given by pullback.
+%
+We expect this difference can be handled in the same way: by a general
+strictification theorem or by moving to a univalent setting.
+
+\begin{construction}[(\citet{shulman-enriched-indexed})]
+  Given any functor $\mathcal V : S^o \to \SymMonCat$ such that $S$
+  and $\mathcal V$ have sufficiently well-behaved (indexed)
+  $\kappa$-products, then there is a virtual equipment $\mathcal
+  V-\textrm{Cat}$ whose objects are locally $\kappa$-small $\mathcal
+  V$-categories, small objects are $\kappa$-small $\mathcal
+  V$-categories etc. This virtual equipment has been shown in
+  loc. cit. to have objects satisfying all of the universal properties
+  used in models of VETT except the graph of a profunctor.
+\end{construction}
 
 \section{Discussion}
 
@@ -2926,8 +3038,6 @@ $\Gamma$.
     universe objects.
   \end{enumerate}
 \end{definition}
-
-
 
 \section{Completeness}
 
