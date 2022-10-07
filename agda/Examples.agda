@@ -56,7 +56,7 @@ module Examples where
                 → (f : Fun ℂ 𝔻)
                 → ∀e (Q [ v ∣ f ])
                 → ∀e {ℂ} (mor 𝔻 f v ▹ Q)
-  based-mor-rec-left Q f b = λe (λ▹ ( app◃ v (appe b v) (app▹ (appe (mor-rec (Q ◃ Q) (λe (λ◃ vt))) f) v vt)))
+  based-mor-rec-left Q f b = λe (λ▹ ( app◃ ? (appe b v) (app▹ (appe (mor-rec (Q ◃ Q) (λe (λ◃ vt))) f) v vt)))
 
   based-mor-rec-left-iso : {ℂ 𝔻 : Cat} (Q : Rel ℂ 𝔻)
                 → (f : Fun ℂ 𝔻)
