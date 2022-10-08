@@ -215,7 +215,7 @@ nncorrespondence \cite{curry-howard-lambek}.
 %
 Examples include the simply typed lambda calculus \cite{lambekscott},
 computational lambda calculus \cite{moggi}, linear logic \cite{girard}
-and dependent type theory\cite{not-sure}.
+and dependent type theory\cite{cartmell1986}.
 %
 These seminal works have led to a fruitful field of research known as
 categorical logic, where new type theories are designed based directly
@@ -1657,19 +1657,63 @@ the VETT judgments in context $\Gamma$, with the functoriality
 modeling the fact that all of these judgments admit a well-behaved
 action of substitution.
 
-
-
-\begin{construction}[Soundness and Completeness]
-  For any choice of connectives, the syntax of parameterized \ohol{}
-  defines a hyperdoctrine of VDCrs that is an initial object in the
-  category of hyperdoctrines of VDCrs with chosen universal
-  constructions and functors preserving those universal constructions.
+An HVE is then precisely the structure corresponding to the
+\emph{judgments} and actions of substitution in VETT.
+\begin{construction}[Syntactic Model]
+  \label{cons:syn-model}
+  The syntax of VETT with any choice of which subset of connectives
+  are included presents an HVE.
 \end{construction}
 \begin{proof}
-  Most of the details of the proof are straightforward. In the
-  appendix we demonstrate the syntactic elements of the proof which
-  are that the syntax itself is a hyperdoctrine of VDCrs, i.e., that
-  the notions of substitution are appropriately functorial.
+  Straightforward, defining the category of families using the
+  dependent type structure and the virtual equipment structure having
+  ($\alpha$-equivalence classes of) syntactic categories as objects,
+  functors/sets as vertical/horizontal arrows and interpreting
+  compositions/restrictions as substitutions.  The biggest gap is in
+  the definition of the 2-cells.
+
+  A 2-cell from $(\alpha_1:\cat C_1;\alpha_2:\cat C_2\vdash
+  R_1),(\alpha_2:\cat C_2;\alpha_3:\cat C_3),\ldots$ to $(\beta_1:\cat
+  D_1;\beta_2\vdash S)$ with frames $\alpha_1:\cat C_1\vdash b_1 :
+  \cat D_1$ and $\alpha_n:\cat C_n\vdash b_2 : \cat D_2$ given by a
+  term $x_1:R_1,x_2:R_2\ldots \vdash s :
+  S[b_1/\beta_1;b_2/\beta_2]$. Composition is then defined by
+  substitution.
+\end{proof}
+
+Then the \emph{connectives} of VETT each precisely correspond to a
+universal construction of structures in an HVE. The
+$\Pi,\Sigma,\text{Id}$ types correspond to their standard semantics in
+a CwF, products of categories interpreted as products in the vertical
+category, and products of sets as products in the category of
+pro-arrows and 2-cells. The units, tensor and covariant and
+contravariant homs are modeled by the universal properties of the same
+names, as described for instance in \citet{shulmanFrBicats}. The graph
+of a profunctor is modeled by \emph{tabulators}
+\citet{grandis-pare}. Finally, the covariant and contravariant
+presheaf categories can be described as a weakening of the definition
+of a Yoneda equipment from \citet{yosegi-boxes} to virtual double
+categories. More detailed descriptions of these universal properties
+are included in the appendix.
+%
+Then we can package up the soundness and completeness of this notion
+of categorical model in the following modular initiality theorem.
+
+\begin{theorem}[Initiality]
+  The syntax of VETT with almost any choice of connectives presents an
+  HVE that is initial in the category of HVEs with the chosen
+  instances of the universal properties and functors that preserve
+  such chosen instances. The only exception is that if units are
+  included, then contravariant and covariant hom sets must be included
+  as well.
+\end{theorem}
+\begin{proof}
+  It is straightforward to extend the construction
+  \ref{cons:syn-model} for any connective modularly, with the
+  exception that the unit relies on the presence of hom sets in order
+  to satisfy the ``distributivity'' requirement that its elimination
+  can occur in any context. Then we can construct the unique morphism
+  to any HVE by straightforward induction on syntax.
 \end{proof}
 
 \subsection{Examples of Models}
@@ -1677,12 +1721,8 @@ action of substitution.
 Now that we have a category-theoretic notion of model, we give some
 model construction theorems that can be used to justify our intuitive
 notion of semantics in (enriched, internal, indexed) category theory.
-
-First, we can extend any virtual equipment to a hyperdoctrine of
-virtual equipments
-
-First, we can extend any model of \ohol{} to a model of \ohol{}
-parameterized by dependent type theory as follows:
+%
+First, we can extend any virtual equipment to an HVE as follows:
 \begin{construction}
   Given a virtual equipment $\mathcal V$, we
   can construct a functor $\mathcal V^{-}: \Set \to \text{vDbl}_r$ by
@@ -1717,14 +1757,16 @@ properties corresponding to those connectives.
 \end{construction}
 
 More generally, categories internal to, enriched in and/or indexed by
-sufficiently nice categories define a virtual equipment that model
-most of the connectives of our type theory. We highlight one example
-from the literature that is highly general: Shulman's enriched indexed
-categories. Shulman's construction defines a virtual double categories
-of large and small $\mathcal V$-categories for any pseudofunctor
-$\mathcal V : S^o \to \MonCat$ where $S$ is a category with finite
-products. He gives examples that show that this internal, enriched and
-indexed categories for suitable choices of $\mathcal V$.
+sufficiently nice categories define a virtual equipment that model the
+connectives of VETT. We highlight one example from the literature that
+is highly general: Shulman's enriched indexed categories. Shulman's
+construction defines a virtual double categories of large and small
+$\mathcal V$-categories for any pseudofunctor $\mathcal V : S^o \to
+\MonCat$ where $S$ is a category with finite products. He gives
+examples that show that this subsumes ordinary internal, enriched and
+indexed categories for suitable choices of $\mathcal V$, as well as
+more general categories that can be thought of as both indexed and
+enriched.
 %
 This is slightly weaker then what we require: to have
 \emph{split} restrictions, we need that $\mathcal V$ be a
@@ -1746,9 +1788,8 @@ strictification theorem or by moving to a univalent setting.
   $\kappa$-products, then there is a virtual equipment $\mathcal
   V-\textrm{Cat}$ whose objects are locally $\kappa$-small $\mathcal
   V$-categories, small objects are $\kappa$-small $\mathcal
-  V$-categories etc. This virtual equipment has been shown in
-  loc. cit. to have objects satisfying all of the universal properties
-  used in models of VETT except the graph of a profunctor.
+  V$-categories etc. This virtual equipment has objects satisfying all
+  of the universal properties needed for a model of VETT.
 \end{construction}
 
 \section{Discussion}
