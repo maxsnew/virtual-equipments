@@ -536,7 +536,7 @@ which come combined with implications and conjunctions.
       Set $X$ & Category $\mathbb{C}$\\
       $X \times Y$ & $\mathbb C \times \mathbb D$ \\ 
       1 & $1$ \\
-      $\mathcal P X$ & $\mathcal P^+ X, \mathcal P^- X$ \\
+      $\mathcal P X$ & $\mathcal P^+ X$ \text{ and } $\mathcal P^- X$ \\
       $\{ (x,y) \in X \times Y | R(x,y) \}$ & $\sum_{\alpha:C;\beta:D} R$\\
       Function $f(x:X) : Y$ & Functor/Object $\alpha:\cat C \vdash A : \cat D$\\
       Relation $R(x,y)$ & Profunctor/Set $\alpha:\cat C; \beta:\cat D \vdash R$\\
@@ -550,6 +550,7 @@ which come combined with implications and conjunctions.
     \end{tabular}
   \end{center}
   \caption{Analogy between Higher-Order Logic and \vett{} Judgments and Connectives}
+\label{fig:hol-cats}
 \end{figure}
 
 The syntactic forms of \vett{} are given in
@@ -582,15 +583,20 @@ meta-language that we use to talk about categories/profunctors/natural
 transformations.  The types include the usual $\Pi$ and $\Sigma$ and
 identity types of dependent type theory, along with universes of
 categories, functors, profunctors and natural transformations.
-%
-Finally we have several forms of context which are used in the theory:
-contexts $\Gamma$ of term variables with their types, contexts $\Xi$
-of object variables with their categories, and contexts $\Phi$ of
+
+Finally we have several forms of context which are used in the theory.
+The contexts $\Gamma$ of term variables with their types are as usual.
+The category contexts $\Xi$ contain object variables with their
+categories; the two forms of category context are $\alpha : \cat C$,
+containing one variable that can be used both contravariantly and
+covariantly, and $alpha : \cat C ; \beta : \cat D$, containing a
+contravariant variable $\alpha$ and covariant variable $\beta$.
+Finally, we have contexts $\Phi$ of
 element variables with their sets, alternating with those sets' object
-variables.  A typical $\Phi$ will look like
+variables.  A typical $\Phi$ has the shape
 \[
 \alpha_1 : \cat C_1, x_1:R_1(\alpha_1,\alpha_2), \alpha_2 : \cat C_2,
-x_2:R_2(\alpha_2,\alpha_3), \alpha_3:\cat C_3, \ldots
+x_2:R_2(\alpha_2,\alpha_3), \ldots, R_n(\alpha_n,\alpha_{n+1}), \alpha_{n+1} : C_{n+1}
 \]
 and represents the composition of the relations $R_1, R_2, R_3, \ldots,
 R_n$.  We write $d^-(\Phi)$ for the first category variable in $\Phi$
@@ -685,7 +691,7 @@ d^+(\alpha_1 : \cat C_1, x_1:R_1(\alpha_1,\alpha_2), \ldots, x_n:R_n(\alpha_n,\a
 %% has a corresponding form of substitution, denoted using the lower-case
 %% form of the same greek letters.
 
-\begin{figure}
+\begin{figure}[t]
   \begin{mathpar}
     \begin{array}{rccl}
       \textrm{Categories} &\cat C, \cat D, \cat E & ::= & M \pipe \cat C \times \cat D \pipe \cat 1
@@ -700,8 +706,8 @@ d^+(\alpha_1 : \cat C_1, x_1:R_1(\alpha_1,\alpha_2), \ldots, x_n:R_n(\alpha_n,\a
       \textrm{Type} & A,B,C & ::= &
       \sum_{X:A} B \pipe \prod_{X:A} B \pipe \Id A M N \\
       &&& \Cat \pipe \varr{\cat C}{\cat D}\pipe \harr {\cat C} {\cat D}\pipe \pendallXdotY {\alpha:{\cat C}} R\\
-      \textrm{Term} & L,M,N & ::= & X \pipe \lambda X:M. N \pipe M\,N \pipe (M,N) \pipe \pi_1 M \pipe \pi_2 M\\
-      &&&\lceil \cat C \rceil \pipe \vlambda {\alpha:\cat C} a \pipe \hlambda {\alpha:\cat C}{\beta: \cat D} R \ldots \\
+      \textrm{Term} & L,M,N & ::= & X \pipe \lambda X:M. N \pipe M\,N \pipe (M,N) \pipe \pi_1 M \pipe \pi_2 M \mid \text{refl}_{M} \\
+      &&&\lceil \cat C \rceil \pipe \vlambda {\alpha:\cat C} a \pipe \hlambda {\alpha:\cat C}{\beta: \cat D} R \mid FIXME \ldots \\
       \textrm{Type Context} & \Gamma, \Delta & ::= & \cdot \pipe \Gamma, X : A\\
       \textrm{Category Context} & \Xi, Z & ::= & \alpha:\cat C \pipe \alpha:\cat C;\beta: \cat D\\
       \textrm{Set Context} & \Phi,\Psi & ::= & \alpha : \cat C \pipe \Phi , x : P,\beta:\cat D\\
@@ -711,34 +717,41 @@ d^+(\alpha_1 : \cat C_1, x_1:R_1(\alpha_1,\alpha_2), \ldots, x_n:R_n(\alpha_n,\a
   \label{fig:syntax}
 \end{figure}
 
-The \emph{formation conditions} or \emph{presuppositions} of a judgement
-are the conditions under which a judgement ``type checks''.  We have
+Next, we overview our basic judgement forms along with the
+\emph{formation conditions} or \emph{presuppositions} (the conditions
+under which a judgement ``type checks'').  We have
 \begin{itemize}
-\item ${\Gamma\vdash \cat C \isaCat}$ presupposes ${\Gamma \isadtctx}$
-\item ${\Gamma \pipe \alpha : \cat C \vdash a : \cat D}$ presupposes
-       $\Gamma \vdash \cat C\isaCat$ and $\Gamma \vdash \cat D \isaCat$.
-\item ${\Gamma \pipe \Xi \vdash S \isaSet}$ presupposes
-      $\Gamma \isadtctx$ and $\Gamma \vdash \Xi \boundary$
-\item ${\Gamma \pipe \Phi \vdash s : R}$ presupposes
-     ${\Gamma \vdash \Phi \isavectx}$
-     and $\Gamma\pipe \underline \Phi \vdash R \isaSet$
-\end{itemize}
-
-%% Next, \cref{fig:formation} shows the \emph{formation} rules for these
-%% various syntactic forms.
-
-All other forms are typed with respect to a well-formed type context
-$\Gamma$. Objects are typed additionally with an input object variable
+\item Categories: ${\Gamma\vdash \cat C \isaCat}$ presupposes ${\Gamma \isadtctx}$.
+  
+\item Objects/functors: ${\Gamma \pipe \alpha : \cat C \vdash a : \cat D}$ presupposes
+  $\Gamma \vdash \cat C\isaCat$ and $\Gamma \vdash \cat D \isaCat$.
+Objects are typed with an input object variable
 $\alpha : \cat C$ and an output category $\cat D$; in the semantics
-these objects are modeled as functors. A set $S$ is typed with respect
+these objects are modeled as functors.
+  
+\item Sets/profunctors: ${\Gamma \pipe \Xi \vdash S \isaSet}$ presupposes
+      $\Gamma \isadtctx$ and $\Gamma \vdash \Xi \boundary$
+A set $S$ is typed with respect
 to a set context $\Xi$ to describe its covariant/contravariant
 dependence on some input objects. These are semantically modeled as
-profunctors. A transformation $s$ has a context of transformation
+profunctors. 
+  
+\item Elements/natural transformations: ${\Gamma \pipe \Phi \vdash s : R}$ presupposes
+     ${\Gamma \vdash \Phi \isavectx}$
+  and $\Gamma\pipe \underline \Phi \vdash R \isaSet$.
+  A transformation $s$ has a context of transformation
 variable and a single set output. To be well formed, the context and set
 must be parameterized by the same contravariant and covariant object
 variables. To ensure this, we use a coercion operation $\underline \Phi$
 that erases everything in the context but the left-most and right-most
-object variables.
+object variables, i.e. $\underline{\alpha : \cat C} = \alpha : \cat C$ and
+$\underline{\Phi} = d^-(\Phi);d^+(\Phi)$ otherwise. 
+
+\item Meta-language types and terms: $\Gamma \vdash A \isaTy$ presupposes $\Gamma \isadtctx$ and $\Gamma
+  \vdash M : A$ presupposes $\Gamma \isadtctx$ and $\Gamma \vdash A
+  \isaTy$.
+\end{itemize}
+
 
 %% \begin{figure}
 %%   \begin{mathpar}
@@ -817,8 +830,6 @@ object variables.
 %% square. These model the ``compatible string'' of 2-cells that arise in
 %% the composition laws.
 
-
-
 %% Next, Figure~\ref{fig:basic-rules} gives the basic structural rules of
 %% judgment theory, which model composition and restrictions in a virtual
 %% double category. First, we have varialbes and substitution for types,
@@ -827,44 +838,40 @@ object variables.
 %% substitution of types for the judgment's parameter variables. Next, we
 %% have rules for constructing an ``empty'' context, which is just a
 
-In typical natural-deduction style, all syntactic forms typed in
-context admit an action of substitution. For terms, this is the
-ordinary type theoretic substitution. Objects $\alpha:\cat C
-\vdash a : \cat D$ can be substituted for object variables $\beta :
-\cat D$ in other objects. We can also substitute objects into
-\emph{sets}, that is, if we have a set $P$ parameterized by a
-contravariant variable $\alpha : \cat C$ and a covariant variable
-$\beta: \cat D$, then we can substitute objects $a : \cat C$ and $b :
-\cat D$ for these variables $P[a/\alpha;b/\beta]$. This generalizes the
-ordinary precomposition of a relation by a function.  Semantically
-this is the ``restriction'' of a profunctor along two functors, which
-is just composition of functors if a profunctor is viewed as a functor
-to $\Set$. Modeling this operation as a substitution considerably
-simplifies reasoning using profunctors.
+All syntactic forms typed in context admit an action of
+substitution. For (meta-language) types and terms, this is as
+usual. Objects $\alpha:\cat C \vdash a : \cat D$ can be substituted for
+object variables $\beta : \cat D$ in other objects. We can also
+substitute objects into \emph{sets}, that is, if we have a set $P$
+parameterized by a contravariant variable $\alpha : \cat C$ and a
+covariant variable $\beta: \cat D$, then we can substitute objects $a :
+\cat C$ and $b : \cat D$ for these variables $P[a/\alpha;b/\beta]$. This
+generalizes the ordinary precomposition of a relation by a function.
+Semantically this is the ``restriction'' of a profunctor along two
+functors, which is just composition of functors if a profunctor is
+viewed as a functor to $\Set$. Modeling this operation as a substitution
+considerably simplifies reasoning using profunctors.
 %
-Finally we have the action of substitution on natural
-transformations. A natural transformation is indexed by set variables
-$x:R$, whose sets are each parameterized by a contravariant and a
-covariant category variable $\alpha;\beta$. We can think of natural
-transformations as \emph{polymorphic} in the categories involved, and
-so when we make a transformation substitution, we substitute not just
-the set variables, but we also \emph{instantiate} the polymorphic
-category variables with objects.
+Finally we have the action of substitution on elements/natural transformations.
+First, we can substitute elements/natural transformations for the set
+variables in elements, denoting the composition of natural
+transformations.  Second, an element is also parameterized
+by a contravariant and a covariant category variable $\alpha;\beta$. We
+can think of natural transformations as \emph{polymorphic} in the
+categories involved, and so when we make a transformation substitution,
+we also \emph{instantiate} the polymorphic category variables with
+objects.
 %
 The full syntactic details of substitution are included in the appendix.
 
 \subsection{Category Connectives}
 
-Recall that the basic entities of our type theory are categories,
-objects/functors, sets/profunctors, and elements/natural
-transformations.  In this section we discuss some connectives for
-constructing categories, which are specified by introduction and
-elimination rules (the $\beta\eta$ equality and substitution rules are
-included in the appendix).  The introduction and elimination rules make
-use of functors, profunctors, and natural transformations.
-%
-We introduce the connectives for defining categories in
-Figure~\ref{fig:category-connectives}. 
+In this section we discuss some connectives for constructing categories,
+which are specified by introduction and elimination rules in
+Figure~\ref{fig:category-connectives} (the $\beta\eta$ equality and
+substitution rules are included in the appendix).  The introduction and
+elimination rules make use of functors, profunctors, and natural
+transformations.
 %
 First we introduce the additives: the unit category $1$ and product
 category $\cat C \times \cat D$ have the usual introduction and
@@ -912,12 +919,15 @@ usual presheaf category $\Set^{\cat C^o}$, and the positive presheaf
 category is the opposite of the dual presheaf category $(\Set^{\cat
   D})^o$.
 
-\begin{figure}
-  \begin{mathpar}
+\begin{figure}[t]
+  \[
+  \begin{array}{l}
+    \text{Unit:} \quad
     \inferrule{ ~ }{\Gamma \vdash 1 \isaCat}
     \quad
-    \inferrule*{ ~ }{\Gamma\pipe\alpha:C \vdash () : 1}\and
+    \inferrule*{ ~ }{\Gamma\pipe\alpha:C \vdash () : 1}\\\\
     
+    \text{Product:} \quad
     \inferrule
         {\Gamma \vdash \cat C_1 \isaCat \and \cat C_2 \isaCat}
         {\Gamma \vdash {\cat C_1} \times {\cat C_2} \isaCat}
@@ -929,7 +939,9 @@ category is the opposite of the dual presheaf category $(\Set^{\cat
     \inferrule
     {\Gamma \pipe\alpha:\cat C \vdash a : {\cat C_1} \times {\cat C_2}}
     {\Gamma\pipe\alpha:\cat C\vdash \pi_i a : \cat C_i}
-
+    \\\\
+    
+    \text{Graph of a profuctor:} \\
     \inferrule
     {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash P \isaSet}
     {\Gamma \vdash \graphProf{\alpha}{\beta} P \isaCat}
@@ -939,7 +951,7 @@ category is the opposite of the dual presheaf category $(\Set^{\cat
       \defaultObCtx \vdash a_+ : C_+\and
       \defaultObCtx \vdash s : P[a_-/\alpha;a_+/\beta]}
     {\defaultObCtx \vdash (a_-,a_+,s) : \graphProf{\alpha:\cat C_-}{\beta:\cat C_+} P}
-
+    \\
     \inferrule
     {\defaultObCtx \vdash a : \graphProf{\alpha:\cat C_-}{\beta} P}
     {\defaultObCtx \vdash \pi_- a : \cat C_-}
@@ -951,8 +963,8 @@ category is the opposite of the dual presheaf category $(\Set^{\cat
     \inferrule
     {\defaultObCtx \vdash a : \graphProf{\alpha}{\beta} P}
     {\defaultObCtx \vdash \pi_e a : P[\pi_-a/\alpha;\pi_+a/\beta]}
-
-
+    \\\\
+    \text{Negative Presehaf:} \\
     \inferrule
     {\Gamma \vdash \cat C \isaCat \and \cat C \isSmall}
     {\Gamma \vdash \negPresheaf {\cat C} \isaCat}
@@ -966,7 +978,9 @@ category is the opposite of the dual presheaf category $(\Set^{\cat
     \inferrule
     {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R : \isaSet}
     {\Gamma \pipe \beta:\cat D \vdash \lambda \alpha:\cat C. R : \negPresheaf {\cat C}}
-    
+    \\
+    \\
+    \text{Positive Presehaf:} \\
     \inferrule
     {\Gamma \vdash \cat D \isaCat \and \cat D \isSmall}
     {\Gamma \vdash \posPresheaf {\cat D} \isaCat}
@@ -980,7 +994,8 @@ category is the opposite of the dual presheaf category $(\Set^{\cat
     \inferrule
     {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R : \isaSet}
     {\Gamma \pipe \alpha:\cat C \vdash \lambda \beta:\cat D. R : \posPresheaf {\cat D}}
-  \end{mathpar}
+  \end{array}
+  \]
   \caption{Category Conectives}
   \label{fig:category-connectives}
 \end{figure}
@@ -988,10 +1003,9 @@ category is the opposite of the dual presheaf category $(\Set^{\cat
 \subsection{Set Connectives}
 
 Next, in Figure~\ref{fig:set-connectives}, we cover the connectives for
-the sets, i.e., constructions on profunctors.  In these constructions,
-the sets/profunctors act like types, and they are given 
-introduction and elimination rules for elements/natural
-transformations.  
+the sets/profunctors.  In these constructions, the sets/profunctors act
+like types, and they are given introduction and elimination rules for
+elements/natural transformations.
 %
 The top of the figure includes the formation rules for tensor products
 $\tensorexistsXwithYandZ \beta P Q$, the covariant $\homrallXYtoZ
@@ -1095,48 +1109,29 @@ constructor ``uses'' all variables and the product ``uses'' all
 variables in both cases.
 
 \begin{figure}
-  \begin{mathpar}
     % unit,
-
-    \inferrule
-    {\cat D \isSmall\\\\
-      \Gamma \pipe d^-\Xi; \beta:D\vdash P \isaSet\\\\
-     \Gamma \pipe \beta:D;d^+\Xi \vdash Q \isaSet}
-    {\Gamma \pipe \Xi \vdash \tensorexistsXwithYandZ {\beta:D} P Q}
+  \[
+  \begin{array}{l}
     
+    \text{Unit/morphism set:}\\
     \inferrule
-    {d^-\Xi \isSmall\\\\
-      \Gamma \pipe \alpha:\cat C; d^-\Xi\vdash R \\\\ \Gamma \pipe \alpha : \cat C; d^+\Xi\vdash P}
-    {\Gamma \pipe \Xi \vdash \homlallXYtoZ {\alpha: \cat C} R P}
-
-  \inferrule
-  {d^+\Xi \isSmall\\\\ \Gamma \pipe d^+\Xi; \alpha : \cat C \vdash  R \\\\ \Gamma \pipe  d^-\Xi; \alpha : \cat C \vdash P}
-  {\Gamma \pipe \Xi \vdash \homrallXYtoZ {\alpha:\cat C} R P}\\
-
-  \inferrule
   {\Gamma \pipe d^-\Xi \vdash a_1 : \cat C\\\\ \Gamma \pipe d^+ \Xi \vdash a_2 : \cat C}
   {\Gamma \pipe \Xi \vdash \punitinXfromYtoZ {\cat C} {a_1} {a_2}}
-
-    \inferrule{}{\Gamma\pipe \Xi \vdash 1 \isaSet}
-
-    \inferrule{\Gamma\pipe\Xi \vdash R \isaSet \\\\ \Gamma\pipe\Xi \vdash S\isaSet}
-              {\Gamma\pipe\Xi \vdash R \times S\isaSet}\\
-
+  \quad
     \inferrule
     {\Gamma\pipe\beta: \cat D \vdash a : \cat C}
     {\Gamma \pipe\cdot \vdash \punitrefl a : \punitinXfromYtoZ {\cat C} a a}
-
+    \quad
 %%     \inferrule*[right=Unit Elim]
 %%     {\Gamma\vdash Q : \harr {\cat C} {\cat C}\and
 %%      \Gamma\vdash t : \pendallXdotY {\alpha:\cat C} {\harrapp Q \alpha \alpha}}
 %%     {\Gamma \vdash \punitelimtoYwithkontZ Q N :
 %%       \pendallXdotY {\alpha_1} {\homrallXYtoZ {\alpha_2} {\punitinXfromYtoZ {\cat C} {\alpha_1}{\alpha_2}} {\harrapp Q {\alpha_1}{\alpha_2}}}}
-
     \inferrule
     {\Gamma\pipe \alpha:\cat C\vdash t : P[\alpha/\alpha^-;\alpha/\alpha^+]\\\\
      \Gamma\pipe\Phi \vdash s : \punitinXfromYtoZ {\cat C} A B}
     {\Gamma \vdash \punitelimkontZatABC {\alpha. t} A s B : P[A/\alpha^-;B/\alpha^+]}
-
+    \\
   %% \inferrule*[right=Tensor intro function]
   %% {}
   %% {\alpha : \cat C, q : Q, \beta : \cat D, r : R, \gamma : \cat E \vdash (q, \beta,r) : \exists \beta : \cat D. Q \odot R}
@@ -1146,18 +1141,26 @@ variables in both cases.
   %%   \Gamma \vdash Q : \harr D E}
   %% {\Gamma\pipe\cdot\vdash \tensorintroofXandY P Q : \pendallXdotY {\alpha} \homrallXYtoZ \beta {\harrapp P \alpha \beta} {\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta}{\harrapp Q \beta \gamma})}}}
 
+    \\
+    \text{Tensor product:}\\
+    \inferrule
+    {\cat D \isSmall\\\\
+      \Gamma \pipe d^-\Xi; \beta:D\vdash P \isaSet\\\\
+     \Gamma \pipe \beta:D;d^+\Xi \vdash Q \isaSet}
+    {\Gamma \pipe \Xi \vdash \tensorexistsXwithYandZ {\beta:D} P Q}
+    \quad
   \inferrule
   {\Gamma \pipe d^+\Psi_s \vdash b : \cat D\\\\
    \Gamma \pipe \Psi_s \vdash s : P[b/\beta] \\\\
    \Gamma \pipe \Psi_t \vdash t : Q[b/\beta]}
   {\Gamma\pipe\Psi_s \jnctx \Psi_t\vdash \tensorintroatXwithYandZ b s t : \tensorexistsXwithYandZ {\beta : \cat D} P Q}
-
+  \quad
   \inferrule
   {
    \Gamma\pipe \Phi_m \jnctx x:P, \beta:\cat D, y:Q \jnctx \Phi_r \vdash t : R\\\\
    \Gamma \pipe\Phi_m \vdash s : \tensorexistsXwithYandZ {\beta} P Q}
   {\Gamma\pipe\Phi_l\jnctx \Phi_m \jnctx \Phi_r \vdash \tensorelimWkontZ s {x.\beta.y. t} : R}
-
+  \\
   %% \tensorintroatXwithYandZ B M N [\phi,B'/\beta',\psi] = \tensorintroatXwithYandZ {B[B'\beta]} {M[\phi]} {N[\psi]}
 
   %% \inferrule*[right=Tensor simpl]
@@ -1170,26 +1173,41 @@ variables in both cases.
 %%    \Gamma \vdash R : \harr {\cat C}{\cat E}\and
 %%    \Gamma \vdash N : \hombinary \alpha {\harrapp P \alpha \beta} \beta {\harrapp Q \beta \gamma} \gamma {\harrapp R \alpha \gamma}}
 %%   {\Gamma \vdash \tensorelimfromWXtoYwithkontZ P Q R N : \homunary \alpha {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta} {\harrapp Q \beta \gamma})} {\gamma} {\harrapp R \alpha \gamma}}
+
+  \\
+  \text{Right hom:} \quad
+  \inferrule
+  {d^+\Xi \isSmall\\\\ \Gamma \pipe d^+\Xi; \alpha : \cat C \vdash  R \\\\ \Gamma \pipe  d^-\Xi; \alpha : \cat C \vdash P}
+  {\Gamma \pipe \Xi \vdash \homrallXYtoZ {\alpha:\cat C} R P}
+  \quad
   \inferrule
   {\Gamma \pipe \Phi, x : R, \alpha : \cat C \vdash t : P}
   {\Gamma \pipe \Phi \vdash
    \homrlambdaXatYdotZ {x : R} {\alpha : \cat C} t : \homrallXYtoZ \alpha R P}
-
-      %% \inferrule*[right=Covar Hom elim simple]
-      %% {}
-      %% {\alpha: \cat C, f:\forall \gamma. P \triangleleft R, \beta : \cat D, x : R, \gamma : \cat E \vdash f\triangleleft (x, \gamma) : P}
-
+  \quad
   \inferrule
   {\Gamma\pipe\Phi_f \vdash s : \homrallXYtoZ {\alpha:\cat C} R P \\\\
     d^+\Phi_a \vdash a : \cat C\\\\
     \Phi_a \vdash t : R[a/\alpha]
   }
   {\Gamma\pipe \Phi_f \jnctx \Phi_a \vdash \homrappXtoYatZ s t a : P[a/\alpha]}\\
+  \quad
 
+      %% \inferrule*[right=Covar Hom elim simple]
+      %% {}
+      %% {\alpha: \cat C, f:\forall \gamma. P \triangleleft R, \beta : \cat D, x : R, \gamma : \cat E \vdash f\triangleleft (x, \gamma) : P}
+
+  \\ 
+  \text{Left hom:} \quad
+  \inferrule
+    {d^-\Xi \isSmall\\\\
+      \Gamma \pipe \alpha:\cat C; d^-\Xi\vdash R \\\\ \Gamma \pipe \alpha : \cat C; d^+\Xi\vdash P}
+    {\Gamma \pipe \Xi \vdash \homlallXYtoZ {\alpha: \cat C} R P}
+  \quad
   \inferrule
   {\Gamma\pipe\alpha:\cat C, x : R, \Phi \vdash t : P}
   {\Gamma\pipe\Phi \vdash \homllambdaXatYdotZ {x : R} {\alpha : \cat C} t : \homlallXYtoZ \alpha R P}
-
+  \quad
   \inferrule
   {\Gamma \pipe d^-\Phi_a \vdash a : \cat C\\\\
    \Gamma \pipe \Phi_a \vdash s : R[a/\alpha] \\\\
@@ -1200,13 +1218,22 @@ variables in both cases.
   % cartesian products,
   % 
 
-  \inferrule{}{\Gamma\pipe \Phi \vdash () :  1}
-
+  \\
+  \text{Cartesian unit and products:} \quad
+      \inferrule{~}{\Gamma\pipe \Xi \vdash 1 \isaSet}
+      \quad
+      \inferrule{~}{\Gamma\pipe \Phi \vdash () :  1}
+      \\ 
+    \inferrule{\Gamma\pipe\Xi \vdash R \isaSet \\\\ \Gamma\pipe\Xi \vdash S\isaSet}
+              {\Gamma\pipe\Xi \vdash R \times S\isaSet}
+    \quad
     \inferrule{\forall i \in \{1,2\}.~ \Gamma \pipe\Phi \vdash M_i : R_i}{\Gamma \pipe\Phi \vdash (M_1,M_2) : R_1 \times R_2}
-
+    \quad
     \inferrule{\Gamma \pipe\Phi\vdash M : R_1 \times R_2}{\Gamma \pipe\Phi \vdash \pi_i M : R_i}
-  \end{mathpar}
+  \end{array}
+  \]
   \caption{Set Connectives}
+  \label{fig:set-connectives}
 \end{figure}
 
 \subsection{Type Connectives}
