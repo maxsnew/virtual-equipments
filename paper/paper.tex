@@ -1241,7 +1241,7 @@ variables in both cases.
 \subsection{Type Connectives}
 
 Finally, we briefly describe the connectives for the ``meta-logic'',
-which extends Martin-L\"of type theory with $Pi$/$Sigma$ and extensional
+which extends Martin-L\"of type theory with $\Pi$/$\Sigma$ and extensional
 identity types (with their standard rules)~\cite{emltt}. We use
 extensional identity types so that the description of models is simpler,
 but intensional identity types could be used instead.
@@ -1250,13 +1250,13 @@ The types we include are what we call \emph{universes} for the object
 categorical logic: types of small categories and locally small
 categories, functors, profunctors and natural transformations.
 %
-The rule for the types of small categories and (large) categories are very
-similar: any definable category defines an element of type $\Cats$,
-and any element of that type can be reflected back into a
-category. The only difference for $\smallCats$ is that the categories
-involved additionally satisfy $\cat C \isSmall$. Again we elide the
-$\beta\eta$ principles, which state that the introduction and
-elimination rules are a bijection between judgement forms.  
+The rule for the types of small categories and (large) categories are
+very similar: any definable category defines an element of type $\Cats$,
+and any element of that type can be reflected back into a category. The
+only difference for $\smallCats$ is that the categories involved
+additionally satisfy $\cat C \isSmall$. Again we elide the $\beta\eta$
+principles, which state that $\quoth{-}$ and $\unquoth{-}$ are mutually
+inverse.
 %
 Since every small category $\cat C \isSmall$ is a category $\cat C
 \isaCat$, there is a definable inclusion function from $\smallCats$ to
@@ -1267,8 +1267,11 @@ Next, we have the types of all functors and profunctors between any
 two fixed categories.
 %
 The introduction and elimination forms are those for unary and binary
-function types respectively.
-%
+function types respectively, where metalanguage terms of type
+$\varr{\cat C}{\cat D}$ can be used to construct an object/functor,
+while metalanguage terms of type $\harr{\cat C}{\cat D}$ can be used to
+construct a set/profunctor.
+
 Finally we include a type $\pendallXdotY {\alpha:\cat C} P$ which we
 call the set of ``natural elements'' of $P$.
 %
@@ -1278,75 +1281,83 @@ $\pendallXdotY {\alpha:\cat C} \punitinXfromYtoZ
 {}{F(\alpha)}{G(\alpha)}$ can be interpreted as the set of all natural
 transformations from $F$ to $G$.
 %
-More generally this is modeled as an end, and matching our notation
-for hom types we use a universal quantifier to notate this.
+More generally this is modeled as an end, and we notate it with a
+universal quantifier (just as we do for the quantifiers in left/right
+hom types).  Syntactically, $\pendallXdotY{\alpha}{P}$ is a
+meta-language type that represents elements/natural transformations with
+exactly one free variable.  
 
 \begin{figure}
-  \begin{mathpar}
+  \[
+  \begin{array}{l}
     \inferrule
     {~}
     {\Gamma\vdash \smallCats}
-
-    \inferrule
-    {~}
-    {\Gamma\vdash \Cats}
-
-    \inferrule
-    {\Gamma \vdash \cat C \isaCat \and\Gamma \vdash \cat D \isaCat}
-    {\Gamma\pipe\cdot \vdash \varr{\cat C}{\cat D} \isaTy}
-
-    \inferrule
-    {\Gamma \vdash \cat C \isaCat \and\Gamma \vdash \cat D \isaCat}
-    {\Gamma\pipe\cdot \vdash \harr{\cat C}{\cat D} \isaTy}
-
-    \inferrule
-    {\Gamma \pipe \alpha:\cat C\vdash P \isaSet}
-    {\Gamma \vdash \pendallXdotY {\alpha:{\cat C}} P \isaTy}
-
+    \quad
     \inferrule
     {\Gamma \vdash \cat C \isSmall}
     {\Gamma \vdash \quoth {\cat C} : \smallCats}
-
+    \quad
     \inferrule
     {\Gamma \vdash M : \smallCats}
     {\Gamma \vdash \unquoth M \isSmall}
-
+    \\\\
+    \inferrule
+    {~}
+    {\Gamma\vdash \Cats}
+    \quad
     \inferrule
     {\Gamma \vdash \cat C \isaCat}
     {\Gamma \vdash \quoth {\cat C} : \Cat}
-
+    \quad
     \inferrule
     {\Gamma \vdash M : \Cat}
     {\Gamma \vdash \unquoth M \isaCat}
-
+    \\ \\
+    
+    \inferrule
+    {\Gamma \vdash \cat C \isaCat \and\Gamma \vdash \cat D \isaCat}
+    {\Gamma\pipe\cdot \vdash \varr{\cat C}{\cat D} \isaTy}
+    \quad
     \inferrule
     {\Gamma \pipe \alpha:\cat C \vdash A : \cat D}
     {\Gamma \vdash \lambda \alpha:\cat C. A : \varr{\cat C}{\cat D}}
-
+    \quad
     \inferrule
     {\Gamma \pipe \alpha:\cat C \vdash A : \cat D\and
       \Gamma\pipe\cdot \vdash M : \varr{\cat D}{\cat E}}
     {\Gamma\pipe \alpha:\cat C \vdash M A : \cat E}
-
+    \\ \\
+    
+    \inferrule
+    {\Gamma \vdash \cat C \isaCat \and\Gamma \vdash \cat D \isaCat}
+    {\Gamma\pipe\cdot \vdash \harr{\cat C}{\cat D} \isaTy}
+    \quad
     \inferrule
     {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R \,\isaSet}
     {\Gamma \vdash \lambda \alpha:\cat C;\beta:\cat D. R : \harr{\cat C}{\cat D}}
-
+    \quad
     \inferrule
-    {\Gamma \vdash M : \harr{\cat C}{\cat D}\and
-     \Gamma \pipe d^- \Xi \vdash A : \cat C\and
+    {\Gamma \vdash M : \harr{\cat C}{\cat D}\\\\
+     \Gamma \pipe d^- \Xi \vdash A : \cat C\\\\
      \Gamma \pipe d^+ \Xi \vdash B : \cat C}
     {\Gamma \pipe \Xi \vdash M A; B \isaSet}
-
+    \\ \\
+    
+    \inferrule
+    {\Gamma \pipe \alpha:\cat C\vdash P \isaSet}
+    {\Gamma \vdash \pendallXdotY {\alpha:{\cat C}} P \isaTy}
+    \quad
     \inferrule
     {\Gamma \pipe \alpha:\cat C\vdash t : P}
     {\Gamma \vdash \pendlambdaXdotY \alpha t : \pendallXdotY \alpha P}
-
+    \quad
     \inferrule
     {\Gamma \vdash M : \pendallXdotY \alpha P\and
      \Gamma \pipe \beta:\cat D \vdash a : \cat C}
     {\Gamma \pipe \beta:\cat D \vdash \pendappXtoY M a : P[a/\alpha]}
-  \end{mathpar}
+  \end{array}
+  \]
   \caption{Type Connectives}
 \end{figure}
 
