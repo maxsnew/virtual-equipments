@@ -170,6 +170,9 @@
 \newcommand{\algVarrQt}{\textrm{FunctQt}}
 \newcommand{\algVarrUnqt}{\textrm{FunctUnQt}}
 
+\newcommand{\quoth}[1]{\lceil{} {#1}\rceil{}}
+\newcommand{\unquoth}[1]{\lfloor{} {#1}\rfloor{}}
+
 
 \title{A Constructive Ordered Predicate Logic for Category Theory}
 \author{Max S. New\inst{1,2} and Daniel R. Licata\inst{2}}
@@ -1282,15 +1285,13 @@ for hom types we use a universal quantifier to notate this.
 \begin{figure}
   \begin{mathpar}
     \inferrule
-    {}
+    {~}
     {\Gamma\vdash \smallCats}
 
     \inferrule
-    {}
+    {~}
     {\Gamma\vdash \Cats}
 
-    FIXME missing intro/elim rules for smallcat and cat
-    
     \inferrule
     {\Gamma \vdash \cat C \isaCat \and\Gamma \vdash \cat D \isaCat}
     {\Gamma\pipe\cdot \vdash \varr{\cat C}{\cat D} \isaTy}
@@ -1302,6 +1303,22 @@ for hom types we use a universal quantifier to notate this.
     \inferrule
     {\Gamma \pipe \alpha:\cat C\vdash P \isaSet}
     {\Gamma \vdash \pendallXdotY {\alpha:{\cat C}} P \isaTy}
+
+    \inferrule
+    {\Gamma \vdash \cat C \isSmall}
+    {\Gamma \vdash \quoth {\cat C} : \smallCats}
+
+    \inferrule
+    {\Gamma \vdash M : \smallCats}
+    {\Gamma \vdash \unquoth M \isSmall}
+
+    \inferrule
+    {\Gamma \vdash \cat C \isaCat}
+    {\Gamma \vdash \quoth {\cat C} : \Cat}
+
+    \inferrule
+    {\Gamma \vdash M : \Cat}
+    {\Gamma \vdash \unquoth M \isaCat}
 
     \inferrule
     {\Gamma \pipe \alpha:\cat C \vdash A : \cat D}
