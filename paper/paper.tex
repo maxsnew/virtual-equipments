@@ -17,7 +17,7 @@
 \newtheorem{construction}{Construction}
 %% \newtheorem{definition}{Definition}
 \newcommand{\vett}{VETT}
-\newcommand{\ohol}{OHol}
+\newcommand{\ohol}{\vett}
 \newcommand{\sem}[1]{\llbracket{#1}\rrbracket}
 \newcommand{\pto}{\nrightarrow}
 \newcommand{\pfrom}{\nleftarrow}
@@ -116,6 +116,7 @@
 \newcommand{\vlambda}[1]{\lambda^{F}{#1}.}
 \newcommand{\hlambda}[2]{\lambda^{P}{#1};{#2}.}
 \newcommand{\ran}[1]{\textrm{Ran}_{#1}\,}
+\newcommand{\weightedLimitDW}[2]{\textrm{lim}^{#2}{#1}\,}
 
 \newcommand{\equalizeVofWbyXeqYatZ}[5]{\{ {#1} : {#2} \pipe {#3} = {#4} : {#5} \}}
 
@@ -1361,29 +1362,31 @@ exactly one free variable.
   \caption{Type Connectives}
 \end{figure}
 
-\section{Synthetic Category Theory in VETT}
+\section{Formal Category Theory in VETT}
 
-To demonstrate that \ohol{} provides a setting in which to carry out
-synthetic category theory, we demonstrate some basic definitions and
-theorems in category theory in \ohol{}. We emphasize throughout the
-interpretations as tautologies in higher order-logic, as well as the
-relation to ordered linear logic.
+To demonstrate what formal category theory in VETT looks like, we
+demonstrate some basic definitions and theorems. We make no claims to
+the originality of the results of this section, as it is well known
+that much category theory can be formalized in virtual equipments, we
+only show these to demonstrate that the VETT syntax does give a more
+familiar syntax to these constructions, while still avoiding the need
+for explicit naturality and functoriality side conditions.
 
-First, we fix some terminology: TODO, isomorphism of profunctors, anything else we'll need?
-%% \begin{definition}{Isomorphism of Profunctors}
-  
-%% \end{definition}
-
-We can witness the fact that all constructions are (pro-)functorial by
-using the hom type $\punitinXfromYtoZ {\cat C}{\alpha}{\alpha'}$.
-\begin{lemma}
+First, we using the elimination for the unit set, we can see that all
+constructions are (pro-)functorial:
+\begin{construction}
+  For any small category $\cat C$, we can construct natural elements
   \begin{enumerate}
   \item Identity: $\pendallXdotY {\alpha} {\punitinXfromYtoZ {\cat C}{\alpha}{\alpha'}}$
   \item Composition: $\hombinary {\alpha_1} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_3} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_3}}$
   \item Functoriality: for any $F : \varr {\cat C}{\cat D}$, $\homunary {\alpha_1} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {} {F(\alpha_1)}{F(\alpha_2)}}$.
-   \item Profunctoriality: for any $R : \harr {\cat C}{\cat D}$ $\homtrinary {\alpha_1} {\punitinXfromYtoZ{} {\alpha_1}{\alpha_2}} {\alpha_2} {R{\alpha_2}{\beta_2}} {\beta_2} {\punitinXfromYtoZ{} {\beta_2} {\beta_1}} {\beta_1} {R\alpha_1\beta_1}$
+   \item Profunctoriality: for any $R : \harr {\cat C}{\cat D}$ if
+     $\cat D$ is small then $\homtrinary {\alpha_1}
+     {\punitinXfromYtoZ{} {\alpha_1}{\alpha_2}} {\alpha_2}
+     {R{\alpha_2}{\beta_2}} {\beta_2} {\punitinXfromYtoZ{} {\beta_2}
+       {\beta_1}} {\beta_1} {R\alpha_1\beta_1}$
   \end{enumerate}
-\end{lemma}
+\end{construction}
 Reflexivity and transitivity generalize the corresponding properties
 of equality, with the lack of symmetry being a key feature of the
 generalization.
@@ -1393,7 +1396,7 @@ with the composition proof by the $\eta$ principle for the unit.
 %
 (Pro-)Functoriality generalizes the statement that all functions and
 relations respect equality.
-
+%
 Naturality is more complex to state, and it is a statement about the
 \emph{proofs} so it has no analogue in ordinary higher-order
 logic. The following version is stated for any \emph{profunctor}, with
@@ -1402,9 +1405,11 @@ the usual case of naturality arising when $R \alpha \beta =
 \begin{lemma}[Naturality]
   For any $t : \pendallXdotY {\alpha:\cat C}{\harrapp R \alpha
     \alpha}$, by composing with profunctoriality, we can construct
-  terms
-  \[ \alpha_1, f : \punitinXfromYtoZ {\cat C} {\alpha_1} {\alpha_2}, \alpha_2 \vdash \textrm{lcomp}(f,\pendappXtoY t {\alpha_2}) \quad \textrm{and} \quad \textrm{rcomp}(\pendappXtoY t {\alpha_1}, f) : \harrapp R {\alpha_1}{\alpha_2}\]
-  These are both equal to $\punitelimtoYwithkontZ f {t}$.
+  terms $\alpha_1, f : \punitinXfromYtoZ {\cat C} {\alpha_1}
+  {\alpha_2}, \alpha_2 \vdash \textrm{lcomp}(f,\pendappXtoY t
+  {\alpha_2})$ and $\textrm{rcomp}(\pendappXtoY t {\alpha_1}, f) :
+  \harrapp R {\alpha_1}{\alpha_2}$ that are both equal to
+  $\punitelimtoYwithkontZ f {t}$.
 \end{lemma}
 
 Next, we turn to some of the central theorems of category theory, the
@@ -1421,11 +1426,13 @@ the equivalence between the formulae $\forall x. \forall y. x = y
   \item (Co-Yoneda) The profunctor $\tensorexistsXwithYandZ {\alpha'}{\punitinXfromYtoZ{}{\alpha}{\alpha'}} {\negPresheafAppPtoX \pi \alpha}$ is isomorphic to $\negPresheafAppPtoX \pi \alpha$
   \end{enumerate}
 \end{lemma}
+The proofs both follow from the unit elimination rule, and we can view
+the unit elimination rule as essentially making the Yoneda lemma a
+primitive axiom, as the two cases of showing (1) is an isomorphism are
+precisely the $\beta$ and $\eta$ rules for the unit.
 
-Next, we have the ``Fubini'' theorems. These correspond to quantifier
-re-ordering and associativity of conjunction and implication in
-higher-order logic.
-\emph{Fubini} theorems about interchange of (co)-ends.
+Next, we have the ``Fubini'' theorems, which are analogous to simple
+theorems relating tensor and hom types in ordered logic, and whose proofs are 
 \begin{lemma}[{Fubini}]
   \label{lem:fubini}
   The following isomorphisms hold when the corresponding profunctors
@@ -1438,134 +1445,131 @@ higher-order logic.
   \item $\pendallXdotY \alpha \homrallXYtoZ \beta P {P'} \cong \pendallXdotY \beta \homlallXYtoZ \alpha P {P'}$
   \end{enumerate}  
 \end{lemma}
-Note that the last item here is different from the others in that it
-is an equivalence of sets rather than profunctors.
+\begin{proof}
+  Straightforward, for instance the forward direction of (1) is given
+  by $\lambdaunary \alpha {x} \delta {\tensorelimWkontZ x
+    {p.\beta.y. \tensorelimWkontZ y
+      {q.\gamma.r. \tensorintroatXwithYandZ {\gamma}
+        {\tensorintroatXwithYandZ \beta p q} {r}}}}$
+\end{proof}
 
-Next, we turn to basic universal properties. While there are many
-equivalent definitions of a universal property in category theory, the
-one most natural in \ohol{} is the notion of a functor representing a
-profunctor, a mild generalization of the more common notion of
-representable presheaf. We say a functor $F : \varr {\cat C}{\cat D}$
-left represents a profunctor $R : \harr {\cat C}{\cat D}$ when
-$\punitinXfromYtoZ {}{\beta}{F \alpha} \cong \harrapp R \alpha
-\beta$. This is an ordered generalization of the notion of a relation
-$R$ being the \emph{graph} of a function $F$. Due to the asymmetry,
-there is a dual notion of a functor $G : \varr {\cat D}{\cat C}$
-right-representing a profunctor $\punitinXfromYtoZ {\alpha}{G\beta}
-\cong \harrapp R \alpha \beta$. Then $F$ and $G$ are adjoint functors
-when $F$ left represents a profunctor that $G$ right-represents. This
-generalizes the formulation that a function $g$ is an inverse to $f$
-if its corresponding relation is the converse of the relation
-corresponding to $f$.
-
-The definition we gave for adjoint functors is the one in terms of
-``hom-isomorphism''. The equivalent in terms of unit and co-unit is a
-simple corollary of the Yoneda lemma, because for instance the unit
-can be extracted from the transformation $\homunary \alpha
-{\punitinXfromYtoZ {}{F \alpha}{\beta}} \beta {\punitinXfromYtoZ
-  {}{\alpha}{G\beta}}$. The formulation in terms of unit and co-unit
-generalizes the formulation of inverses that each composition is equal
-to the identity.
-%% \begin{lemma}[Formulations of Representability]
-%%   The following are equivalent
-%%   \begin{enumerate}
-%%   \item An isomorphism between $\punitinXfromYtoZ {}{F \alpha}{\beta}$ and $\harrapp R \alpha \beta$
-%%   \item A term $\pendallXdotY \alpha {\harrapp R \alpha {F \alpha}}$
-%%     such that the induced morphism from $\punitinXfromYtoZ {}{F
-%%       \alpha}{\beta}$ to $\harrapp R \alpha \beta$ is an isomorphism.
-%%   \end{enumerate}
-%% \end{lemma}
-
-Next, we turn to limits, or more generally, Kan extensions.
-%
-Given functors $J : \varr {\cat C}{\cat C'}$ and $F : \varr{\cat
-  C}{\cat D}$, a right Kan extension is functor $\ran J F : \varr{\cat
-  C'}{\cat D}$ such that the composition $\ran J F \circ J$ has a
-universal natural transformation to $F$.
+Next, we turn to basic universal properties.
 \begin{lemma}
-  A right Kan extension of $F$ along $J$ is a functor $\ran J F$ that
-  right-represents the profunctor $\homrallXYtoZ {\alpha} {\punitinXfromYtoZ {} {\alpha'}{J \alpha}}{\punitinXfromYtoZ {} \beta {F \alpha}}$
+  Let $R : \varr {\cat D}{\cat C}$ and $L : \varr {\cat
+    C}{\cat D}$. Then the following data are in bijection:
+  \begin{enumerate}
+  \item An isomorphism of profunctors $(\punitinXfromYtoZ {\cat D} {L \alpha}{\beta}) \cong (\punitinXfromYtoZ {\cat C} \alpha {R \beta})$
+  \item A unit $\eta : \pendallXdotY \alpha {\punitinXfromYtoZ {\cat C} \alpha
+    {R(L\alpha)}}$ and co-unit $\varepsilon: \pendallXdotY \beta
+    {\punitinXfromYtoZ {\cat D} {L(R(\beta))}{\beta}}$ satisfying triangle
+    identities.
+  \end{enumerate}
 \end{lemma}
-Viewing this in higher-order logic, this says that $\beta = (\ran J
-F)\alpha'$ if and only if $\forall \alpha. \alpha' = J \alpha
-\Rightarrow \beta = F \alpha$. If $J$ is surjective this says that
-$\ran J F$ composed with $J$ is equal to $F$, but if $J$ is not
-surjective then this is impossible to satisfy for ordinary
-functions. Kan extensions generalize limits in that the limit of a
-diagram $F : \varr {\cat C}{\cat D}$ is the same as a right Kan
-extension along the unique $! : \varr{\cat C}{1}$.
+\begin{proof}
+  Given the forward homomorphism $\text{lr}$, we can construct $\eta =
+  \pendlambdaXdotY \alpha \appunary {\text{lr}} \alpha {\punitrefl
+    \alpha} {L \alpha}$ and given the unit we can reconstruct the
+  forward homomorphism using
+  $\text{comp}$ and $\text{fctor}$ as defined in
+  Construction\ref{construction:synthetic-composition} as
+  $\appbinary {\text{comp}} \alpha
+  {\pendappXtoY \eta \alpha} {R(L\alpha)} {(\appunary
+    {\text{fctor}(R)}{L \alpha} {f} {\beta})} {R \beta}$.
+\end{proof}
 
-Then we can prove the famous theorem that right adjoints preserve
-right Kan extensions, and so in particular, limits.
+Next, we turn to weighted limits, which generalize ordinary limits and
+Kan extensions.
+\begin{definition}
+  For a functor $D : \varr {\cat J}{\cat C}$ and a profunctor $W :
+  \harr{\cat K}{\cat J}$, the limit of $D$ weighted by $W$ is (if it
+  exists) a functor $\weightedLimitDW D W : \varr{\cat K}{\cat C}$
+  with an isomorphism $\punitinXfromYtoZ {\cat C} {\alpha} {(\weightedLimitDW D W) k} \cong \homrallXYtoZ j {W k j} {(\punitinXfromYtoZ {\cat C} \alpha {D j})}$
+\end{definition}
+This generalizes the usual definition that a morphism into a limit is
+a cone over the diagram $(\punitinXfromYtoZ {\cat C} \alpha {D j})$ to
+be parameterized by a weight $W k j$.
+Then we can prove the famous theorem that right adjoints preserve (weighted) limits:
 \begin{theorem}
-  If $\ran J F$ is a right Kan extension and $G : \varr{\cat D}{\cat
-    E}$ has a left adjoint $L$, then $G \circ (\ran J F)$ is the right
-  Kan extension of $G \circ F$ along $J$.
+  If $\weightedLimitDW D W$ exists and is a limit and $R : \varr{\cat
+    C}{\cat C'}$ has a left adjoint $L$, then $\lambda
+  \kappa. R((\weightedLimitDW D W) \kappa)$ is the limit of $\lambda
+  j. R(D j)$ weighted by $W$.
 \end{theorem}
 \begin{proof}
   \begin{align*}
-    \punitinXfromYtoZ {} {\gamma} {G (\ran J F \alpha')}
-    &\cong \punitinXfromYtoZ {}{L \gamma} {\ran J F \alpha'}\\
-    &\cong \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {}{\alpha'}{J\alpha})} {\punitinXfromYtoZ {}{L \gamma}{F \alpha}}\\
-    &\cong \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {}{\alpha'}{J\alpha})} {\punitinXfromYtoZ {}{\gamma}{G (F \alpha)}}
+    \punitinXfromYtoZ {} {\gamma} {R ((\weightedLimitDW D W) \kappa)}
+    \cong \punitinXfromYtoZ {}{L \gamma} {(\weightedLimitDW D W) \kappa}
+    \cong \homrallXYtoZ {j}{W k j} {\punitinXfromYtoZ {}{L \gamma}{D j}}
+    \cong \homrallXYtoZ {j}{W k j} {\punitinXfromYtoZ {}{\gamma}{R(D j)}}\\
   \end{align*}  
 \end{proof}
+This is a high level proof in terms of isomorphisms that may be
+written in VETT. The first two steps are the instantiation of
+assumptions (adjointness, weighted limits). The last step uses the
+fact that a natural isomorphisms lift to natural isomorphism of homs
+of profunctors. We show the construction of this isomorphism as follows, giving an example that naturality is simply 
+\begin{construction}
+  For any $\phi: \homunary \alpha {R' \alpha \beta} \beta {R \alpha
+    \beta}$ and $\psi : \homunary \gamma {S \gamma \beta} \beta {S'
+    \gamma \beta}$ we can construct a natural transformation $\phi
+  \triangleright \psi : \hombinary \gamma {(\homrallXYtoZ \beta {R
+      \alpha \beta}{S \gamma \beta})} {\alpha} {R'\alpha\beta} \beta {S'\gamma\beta}$ as
+  $\lambdabinary {\gamma} {f} {\alpha} r \beta {\appunary \psi \gamma {(\homrappXtoYatZ f {(\appunary \phi \alpha r \beta)} \beta)} \beta}$. Furthermore if $\phi$ and $\psi$ have inverses, then $\phi^{-1} \triangleright \psi^{-1}$ is the inverse of $\phi \triangleright \psi$.
+\end{construction}
 
-\subsection{Ordered Theories}
+%% \subsection{Ordered Theories}
 
-Just as we can define theories in first-order logic or higher-order
-logic by assuming base sorts, function and relation symbols and
-axioms, we can define ordered, or categorical theories in \ohol{}
-easily by using the two-level type theory structure.
-%
-We can define an \emph{ordered theory} to be any context $\Gamma$ and
-a translation of theories to be a substitution.
-%
-Then we can define theories for cartesian categories, monoidal
-categories, bicartesian categories, strong monads, (strong)
-adjunctions.
-%
-However the utility for applications to programming language semantics
-is limited due to the lack of opposite categories.
+%% Just as we can define theories in first-order logic or higher-order
+%% logic by assuming base sorts, function and relation symbols and
+%% axioms, we can define ordered, or categorical theories in \ohol{}
+%% easily by using the two-level type theory structure.
+%% %
+%% We can define an \emph{ordered theory} to be any context $\Gamma$ and
+%% a translation of theories to be a substitution.
+%% %
+%% Then we can define theories for cartesian categories, monoidal
+%% categories, bicartesian categories, strong monads, (strong)
+%% adjunctions.
+%% %
+%% However the utility for applications to programming language semantics
+%% is limited due to the lack of opposite categories.
 
-
-
-\subsection{Duality Principle}
-One common source of category theoretic arguments is the duality
-principle: since the opposite of any category is also a category, any
-statement that quantifies over all categories is equally true of their
-opposites. Furthermore in a formal language of categories, any
-statement can be dualized to a statement where domains and codomains
-are swapped and composition is flipped.
-%
-A similar duality principle holds in SCT.
-%
-The basic idea is to reverse the orientation of all \emph{set}
-expressions by swapping which variable is covariant and which is
-contravariant.
-%
-This has the effect of reversing the order of the context $\Phi$.
-%
-We can define this as a translation $\cdot^* : SCT \to SCT$ defined on
-syntactic forms of SCT in Figure~\ref{fig:duality}.
-\begin{figure}
-    \begin{align*}
-      (\harr {\cat C} {\cat D})^* &= \harr {\cat D^*} {\cat C^*}\\
-      (\alpha:\cat C)^* &= \alpha: \cat C^*\\
-      (\alpha:\cat C; \beta:\cat D)^* &= \beta:\cat D^*; \alpha:\cat C^*\\
-      (\Phi,x:R,\Psi)^* &= \Psi^*,x:R^*, \Phi^*\\
-      (\homrallXYtoZ \alpha P Q)^* &= \homlallXYtoZ \alpha {P^*} {Q^*}\\
-      (\homlallXYtoZ \alpha P Q)^* &= \homrallXYtoZ \alpha {P^*} {Q^*}\\
-      (\homrlambdaXatYdotZ x \alpha s)^* &= \homllambdaXatYdotZ x \alpha s^*\\
-      (\homrappXtoYatZ s t a)^* &= \homlappXtoYatZ {s^*} {t^*} {a^*}\\
-      (\tensorexistsXwithYandZ \beta P Q)^* &=
-      \tensorexistsXwithYandZ \beta {Q^*}{P^*}\\
-      (\tensorintroatXwithYandZ b s t)^* &= \tensorintroatXwithYandZ {b^*} {t^*} {s^*}\\
-      (\punitinXfromYtoZ {\cat C} {a_1}{a_2})^* &= \punitinXfromYtoZ {\cat C^*} {a_2^*}{a_1^*}
-    \end{align*}
-  \caption{Duality Involution}
-  \label{fig:duality}
-\end{figure}
+%% \subsection{Duality Principle}
+%% One common source of category theoretic arguments is the duality
+%% principle: since the opposite of any category is also a category, any
+%% statement that quantifies over all categories is equally true of their
+%% opposites. Furthermore in a formal language of categories, any
+%% statement can be dualized to a statement where domains and codomains
+%% are swapped and composition is flipped.
+%% %
+%% A similar duality principle holds in SCT.
+%% %
+%% The basic idea is to reverse the orientation of all \emph{set}
+%% expressions by swapping which variable is covariant and which is
+%% contravariant.
+%% %
+%% This has the effect of reversing the order of the context $\Phi$.
+%% %
+%% We can define this as a translation $\cdot^* : SCT \to SCT$ defined on
+%% syntactic forms of SCT in Figure~\ref{fig:duality}.
+%% \begin{figure}
+%%     \begin{align*}
+%%       (\harr {\cat C} {\cat D})^* &= \harr {\cat D^*} {\cat C^*}\\
+%%       (\alpha:\cat C)^* &= \alpha: \cat C^*\\
+%%       (\alpha:\cat C; \beta:\cat D)^* &= \beta:\cat D^*; \alpha:\cat C^*\\
+%%       (\Phi,x:R,\Psi)^* &= \Psi^*,x:R^*, \Phi^*\\
+%%       (\homrallXYtoZ \alpha P Q)^* &= \homlallXYtoZ \alpha {P^*} {Q^*}\\
+%%       (\homlallXYtoZ \alpha P Q)^* &= \homrallXYtoZ \alpha {P^*} {Q^*}\\
+%%       (\homrlambdaXatYdotZ x \alpha s)^* &= \homllambdaXatYdotZ x \alpha s^*\\
+%%       (\homrappXtoYatZ s t a)^* &= \homlappXtoYatZ {s^*} {t^*} {a^*}\\
+%%       (\tensorexistsXwithYandZ \beta P Q)^* &=
+%%       \tensorexistsXwithYandZ \beta {Q^*}{P^*}\\
+%%       (\tensorintroatXwithYandZ b s t)^* &= \tensorintroatXwithYandZ {b^*} {t^*} {s^*}\\
+%%       (\punitinXfromYtoZ {\cat C} {a_1}{a_2})^* &= \punitinXfromYtoZ {\cat C^*} {a_2^*}{a_1^*}
+%%     \end{align*}
+%%   \caption{Duality Involution}
+%%   \label{fig:duality}
+%% \end{figure}
 
 \subsection{Extensionality Axioms}
 
