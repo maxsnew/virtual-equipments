@@ -8,12 +8,12 @@
    categories
 
 * New Outline
+** Title/Abstract (currenlty 0.5 page)
+** Intro (currently 5 pages) (shorter?)
+** Syntax (currently 7) (shorter?)
 
-** Intro (currently 5 pages) (shorter)
-** Syntax (currently 14) (much shorter)
-
-** Synthetic Category Theory (currently 10)    (much shorter)
-** Model Theory (currently 6) (much shorter)
-** Discussion (currently 2.5) (shorter)
+** Synthetic Category Theory (currently 3)    (shorter?)
+** Model Theory (currently 3.5) (shorter?)
+** Discussion (currently 2.5) (shorter!)
 
 ** References (currently 0 oops)
