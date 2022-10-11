@@ -7,7 +7,6 @@
 \usepackage{mathpartir}
 \usepackage{bbm}
 \usepackage{cleveref}
-\usepackage{natbib}
 
 \DeclareMathOperator*{\colim}{colim}
 
@@ -174,6 +173,8 @@
 \newcommand{\quoth}[1]{\lceil{} {#1}\rceil{}}
 \newcommand{\unquoth}[1]{\lfloor{} {#1}\rfloor{}}
 
+\newcommand{\citet}[1]{\cite{#1}}
+\newcommand{\citep}[1]{(\cite{#1})}
 
 \title{A Constructive Ordered Predicate Logic for Category Theory}
 \author{Max S. New\inst{1,2} and Daniel R. Licata\inst{2}}
@@ -2046,10 +2047,10 @@ morphisms: functors, profunctors and spans of functors.
 %% %% Please use bibtex, 
 \subsubsection*{Acknowledgements}
 Grants stuff...? The authors would like to thank David Jaz Myers, Emily Riehl, Mike
-Shulman, Dominic Verity,...for helpful feedback on this work
+Shulman, Dominic Verity for helpful feedback on this work.
 
+\bibliographystyle{splncs04}
 \bibliography{cats}
-
 
 \appendix
 
