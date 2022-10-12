@@ -1393,12 +1393,16 @@ exactly one free variable.
 \section{Formal Category Theory in VETT}
 
 To demonstrate what formal category theory in VETT looks like, we
-demonstrate some basic definitions and theorems. We make no claims to
-the originality of the results of this section, as it is well known
+demonstrate some basic definitions and theorems.  While it is well known
 that much category theory can be formalized in virtual equipments, we
-only show these to demonstrate that the VETT syntax does give a more
+show these examples to demonstrate how the VETT syntax gives a more
 familiar syntax to these constructions, while still avoiding the need
-for explicit naturality and functoriality side conditions.
+for explicit naturality and functoriality side conditions.  We have
+formalized the syntax of \vett{} in Agda, using Agda's rewriting
+mechanism to implement substitution and $\beta$-reduction, and checked
+some of the results in this section (e.g. Lemma~\ref{lem:yoneda} and
+Lemma~\ref{lem:fubini-short} and the maps in
+Lemma~\ref{lem:adjunction}).\footnote{\url{https://github.com/maxsnew/virtual-equipments/blob/master/agda/Examples.agda}}
 
 First, we using the elimination for the unit set, we can see that all
 constructions are (pro-)functorial:
@@ -1409,7 +1413,7 @@ constructions are (pro-)functorial:
   \item Composition: $\hombinary {\alpha_1} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_3} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_3}}$
   \item Functoriality: for any $F : \varr {\cat C}{\cat D}$, $\homunary {\alpha_1} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {} {F(\alpha_1)}{F(\alpha_2)}}$.
    \item Profunctoriality: for any $R : \harr {\cat C}{\cat D}$ if
-     $\cat D$ is small then $\homtrinary {\alpha_1}
+     $\cat D$ is small then \\ $\homtrinary {\alpha_1}
      {\punitinXfromYtoZ{} {\alpha_1}{\alpha_2}} {\alpha_2}
      {R{\alpha_2}{\beta_2}} {\beta_2} {\punitinXfromYtoZ{} {\beta_2}
        {\beta_1}} {\beta_1} {R\alpha_1\beta_1}$
@@ -1447,14 +1451,14 @@ ordered generalizations of some very simple tautologies about
 equality. For instance, the Yoneda lemma (and its proof) generalizes
 the equivalence between the formulae $\forall x. \forall y. x = y
 \Rightarrow P y$ and $P x$.
-\begin{lemma}
+\begin{lemma} \label{lem:yoneda}
   Let $\alpha^o : \cat C$ and $\pi : \negPresheaf {\cat C}$. Then
   \begin{enumerate}
   \item (Yoneda) The profunctor $\homrallXYtoZ {\alpha'} {\punitinXfromYtoZ {\cat C} {\alpha'}{\alpha}} {\negPresheafAppPtoX \pi {\alpha'}}$ is isomorphic to $\negPresheafAppPtoX \pi \alpha$
   \item (Co-Yoneda) The profunctor $\tensorexistsXwithYandZ {\alpha'}{\punitinXfromYtoZ{}{\alpha}{\alpha'}} {\negPresheafAppPtoX \pi \alpha}$ is isomorphic to $\negPresheafAppPtoX \pi \alpha$
   \end{enumerate}
 \end{lemma}
-The proofs both follow from the unit elimination rule, and we can view
+The proofs both follow from the unit elimination rule: we can view
 the unit elimination rule as essentially making the Yoneda lemma a
 primitive axiom, as the two cases of showing (1) is an isomorphism are
 precisely the $\beta$ and $\eta$ rules for the unit.
@@ -1462,7 +1466,7 @@ precisely the $\beta$ and $\eta$ rules for the unit.
 Next, we have the ``Fubini'' theorems, which are analogous to simple
 theorems relating tensor and hom types in ordered logic, and whose proofs are 
 \begin{lemma}[{Fubini}]
-  \label{lem:fubini}
+  \label{lem:fubini-short}
   The following isomorphisms hold when the corresponding profunctors
   are well typed.
   \begin{enumerate}
@@ -1481,8 +1485,8 @@ theorems relating tensor and hom types in ordered logic, and whose proofs are
         {\tensorintroatXwithYandZ \beta p q} {r}}}}$
 \end{proof}
 
-Next, we turn to basic universal properties.
-\begin{lemma}
+Next, we can prove that two definitions of an adjunction are equivalent:
+\begin{lemma} \label{lem:adjunction}
   Let $R : \varr {\cat D}{\cat C}$ and $L : \varr {\cat
     C}{\cat D}$. Then the following data are in bijection:
   \begin{enumerate}
@@ -1535,7 +1539,8 @@ This is a high level proof in terms of isomorphisms that may be
 written in VETT. The first two steps are the instantiation of
 assumptions (adjointness, weighted limits). The last step uses the
 fact that a natural isomorphisms lift to natural isomorphism of homs
-of profunctors. We show the construction of this isomorphism as follows, giving an example that naturality is simply 
+of profunctors. We show the construction of this isomorphism as follows,
+giving an example that naturality need not be proved explicitly.
 \begin{construction}
   For any $\phi: \homunary \alpha {R' \alpha \beta} \beta {R \alpha
     \beta}$ and $\psi : \homunary \gamma {S \gamma \beta} \beta {S'
