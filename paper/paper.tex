@@ -1876,43 +1876,36 @@ strictification theorem or by moving to a univalent setting.
   of the universal properties needed for a model of VETT.
 \end{construction}
 
-\section{Discussion}
+\section{Related and Future Work}
 
-\paragraph{Calculi for formal category theory}
+We now comapre \vett{} with other calculi for formal category theory.  
 
-In their book on $\infty$-category theory, Riehl and Verity use the
-formal language of virtual equipments to prove results valid for
-$\infty$-categories without concrete manipulation of model
-categories. They formalize this language using Makkai's FOLDS
-framework of first-order logic with dependent sorts. The approach is
-similar in spirit to our \ohol{}, and has the same models. The main
-difference is that their theory is built on top of first-order logic,
-whereas ours is built on a custom-made variant of higher-order logic
-over a (unary) simple type theory. For this reason, statements in
-their theory are quite complex as they have to be encoded into
-first-order logic, whereas we argue our type-theoretic approach
-formalizes informal arguments much more directly, as shown in
-Section~\ref{sec:examples}.
-%
-An informal syntax for manipulating profunctors involving ends and
-coends, called the coend calculus is closely related, an extension of
-\ohol{} to treat profunctors of many variables of different variances
-should provide a formal treatment for the coend calculus
-\citet{coend-calculus}.
+Riehl and Verity~\cite{rvXXelements} use a formal language of virtual
+equipments to prove results valid for $\infty$-categories without
+concrete manipulation of model categories. They formalize this language
+as a theory in Makkai's framework of first-order logic with dependent
+sorts (FOLDS).  While this previous work has the same models as \vett{},
+we believe that the syntax we propose in this paper formalizes informal
+arguments more directly, as shown in Section~\ref{sec:examples}.  This
+is because FOLDS approach approach is entirely relational, whereas we
+formalize concepts like restriction of a profunctor or composition of
+natural transformations as functional operations (substitution).  In
+particular, this means that our calculus requires only vertically
+degenerate squares (elements/natural transformations) as a
+``user-facing'' notion, with general squares occuring only in the
+admissible substitution operations.
 
-Another approach to formal category theory is to develop a
-\emph{directed dependent type theory}, a type theory where the
-identity type is interpreted as morphisms in a (possibly
-$\infty$-)category. Research on directed dependent type theories is
-ongoing \cite{riehl-shulman,north}. Directed dependent type theories
-should generalize \ohol{} in the same way that dependent type theory
-generalizes higher order logic: internally there should be a type that
-models the category of sets, and terms of this type should model the
-profunctors of \ohol{}.  As a foundation for a domain-specific proof
-assistant for category theory, \ohol{} may provide a foundation for a
-proof assistant in the style of Isabelle/HOL \cite{isabelle-hol},
-whereas directed type theory would provide a foundation for a proof
-assistant in the style of Agda or Coq \cite{agda,coq}.
+%% The main difference is that their theory is built on top of
+%% first-order logic, whereas ours is built on a custom-made variant of
+%% higher-order logic over a (unary) simple type theory. For this reason,
+%% statements in their theory are quite complex as they have to be encoded
+%% into first-order logic, whereas we argue our type-theoretic approach
+%% %
+
+The coend calculus~\citet{coend-calculus} is an informal syntax for
+manipulating profunctors involving ends and coends; an extension of
+\vett{} to treat profunctors of many variables of different variances
+should would provide a formal treatment of it.
 
 \citet{djm-string-diagrams} provides a string diagram calculus for
 double categories and pro-arrow equipments, generalizing string
@@ -1925,24 +1918,54 @@ variables.
 
 One alternative to proarrow equipments is to axiomatize the bicategory
 of categories, profunctors and natural transformations rather than the
-virtual double category of categories, functors, profunctors and
-natural transformations. An abstract structure along
-these lines is a \emph{Cartesian bicategory}\footnote{which is not the
-same as a bicategory with products/finite limits, for which a syntax
-was developed \citet{fioresaville}} is given in
-\citet{carboni-walters,carboni-walters-someonelese}. 
-Some preliminary work on a proof system for Cartesian bicateogires was
-presented at \citet{jonasfreycartesianbicategories}. This bears strong
-similarities to our calculus VETT, except that (1) their profunctors
-may have 0, 1 or more covariant or contravariant variables but (2)
-they do not have a term syntax like our natural transformation syntax
-and (3) they do not have functors and restriction of profunctors by
-functors (since this structure is not present in a Cartesian
-bicategory). Semantically, Cartesian bicategories are somewhat less
-general than virtual equipments because in general the set of
-functors between two categories can only be recovered from the set of
-profunctors if the codomain category is Cauchy complete, in which case
-functors are equivalent to adjoint pairs of profunctors.
+virtual double category of categories, functors, profunctors and natural
+transformations. An abstract structure along these lines is a
+\emph{Cartesian
+  bicategory}~\citet{carboni-walters,carboni-walters-someonelese}.  (In
+a terminological collision, \citet{fioresaville} give a syntax for a a
+bicategory with products/finite limits, but this is a different notion.)
+\citet{jonasfreycartesianbicategories} describe some preliminary work on
+a proof system for Cartesian bicateogires.  This calculus is more
+general than \vett{} in that their profunctors may have 0, 1 or more
+covariant or contravariant variables, but they do not have a term syntax
+for the natural transformations/elements, and Cartesian bicategories do
+not have functors and restriction of profunctors by
+functors. Semantically, Cartesian bicategories are somewhat less general
+than virtual equipments because in general the set of functors between
+two categories can only be recovered from the set of profunctors if the
+codomain category is Cauchy complete, in which case functors are
+equivalent to adjoint pairs of profunctors.
+
+Our work in this paper fits broadly into a line of work on
+\emph{directed dependent type theories}, a type theory where the
+identity type is interpreted as morphisms in a (possibly
+$\infty$-)category.  In directed type theories based on a bisimplicial
+model~\cite{riehl-shulman,weinberger,otherweinbegerpaper,licataweaver},
+morphism types are defined using an interval object, like in cubical
+type theory~\cite{bch,cchm,afh,abcfhl}, and universal properties like
+``morphism induction'' are an internally definable property of certain
+types.  Other type theories~\cite{north,ahrensnorth} define morphism
+types via an induction principle, corresponding to the lifting
+properties of certain kinds of fibrations of categories.  While these
+previous works can express some constructions on $\Cat$ that are not
+expressible in \vett{}, because \vett{} is more restricted, it has more
+models, e.g. in internal and enriched categories, so the theorems that
+are provable in \vett{} apply in more settings.    
+
+Our use of dependent type theory as a metalanguage, with new judgements
+for the virtual equipment structure dependent on the meta-language
+context, is similar to the indexed type theories developed by
+\citet{isaev}.
+
+%% Directed dependent type theories
+%% should generalize \ohol{} in the same way that dependent type theory
+%% generalizes higher order logic: internally there should be a type that
+%% models the category of sets, and terms of this type should model the
+%% profunctors of \ohol{}.  As a foundation for a domain-specific proof
+%% assistant for category theory, \ohol{} may provide a foundation for a
+%% proof assistant in the style of Isabelle/HOL \cite{isabelle-hol},
+%% whereas directed type theory would provide a foundation for a proof
+%% assistant in the style of Agda or Coq \cite{agda,coq}.
 
 Finally, some variations on double categories have been used to model
 the structure of certain program logics. \citet{newlicata20} present a
@@ -1950,12 +1973,15 @@ logic for \emph{vertically thin} pro-arrow equipments, i.e., pro-arrow
 equipments where the functor and natural transformation judgments are
 posetal. This calculus is quite different from ours in that the
 horizontal morphisms are terms of a programming language, and so they
-are not presented as having co-variant and contravariant variables,
-and the equipment structure is modeled by explicit coercions rather
-than by syntactic substitution of vertical arrows in horizontal
-arrows. Another similar calculus is System P \citep{systemP} which is
-an internal language of \emph{reflexive graph categories}, which are
-like double categories without horizontal composition. 
+are not presented as relations with co-variant and contravariant
+variables, and the equipment structure is modeled by explicit coercions
+rather than by syntactic substitution of vertical arrows in horizontal
+arrows. Another similar calculus is System P \citep{systemP} which is an
+internal language of \emph{reflexive graph categories}, which are like
+double categories without horizontal composition.
+
+%% DRL note: I would compress the rest of this to a couple of sentences
+%% as the first thing to remove for space.  
 
 \subsection{Category Theoretic Extensions}
 
