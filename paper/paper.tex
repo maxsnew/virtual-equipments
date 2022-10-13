@@ -1876,7 +1876,7 @@ admissible substitution operations.
 The coend calculus~\citet{coend-calculus} is an informal syntax for
 manipulating profunctors involving ends and coends; an extension of
 \vett{} to treat profunctors of many variables of different variances
-should would provide a formal treatment of it.
+may provide a formal treatment of it.
 
 \citet{djm-string-diagrams} provides a string diagram calculus for
 double categories and pro-arrow equipments, generalizing string
@@ -1919,9 +1919,10 @@ types.  Other type theories~\cite{north,ahrensnorth} define morphism
 types via an induction principle, corresponding to the lifting
 properties of certain kinds of fibrations of categories.  While these
 previous works can express some constructions on $\Cat$ that are not
-expressible in \vett{}, because \vett{} is more restricted, it has more
-models, e.g. in internal and enriched categories, so the theorems that
-are provable in \vett{} apply in more settings.    
+expressible in \vett{}, because \vett{} is more restricted, \vett{}
+contrariwise has more models, for instance categories enriched in
+non-cartesian monoidal categories, so the theorems that are provable
+in \vett{} apply in more settings.
 
 %% Directed dependent type theories
 %% should generalize \ohol{} in the same way that dependent type theory
@@ -1949,78 +1950,88 @@ double categories without horizontal composition.
 %% DRL note: I would compress the rest of this to a couple of sentences
 %% as the first thing to remove for space.  
 
-\subsection{Category Theoretic Extensions}
+\subsection{Extending VETT}
 
-While we have demonstrated that some common constructions in category
-theory can be expressed using the simple combination of homs, tensors
-and units, there are several that are out of reach for SCT due to its
-restrictive judgmental structure. These require extensions to the
-judgmental structure that would move beyond virtual equipments.
+While many constructions in category theory can be formalized in
+virtual equipments, and therefore \vett{}, others require more
+structure. Future extensions to \vett{} could incorporate functor
+categories by generalizing the unary type theory of functors to
+functors of many variables, in which case ordinary $\lambda$ calculus
+can be used to define functor categories as function types. Similarly,
+ideas from modal type theory/graded linear logic could be used for
+defining opposite categories
+\cite{mike-contravariance-enrichment,semiring-stuf??}.
 
-First, while we can add products to the calculus, adding in a
-\emph{functor category} ${\cat C}^{\cat D}$ would necessitate adding a
-syntax for functors of multiple arguments, to allow for the lambda rule:
-\[ \inferrule {\alpha:\cat C, \beta:\cat D \vdash e : \cat E} {\alpha:\cat C \vdash \lambda \beta:\cat D. e : \cat E} \]
-This would then require also some extension to profunctors for
-allowing 0 or more covariant/contravariant dependencies as well.
-%
-Semantically, this would correspond to generalizing from virtual
-equipments to some kind of (possibly cartesian) \emph{monoidal closed}
-virtual equipments.
+%% While we have demonstrated that some common constructions in category
+%% theory can be expressed using the simple combination of homs, tensors
+%% and units, there are several that are out of reach for SCT due to its
+%% restrictive judgmental structure. These require extensions to the
+%% judgmental structure that would move beyond virtual equipments.
 
-In addition, we could consider extending our semantics with a notion
-of \emph{opposite category}, with the property that a covariant
-dependence of a profunctor on a variable in a category should be
-equivalent to a contravariant dependence on a variable in the opposite
-category.
-%
-This could possibly be done by introducing a modal distinction
-$\alpha:^{+}\cat C$ for covariant dependence and $\alpha:^{-}\cat C$
-for contravariant dependence, with the opposite category being a
-modality that internalizes flipping the variance as a type
-constructor.
-%
-With these two extensions, possibly, the category contexts for
-functors and profunctors could be unified as one notion of a sequence
-of object variables with variances.
-%
-With this unification, it would then be simpler to incorporate a third
-extension: a universe object, corresponding to an object
-$\textrm{Set}$, which would allow us to internalize the profunctor
-judgment in the functor judgment, modeling that in classical category
-theory, profunctors are the same as certain functors to the category
-of Sets.
-%
-While all of these extensions seem plausible, they all move away to
-the simple ordered type theory structure that allowed us to define
-units, tensor and hom profunctors so easily. It is unclear how to
-define these types in this extended structure. As a simple example, if
-profunctors have many variables of mixed variance, rather than exactly
-one of each variance, it is unclear what the appropriate
-generalization of the transformation context $\Phi$ should be.
+%% First, while we can add products to the calculus, adding in a
+%% \emph{functor category} ${\cat C}^{\cat D}$ would necessitate adding a
+%% syntax for functors of multiple arguments, to allow for the lambda rule:
+%% \[ \inferrule {\alpha:\cat C, \beta:\cat D \vdash e : \cat E} {\alpha:\cat C \vdash \lambda \beta:\cat D. e : \cat E} \]
+%% This would then require also some extension to profunctors for
+%% allowing 0 or more covariant/contravariant dependencies as well.
+%% %
+%% Semantically, this would correspond to generalizing from virtual
+%% equipments to some kind of (possibly cartesian) \emph{monoidal closed}
+%% virtual equipments.
 
-An orthogonal extension to these would be to consider adding a
-\emph{discretization} modality $\Delta\cat C$ that gives the discrete
-category on the underlying set of objects of $\cat C$. This would give
-us the ability to formalize concepts like ``function on objects'' or
-``unnatural transformation'' without the need to define internal
-categories. This could be modeled by adding a modal distinction
-$\alpha:^{\#}\cat C$ for ``crisp'' dependence on an object of $\cat
-C$, i.e., dependence merely on the object of $\cat C$ with no
-functoriality/naturality conditions. This would then be internalized
-by the discretization modality.
+%% In addition, we could consider extending our semantics with a notion
+%% of \emph{opposite category}, with the property that a covariant
+%% dependence of a profunctor on a variable in a category should be
+%% equivalent to a contravariant dependence on a variable in the opposite
+%% category.
+%% %
+%% This could possibly be done by introducing a modal distinction
+%% $\alpha:^{+}\cat C$ for covariant dependence and $\alpha:^{-}\cat C$
+%% for contravariant dependence, with the opposite category being a
+%% modality that internalizes flipping the variance as a type
+%% constructor.
+%% %
+%% With these two extensions, possibly, the category contexts for
+%% functors and profunctors could be unified as one notion of a sequence
+%% of object variables with variances.
+%% %
+%% With this unification, it would then be simpler to incorporate a third
+%% extension: a universe object, corresponding to an object
+%% $\textrm{Set}$, which would allow us to internalize the profunctor
+%% judgment in the functor judgment, modeling that in classical category
+%% theory, profunctors are the same as certain functors to the category
+%% of Sets.
+%% %
+%% While all of these extensions seem plausible, they all move away to
+%% the simple ordered type theory structure that allowed us to define
+%% units, tensor and hom profunctors so easily. It is unclear how to
+%% define these types in this extended structure. As a simple example, if
+%% profunctors have many variables of mixed variance, rather than exactly
+%% one of each variance, it is unclear what the appropriate
+%% generalization of the transformation context $\Phi$ should be.
 
-A third approach would be to extend the calculus to model general
-monoidal closed structures and more generally multicategories, which
-provides semantics of modal substructural type theories.
-%
-This can be modeled by extending the ``universe'' $\Set$ to be a
-monoidal closed category, which induces a monoidal closed structure on
-profunctors by the Day convolution product \cite{...}.
-%
-Similar developments along these lines have already been done for
-coend calculus \citep{coend-calculus} and in formalization of
-substructural type theories \citep{atkey-woods}.
+%% An orthogonal extension to these would be to consider adding a
+%% \emph{discretization} modality $\Delta\cat C$ that gives the discrete
+%% category on the underlying set of objects of $\cat C$. This would give
+%% us the ability to formalize concepts like ``function on objects'' or
+%% ``unnatural transformation'' without the need to define internal
+%% categories. This could be modeled by adding a modal distinction
+%% $\alpha:^{\#}\cat C$ for ``crisp'' dependence on an object of $\cat
+%% C$, i.e., dependence merely on the object of $\cat C$ with no
+%% functoriality/naturality conditions. This would then be internalized
+%% by the discretization modality.
+
+%% A third approach would be to extend the calculus to model general
+%% monoidal closed structures and more generally multicategories, which
+%% provides semantics of modal substructural type theories.
+%% %
+%% This can be modeled by extending the ``universe'' $\Set$ to be a
+%% monoidal closed category, which induces a monoidal closed structure on
+%% profunctors by the Day convolution product \cite{...}.
+%% %
+%% Similar developments along these lines have already been done for
+%% coend calculus \citep{coend-calculus} and in formalization of
+%% substructural type theories \citep{atkey-woods}.
 
 %% A recent development in the formalization of substructural type
 %% theories is to use monoidal connectives at the meta-level when
@@ -2046,17 +2057,6 @@ substructural type theories \citep{atkey-woods}.
 %% universal property, i.e., to define when the multicategory is
 %% \emph{representable}.
 
-\subsection{Semantics}
-
-Our definition of a double category with displays is suggestive of a
-simple generalization. A double category is a monoid object in the
-double category of $Span(Cat)$, and a double category with displays
-furthermore uses certain diagrams involving profunctors, which also
-form a double category $Prof$. This suggests that the algebraic
-structure of a double category with displays is naturally modeled in
-some kind of \emph{triple category}, modeling the three types of
-morphisms: functors, profunctors and spans of functors.
-   
 %% \subsubsection*{Acknowledgements}
 %% Grants stuff...? The authors would like to thank David Jaz Myers, Emily Riehl, Mike
 %% Shulman, Dominic Verity for helpful feedback on this work.
