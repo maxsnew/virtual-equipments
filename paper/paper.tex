@@ -2185,11 +2185,69 @@ of contexts and substitutions.
     d^{-}(\phi,t/x,\psi) &= d^-\phi\\
     d^{+}(\phi,t/x,\psi) &= d^+\psi\\
   \end{align*}
-  
   \caption{Operations on Contexts}
-  
 \end{figure}
 
+
+In Figure~\ref{fig:admissible}, we describe the admissible typing
+rules for the actions of substitution.
+
+\begin{definition}[Substitution Actions]
+  For any $\Gamma \pipe \alpha: \cat C \vdash a : \cat D$ and $\Gamma
+  \pipe \beta:\cat D \vdash b \cat E$, we define $b[a/\beta]$ by
+  recursion on $b$:
+
+  \begin{align*}
+    \beta[a/\beta] &= a\\
+    (M\,b)[a/\beta] &= M\,(b[a/\beta])\\
+    (\lambda \beta)    
+    (\pi_\pm b)[a/\beta] &= \pi_\pm b[a/\beta]\\
+    (b_-,b_+,s)[a/\beta] &= (b_-[a/\beta],b_+[a/\beta], s[a/\beta])\\
+  \end{align*}
+
+  Simultaneously by recursion on $s$ we define $s[\phi]$
+  \begin{align*}
+    x[a/\alpha,t,b/\beta] &= t\\
+    \pendappXtoY M b[a/\alpha] &= \pendappXtoY M {b[a/\alpha]}\\
+    {\punitelimkontZatABC {\alpha. t}{b_1} s {b_2}}[\phi] &=
+    {\punitelimkontZatABC {\alpha. t}{b_1[d^-\phi]} {s[\phi]} {b_2[d^+\phi]}}\\
+    (\punitrefl b)[a/\alpha] &= \punitrefl {b[a/\alpha]}\\
+    {\tensorelimWkontZ s {x.\beta.y.r}[\phi_l\jnctx\phi_m\jnctx\phi_r]} &=
+    \tensorelimWkontZ {s[\phi_m]} {x.\beta.y. r[\phi_l,x/x,\beta/\beta \jnctx \beta/\beta,y/y,\phi_r]}\\
+    {\tensorintroatXwithYandZ b s t}[\phi_s \jnctx \phi_t] &= \tensorintroatXwithYandZ {d^+\phi_s} {s[\phi_s]} {t[\phi_t]}\\
+    {(\homrappXtoYatZ s t a)}[\phi_f\jnctx \phi_a] &=
+    {\homrappXtoYatZ {s[\phi_f]} {t[\phi_a]} {a[d^+\phi_f]}}\\
+    {(\homrlambdaXatYdotZ {x}{\alpha} s)}[\phi] &=
+    {\homrlambdaXatYdotZ {x}{\alpha} {s[\phi,x/x,\alpha/\alpha]}}\\
+    {(\homlappXtoYatZ t s a)}[\phi_a\jnctx \phi_f] &=
+    {\homlappXtoYatZ {t[\phi_a]} {s[\phi_f]} {a[d^-\phi_f]}}\\
+    {(\homllambdaXatYdotZ {x}{\alpha} s)}[\phi] &=
+    {\homllambdaXatYdotZ {x}{\alpha} {s[\alpha/\alpha,x/x,\phi]}}\\
+    (\pi_i s)[\phi] &= \pi_i s[\phi]\\
+    (s_1,s_2)[\phi] &= (s_1[\phi], s_2[\phi])\\
+    ()[\phi] &= ()
+  \end{align*}
+
+  And finally, we define $P[\xi]$ by recursion on $P$:
+  \begin{align*}
+    (M\,a\,b)[\xi] &= M\,(a[d^-\xi])\,(b[d^+\xi])\\
+    (\punitinXfromYtoZ {\cat C} a b)[\xi] &= \punitinXfromYtoZ {\cat C} {a[\xi]}{b[\xi]}\\
+    (\tensorexistsXwithYandZ \beta P Q)[\xi] &= \tensorexistsXwithYandZ \beta {P[d^-\xi;\beta/\beta]}{P[\beta/\beta;d^+\xi]}\\
+    (\homrallXYtoZ \alpha R P)[\xi] &= \homrallXYtoZ \alpha {R[d^+\xi;\alpha/\alpha]} {P[d^-\xi;\alpha/\alpha]}\\
+    (\homlallXYtoZ \alpha P Q)[\xi] &= \homlallXYtoZ \alpha {P[\alpha/\alpha;d^-\xi]} {Q[\alpha/\alpha;d^+\xi]}\\
+    1[\xi] &= 1\\
+    (P_1 \times P_2)[\xi] &= P_1[\xi] \times P_2[\xi]
+  \end{align*}
+\end{definition}
+
+%% Theorems about substitution?
+
+%% \begin{definition}[Substitution of Objects in Sets]
+%%   3
+%% \end{definition}
+%% \begin{definition}[Substitution of Elements in Elements]
+%%   3
+%% \end{definition}
 
 \begin{figure}
   \begin{mathpar}
@@ -2220,9 +2278,9 @@ of contexts and substitutions.
 
     \inferrule*[right=Everything Subst]{\gamma : \Delta \to \Gamma \and \Gamma J}{\Delta J}
 
-    \inferrule{\Gamma \vdash \xi : Z \to \Xi\and \Gamma \pipe \Xi \vdash R \isaSet}{\Gamma \pipe Z \vdash R[\xi] \isaSet}
+    \inferrule*[right=BoundarySubst]{\Gamma \vdash \xi : Z \to \Xi\and \Gamma \pipe \Xi \vdash R \isaSet}{\Gamma \pipe Z \vdash R[\xi] \isaSet}
 
-    \inferrule{\Gamma \vdash \phi : \Psi \to \Phi\and \Gamma \pipe \Phi \vdash M : R}{\Gamma \pipe \Psi \vdash M[\phi] : R[\underline \phi]}
+    \inferrule*[right=TransSubst]{\Gamma \vdash \phi : \Psi \to \Phi\and \Gamma \pipe \Phi \vdash s : R}{\Gamma \pipe \Psi \vdash s[\phi] : R[\underline \phi]}
   \end{mathpar}
   \begin{align*}
     (\Phi \jnctx \Psi) \jnctx \Sigma &= \Phi \jnctx (\Psi \jnctx \Sigma)\\
