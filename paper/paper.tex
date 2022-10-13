@@ -300,9 +300,11 @@ In this work, we apply the techniques of categorical logic to define a
 more familiar logical syntax for carrying out constructions and proofs
 in formal category theory.  
 %
-We call the resulting theory \emph{virtual equipment type theory}
-(VETT) as (hyperdoctrines of) virtual equipments provide a sound and
-complete notion of model for the theory.
+We call the resulting theory \emph{virtual equipment type theory} (VETT)
+as (hyperdoctrines of) \emph{virtual
+  equipments}~\cite{virtualequipments}, a particular semantic model of
+formal category theory, provide a sound and complete notion of model for
+the theory.
 %
 VETT provides syntax for categories, functors, profunctors, and natural
 transformations, which are defined using familiar term syntax and
@@ -498,12 +500,12 @@ ordinary 1-dimensional categories, not higher generalizations).
 %% \to \cat C$ and $G : \cat D' \to \cat D$, by composition we can define a
 %% profunctor $R(F,G)$, the ``restriction'' of $R$ along $F$ and $G$.
 The remainder of this paper is organized as follows.  
-In \cref{sec:syntax} we introduce the syntax of \vett{}.  In
-\cref{sec:examples} we demonstrate how to use our syntax for formal
-category theory.  In \cref{sec:semantics}, we develop some model theory
+In Section~\ref{sec:syntax} we introduce the syntax of \vett{}.  In
+Section~\ref{sec:examples} we demonstrate how to use our syntax for formal
+category theory.  In Section~\ref{sec:semantics}, we develop some model theory
 for \vett{}, including a sound and complete notion of categorical model
 and sound interpretation in virtual equipments modeling ordinary,
-enriched and internal category theory.  In \cref{sec:discussion}, we
+enriched and internal category theory.  In Section~\ref{sec:discussion}, we
 discuss related type theories and potential extensions.
 
 \section{Syntax of VETT}
@@ -1851,6 +1853,7 @@ We leave strictification theorems to future work.
 \end{construction}
 
 \section{Related and Future Work}
+\label{sec:discussion}
 
 We now comapre \vett{} with other calculi for formal category theory.  
 
