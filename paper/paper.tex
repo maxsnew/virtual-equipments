@@ -183,108 +183,94 @@
 \maketitle
 
 \begin{abstract}
-  We present a domain-specific type theory for constructions and
-  proofs in category theory. The type theory axiomatizes notions of
-  category, functor, profunctor and a generalized form of natural
-  transformations. The type theory imposes an ordered linear
-  restriction on standard predicate logic, which guarantees that all functions
+  We present a domain-specific type theory for constructions and proofs
+  in category theory. The type theory axiomatizes notions of category,
+  functor, profunctor and a generalized form of natural
+  transformations. The type theory imposes an ordered linear restriction
+  on standard predicate logic, which guarantees that all functions
   between categories are functorial, all relations are profunctorial,
-  and all transformations are natural by construction, with no
-  separate proofs necessary. Important category theoretic proofs such
-  as the Yoneda lemma and Co-yoneda lemma become simple type theoretic
-  proofs about the relationship between unit, tensor and (ordered)
-  function types, and can be seen to be ordered refinements of
-  theorems in predicate logic.
-
-  We develop a sound and complete notion of categorical model for the
-  type theory based on virtual equipments, which are known to model
-  both internal and enriched category theory. This means that while
-  the proofs in our type theory look like standard set-based
-  arguments, the syntactic discipline ensure that all proofs and
-  constructions carry over to enriched and internal settings as well.
+  and all transformations are natural by construction, with no separate
+  proofs necessary. Important category theoretic proofs such as the
+  Yoneda lemma and Co-yoneda lemma become simple type theoretic proofs
+  about the relationship between unit, tensor and (ordered) function
+  types, and can be seen to be ordered refinements of theorems in
+  predicate logic.  The type theory is sound and complete for a
+  categorical model in \emph{virtual equipments}, which model both
+  internal and enriched category theory. While the proofs in our type
+  theory look like standard set-based arguments, the syntactic
+  discipline ensure that all proofs and constructions carry over to
+  enriched and internal settings as well.
 \end{abstract}
 
 \section{Introduction}
 
 Category theory is a branch of mathematics that studies
-higher-dimensional typed algebraic structures .
+higher-dimensional typed algebraic structures.
 %
 Originally developed for applications to homological algebra, it was
-quickly discovered that (among many other applications) these
-categorical structures were common in logic and computer science, and
-formal systems like logics, type theories and programming languages
-typically have sound and complete models given by notions of
-structured categories\cite{lawvere,goguen,lambek,moggi}, a phenomenon
-sometimes referred to as the Curry-Howard-Lambek nncorrespondence
-\cite{curry-howard-lambek}.
+quickly discovered that categorical structures were common in logic and
+computer science.  Formal systems like logics, type theories and
+programming languages typically have sound and complete models given by
+notions of structured categories,\cite{lawvere,goguen,lambek,moggi}.
 %
-Examples include the simply typed lambda calculus \cite{lambekscott},
-computational lambda calculus \cite{moggi}, linear logic \cite{girard}
-and dependent type theory\cite{cartmell1986}.
+This Curry-Howard-Lambek correspondence~\cite{curry-howard-lambek}
+applies to simply typed lambda calculus~\cite{lambekscott},
+computational lambda calculus~\cite{moggi}, linear logic~\cite{girard}
+dependent type theory\cite{cartmell1986}, and many other type theories
+designed based on category-theoretic semantics.
 %
-These seminal works have led to a fruitful field of research known as
-categorical logic, where new type theories are designed based directly
-on category-theoretic semantics.
-%
-The slogan is that the syntax of a type theory should present an
-initial object in its category of models, a category-theoretic
-reformulation and generalization of the logical notion of soundness
-and completeness.
+The syntax of a type theory should present an initial object in its
+category of models, a category-theoretic reformulation of logical
+soundness and completeness.
 
 % TODO: do we have citations for this?
 While this research program has been quite successful,
 category-theoretic techniques in computer science are sometimes
-criticized for being overly complex, and there is difficulty in
-acquisition of competence in category theory by computer scientists
-who do not have a strong background in pure mathemantics.
+criticized for being overly complex and hard to learn, especially for
+computer scientists who do not have a strong background in pure
+mathemantics.
 %
-While much of this can be explained by lack of, or lack of awareness
-of, accessible material for computer scientists, in some ways category
-theory is objectively complex.
+While in some ways this could be remedied by better introductory
+materials, in some ways category theory is objectively complex.
 %
 In a traditional set-theoretic formulation, notions such as adjoint
 functors and limits produce a proliferation of ``naturality'' and
 ``functoriality'' side-conditions that must be discharged.
 %
-This is compounded when we move from ordinary category theory to
+For example, when constructing an adjoint pair of
+functors between two categories, a na\"ive approach would define all of
+the data of the action on objects, action on arrows, prove the
+functoriality of such actions, as well as construct two families of
+transformations, prove they are natural and then finally proving a pair
+of equalities relating compositions of natural transformations.
+%
+Carrying out these proofs explicitly is quite tedious and many newcomers
+to are left with the impression that category theory is full of long,
+but ultimately trivial constructions.
+%
+This complexity is compounded when we move from ordinary category theory to
 enriched and internal category theory, where constructions must be
 additionally proven continuous, monotone, etc, in addition to natural
 or functorial.
 %
-These generalizations have long been recognized as being important in
-programming language applications: domain-, metric- and
+Moreover, these generalizations are often what is needed for programming
+language applications; for example, domain- and metric- and
 step-index-enriched categories have been used to model recursive
 programming languages and internal categories have been used to model
 parametricity and gradual
 typing\cite{order-enriched-cats,topos-of-trees,reflexive-graphs,double-cats-gradual-typing}.
 
-For instance, when constructing an adjoint pair of functors between
-two categories, a na\"ive approach would define all of the data of the
-action on objects, action on arrows, prove the functoriality of such
-actions, as well as construct two families of transformations, prove
-they are natural and then finally proving a pair of equalities
-relating compositions of natural transformations.
-%
-Furthermore, when moving into the enriched or internal setting, the
-proofs can have further continuity, monotonicity, or other
-side-conditions.
-%
-Carrying out the proofs explicitly is quite tedious and many newcomers
-to are left with the impression that category theory is full of long,
-but ultimately trivial constructions.
-
 Fortunately, the tools of category theory itself can be employed to
-simplify these constructions, specifically the tools of \emph{higher}
+simplify this complexity, specifically the tools of \emph{higher}
 category theory.
 %
-Consider the analogous situation in differential calculus. When an
-adept analyst writes down a function, they do not expand out the
-$\epsilon\mathord{-}\delta$ definition of continuity for a function
-and proceed from first principles. Rather, they are aware of certain
-\emph{syntactic principles} for defining functions that are continuous
-by construction, most importantly that composition of continuous
-functions is continuous and that previously defined functions are
-known to be continuous.
+As an analogy in differential calculus, when an adept analyst writes
+down a function, they do not expand out the $\epsilon\mathord{-}\delta$
+definition of continuity for a function and proceed from first
+principles, but rather use certain \emph{syntactic principles} for
+defining functions that are continuous by construction --- e.g. that
+composition of continuous functions is continuous and that previously
+defined functions are known to be continuous.
 %
 Similar principles apply to category theory itself: functors and
 natural transformations are closed under composition and whiskering
@@ -301,29 +287,27 @@ and natural transformation from first principles, they are axiomatized
 in a manner similar to how a category axiomatizes a notion of space
 and homomorphism.
 %
-One benefit is that the formal approaches also apply to enriched and
-internal settings, so \emph{formal} category theory proofs apply to
-these settings.
+The formal approaches also apply to enriched and internal settings, so
+\emph{formal} category theory proofs apply to these settings.
 %
-A downside is that these algebraic structures are quite complicated,
-and practitioners typically employ either an algebraic combinator
-syntax or a 2-dimensional diagrammatic language that can be quite
-beautiful and elegant, but is also seems very far removed from the
-traditional formulation of category theory in terms of sets and
-functions.
+A downside is that these algebraic structures are quite complicated, and
+practitioners typically employ either an algebraic combinator syntax or
+a 2-dimensional diagrammatic language that can be quite beautiful and
+elegant, but is also somewhat removed from the traditional formulation
+of category theory in terms of sets and functions.
 
 In this work, we apply the techniques of categorical logic to define a
 more familiar logical syntax for carrying out constructions and proofs
-in formal category theory.
+in formal category theory.  
 %
 We call the resulting theory \emph{virtual equipment type theory}
 (VETT) as (hyperdoctrines of) virtual equipments provide a sound and
 complete notion of model for the theory.
 %
-In VETT, functors and natural transformations are defined using
-ordinary term syntax, using familiar notations and $\beta\eta$
-reasoning principles for $\lambda$-functions, bound variables, tuples,
-etc.
+VETT provides syntax for categories, functors, profunctors, and natural
+transformations, which are defined using familiar term syntax and
+$\beta\eta$ reasoning principles for $\lambda$-functions, bound
+variables, tuples, etc.  
 %
 By adhering to a \emph{syntactic discipline}, the logic guarantees
 that all functor terms are automatically functorial, all and natural
@@ -331,10 +315,10 @@ transformation terms are natural.
 %
 More specifically, the syntax for transformations is a kind of
 \emph{indexed, ordered linear} $lambda$ calculus, where the indexing
-ensures that transformations are correctly natural and the ordering
-and linearity ensure that the proofs are valid in a large class of
-enriched and internal categories: for instance enrichment in a
-non-symmetric monoidal category.
+ensures that transformations are correctly natural and the ordering and
+linearity ensure that the proofs are valid in a large class of enriched
+and internal categories, such as enrichment in a non-symmetric monoidal
+category.
 %
 VETT provides an alternative alternative to algebraic and
 string-diagram syntaxes for working with virtual equipments,
@@ -342,23 +326,12 @@ similar to how the lambda calculus provides an alternative to
 categorical combinators and string diagram calculi for cartesian
 closed categories.
 
-In this work, we apply the technique of categorical logic to these
-algebraic structures to design a formal logic, which we call
-\emph{virtual equipment type theory}, that can be soundly interpreted
-in virtual equipments.
-%
-In the ``standard model'' of \vett{}, the sorts are interpreted as
-categories, functions as functors, relations as profunctors and
-implications of relations as profunctor homomorphisms, a generalization
-of natural transformations.
-%
-The type theoretic syntax allows us to write all of our constructions
-as if they were ordinary functors and profunctors in set-based
-category theory.
-%
-\vett also can be modeled in an arbitrary virtual equipments, and so the
-constructions are valid in enriched and internal category theory as
-well.
+
+%% The type theoretic syntax allows us to write all of our 
+%% constructions are written as if they were
+%% ordinary functors and profunctors in set-based category theory.
+
+
 %%
 %% DRL: I know what you mean, but I think conflating set theory and
 %% type theory will put some people off... 
@@ -370,24 +343,22 @@ well.
 %% functions ``for free''.
 %
 
-The syntax of \vett{} is a kind of indexed, ordered linear,
-proof-relevant variant of predicate logic over a unary type theory.
+The syntax of \vett{} is an indexed, ordered linear, proof-relevant
+variant of predicate logic over a unary type theory.
 %
-That is just as a predicate logic has a notion of type, term,
-relation and implication, \vett{} is based on four analogous category
-theoretic concepts: categories, functors, profunctors and natural
-transformations of profunctors.
+Just as a predicate logic has a notion of type, term, relation and
+implication, \vett{} is based on four analogous category theoretic
+concepts: categories, functors, profunctors and natural transformations
+of profunctors.
 %
-So categories are simply treated like types, and functors are simply
-terms whose type is a category and whose free variables have
-categories as types as well. The functor syntax is a unary type
-theory, meaning functor terms always have precisely one free variable
-representing the input object.
+Categories are treated like types, and the unary functors we consider in
+this paper are each represented by a term whose type is a category and
+whose one free variable ranges over a category.
 %
-The analogue of a relation is a \emph{profunctor} (defined below),
-which are written as a kind of set with free category variables. In
-keeping with our models, like the restriction to unary functors, we
-restrict to profunctors with two free variables.
+The analogue of a relation is a \emph{profunctor} (defined below), which
+are written as a kind of set with free category variables.  Like the
+restriction to unary functors, we restrict to profunctors with two free
+variables.
 %
 The logic is proof-relevant in that the implications of relations are
 generalized to natural transformations of profunctors, and we use a
@@ -395,38 +366,35 @@ $\lambda$-calculus notation to describe these ``proof terms''.
 %
 We can strenghten this analogy into a formal construction: any
 construction in \vett{} can be erased to a corresponding construction
-or proof in predicate logic, as sets, functions and relations define a
+or proof in predicate logic, as sets, functions and relations define a 
 (somewhat degenerate) virtual equipment.
-%
-Our syntax highlights this analogy in that some of our constructions
-are generalizations of set comprehension or power-sets and we use
-similar notation.
+%% %
+%% Our syntax highlights this analogy in that some of our constructions
+%% are generalizations of set comprehension or power-sets and we use
+%% similar notation.
 
-The restriction to unary type theory and binary relations is fairly
-strict: we cannot discuss important concepts such as functor
-categories or opposite categories. However, the restriction is natural
-in that it corresponds to a well-understood notion of model (virtual
-equipments).
+While the restricted syntax developed in this paper does not express
+important concepts such as functor categories or opposite categories,
+the restriction is natural in that it corresponds exactly to a
+well-understood notion of model, virtual equipments, which can express a
+great deal of fundamental results and constructions in category
+theory~\cite{elements-of-oo-category-theory,
+  enriched-indexed-categories}.
 %
-It is well known that a great deal of fundamental results and
-constructions in category theory, and they have been used for this
-purpose in the formal category theory literature
-\cite{elements-of-oo-category-theory, enriched-indexed-categories}.
-%
-However, we can work around these unary/binary restrictions to some
-extent by viewing the type theory as a domain-specific language
-embedded in a metalanguage.  For example, while we cannot talk about
-functor categories inside the ordered part of the type theory, we can
-state a theorem that quantifies over functors using the
-meta-language's universal quantifier.  To more easily formalize these
-metatheorems, we add a third layer to the type theory: an extensional
-dependent type theory in the style of Martin-L\"of type theory. Then
-all of our ordered predicate logic judgments will also be indexed by a
-context from this dependent type theory, and the type theory includes
-universe types for categories, functors, profunctors and natural
-transformations that allow us to formalize theorems the logic is too
-restrictive to encode, analogous to the use of 2-level type theory in
-homotopy type theory \cite{voevodsky12,altenkirchXX}.
+Moveover, we can work around these unary/binary restrictions to some
+extent by viewing the type theory as a domain-specific language embedded
+in a metalanguage.  For example, while we cannot talk about functor
+categories, we can state a theorem that quantifies over functors using
+the meta-language's ``external'' universal quantifier (which does not
+have automatic functoriality/naturality properties).  To support this,
+\vett includes a third layer, an extensional dependent type theory in
+the style of Martin-L\"of type theory. All of our ordered predicate
+logic judgments are also be indexed by a context from this dependent
+type theory, and the type theory includes universe types for categories,
+functors, profunctors and natural transformations.  This allow us to
+formalize theorems the logic is too restrictive to encode, analogous to
+2-level~\cite{voevodsky12,altenkirchXX} or indexed type
+theories~\cite{isaev,linearlf,vakar,krishnaswamibenton}.
 
 %% This is analogous to the notion of a
 %% \emph{2-level type theory}: we add a
@@ -442,10 +410,10 @@ While we emphasize the applications to enriched and internal category
 theory in this work, there is potential for more direct application to
 programming language semantics.
 %
-Ordinary predicate logic has been used to develop logics in which
-logical relations proofs can be developed such as Abadi-Plotkin logic
-for parametricity and LSLR and Iris for step-indexed logical relations
-proofs \cite{abadi-plotkin,lslr,iris}.
+Ordinary predicate logic is the foundation for logical presentations of
+logical relations, such as Abadi-Plotkin logic for parametricity and
+LSLR and Iris for step-indexed logical relations proofs
+\cite{abadi-plotkin,lslr,iris}.
 %
 We conjecture that \vett{} might similarly serve as the foundation for
 a logic of \emph{ordered} structures, which abound in applications:
@@ -459,95 +427,87 @@ explicit step-indexing, \vett{} may be used to release the user from
 the syntactic burden of proving downward-closure or transitivity
 side-conditions.
 %
-Additionally, \vett{} may serve as the basis of a future domain
-specific proof assistant for category theoretic proofs.
+Additionally, \vett{} may serve as the basis of a future domain specific
+proof assistant for category theoretic proofs.  To pilot-test this, we
+have formalized the syntax of \vett{} in Agda 2.6.2.2, using the rewrite
+mechanism to make \vett's substitution and $\beta$-reduction rules
+definitional
+equalities.\footnote{\url{https://github.com/maxsnew/virtual-equipments/blob/master/agda/STC.agda}}
+We have used this lightweight implementation to check a number of
+examples.  
 
 \paragraph{Basics of Profunctors.}
-
 While we assume the reader has some background knowledge of category
 theory, we briefly define profunctors, which are not included in many
-introductory texts.  Profunctors arise implicitly in formulations of
-universal properties such as representable functors and adjunctions.
-
-First, a category $\cat C$ has a collection of objects and morphisms
-with identity and composition, and a functor $F : \cat C \to \cat D$ is
-a function on objects and a function on morphisms that respects source
-and target and preserves identity and composition. It will be useful for
-intuition to think of a category as a generalization of a preordered
-set, which has a set of elements and a binary \emph{relation} on its
-objects satisfying reflexivity and transitivity. It is fruitful to think
-of a category as a \emph{proof-relevant preorder}, where morphisms are
-the proofs of ordering, and the reflexivity and transitivity
-constructions must additionally satisfy equations that make them act
-like identity and composition. Then a functor is a proof-relevant
-version of a monotone function.
-
-Given categories $\mathcal C$ and $\mathcal D$, a profunctor $R$ from
-$\mathcal C$ to $\mathcal D$, written $R : \cat C \pto \cat D$ is a
-functor $R : {\cat C}^{op} \times {\cat D} \to \Set$. We can think of
-each set $R(c,d)$ as a set of ``heteromorphisms'' from $c$ (an object of
-$\cat C$) to $d$ (an object of $\cat D$).  These ``heteromorphisms''
-differ from the usual ``homomorphisms'' in a single category $\cat C$
-because they relate two objects from two different categories.
-Functoriality then defines a notion of composition of heteromorphisms
-with homomorphisms in $\cat C$ and $\cat D$. Thinking of categories as
-proof-relevant preorders, a profunctor is a proof-relevant relation that
-is downward-closed in $\cat C$ and upward-closed in $\cat D$, a kind of
-``hetero-ordering''.
-%
+introductory texts.  Recall that a category $\cat C$ has a collection of
+objects and morphisms with identity and composition, and a functor $F :
+\cat C \to \cat D$ is a function on objects and a function on morphisms
+that preserves identity and composition.  A category can be thought of
+as a generalization of a preordered set, which has a set of elements and
+a binary \emph{relation} on its objects satisfying reflexivity and
+transitivity.  A category is then a \emph{proof-relevant preorder},
+where morphisms are the proofs of ordering, and the reflexivity and
+transitivity proofs must identity and unit equations. A functor is then
+a \emph{proof-relevant monotone function}.  Given categories $\mathcal
+C$ and $\mathcal D$, a profunctor $R$ from $\mathcal C$ to $\mathcal D$,
+written $R : \cat C \pto \cat D$ is a functor $R : {\cat C}^{op} \times
+{\cat D} \to \Set$.  Because a profunctor outputs a $\Set$ rather than a
+proposition, it is itself a \emph{proof-relevant relation}.  Thinking of
+categories as proof-relevant preorders, functoriality says that the
+profunctor is downward-closed in $\cat C$ and upward-closed in $\cat D$.
 Given profunctors $R, S : \cat C \pto \cat D$, a homomorphism from
 $R$ to $S$ is simply a natural transformation, which in the preordered
 setting is simply an implication of relations.
 
-In addition to their usefulness for formalizing category theory, one
-reason we take profunctors to be a basic concept of \vett{} is that they
+%% We can think of each set $R(c,d)$ as a set of
+%% ``heteromorphisms'' from $c$ (an object of $\cat C$) to $d$ (an object
+%% of $\cat D$).  These ``heteromorphisms'' differ from the usual
+%% ``homomorphisms'' in a single category $\cat C$ because they relate two
+%% objects from two different categories.  Functoriality then defines a
+%% notion of composition of heteromorphisms with homomorphisms in $\cat C$
+%% and $\cat D$.
+
+Profunctors are very useful for formalizing category theory, but an
+additional reason we make them a basic concept of \vett{} is that they
 allow us to give a \emph{universal property} for the type of ``morphisms
-in a category ${\cat C}$''.  This is analogous to how the $J$ elimination
-rule for the identity type in Martin-L\"of type theory gives a universal
-property for morphisms in a groupoid (the special case of a category
-where all morphisms are
-invertible)~\cite{hofmannstreicher,awodey,voevodsky}. The reason
+in a category ${\cat C}$''.  This is analogous to how the $J$
+elimination rule for the identity type in Martin-L\"of type theory gives
+a universal property for morphisms in a groupoid (the special case of a
+category where all morphisms are
+invertible)~\cite{hofmannstreicher,awodeywarren,voevodsky}. The reason
 profunctors are useful for this purpose is that, for any category $\cat
 C$, $\text{Hom}_{\cat C} : \cat C \pto \cat C$ is a profunctor. On
 preorders this is just the preorder's ordering relation
 itself. Moreover, the hom profunctor is the unit for a composition of
-profunctors $R \odot S$ which is defined as a \emph{co-end}. The
-heteromorphisms of $(R \odot S)(c,e)$ are triples $(d \in \cat D, f \in
-R(c,d), g \in S(d,e))$ modulo the equivalence relation generated by
-$(d,f,g) ~ (d', f', g')$ if there exists $h \in D(d,d')$ such that
-$h\circ f = f'$ and $g'\circ h = g$. The composition of profunctors is a
-generalization of the composition of relations, and just as the equality
-relation is the identity for the composition of relations, the hom
-profunctor is the identity for this composition.  The unit law for the
-hom profunctor can be seen as a ``morphism induction'' principle,
-analogous to the ``path induction'' used in homotopy type theory (though
-in this paper we consider only ordinary 1-dimensional categories, not
-higher generalizations).
+profunctors $R \odot S$ which is defined as a \emph{co-end}.
+%% The
+%% heteromorphisms of $(R \odot S)(c,e)$ are triples $(d \in \cat D, f \in
+%% R(c,d), g \in S(d,e))$ modulo the equivalence relation generated by
+%% $(d,f,g) ~ (d', f', g')$ if there exists $h \in D(d,d')$ such that
+%% $h\circ f = f'$ and $g'\circ h = g$.
+The composition of profunctors is a generalization of the composition of
+relations, and just as the equality relation is the identity for the
+composition of relations, the hom profunctor is the identity for this
+composition.  The unit law for the hom profunctor can be seen as a
+``morphism induction'' principle, analogous to the ``path induction''
+used in homotopy type theory (though in this paper we consider only
+ordinary 1-dimensional categories, not higher generalizations).
 
 %% orphaned --- move later? 
 %% For any profunctor $R : \cat C \pto \cat D$ and functors $F : \cat C'
 %% \to \cat C$ and $G : \cat D' \to \cat D$, by composition we can define a
 %% profunctor $R(F,G)$, the ``restriction'' of $R$ along $F$ and $G$.
-
-\paragraph{Paper Overview.}
-
-\begin{enumerate}
-\item In \cref{sec:syntax} we introduce the syntax of \vett{}.
-
-\item In \cref{sec:examples} we demonstrate how to use our syntax for
-  formal category theory.
-
-\item In \cref{sec:semantics}, we develop some model theory for
-  \vett{}, including a sound and complete notion of categorical model
-  and sound interpretation in virtual equipments modeling ordinary,
-  enriched and internal category theory.
-
-\item In \cref{sec:discussion}, we discuss related type theories and
-  potential extensions to model multi-variable and higher-order
-  categorical constructions.
-\end{enumerate}
+The remainder of this paper is organized as follows.  
+In \cref{sec:syntax} we introduce the syntax of \vett{}.  In
+\cref{sec:examples} we demonstrate how to use our syntax for formal
+category theory.  In \cref{sec:semantics}, we develop some model theory
+for \vett{}, including a sound and complete notion of categorical model
+and sound interpretation in virtual equipments modeling ordinary,
+enriched and internal category theory.  In \cref{sec:discussion}, we
+discuss related type theories and potential extensions.
 
 \section{Syntax of VETT}
+\label{sec:syntax}
 
 In Figure~\ref{fig:hol-cats} we give a table summarizing the
 relationship between the judgments and connectives of higher-order
@@ -1058,15 +1018,19 @@ principle: we can use a term of $s : \punitinXfromYtoZ {\cat C} A B$ by
 specifying the behavior when $s$ is of the form $\punitrefl \alpha$ in
 the form of a continuation $\alpha. t$.  Like the $J$ elimination rule
 for equality in Martin-L\"of type theory, $P$ must be ``fully general'',
-i.e. well-typed for variables $\alpha$ and $\beta$.  Those familiar with
-linear logic~\cite{polakawpfenning} might expect a more general rule,
-with the continuation $t$ typed in a context $\Phi_l \jnctx \Phi_r$ and
-$\Phi_l \jnctx \Phi \jnctx \Phi_r$ as the context of the conclusion of
-the rule.  Because of dependency, this is not necessarily well-formed in
-cases where the endpoints $A$ and $B$ of $\punitinXfromYtoZ{\cat C} A B$
-are not fully general (i.e. not distinct variables).  However, the
-instances of this more general rule that do type check are derivable
-from our more restricted rule using right/left-hom types.
+i.e. well-typed for variables $\alpha$ and $\beta$; this is because for
+distinct variables $\alpha$ and $\beta$, $\punitinXfromYtoZ{\cat
+  C}{\alpha}{\beta}$ denotes the unit, which has a universal property,
+but $\punitinXfromYtoZ{\cat C} A B$ denotes a restriction of a unit,
+which in general does not.  Those familiar with linear
+logic~\cite{polakawpfenning} might expect a more general rule, with the
+continuation $t$ typed in a context $\Phi_l \jnctx \Phi_r$ and $\Phi_l
+\jnctx \Phi \jnctx \Phi_r$ as the context of the conclusion of the rule.
+Because of dependency, this is not necessarily well-formed in cases
+where the endpoints $A$ and $B$ of $\punitinXfromYtoZ{\cat C} A B$ are
+not fully general (i.e. not distinct variables).  However, the instances
+of this more general rule that do type check are derivable from our more
+restricted rule using right/left-hom types.
 
 The tensor product of sets is a kind of combined existential quantifier
 and monoidal product, which we combine into a single notation
@@ -1186,7 +1150,7 @@ variables in both cases.
   \quad
   \inferrule
   {
-   \Gamma\pipe \Phi_m \jnctx x:P, \beta:\cat D, y:Q \jnctx \Phi_r \vdash t : R\\\\
+   \Gamma\pipe \Phi_l \jnctx x:P, \beta:\cat D, y:Q \jnctx \Phi_r \vdash t : R\\\\
    \Gamma \pipe\Phi_m \vdash s : \tensorexistsXwithYandZ {\beta} P Q}
   {\Gamma\pipe\Phi_l\jnctx \Phi_m \jnctx \Phi_r \vdash \tensorelimWkontZ s {x.\beta.y. t} : R}
   \\
@@ -1391,6 +1355,7 @@ exactly one free variable.
 \end{figure}
 
 \section{Formal Category Theory in VETT}
+\label{sec:examples}
 
 To demonstrate what formal category theory in VETT looks like, we
 demonstrate some basic definitions and theorems.  While it is well known
@@ -1653,6 +1618,7 @@ be applied to incorporate these as computationally meaningful
 principles rather than assumed as axioms \cite{obs-tt,xtt,cubical-type-theory}.
 
 \section{Semantics}
+\label{sec:semantics}
 
 Next, we develop the basics of the model theory for \ohol{}.
 %
@@ -1956,11 +1922,6 @@ previous works can express some constructions on $\Cat$ that are not
 expressible in \vett{}, because \vett{} is more restricted, it has more
 models, e.g. in internal and enriched categories, so the theorems that
 are provable in \vett{} apply in more settings.    
-
-Our use of dependent type theory as a metalanguage, with new judgements
-for the virtual equipment structure dependent on the meta-language
-context, is similar to the indexed type theories developed by
-\citet{isaev}.
 
 %% Directed dependent type theories
 %% should generalize \ohol{} in the same way that dependent type theory
