@@ -33,9 +33,9 @@ search for "appendix"
   4. [X] equational theory
   5. [X] admissibility of general identity elimination (syntax or semantics? really part of completeness)
   6. [X] composition of substitutions?
-- [ ] Examples
-  1. [ ] Compositions/naturality
-  2. [ ] Fubini
+- [-] Examples
+  1. [X] Compositions/naturality
+  2. [X] Fubini
   3. [ ] Adjoints
   4. [ ] Weighted limits?
 - [X] Semantics

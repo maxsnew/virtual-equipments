@@ -178,7 +178,7 @@
 \newcommand{\citet}[1]{\cite{#1}}
 \newcommand{\citep}[1]{(\cite{#1})}
 
-\title{A Constructive Ordered Predicate Logic \\ for Category Theory}
+\title{A Formal Logic for Formal Category Theory}
 \author{Max S. New\inst{1,2} and Daniel R. Licata\inst{2}}
 \institute{University of Michigan \and Wesleyan University}
 
@@ -1463,10 +1463,10 @@ theorems relating tensor and hom types in ordered logic, and whose proofs are
   are well typed.
   \begin{enumerate}
   \item $\tensorexistsXwithYandZ {\beta} {\harrapp P \alpha \beta} {(\tensorexistsXwithYandZ \gamma {\harrapp Q \beta \gamma} {\harrapp R \gamma \delta})} \cong \tensorexistsXwithYandZ {\gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta} {\harrapp Q \beta \gamma})} {\harrapp R \gamma \delta}$
-  \item $\homrallXYtoZ {\gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta} {\harrapp Q \beta \gamma})} {\harrapp S \alpha \gamma} \cong \homrallXYtoZ \beta {\harrapp P \alpha \beta} {\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {\harrapp S \alpha \gamma}}$
-  \item $\homlallXYtoZ {\alpha} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta} {\harrapp Q \beta \gamma})} {\harrapp S \alpha \gamma} \cong \homlallXYtoZ \beta {\harrapp Q \beta \gamma} {\homlallXYtoZ \alpha {\harrapp P \alpha \beta} {\harrapp S \alpha \gamma}}$
-  \item $\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {(\homlallXYtoZ \alpha {\harrapp P \alpha \beta} {\harrapp S \alpha \gamma})} \cong \homlallXYtoZ \alpha {\harrapp P \alpha \beta} {(\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {\harrapp S \alpha \gamma})}$
-  \item $\pendallXdotY \alpha \homrallXYtoZ \beta P {P'} \cong \pendallXdotY \beta \homlallXYtoZ \alpha P {P'}$
+  \item $\homrallXYtoZ {\gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \delta \beta} {\harrapp Q \beta \gamma})} {\harrapp S \alpha \gamma} \cong \homrallXYtoZ \beta {\harrapp P \delta \beta} {\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {\harrapp S \alpha \gamma}}$
+  \item $\homlallXYtoZ {\gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \gamma \beta} {\harrapp Q \beta \alpha})} {\harrapp S \gamma \delta} \cong \homlallXYtoZ \beta {\harrapp Q \beta \alpha} {\homlallXYtoZ \gamma {\harrapp P \gamma \beta} {\harrapp S \gamma \delta}}$
+  \item $\homrallXYtoZ \gamma {\harrapp Q \delta \gamma} {(\homlallXYtoZ \beta {\harrapp P \beta \alpha} {\harrapp S \beta \gamma})} \cong \homlallXYtoZ \beta {\harrapp P \beta \alpha} {(\homrallXYtoZ \gamma {\harrapp Q \delta \gamma} {\harrapp S \beta \gamma})}$
+  \item $\pendallXdotY \alpha \homrallXYtoZ \beta {\harrapp P \alpha \beta} {\harrapp Q \alpha \beta} \cong \pendallXdotY \beta \homlallXYtoZ \alpha {\harrapp P \alpha \beta} {\harrapp Q \alpha \beta}$
   \end{enumerate}  
 \end{lemma}
 \begin{proof}
@@ -2655,7 +2655,7 @@ formal category theory constructions and theorems from
 Section~\ref{sec:examples}.
 
 \begin{definition}[Synthetic Composition/Functoriality]
-  We provide the definitions of the terms in \cref{construction:synthetic-composition}
+  We provide the definitions of the terms in Construction~\ref{construction:synthetic-composition}
   \begin{enumerate}
   \item Identity $\id = \pendlambdaXdotY \alpha \punitrefl \alpha$
   \item Composition $\textrm{comp} = \lambdaunary {\alpha_1} f {\alpha_2} \punitelimkontZatABC {\alpha. \homrallXYtoZ {\alpha_3} g g} {\alpha_1} f {\alpha_2}$
@@ -2717,6 +2717,60 @@ Section~\ref{sec:examples}.
       &= \lambdaunary {\alpha} {\phi} \pi \phi \tag{covhom $\eta$} \\ 
     \end{align*}
   \end{itemize}
+\end{proof}
+
+\begin{lemma}[Fubini]
+  We show two of the Fubini cases in detail:
+
+  \begin{enumerate}
+  \item $\homlallXYtoZ {\gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \gamma \beta} {\harrapp Q \beta \alpha})} {\harrapp S \gamma \delta} \cong \homlallXYtoZ \beta {\harrapp Q \beta \alpha} {\homlallXYtoZ \gamma {\harrapp P \gamma \beta} {\harrapp S \gamma \delta}}$
+  \item $\pendallXdotY \alpha \homrallXYtoZ \beta {\harrapp P \alpha \beta} {\harrapp Q \alpha \beta} \cong \pendallXdotY \beta \homlallXYtoZ \alpha {\harrapp P \alpha \beta} {\harrapp Q \alpha \beta}$
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  \begin{enumerate}
+  \item This is a form of Currying isomorphism, as the $\lambda$ term
+    makes clear:
+    \begin{itemize}
+    \item Left to Right
+      \[ \lambdaunary \alpha h \delta \homllambdaXatYdotZ q \beta \homllambdaXatYdotZ p \gamma \homlappXtoYatZ h {(p,\beta,q)} \gamma  \]
+    \item Right to Left
+      \[ \lambdaunary {\alpha} k \delta \homllambdaXatYdotZ w \gamma \tensorelimWkontZ {w} {p.\beta.q. \homlappXtoYatZ {\homlappXtoYatZ k p \gamma} q \beta } \]
+    \item Left to Right to Left
+      \begin{align*}
+        &\lambdaunary \alpha h \delta \homllambdaXatYdotZ w \gamma {\tensorelimWkontZ {w} {p.\beta.q. (\homlappXtoYatZ {\homlappXtoYatZ {(\homllambdaXatYdotZ q \beta \homllambdaXatYdotZ p \gamma {\homlappXtoYatZ h {(p,\beta,q)} \gamma})} q \beta }  p \gamma) }}\\
+        &=\lambdaunary \alpha h \delta \homllambdaXatYdotZ w \gamma {\tensorelimWkontZ {w} {p.\beta.q. (\homlappXtoYatZ {{(\homllambdaXatYdotZ p \gamma {\homlappXtoYatZ h {(p,\beta,q)} \gamma})} }  p \gamma) }}\tag{contrahom$\beta$}\\
+        &=\lambdaunary \alpha h \delta \homllambdaXatYdotZ w \gamma {\tensorelimWkontZ {w} {p.\beta.q. {{({\homlappXtoYatZ h {(p,\beta,q)} \gamma})} } }}\tag{contrahom$\beta$}\\
+        &=\lambdaunary \alpha h \delta \homllambdaXatYdotZ w \gamma \homlappXtoYatZ h w \gamma\tag{tensor$\eta$}\\
+        &=\lambdaunary \alpha h h\tag{contrahom$\eta$}
+      \end{align*}
+    \item Right to Left to Right
+      \begin{align*}
+        &\lambdaunary \alpha k \delta \homllambdaXatYdotZ q \beta \homllambdaXatYdotZ p \gamma \homlappXtoYatZ {(\homllambdaXatYdotZ w \gamma {\tensorelimWkontZ {w} {p.\beta.q. \homlappXtoYatZ {\homlappXtoYatZ k q \beta}  p \gamma }})} {(p,\beta,q)} \gamma\\
+        &=\lambdaunary \alpha k \delta \homllambdaXatYdotZ q \beta \homllambdaXatYdotZ p \gamma { {\tensorelimWkontZ { {(p,\beta,q)}} {p.\beta.q. \homlappXtoYatZ {\homlappXtoYatZ k q \beta } p \gamma }}}\\
+        &=\lambdaunary \alpha k \delta \homllambdaXatYdotZ q \beta \homllambdaXatYdotZ p \gamma {\homlappXtoYatZ {\homlappXtoYatZ k q \beta } p \gamma}\\
+        &=\lambdaunary \alpha k \delta \homllambdaXatYdotZ q \beta { {\homlappXtoYatZ k q \beta}}\\
+        &=\lambdaunary \alpha k \delta k\\
+      \end{align*}
+    \end{itemize}
+  \item This isomorphism relates left and right homs. Unlike the
+    previous cases, the isomorphism is of types, not sets/profunctors.
+    \begin{itemize}
+    \item Left to right
+      \[\lambda X. \pendlambdaXdotY \beta \homllambdaXatYdotZ p \alpha {\appunary X \alpha p \beta}\]
+    \item Right to left
+      \[ \lambda Y. \pendlambdaXdotY \alpha \homrlambdaXatYdotZ p \beta {\homlappXtoYatZ {\pendappXtoY Y \beta} p \alpha} \]
+    \item Left to right to left
+      \begin{align*}
+        &\lambda X. \pendlambdaXdotY \alpha \homrlambdaXatYdotZ p \beta {\homlappXtoYatZ {\pendappXtoY {(\pendlambdaXdotY \beta \homllambdaXatYdotZ p \alpha {\appunary X \alpha p \beta})} \beta} p \alpha}\\
+        &= \lambda X. \pendlambdaXdotY \alpha \homrlambdaXatYdotZ p \beta {\homlappXtoYatZ { {(\homllambdaXatYdotZ p \alpha {\appunary X \alpha p \beta})}} p \alpha}\tag{nat.elt.$\beta$}\\
+        &= \lambda X. \pendlambdaXdotY \alpha \homrlambdaXatYdotZ p \beta {\appunary X \alpha p \beta}\tag{contrahom$\beta$}\\
+        &= \lambda X. \pendlambdaXdotY \alpha {\pendappXtoY X \alpha}\tag{contrahom$\eta$}\\
+        &= \lambda X. X\tag{nat.elt.$\eta$}\\
+      \end{align*}
+    \item The other case is similar.
+    \end{itemize}
+  \end{enumerate}
 \end{proof}
 
 \section{Semantics}
@@ -2854,376 +2908,5 @@ equipments.
   and unital
   \[ \id_{\Phi}[\phi] = \phi = \phi[\id_{\Psi}] \]
 \end{definition}
-
-\section{Extended Synthetic Category Theory}
-
-Next, we look at synthetic category theory constructions in SCT.
-
-\subsection{Profunctor Isomorphisms}
-
-We start our study of synthetic category theory constructions with
-some isomorphisms that show the interaction between the 5
-multiplicative connectives: right/left hom, end, unit and tensor.
-
-First, we fix some terminology
-\begin{lemma}
-  Let $P, Q : \harr {\cat C} {\cat D}$.
-  A homomorphism from $P$ to $Q$ is a term of type
-  \[ \homunary {\alpha} {\harrapp P \alpha \beta} {\beta} {\harrapp Q \alpha \beta} \]
-  Given homomorphisms $M : P \multimap Q$, $N : Q \multimap R$ we can define their composite as
-  \[ (N \circ M) = \lambdaunary {\alpha} {x:\harrapp P \alpha \beta} \beta {\appunary \alpha N \beta {\appunary \alpha M \beta x}} \]
-  This notion of composition is associative and unital using the
-  $\beta\eta$ equations for the end/right hom connectives, with unit
-  $\lambdaunary {\alpha} x \beta x$.
-
-  An isomorphism between $P, Q : \harr {\cat C}{\cat D}$ is then a
-  homomorphism $P \multimap Q$ with an inverse $Q \multimap P$.
-\end{lemma}
-
-Our first synthetic theorem is that we have that the unit, i.e., the
-hom set, is the unit for tensor and hom.
-%
-The theorem for hom is the synthetic \emph{Yoneda lemma} and the
-theorem for tensor is the synthetic \emph{Co-Yoneda lemma}.
-\begin{lemma}[{Yoneda and Co-Yoneda}]
-  \label{lem:yo-and-co-yo}
-  Let $P : \harr {\cat C} {\cat D}$.
-
-  For any $\gamma : \cat E \vdash b : \cat D$, the following are naturally isomorphic to $\harrapp P \alpha b$:
-  \begin{enumerate}
-  \item $\homrallXYtoZ {\beta} {(\punitinXfromYtoZ {D} {\beta} {b})} {\harrapp P {\alpha} {\beta}}$
-  \item $\tensorexistsXwithYandZ {\beta} {\harrapp P \alpha {\beta}} {(\punitinXfromYtoZ {\cat D} {\beta} {b})}$
-  \end{enumerate}
-
-  For any $\gamma : \cat E \vdash a : \cat C$, the following are naturally isomorphic to $\harrapp P a \beta$:
-  \begin{enumerate}
-  \item $\homlallXYtoZ {{\alpha}} {(\punitinXfromYtoZ {C} {\alpha} {a})} {\harrapp P {{\alpha}} {\beta}}$
-  \item $\tensorexistsXwithYandZ {\alpha} {(\punitinXfromYtoZ {C} {a} {\alpha})} {\harrapp P {\alpha}{\beta}}$
-  \end{enumerate}
-\end{lemma}
-\begin{proof}
-  TODO: what's better, build the substitution in or prove the
-  substitution can be built in afterwards? The one building in the
-  substitution obscures the connection to the normal tensor/hom/unit
-  relationship, but the one with the built in subst is obviously more
-  general.
-\end{proof}
-
-Next, we have various associativities between the homs, tensor and end
-constructions. Semantically, these are related to so-called
-\emph{Fubini} theorems about interchange of (co)-ends.
-\begin{lemma}[{Fubini}]
-  \label{lem:fubini}
-  The following isomorphisms hold for any $P : \harr {\cat C}{\cat D},
-  P' : \harr {\cat C}{\cat D} Q :\harr {\cat D}{\cat E}, R : \harr
-  {\cat E} {\cat F}, S : \harr {\cat C} {\cat E}$. where $\alpha:\cat
-  C, \beta:\cat D, \gamma : \cat E, \delta: \cat F$
-  \begin{enumerate}
-  \item $\tensorexistsXwithYandZ {\beta} {\harrapp P \alpha \beta} {(\tensorexistsXwithYandZ \gamma {\harrapp Q \beta \gamma} {\harrapp R \gamma \delta})} \cong \tensorexistsXwithYandZ {\gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta} {\harrapp Q \beta \gamma})} {\harrapp R \gamma \delta}$
-  \item $\homrallXYtoZ {\gamma} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta} {\harrapp Q \beta \gamma})} {\harrapp S \alpha \gamma} \cong \homrallXYtoZ \beta {\harrapp P \alpha \beta} {\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {\harrapp S \alpha \gamma}}$
-  \item $\homlallXYtoZ {\alpha} {(\tensorexistsXwithYandZ \beta {\harrapp P \alpha \beta} {\harrapp Q \beta \gamma})} {\harrapp S \alpha \gamma} \cong \homlallXYtoZ \beta {\harrapp Q \beta \gamma} {\homlallXYtoZ \alpha {\harrapp P \alpha \beta} {\harrapp S \alpha \gamma}}$
-  \item $\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {(\homlallXYtoZ \alpha {\harrapp P \alpha \beta} {\harrapp S \alpha \gamma})} \cong \homlallXYtoZ \alpha {\harrapp P \alpha \beta} {(\homrallXYtoZ \gamma {\harrapp Q \beta \gamma} {\harrapp S \alpha \gamma})}$
-  \item $\pendallXdotY \alpha \homrallXYtoZ \beta P {P'} \cong \pendallXdotY \beta \homlallXYtoZ \alpha P {P'}$
-  \end{enumerate}  
-\end{lemma}
-\begin{proof}
-  TODO
-\end{proof}
-\subsection{Composition, Functoriality, Profunctoriality, Naturality}
-
-Hom sets don't provide primitive syntax for composition of morphisms
-in a category. As our first synthetic construction, we can
-\emph{define} composition using the elimination form for the unit.
-%
-\begin{definition}[Composition of Morphisms]
-  We define composition of morphisms as the following term of type $\Pi_{\cat C:\Cat}\hombinary {\alpha_1} {\punitinXfromYtoZ {\cat C}{\alpha_1} {\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {\cat C}{\alpha_2} {\alpha_3}} {\alpha_3} {\punitinXfromYtoZ {\cat C}{\alpha_1} {\alpha_3}}$:
-  \[
-  \lambda \cat C. \punitelimtoYwithkontZ {\hlambda {\alpha_1}{\alpha_2} \homrallXYtoZ {\alpha_3} {\punitinXfromYtoZ {\cat C} {\alpha_2} {\alpha_3}} {\punitinXfromYtoZ {\cat C} {\alpha_1} {\alpha_3}}} {\lambdaunary {\alpha} {f : \punitinXfromYtoZ {\cat C}{\alpha} {\alpha_3}} {\alpha_3} f}
-  \]
-  We call this term $\textrm{comp}$
-\end{definition}
-This has the same flavor as a directed type theory: to construct the
-composite it is sufficient to define the action on the identity
-morphism, which is of course the identity for composition.
-%
-Note that we gave a slight bias to the definition to follow by
-induction on the \emph{first} function, whereas we could make the
-following alternative definition, naturally of type
-$\pendallXdotY {\alpha_2} \homrallXYtoZ {\alpha_3} {\punitinXfromYtoZ {\cat C}{\alpha_2} {\alpha_3}}
-{(\homlallXYtoZ {{\alpha_1}} {\punitinXfromYtoZ {\cat C}{\alpha_1} {\alpha_2}}{\punitinXfromYtoZ {\cat C}{\alpha_1} {\alpha_3}})}$:
-\[
-  \punitelimtoYwithkontZ {\hlambda {\alpha_2}{\alpha_3} \homlallXYtoZ {{\alpha_1}} {\punitinXfromYtoZ {\cat C}{\alpha_1} {\alpha_2}}{\punitinXfromYtoZ {\cat C}{\alpha_1} {\alpha_3}} } {\lambdaunary {\alpha} {g : \punitinXfromYtoZ {\cat C}{\alpha_1}{\alpha}} {\alpha} g}
-\]
-
-\begin{lemma}[Equivalence of Composition Definitions]
-  TODO
-\end{lemma}
-
-It should follow by $\beta\eta$ that this is associative and unital.
-
-Next, let's prove synthetically that every functor $F : \varr{\cat
-  C}{\cat D}$ is functorial in this notion of composition.
-\begin{definition}
-  For any $F : \varr {\cat C} {\cat D}$, we can define a morphism $F_1
-  : \homunary {\alpha_1} {\punitinXfromYtoZ {\cat C} {\alpha_1}
-    {\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {\cat D} {F \alpha_1}
-    {F \alpha_2}}$ as
-  \[ F_1 = \punitelimtoYwithkontZ {\hlambda {\alpha_1}{\alpha_2} \punitinXfromYtoZ {\cat D} {F \alpha_1}{F \alpha_2}}
-  {\pendlambdaXdotY \alpha \punitrefl {\cat D} {F \alpha}}
-  \]
-  Note that
-  \[ A[\id_\alpha/\alpha] = \id_{A} \]
-  \[ A[f;g] = A[f];A[g] \]
-\end{definition}
-Note the similarity to the proof that all functions are congruences in
-MLTT/HoTT.
-
-And similarly, every profunctor $R : \harr {\cat C}{\cat D}$ is
-\emph{pro-functorial}.
-\begin{definition}
-  For any $R : \varr {\cat C} {\cat D}$, we can define left and right
-  actions of composition:
-  \[ \homunary {\alpha_1} {\tensorexistsXwithYandZ {\alpha_2} {(\punitinXfromYtoZ {\cat C} {\alpha_1}{\alpha_2})} {\tensorexistsXwithYandZ {\alpha_3} {(\harrapp R {\alpha_2} {\alpha_3})}}{(\punitinXfromYtoZ {\cat C} {\alpha_3}{\alpha_4})}} {\alpha_4} {\harrapp R {\alpha_1}{\alpha_4}}
-  \]
-  Furthermore we can show that they are functorial in that the induced functions
-  TODO
-  are equal
-\end{definition}
-
-Next we can define natural transformations as specific kinds of terms
-whose type is $\pendallXdotY {\alpha} \punitinXfromYtoZ {\cat D} {F
-  \alpha}{G \alpha}$. In fact we can generalize this to any
-endo-profunctor $P$:
-\begin{definition}[Natural element]
-  A natural element of an endo-profunctor $P : \harr {\cat C}{\cat C}$
-  is a term of type $\pendallXdotY {\alpha} \harrapp P \alpha \alpha$.
-
-  A natural transformation is the special case where $P =
-  \punitinXfromYtoZ {\cat D} {F \alpha}{G \alpha}$ for functors $F, G
-  : \varr {\cat C}{\cat D}$.
-
-  This is natural in the sense that the incuded terms
-  \[ \homunary {\alpha_1}{\punitinXfromYtoZ {} {\alpha_1}{\alpha_2}} {\alpha_2} {\harrapp P {\alpha_1}{\alpha_2}}  \]
-  and
-  \[ \pendallXdotY {\alpha_2} \homlallXYtoZ {\alpha_1} {\punitinXfromYtoZ {} {\alpha_1}{\alpha_2}} {\harrapp P {\alpha_1}{\alpha_2}}\]
-
-  are equal under the associativity equivalence between these two
-  types.
-\end{definition}
-
-\subsection{Yoneda Lemma and Representable Presheaves}
-
-Given any category $\cat C$, we can define the positive and negative
-Yoneda embeddings $Y^\pm : \cat C \to \pmPresheaf {\cat C}$ using the
-hom profunctor. Note that both of these functors are covariant in
-$\cat C$, so semantically, $\posPresheaf {\cat C}$ should be
-interpreted as $(\Set^{\cat C})^o$.
-
-\begin{definition}
-  Define the negative Yoneda embedding $Y^-[\alpha]$
-  \[ \alpha:\cat C \vdash Y^-[\alpha] = \lambda \alpha':\cat C. \punitinXfromYtoZ {\cat C}{\alpha'}{\alpha} : \negPresheaf {\cat C} \]
-
-  The positive Yoneda embedding is defined similarly $Y^+[\alpha]$.
-\end{definition}
-
-The Yoneda lemma says that the set of natural transformations from
-$Y^-[\alpha]$ to a presheaf $p$ is naturally isomorphic to the
-elements of the presheaf itself: $\negPresheafApp \alpha p$. In
-encoding this statement in our type theory, we find that we can use
-two different interpretations of ``natural transformations''.
-
-On the one hand, a natural transformation should be a morphism in the
-presheaf category. This interpretation of the Yoneda lemma would mean
-that we have a natural isomorphism of profunctors:
-\[ \alpha:\cat C; \pi:\negPresheaf {\cat C} \vdash \punitinXfromYtoZ{\negPresheaf {\cat C}} {Y^-[\alpha]} {\pi} \cong \negPresheafApp \alpha \pi \]
-Attempting to prove this we become stuck very quickly because we know
-nothing about the structure of morphisms in the presheaf category.
-
-On the other hand, a natural transformation of presheaves $\pi$ and
-$\rho$ can be defined as a family of functions from $\negPresheafApp
-\alpha \pi$ to $\negPresheafApp \alpha \rho$, or in other words as an
-\emph{end}. Specializing to the Yoneda lemma, we interpret ``a natural
-transformation from $Y^-[\alpha]$ to $\pi$'' as the following, which simplifies using $\beta$ reduction:
-\[ \alpha:\cat C; \pi:\negPresheaf {\cat C} \vdash \homrallXYtoZ {\alpha':\cat C} {\negPresheafApp {\alpha'} {Y^-[\alpha]}}{\negPresheafApp {\alpha'} \pi} = \homrallXYtoZ {\alpha':\cat C} {(\punitinXfromYtoZ {\cat C}{\alpha'}{\alpha})}{(\negPresheafApp {\alpha'} \pi)} \]
-And then the Yoneda lemma becomes:
-\[ \alpha:\cat C; \pi:\negPresheaf {\cat C} \vdash \homrallXYtoZ {\alpha':\cat C} {(\punitinXfromYtoZ {\cat C}{\alpha'}{\alpha})}{(\negPresheafApp {\alpha'} \pi)} \cong \negPresheafApp \alpha \pi\]
-Which is an instance of our earlier Lemma\,\ref{lem:yo-and-co-yo}
-which follows quite easily.
-
-Then we are left with the question of whether these two forms of the
-Yoneda lemma are equivalent, or slightly more generally are these two definitions of natural transformation of presheaves equivalent:
-\[ \rho:\negPresheaf{\cat C}; \pi:\negPresheaf {\cat C} \vdash \punitinXfromYtoZ{\negPresheaf {\cat C}} {\rho} {\pi} \]
-and
-\[ \rho:\negPresheaf{\cat C}; \pi:\negPresheaf {\cat C} \vdash \homrallXYtoZ {\alpha:\cat C} {\negPresheafApp \alpha \rho}{\negPresheafApp \alpha \pi} \]
-While we can show that there is a morphism from the hom set to the
-end, the inverse does not seem provable, and seems analogous to the
-\emph{univalence} axiom in homotopy type theory, as it tells us that
-the morphisms of the universe are given by a particular kind of
-function in our logic.
-
-\subsection{Adjoint Functors and Representable Profunctors}
-
-Next, we demonstrate that the two common definitions of adjoint
-functors are equivalent: isomorphism of hom-sets and units and
-co-units.
-%
-The proof goes through most easily, and utilizes duality most
-effectively, if we factorize the construction through an intermediate
-notion of when a functor \emph{represents} a profunctor.
-
-\begin{definition}[Functor Represents a Profunctor]
-  A functor $G : \varr{\cat D}{\cat C}$ right-represents a profunctor $R :
-  \harr {\cat C}{\cat D}$ when there is an isomorphism of profunctors:
-  \[ \punitinXfromYtoZ {\cat C} {\alpha} {G \beta} \cong \harrapp R {\alpha}{\beta}\]
-
-  We say a functor $F : \varr{\cat C}{\cat D}$ \emph{left-represents} a profunctor $R : \harr {\cat C}{\cat D}$ when there is an isomorphism of profunctors
-  \[ \punitinXfromYtoZ {\cat D} {F \alpha} {\beta} \cong \harrapp R {\alpha}{\beta}\]
-\end{definition}
-
-This is a parameterized generalization of the notion of an object
-representing a functor $R : C^{op} \to Set$.
-These notions are precisely dual. $F$ left-represents a profunctor $R$
-precisely if it right-represents it in the opposite SCT.
-
-Note that trivially any functor $G$ right-represents
-$\hlambda\alpha\beta \punitinXfromYtoZ {\cat D}{\alpha} {G \beta}$ and
-dually, any functor $F$ left-represents
-$\hlambda\alpha\beta\punitinXfromYtoZ {\cat C}{F\alpha}{\beta}$.
-
-Then we can show that any right-representation isomorphism is
-determined by a co-unit:
-\begin{lemma}[(Co)-unit of a Representation]
-  If $G: \varr {\cat D}{\cat C}$ right-represents $R : \harr {\cat
-    C}{\cat D}$, then there is a natural element, the co-unit:
-  \[ \pendallXdotY \beta \harrapp R {G\beta} \beta \]
-  Such that the half of the isomorphism 
-  \[ \punitinXfromYtoZ {\cat C} {\alpha} {G \beta} \multimap \harrapp R {\alpha}{\beta} \]
-  is defined by composition with the natural element.
-
-  Dually, any $F$ left-representing isomorphism with $R$ is determined
-  by a ``unit'' of type $\pendallXdotY \alpha \harrapp R {\alpha}
-  {F\alpha}$.
-\end{lemma}
-\begin{proof}
-  A homomorphism $\punitinXfromYtoZ {\cat C} {\alpha} {G \beta} \multimap \harrapp R {\alpha}{\beta}$ is by definition a term of type
-  \[ \pendallXdotY \alpha \homrallXYtoZ {\beta} {(\punitinXfromYtoZ {\cat C} \alpha {G \beta})} {\harrapp R \alpha \beta} \]
-  By \cref{lem:fubini}, this type is isomorphic to 
-  \[ \pendallXdotY \beta \homlallXYtoZ {\alpha} {(\punitinXfromYtoZ {\cat C} \alpha {G \beta})} {\harrapp R \alpha \beta} \]
-  By \cref{lem:yo-and-co-yo}, this type is isomorphic to
-  \[ \pendallXdotY \beta {{\harrapp R {(G \beta)} \beta}} \]
-
-  Therefore this half of the isomorphism is determined by a natural
-  element. The construction in the proof of \cref{lem:yo-and-co-yo} is
-  indeed by composition (i.e., unit elimination).
-
-  The $F$ case is precisely dual.
-\end{proof}
-
-Combining these two, we get the unit-counit definition for adjoint
-functors
-
-\begin{definition}[Adjunction by unit/co-unit]
-  We say $G : \varr {\cat D}{\cat C}$ is right adjoint to $F : \varr
-  {\cat C}{\cat D}$ if there is a unit
-  \[ \eta : \pendallXdotY \alpha \punitinXfromYtoZ \alpha {G(F(\alpha))}\]
-  and a co-unit
-  \[ \epsilon : \pendallXdotY \beta \punitinXfromYtoZ {F(G(\beta))} \beta \]
-
-  satisfying the triangle identities...
-  \[ \id_{R[\beta]} = R[\epsilon_{\beta}] \circ \eta_{R[\beta]} \]
-  \[ \id_{L[\alpha]} = \epsilon_{L[\alpha]} \circ L[\eta_{\alpha}] \]
-\end{definition}
-
-%% \begin{theorem}[Adjunctions]
-%%   $G$ is right adjoint to $F$ if and only if there is a natural isomorphism
-%%   $\punitinXfromYtoZ {\cat D} {(F \alpha)} \beta \cong \punitinXfromYtoZ {\cat D} \alpha {G \beta}$
-%% \end{theorem}
-%% \begin{proof}
-%%   First, by \cref{lem:co-unit}, the forward direction of the
-%%   isomorphism is equivalent to providing a term
-%%   \[ \eta : \pendallXdotY \alpha \punitinXfromYtoZ \alpha {G(F(\alpha)) } \]
-
-%%   Second, the backward direction of the isomorphism is equivalent to
-%%   providing a term
-%%   \[ \epsilon : \pendallXdotY \beta \punitinXfromYtoZ {F(G(\beta))} \beta \]
-
-%%   And the triangle laws state exactly that the induced functions are
-%%   isomorphisms.
-%% \end{proof}
-
-%% \subsection{Kan Extensions/Lifts}
-
-%% As a further example of the synthetic approach to universal
-%% properties, we consider right and left \emph{Kan extensions}, which
-%% are generalizations of limits and colimits, respectively.
-
-%% The right Kan extension of $F$ along $J$ is the ``best'' (maximal) way to
-%% fill in the following square:
-%% \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEQBfU9TXfIRQBGclVqMWbACLdeIDNjwEiZYePrNWiDgHJu4mFADm8IqABmAJwgBbJGRA4ISAEzVNUnQCk5lm-aIjs5IohJabABiBlxAA
-%% \begin{tikzcd}
-%% \cat C \arrow[d, "J"] \arrow[r, "F"] & \cat D \\
-%% \cat C'                              &  
-%% \end{tikzcd}\]
-%% I.e. a functor $\textrm{Ran}_J F : \cat C' \to \cat D$ with a
-%% universal natural transformation $\textrm{Ran}_J F \circ J \Rightarrow
-%% F$. A left kan extension $\textrm{Lan}_J F$ is the same but with a
-%% natural transformation $F \Rightarrow \textrm{Lan}_J F \circ J $.
-
-%% We can express the concept in SCT as representing a certain profunctor
-%% constructed using the profunctor hom:
-%% \begin{definition}[Kan Extensions]
-%%   Given functors $F : \varr {\cat C}{\cat D}$ and $J : \varr {\cat
-%%     C}{\cat C'}$, a right Kan extension is a functor $\textrm{Ran}_J F
-%%   : \varr {\cat C'}{\cat D} $that right-represents the profunctor
-%%   \[ \hlambda {\beta:\cat D}{\alpha': \cat C} \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {\cat C'}{\alpha'}{J\alpha})} {\punitinXfromYtoZ {\cat D}{\beta}{F \alpha}} \]
-
-%%   A left Kan extensions is a functor $\textrm{Lan}_J F : \varr {\cat
-%%     C'}{\cat D}$ is a functor satisfying the dual property: it
-%%   \emph{left}-represents the profunctor
-%%   \[\hlambda {\alpha':\cat C}{\beta:\cat D} \homlallXYtoZ {\alpha}{(\punitinXfromYtoZ {\cat C'}{J\alpha}{\alpha'})} {\punitinXfromYtoZ {\cat D}{F \alpha}{\beta}}
-%%   \]
-%% \end{definition}
-
-%% The limit of a functor $F : \varr{\cat C}{\cat D}$ is a special case
-%% of a Kan extension where $J : \varr{\cat C}{1}$ is the unique functor
-%% to the terminal category. Similarly, the colimit of $F$ is the left
-%% Kan extension with respect to the same $J$.
-%% %
-%% Specializing to this case, the representability for limits means:
-%% \[ \punitinXfromYtoZ {\cat D}{\beta}{\textrm{lim} F} \cong \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {\cat 1}{\alpha'}{()})}{\punitinXfromYtoZ {\cat D}{\beta}{F \alpha}} \]
-%% And if we view a morphism in $\cat 1$ as being trivial, then this
-%% essentially states that mapping $\beta$ to $\textrm{lim} F$ is the
-%% same thing as constructing a cone: for all $\alpha :\cat C$, a
-%% morphism from $\beta$ to $F \alpha$, naturally in $\alpha$.
-
-%% The usual formulation of Kan extensions is in terms of a universal
-%% morphism.
-%% %
-%% We can reproduce this formulation using our established theory of
-%% equivalences for homs of profunctors.
-%% \begin{lemma}
-%%   One half of the representability isomorphism for a right Kan
-%%   extension $\textrm{Ran}_J F$ is determined by a natural
-%%   transformation
-%%   \[ \pendallXdotY \alpha \punitinXfromYtoZ {\cat D}{(\textrm{Ran}_JF)(J\alpha)}{F\alpha} \]
-
-%%   Dually, one half of the representability isomorphism for a left Kan
-%%   extension $\textrm{Lan}_J F$ is determined by a natural
-%%   transformation
-%%   \[ \pendallXdotY \alpha \punitinXfromYtoZ {\cat D}{F\alpha}{(\textrm{Lan}_JF)(J\alpha)} \]
-%% \end{lemma}
-%% \begin{proof}
-%%   By \cref{lem:unit-repr}, one half of representability is determined by a natural element
-%%   \[ \pendallXdotY {\alpha'} \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {\cat C'}{\alpha'}{J\alpha})} {\punitinXfromYtoZ {\cat D}{(\textrm{Ran}_J F)\alpha'}{F \alpha}} \]
-%%   which, by \cref{lem:fubini} is isomorphic to
-%%   \[
-%%   \pendallXdotY {\alpha} \homlallXYtoZ {\alpha'}{(\punitinXfromYtoZ {\cat C'}{\alpha'}{J\alpha})}{\punitinXfromYtoZ {\cat D}{(\textrm{Ran}_J F)\alpha'}{F \alpha}}
-%%   \]
-%%   which, by \cref{lem:yo-and-co-yo}, is isomorphic to 
-%%   \[ \pendallXdotY \alpha \punitinXfromYtoZ {\cat D}{(\textrm{Ran}_JF)(J\alpha)}{F\alpha} \]
-%%   by taking $P = \hlambda {\alpha'}{\alpha} {\punitinXfromYtoZ {\cat D}{(\textrm{Ran}_J F)\alpha'}{F \alpha}}$.
-
-%%   The proof for left Kan extensions follows by \cref{lem:duality}.
-%% \end{proof}
 
 \end{document}
