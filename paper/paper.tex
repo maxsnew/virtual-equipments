@@ -2333,8 +2333,8 @@ obvious action of term substitutions $\gamma$ and include only the
 more unusual substructural substitutions.
 \begin{definition}[Substitution Actions]
   For any $\Gamma \pipe \alpha: \cat C \vdash a : \cat D$ and $\Gamma
-  \pipe \beta:\cat D \vdash b : \cat E$, we define $b[a/\beta]$ by
-  recursion on $b$:
+  \pipe \beta:\cat D \vdash b : \cat E$, we define
+  $\Gamma \pipe \alpha : \cat C \vdash b[a/\beta] : \cat E$ by recursion on $b$:
 
   \begin{align*}
     \beta[a/\beta] &= a\\
@@ -2347,7 +2347,12 @@ more unusual substructural substitutions.
     (\lambda \alpha.R)[a/\beta] &=\lambda \alpha.R[a/\beta] %% FIXME: not sure if this is formally legal... split cases on positive and negative
   \end{align*}
 
-  Simultaneously by recursion on an element $s$ we define $s[\phi]$
+  Simultaneously,
+  for
+  $\Gamma \pipe \Psi \vdash \phi : \Phi$
+  and 
+  $\Gamma \pipe \Phi \vdash s : R$ we define\\
+  $\Gamma \pipe \Psi \vdash s[\phi] : R [ \underline \phi ]$ by recursion on $s$:
   \begin{align*}
     x[a/\alpha,t/x,b/\beta] &= t\\
     \pendappXtoY M b[a/\alpha] &= \pendappXtoY M {b[a/\alpha]}\\
@@ -2375,7 +2380,8 @@ more unusual substructural substitutions.
   decomposed in a well-typed way follows from an inversion principle (Lemma~\ref{lem:inversion})
   for well-typed substitutions.
 
-  And finally, we define $P[\xi]$ by recursion on $P$:
+  And finally, for $\Gamma \pipe \Xi' \vdash \xi : \Xi$ and $\Gamma \pipe \Xi \vdash P \isaSet$,
+  we define $\Gamma \pipe \Xi' \vdash P[\xi] \isaSet$ by recursion on $P$:
   \begin{align*}
     (M\,a\,b)[\xi] &= M\,(a[d^-\xi])\,(b[d^+\xi])\\
     (\punitinXfromYtoZ {\cat C} a b)[\xi] &= \punitinXfromYtoZ {\cat C} {a[d^- \xi]}{b[d^+ \xi]}\\
