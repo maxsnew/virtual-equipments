@@ -7,6 +7,7 @@
 \usepackage{mathpartir}
 \usepackage{bbm}
 \usepackage{cleveref}
+\usepackage[utf8]{inputenc}
 
 \DeclareMathOperator*{\colim}{colim}
 
@@ -123,10 +124,10 @@
 \newcommand{\pmPresheaf}{\paramPresheaf\pm}
 \newcommand{\posPresheaf}{\paramPresheaf+}
 \newcommand{\negPresheaf}{\paramPresheaf-}
-\newcommand{\negPresheafApp}[2]{#1\,#2}
 \newcommand{\negPresheafAppPtoX}[2]{#2\in #1}
 \newcommand{\posPresheafAppPtoX}[2]{#1 \ni #2}
-\newcommand{\posPresheafApp}[2]{#1\,#2}
+\newcommand{\negPresheafApp}{\negPresheafAppPtoX}
+\newcommand{\posPresheafApp}{\posPresheafAppPtoX}
 
 \newcommand{\graphProf}[3]{\sum_{{#1};{#2}} #3}
 
@@ -1340,7 +1341,7 @@ exactly one free variable.
     {\Gamma \vdash M : \harr{\cat C}{\cat D}\\\\
      \Gamma \pipe d^- \Xi \vdash A : \cat C\\\\
      \Gamma \pipe d^+ \Xi \vdash B : \cat C}
-    {\Gamma \pipe \Xi \vdash M A; B \isaSet}
+    {\Gamma \pipe \Xi \vdash M A\, B \isaSet}
     \\ \\
     
     \inferrule
@@ -2089,7 +2090,57 @@ Shulman, Dominic Verity for helpful feedback on this work.
 
 \appendix
 
-\section{Syntactic Details}
+\section{\vett{} Syntactic Metatheory}
+\label{sec:appendix:syntax}
+
+\subsection{Substitution}
+
+In Figure~\ref{fig:ctx} we include the formation rules and definitions
+of the three kinds of contexts that are used in \vett{}.
+%
+In Figure~\ref{fig:substitutions} we give definitions for
+well-typedness of the corresponding three kinds of substitutions.
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule*[right=TyCtxForm]
+    {}
+    {\Gamma \isadtctx}
+
+    \inferrule*[right=MtTyCtx]{}{\cdot \isadtctx}
+
+    \inferrule*[right=TyCtxExt]
+    {\Gamma \isadtctx \and \Gamma \vdash A \isaTy}
+    {\Gamma , X : A \isadtctx}
+
+    \inferrule*[right=BoundaryForm]
+    {\Gamma \isadtctx}
+    {\Gamma \vdash \Xi \boundary}
+
+    \inferrule*[right=BoundarySingle]
+    {\Gamma \vdash \cat C \isaCat}
+    {\Gamma \vdash \alpha: \cat C \boundary}
+
+    \inferrule*[right=BoundaryDbl]
+    {\Gamma \vdash \cat C \isaCat \and \Gamma\vdash\cat D \isaCat}
+    {\Gamma \vdash \alpha: \cat C; \beta: \cat D \boundary}
+
+    \inferrule*[right=SetCtxForm]
+    {\Gamma \isadtctx}
+    {\Gamma \vdash \Phi \isavectx}
+
+    \inferrule*[right=SetCtxMt]
+    {\Gamma \vdash \cat C \isaCat}
+    {\Gamma \vdash \alpha: \cat C \isavectx}
+
+    \inferrule*[right=SetCtxExt]
+    {\Gamma \vdash \Phi \isavectx\and
+    \Gamma \pipe d^+\Phi; \beta:\cat D \vdash R \isaSet}
+    {\Gamma \vdash \Phi, x:R, \beta:\cat D \isavectx}
+  \end{mathpar}
+  \caption{Contexts}
+  \label{fig:ctx}
+\end{figure}
 
 \begin{figure}
   \begin{mathpar}
@@ -2099,33 +2150,214 @@ Shulman, Dominic Verity for helpful feedback on this work.
       \textrm{Transformation Substitution} & \phi, \psi & ::= & a/\alpha \pipe \phi,s/x, \psi      
     \end{array}
 
-      \inferrule*[right=TyCtxForm]
-        {}
-        {\Gamma \isadtctx}
-
-    \inferrule*[right=SetCtxForm]
-    {\Gamma \isadtctx}
-    {\Gamma \vdash \Xi \boundary}
-
-    \inferrule*[right=TransCtxForm]
-    {\Gamma \isadtctx}
-     {\Gamma \vdash \Phi \isavectx}
-    \inferrule
+    \inferrule*[right=TermSubstFormation]
     {\Delta \isadtctx \and \Gamma \isadtctx}
-    {\gamma : \Delta \to \Gamma}
+    {\Delta \vdash \gamma :: \Gamma}
     
-    \inferrule*[right=Boundary Map formation]
+    \inferrule*[right=TermSubstMt]
+    {}
+    {\cdot : \Gamma \to \cdot}
+
+    \inferrule*[right=TermSubstExt]
+    {\gamma : \Delta \to \Gamma \and \Delta \vdash M : A[\gamma]}
+    {\gamma,M/X : \Delta \to \Gamma,X:A}
+
+    \inferrule*[right=BoundarySubstFormation]
     {\Gamma \vdash Z \boundary \and \Gamma \vdash \Xi \boundary}
-    {\Gamma \vdash \xi : Z \to \Xi}
+    {\Gamma\pipe Z \vdash \xi :: \Xi}
 
-    \inferrule*[right=Cat Subst formation]
+    \inferrule*[right=BoundarySubstSingle]
+    {\Gamma\pipe \alpha:\cat C \vdash b : \cat D}
+    {\Gamma \pipe \alpha:\cat C \vdash b/\beta :: \beta:\cat D}
+
+    \inferrule*[right=BoundarySubstDbl]
+    {\Gamma\pipe d^-\Xi \vdash a : \cat C\and
+     \Gamma\pipe d^+\Xi \vdash b : \cat D}
+    {\Gamma \pipe \Xi \vdash a/\alpha;b/\beta :: (\alpha : \cat C; \beta:\cat D)}
+
+    \inferrule*[right=ElementSubstFormation]
     {\Gamma \vdash \Psi \isavectx \and \Gamma \vdash \Phi \isavectx}
-    {\Gamma \vdash \phi : \Psi \to \Phi}
+    {\Gamma\pipe \Psi \vdash \phi :: \Phi}
 
+    % horizontal identity
+    \inferrule*[right=ElementSubstMt]
+    {\Gamma\pipe \beta:\cat C \vdash a : \cat C}
+    {\Gamma \pipe \beta:\cat C \vdash a/\alpha : (\alpha : \cat C)}
+
+    \inferrule*[right=ElementSubstExt]
+    {\Gamma\pipe\Psi \vdash \phi :: \Phi \and
+      d^+\Psi = d^-\Psi'
+     \Gamma\pipe\Psi' \vdash t : R[d^+\phi;b/\beta]\and
+     \Gamma\pipe d^+\Psi'\vdash b : \cat D}
+    {\Gamma\pipe\Psi \vdash \phi,t/x,b/\beta :: (\Phi,x:R,\beta:\cat D)}
   \end{mathpar}
   \caption{Substitution}
-  
+  \label{fig:substitions}
 \end{figure}
+
+
+
+These definitions involve several operations $d^\pm\Phi$, $\underline
+\Phi$ and $\Phi\jnctx \Psi$ on contexts (and their functorial lift to
+substitutions) that we now define.
+
+\begin{definition}
+  We define operations $d^\pm$ that project out the covariant and
+  contravariant boundary of a set context.
+  This can be typed with the admissible rule
+  \begin{mathpar}
+    \inferrule*[right=(*)]
+               {\Gamma \vdash \Phi \isavectx}
+               {\Gamma \vdash d^\pm\Phi \boundary}
+  \end{mathpar}
+  and is defined as
+  \begin{align*}
+    d^{\pm}(\alpha:\cat C) &= \alpha : \cat C\\
+    d^{-}(\Phi,x:R,\Psi) &= d^-\Phi\\
+    d^{+}(\Phi,x:R,\Psi) &= d^-\Psi
+  \end{align*}
+  This operation extends to the substitutions with admissible rule
+  \begin{mathpar}
+    \inferrule*[right=(*)]
+    {\Gamma\pipe\Psi \vdash \phi :: \Phi}
+    {\Gamma\pipe d^\pm \Psi \vdash d^\pm\phi :: d^\pm \Phi}
+  \end{mathpar}
+  defined as
+  \begin{align*}
+    d^{\pm}(a/\alpha) &= a/\alpha\\
+    d^{-}(\phi,t/x,\psi) &= d^-\phi\\
+    d^{+}(\phi,t/x,\psi) &= d^+\psi\\
+  \end{align*}
+\end{definition}
+
+\begin{definition}
+  We define the operation of restricting a set context to both sides
+  of its boundary with admissible typing
+  \begin{mathpar}
+    \inferrule*[right=(*)]
+    {\Gamma \vdash \Phi \isavectx}
+    {\Gamma \vdash \underline\Phi \boundary}
+  \end{mathpar}
+  and definition
+  \begin{align*}
+    \underline{\alpha:C} &= \alpha:C\\
+    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
+  \end{align*}
+  The extension to substitutions has admissible typing
+  \begin{mathpar}
+    \inferrule*[right=(*)]
+    {\Gamma \pipe \Psi \vdash \phi :: \Phi}
+    {\Gamma\pipe\underline \vdash \Phi \boundary}
+  \end{mathpar}
+  and definition
+  \begin{align*}
+    \underline{\alpha:C} &= \alpha:C\\
+    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
+  \end{align*}
+\end{definition}
+
+% RETURN
+Finally, we define the operation of ``horizontal composition'' of set
+contexts $\Phi \jnctx \Psi$ and its functorial lift $\phi \jnctx
+\psi$. Note that the horizontal composition is only well-defined when 
+
+Next, we define the actions of substitutions on terms. We elide the
+obvious action of term substitutions $\gamma$ and include only the
+more unusual substructural substitutions.
+\begin{definition}[Substitution Actions]
+  For any $\Gamma \pipe \alpha: \cat C \vdash a : \cat D$ and $\Gamma
+  \pipe \beta:\cat D \vdash b \cat E$, we define $b[a/\beta]$ by
+  recursion on $b$:
+
+  \begin{align*}
+    \beta[a/\beta] &= a\\
+    (M\,b)[a/\beta] &= M\,(b[a/\beta])\\
+    (\lambda \beta)    
+    (\pi_\pm b)[a/\beta] &= \pi_\pm b[a/\beta]\\
+    (b_-,b_+,s)[a/\beta] &= (b_-[a/\beta],b_+[a/\beta], s[a/\beta])\\
+  \end{align*}
+
+  Simultaneously by recursion on $s$ we define $s[\phi]$
+  \begin{align*}
+    x[a/\alpha,t,b/\beta] &= t\\
+    \pendappXtoY M b[a/\alpha] &= \pendappXtoY M {b[a/\alpha]}\\
+    {\punitelimkontZatABC {\alpha. t}{b_1} s {b_2}}[\phi] &=
+    {\punitelimkontZatABC {\alpha. t}{b_1[d^-\phi]} {s[\phi]} {b_2[d^+\phi]}}\\
+    (\punitrefl b)[a/\alpha] &= \punitrefl {b[a/\alpha]}\\
+    {\tensorelimWkontZ s {x.\beta.y.r}[\phi_l\jnctx\phi_m\jnctx\phi_r]} &=
+    \tensorelimWkontZ {s[\phi_m]} {x.\beta.y. r[\phi_l,x/x,\beta/\beta \jnctx \beta/\beta,y/y,\phi_r]}\\
+    {\tensorintroatXwithYandZ b s t}[\phi_s \jnctx \phi_t] &= \tensorintroatXwithYandZ {d^+\phi_s} {s[\phi_s]} {t[\phi_t]}\\
+    {(\homrappXtoYatZ s t a)}[\phi_f\jnctx \phi_a] &=
+    {\homrappXtoYatZ {s[\phi_f]} {t[\phi_a]} {a[d^+\phi_f]}}\\
+    {(\homrlambdaXatYdotZ {x}{\alpha} s)}[\phi] &=
+    {\homrlambdaXatYdotZ {x}{\alpha} {s[\phi,x/x,\alpha/\alpha]}}\\
+    {(\homlappXtoYatZ t s a)}[\phi_a\jnctx \phi_f] &=
+    {\homlappXtoYatZ {t[\phi_a]} {s[\phi_f]} {a[d^-\phi_f]}}\\
+    {(\homllambdaXatYdotZ {x}{\alpha} s)}[\phi] &=
+    {\homllambdaXatYdotZ {x}{\alpha} {s[\alpha/\alpha,x/x,\phi]}}\\
+    (\pi_i s)[\phi] &= \pi_i s[\phi]\\
+    (s_1,s_2)[\phi] &= (s_1[\phi], s_2[\phi])\\
+    ()[\phi] &= ()
+  \end{align*}
+
+  And finally, we define $P[\xi]$ by recursion on $P$:
+  \begin{align*}
+    (M\,a\,b)[\xi] &= M\,(a[d^-\xi])\,(b[d^+\xi])\\
+    (\punitinXfromYtoZ {\cat C} a b)[\xi] &= \punitinXfromYtoZ {\cat C} {a[\xi]}{b[\xi]}\\
+    (\tensorexistsXwithYandZ \beta P Q)[\xi] &= \tensorexistsXwithYandZ \beta {P[d^-\xi;\beta/\beta]}{P[\beta/\beta;d^+\xi]}\\
+    (\homrallXYtoZ \alpha R P)[\xi] &= \homrallXYtoZ \alpha {R[d^+\xi;\alpha/\alpha]} {P[d^-\xi;\alpha/\alpha]}\\
+    (\homlallXYtoZ \alpha P Q)[\xi] &= \homlallXYtoZ \alpha {P[\alpha/\alpha;d^-\xi]} {Q[\alpha/\alpha;d^+\xi]}\\
+    1[\xi] &= 1\\
+    (P_1 \times P_2)[\xi] &= P_1[\xi] \times P_2[\xi]
+  \end{align*}
+\end{definition}
+
+\begin{lemma}[Properties of Substitution]
+  Substitution is associative and unital?
+\end{lemma}
+
+%% Theorems about substitution?
+
+\begin{figure}
+  \begin{mathpar}
+    
+    \inferrule
+    {\Gamma \vdash \Phi \isavectx \and
+    \Gamma \vdash \Psi \isavectx \and
+    d^+\Phi = d^- \Psi}
+    {\Gamma \vdash \Phi \jnctx \Psi \isavectx}
+
+    \inferrule
+    {\Gamma \vdash \phi : \Phi' \to \Phi \and
+     \Gamma \vdash \psi : \Psi' \to \Psi\and
+     d^+\phi = d^- \psi}
+    {\Gamma \vdash \phi \jnctx \psi : \Phi' \jnctx \Psi' \to \Phi \jnctx \Psi}
+
+    \inferrule*[right=ObSubst]
+    {\alpha : \cat C \vdash B : \cat D\and
+    \beta : \cat D \vdash A : \cat E}
+    {\alpha : \cat C \vdash A[B/\beta] : \cat E}\\
+
+    \inferrule*[right=Everything Subst]{\gamma : \Delta \to \Gamma \and \Gamma J}{\Delta J}
+
+    \inferrule*[right=BoundarySubst]{\Gamma \vdash \xi : Z \to \Xi\and \Gamma \pipe \Xi \vdash R \isaSet}{\Gamma \pipe Z \vdash R[\xi] \isaSet}
+
+    \inferrule*[right=TransSubst]{\Gamma \vdash \phi : \Psi \to \Phi\and \Gamma \pipe \Phi \vdash s : R}{\Gamma \pipe \Psi \vdash s[\phi] : R[\underline \phi]}
+  \end{mathpar}
+  \begin{align*}
+    (\Phi \jnctx \Psi) \jnctx \Sigma &= \Phi \jnctx (\Psi \jnctx \Sigma)\\
+    \Phi \jnctx \alpha:C &= \Phi\\
+    \alpha:C \jnctx \Psi &= \Psi\\\\
+    d^\pm(A/\alpha) &= A/\alpha\\
+    d^+(\phi_1,M/x,\phi_2) &= d^+ \phi_2\\
+    d^-(\phi_1,M/x,\phi_2) &= d^- \phi_1\\\\
+    \underline \cdot &= \cdot\\
+    \underline {A/\alpha} &= A/\alpha\\
+    \underline {\phi_1,M/x,\phi_2} &= d^-\phi_1;d^+\phi_2
+  \end{align*}
+  \caption{Admissible Rules}
+\end{figure}
+
 
 \cref{fig:contexts} details the typing rules for contexts and the
 typing for variables and the admissible actions of substitution (the
@@ -2176,61 +2408,7 @@ d^-(\Psi)$. Next, we extend the boundary maps $d^\pm$ to substitutions
 to extract their object substitutions.
 
 \begin{figure}
-  \begin{mathpar}
-    \inferrule{}{\cdot \isadtctx}
 
-    \inferrule
-    {\Gamma \isadtctx \and \Gamma \vdash A \isaTy}
-    {\Gamma , X : A \isadtctx}\\
-
-    \inferrule
-    {X : A \in \Gamma}
-    {\Gamma \vdash X : A}
-
-    \inferrule
-    {}
-    {\alpha: \cat C \vdash \alpha: \cat C}
-
-    \inferrule
-    {\Gamma \vdash \cat C : \isaCat}
-    {\Gamma \vdash \alpha: \cat C \isavectx}
-
-    \inferrule
-    {\Gamma \vdash \Phi \isavectx\and
-    \Gamma \pipe d^+\Phi; \beta:\cat D \vdash R \isaSet}
-    {\Gamma \vdash \Phi, x:R, \beta:\cat D \isavectx}
-
-    \inferrule
-    {}
-    {\Gamma \pipe \alpha:\cat C, x : R, \beta: \cat D \vdash x : R}
-
-    % horizontal identity
-    \inferrule
-    {\Gamma\pipe \beta:\cat C \vdash a : \cat C}
-    {\Gamma \pipe \beta:\cat C \vdash a/\alpha : (\alpha : \cat C)}
-
-    \inferrule
-    {\Psi = \Psi_1 \jnctx \Psi_2\and
-      \Gamma\pipe\Psi_1 \vdash \phi : \Phi\and
-      \Gamma \pipe \Psi_2 \vdash t : R[d^+\phi;b/\beta] \and
-      \Gamma \vdash \phi_2 : \Psi_2 \to \Phi_2
-      }
-    {\Gamma\pipe\Psi \vdash \phi,t/x,b/\beta :: (\Phi,x:R,\beta:\cat D)}
-  \end{mathpar}
-  \begin{align*}
-    \underline{\alpha:C} &= \alpha:C\\
-    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
-  \end{align*}
-  \begin{align*}
-    d^{\pm}(\alpha:\cat C) &= \alpha : \cat C\\
-    d^{-}(\Phi,x:R,\Psi) &= d^-\Phi\\
-    d^{+}(\Phi,x:R,\Psi) &= d^-\Psi
-  \end{align*}
-  \begin{align*}
-    d^{\pm}(a/\alpha) &= a/\alpha\\
-    d^{-}(\phi,t/x,\psi) &= d^-\phi\\
-    d^{+}(\phi,t/x,\psi) &= d^+\psi\\
-  \end{align*}
   \caption{Basic Rules of Judgment Theory}
   \label{fig:contexts}
 \end{figure}
@@ -2241,6 +2419,166 @@ internalizing the judgments. Though the positive multiplicatives are
 more familiar, we start by describing the negative multiplicatives,
 since they are better behaved, and are useful to have already defined
 when discussing the positives.
+
+\subsection{Equational Theory}
+
+Next we present the $\beta\eta$ rules that generate the equational
+theory of the terms. In keeping with the extensional style of the type
+theory, we do not present explicit transitivity, congruence, or
+transport rules, but rather consider these as inherent to the notion
+of equality. This can be formalized by modeling the terms of our type
+theory as a quotient inductive inductive type
+\cite{altenkirch-kaposi-popl17}.
+
+\begin{figure}
+  \begin{mathpar}
+    % Type connectives: small and large cats, functors, profs, nat transformations, and if we want also Pi/Sigma/Id
+    \inferrule*[right=SmallCat$\beta$]
+    {~}
+    {\unquoth {\quoth {\cat C}}  = \cat C}
+
+    \inferrule*[right=SmallCat$\eta$]
+    {\Gamma \vdash M : \smallCats}
+    {\Gamma \vdash \quoth {\unquoth {M}}  = M : \smallCats}
+
+    \inferrule*[right=Cat$\beta$]
+    {~}
+    {\unquoth {\quoth {\cat C}}  = \cat C}
+    
+    \inferrule*[right=Cat$\eta$]
+    {\Gamma \vdash M : \Cats}
+    {\Gamma \vdash \quoth {\unquoth {M}}  = M : \Cats}
+
+    \\
+    \inferrule*[right=Fctor$\beta$]
+    {~}
+    {(\lambda \alpha. b)\,a = b[a/\alpha]}
+
+    \inferrule*[right=Fctor$\eta$]
+    {\Gamma \vdash M : \varr {\cat C}{\cat D}}
+    {\Gamma \vdash M = \lambda \alpha. M\,\alpha : \varr {\cat C}{\cat D}}
+
+    \inferrule*[right=Prof$\beta$]
+    {~}
+    {(\lambda \alpha \beta. P)\,a\,b = P[a/\alpha;b/\beta]}
+
+    \inferrule*[right=Prof$\eta$]
+    {\Gamma \vdash M : \harr {\cat C}{\cat D}}
+    {\Gamma \vdash M = \lambda \alpha\,\beta. M\,\alpha\,\beta : \harr {\cat C}{\cat D}}
+
+    \inferrule*[right=NatElt$\beta$]
+    {~}
+    {(\pendlambdaXdotY \alpha s) a = s[a/\alpha]}
+
+    \inferrule*[right=NatElt$\eta$]
+    {\Gamma \vdash M : \pendallXdotY \alpha P}
+    {\Gamma \vdash M = \pendlambdaXdotY \alpha {M\,a} : \pendallXdotY\alpha P}
+
+    \\\\\\\\
+
+    % Object connectives: 0,2-products, tabulators, +/- presheafs
+
+    \inferrule*[right=NegPresheaf$\beta$]
+    {~}
+    {\negPresheafApp a (\lambda \alpha. R) = R[a/\alpha]}
+
+    \inferrule*[right=NegPresheaf$\eta$]
+    {\Gamma \pipe \beta:\cat D \vdash p : \negPresheaf {\cat C}}
+    {p = \lambda \alpha. \negPresheafApp \alpha p}
+    
+    \inferrule*[right=NegPresheaf$\beta$]
+    {~}
+    {\posPresheafApp {(\lambda \beta. R)} b = R[b/\beta]}
+
+    \inferrule*[right=PosPresheaf$\eta$]
+    {\Gamma \pipe \alpha:\cat C \vdash p : \posPresheaf {\cat D}}
+    {p = \lambda \beta. \posPresheafApp p \beta}
+    
+    \inferrule*[right=Graph$\beta-$]
+    {~}
+    {\pi_- (a_-,a_+,s) = a_-}
+
+    \inferrule*[right=Graph$\beta+$]
+    {~}
+    {\pi_+ (a_-,a_+,s) = a_+}
+    
+    \inferrule*[right=Graph$\beta e$]
+    {~}
+    {\pi_e (a_-,a_+,s) = s}
+    
+    \inferrule*[right=Graph$\eta$]
+    {\Gamma \pipe \alpha:\cat C \vdash b : \graphProf{\beta_-}{\beta_+} P}
+    {\Gamma \pipe \alpha:\cat C \vdash b = (\pi_-b, \pi_+b, \pi_e b) : \graphProf{\beta_-}{\beta_+} P}
+    
+  \inferrule*[right=${1}\eta$]
+  {\Gamma \pipe \alpha:\cat C \vdash a : 1}
+  {\Gamma \pipe \alpha:\cat C \vdash a = () : 1}\\
+
+  \inferrule*[right=${\times}\beta$]
+  {~}
+  {\pi_i(a_1,a_2) = a_i}
+
+  \inferrule*[right=${\times}\eta$]
+  {\Gamma \pipe \alpha:\cat C \vdash a : \cat D_1 \times \cat D_2}
+  {\Gamma \pipe \alpha:\cat C \vdash a = (\pi_1a, \pi_2a) : \cat D_1 \times \cat D_2}
+  \end{mathpar}
+  \caption{$\beta\eta$ Equality for type and object connectives}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+  % Set connectives: unit, tensor, +/- hom, 0,2-products
+  \inferrule*[right=CovHom$\beta$]
+    {~}
+    {\homrappXtoYatZ {(\homrlambdaXatYdotZ x \alpha s)} t a = s[t/x,a/\alpha]}
+    \inferrule*[right=CovHom$\eta$]
+               {\Gamma\pipe\Phi \vdash s : \homrallXYtoZ \alpha R P}
+               {\Gamma\pipe\Phi \vdash s = \homrlambdaXatYdotZ {x}{\alpha} \homrappXtoYatZ s x \alpha}
+
+    \inferrule*[right=ConHom$\beta$]
+                 {~}
+                 {\homlappXtoYatZ {(\homllambdaXatYdotZ x \alpha t)} s a = t[a/\alpha,s/x]}
+      \inferrule*[right=ConHom$\eta$]
+      {\Gamma \pipe \Phi \vdash t : \homlallXYtoZ \alpha R P}
+      {\Gamma \pipe \Phi \vdash t = \homllambdaXatYdotZ x \alpha \homlappXtoYatZ t x \alpha : \homlallXYtoZ \alpha R P}
+
+    \inferrule*[right=Unit$\beta$]
+    {~}
+    {(\punitelimkontZatABC {\alpha. t} a {\punitrefl a} a) = t[a/\alpha]}
+    \inferrule*[right=Unit$\eta$]
+    {\Gamma\pipe\Phi \vdash s : \punitinXfromYtoZ {\cat C}{a}{b}}
+    {\Gamma\pipe\Phi\vdash s = \punitelimkontZatABC {\alpha. \punitrefl \alpha} a s b: \punitinXfromYtoZ {\cat C}{a}{b}}
+      
+    \inferrule*[right=Tensor$\beta$]
+    {~}
+    {\tensorelimWkontZ {\tensorintroatXwithYandZ b s t} {x.\beta.y. r} = t[s/x;b/\beta;t/y]}
+    \inferrule*[right=Tensor$\eta$]
+    {\Gamma\pipe\Phi \vdash s : \tensorexistsXwithYandZ \beta P Q}
+    {\Gamma\pipe\Phi\vdash s = \tensorelimWkontZ s {x.\beta.y. \tensorintroatXwithYandZ \beta x y}: \tensorexistsXwithYandZ \beta P Q}
+
+  \inferrule*[right=$1\eta$]
+  {\Phi \vdash s : 1}
+  {\Phi \vdash s = () : 1}\\
+
+  \inferrule*[right=${\times}\beta$]
+  {~}
+  {\pi_i(s_1,s_2) = s_i}
+
+  \inferrule*[right=${\times}\eta$]
+  {\Phi \vdash s : P \times Q}
+  {\Phi \vdash s = (\pi_1 s, \pi_2 s) : P \times Q}
+  \end{mathpar}
+  \caption{$\beta\eta$ Equality for set connectives}
+  \label{fig:betaeta-sets}
+\end{figure}
+
+\subsection{Identity Elimination}
+
+As a final syntactic meta-theorem, we prove that the more general identity elimination principle
+\[ \]
+is admissible in the presence of let and right hom types.
+
+TODO
 
 \subsection{Negative Multiplicatives}
 
@@ -2864,7 +3202,22 @@ and identity types.
   \caption{End}
   \label{fig:end}
 \end{figure}
+
+\section{Extended Formal Category Theory Examples}
+\label{sec:appendix:examples}
+
+Next, we provide some futher detailed examples of the formal category
+theory constructions and theorems from Section~\ref{sec:examples}.
+
 \section{Semantics}
+\label{sec:appendix:semantics}
+
+In this section, we provide the full definitions of the universal
+properties in a virtual equipment corresponding to each connective in
+\vett{}, and the most critical details of the soundness and
+completeness proof.
+
+TODO
 
 Next, we develop the basics of the model theory for SCT. Because SCT
 includes not just a syntax for category theory, but is also indexed by
@@ -3174,79 +3527,7 @@ $\alpha$-equivalence of names.
   \item The remaining universal properties are satisfied using the
     analogous type theoretic construction.
   \end{enumerate}
-\end{construction}
-
-The associativity, unit and interchange laws of a category are proven
-in the \cref{appendix}.
-
-\begin{theorem}{(Sketch) Soundness/Initiality}
-  Given any HED $\mathcal V$, there is a unique homomorphism of HEDs $\sem\cdot$
-  from $\textrm{Syn}(\textrm{SCT})$ to $\mathcal V$.
-\end{theorem}
-\begin{proof}
-  Roughly the converse of the completeness theorem. For instance,
-  profunctor contexts are interpreted using horizontal identity and
-  composition as well as the $i$ functor. Preservation of the
-  restriction operation requires that restriction commutes with the
-  display connectives.
-\end{proof}
-
-Details of the interpretation of profunctor contexts and substitutions
-are given in the appendix\cref{appendix}.
-
-\subsection{Example Models}
-
-We now describe how to interpret the syntax in any virtual equipment
-(that can model the connectives). First, from any virtual equipment we
-can construct a DCD:
-
-\begin{definition}
-  Given a virtual equipment $\mathcal V$, define a DCD by taking the
-  horizontal morphisms of $\mathcal V$ as the display morphisms and
-  the horizontal morphisms as the ``composable strings'' of horizontal
-  morphisms. Then we define $C_\vdash$ using the notion of
-  ``multi-2-cell''.
-\end{definition}
-
-Next, we can upgrade any DCD in $\Set$ to a DCD internal to
-$\Set^{\Set^o}$ by taking the presheaf of objects, vertical arrows, etc as
-families of objects, vertical arrows etc indexed by the indexing set
-$\Gamma$ as follows:
-\begin{definition}[Powers of Virtual Equipments]
-  Let $\mathcal V$ be a virtual equipment and let $X$ be a set.
-  Define a virtual equipment, the ``power'' $\mathcal V^X$ as follows.
-
-  \begin{enumerate}
-  \item Objects are functions $X \to \mathcal V_0$.
-  \item Vertical morphisms $\mathcal V^X_0(A,B)$ are functions
-    $\Pi_{x\in X} V_0(A x,B x)$. With pointwise composition, identity.
-  \item Horizontal morphisms $\mathcal V^X_1$ are functions $\Gamma
-    \to \mathcal V_1$.
-  \item A 2-cell from $\Phi$ to $R$ is a family $\Pi_{x\in X} \mathcal
-    V^X_h(\Phi x,R x)$.
-  \end{enumerate}
-  All operations are lifted pointwise.
-\end{definition}
-
-This defines the ``natural'' interpretation of SCT in a virtual
-equipment once we see that the powering construction is functorial in
-$\Gamma$.
-\begin{definition}[Internal Logic]
-  Given any virtual equipment $\mathcal V$, we can construct the
-  ``internal logic'' by indexing $\mathcal V$ by $\Set$:
-
-  \begin{enumerate}
-  \item The indexing cateogry is $\Set$, which is a category with families.
-  \item The equipment is defined as $\mathcal U\Gamma = \mathcal V^\Gamma$.
-  \item Restriction by a function $\gamma : \Delta \to \Gamma$ is
-    given pointwise.
-  \item The representing object for objects is $\textrm{Ob}_\Gamma =
-    \textrm{Ob}(\mathcal V)^\Gamma$ and similarly for the other
-    universe objects.
-  \end{enumerate}
-\end{definition}
-
-\section{Completeness}
+\end{construction}\section{Completeness}
 
 %% \begin{figure}
 %%   \begin{mathpar}
@@ -3512,53 +3793,6 @@ To define vertical composition of squares, we need the following lemma.
     t[\phi][\psi] = t[\phi[\psi]]
   \end{mathpar}
   \caption{Syntactic Double Category with Displays Structure}
-\end{figure}
-
-\begin{figure}
-  \begin{mathpar}
-    \inferrule
-    {}
-    {\cdot : \Gamma \to \cdot}
-
-    \inferrule
-    {\gamma : \Delta \to \Gamma \and \Delta \vdash M : A[\gamma]}
-    {\gamma,M/X : \Delta \to \Gamma,X:A}
-    
-    \inferrule
-    {\Gamma \vdash \Phi \isavectx \and
-    \Gamma \vdash \Psi \isavectx \and
-    d^+\Phi = d^- \Psi}
-    {\Gamma \vdash \Phi \jnctx \Psi \isavectx}
-
-    \inferrule
-    {\Gamma \vdash \phi : \Phi' \to \Phi \and
-     \Gamma \vdash \psi : \Psi' \to \Psi\and
-     d^+\phi = d^- \psi}
-    {\Gamma \vdash \phi \jnctx \psi : \Phi' \jnctx \Psi' \to \Phi \jnctx \Psi}
-
-    \inferrule*[right=ObSubst]
-    {\alpha : \cat C \vdash B : \cat D\and
-    \beta : \cat D \vdash A : \cat E}
-    {\alpha : \cat C \vdash A[B/\beta] : \cat E}\\
-
-    \inferrule*[right=Everything Subst]{\gamma : \Delta \to \Gamma \and \Gamma J}{\Delta J}
-
-    \inferrule{\Gamma \vdash \xi : Z \to \Xi\and \Gamma \pipe \Xi \vdash R \isaSet}{\Gamma \pipe Z \vdash R[\xi] \isaSet}
-
-    \inferrule{\Gamma \vdash \phi : \Psi \to \Phi\and \Gamma \pipe \Phi \vdash M : R}{\Gamma \pipe \Psi \vdash M[\phi] : R[\underline \phi]}
-  \end{mathpar}
-  \begin{align*}
-    (\Phi \jnctx \Psi) \jnctx \Sigma &= \Phi \jnctx (\Psi \jnctx \Sigma)\\
-    \Phi \jnctx \alpha:C &= \Phi\\
-    \alpha:C \jnctx \Psi &= \Psi\\\\
-    d^\pm(A/\alpha) &= A/\alpha\\
-    d^+(\phi_1,M/x,\phi_2) &= d^+ \phi_2\\
-    d^-(\phi_1,M/x,\phi_2) &= d^- \phi_1\\\\
-    \underline \cdot &= \cdot\\
-    \underline {A/\alpha} &= A/\alpha\\
-    \underline {\phi_1,M/x,\phi_2} &= d^-\phi_1;d^+\phi_2
-  \end{align*}
-  \caption{Admissible Rules}
 \end{figure}
 
 \section{Soundness}
