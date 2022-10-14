@@ -438,28 +438,28 @@ equalities.\footnote{\url{https://github.com/maxsnew/virtual-equipments/blob/mas
 We have used this lightweight implementation to check a number of
 examples.  
 
-\paragraph{Basics of Profunctors.}
-While we assume the reader has some background knowledge of category
-theory, we briefly define profunctors, which are not included in many
-introductory texts.  Recall that a category $\cat C$ has a collection of
-objects and morphisms with identity and composition, and a functor $F :
-\cat C \to \cat D$ is a function on objects and a function on morphisms
-that preserves identity and composition.  A category can be thought of
-as a generalization of a preordered set, which has a set of elements and
-a binary \emph{relation} on its objects satisfying reflexivity and
-transitivity.  A category is then a \emph{proof-relevant preorder},
-where morphisms are the proofs of ordering, and the reflexivity and
-transitivity proofs must identity and unit equations. A functor is then
-a \emph{proof-relevant monotone function}.  Given categories $\mathcal
-C$ and $\mathcal D$, a profunctor $R$ from $\mathcal C$ to $\mathcal D$,
-written $R : \cat C \pto \cat D$ is a functor $R : {\cat C}^{op} \times
-{\cat D} \to \Set$.  Because a profunctor outputs a $\Set$ rather than a
-proposition, it is itself a \emph{proof-relevant relation}.  Thinking of
-categories as proof-relevant preorders, functoriality says that the
-profunctor is downward-closed in $\cat C$ and upward-closed in $\cat D$.
-Given profunctors $R, S : \cat C \pto \cat D$, a homomorphism from
-$R$ to $S$ is simply a natural transformation, which in the preordered
-setting is simply an implication of relations.
+\textbf{Basics of Profunctors.}  While we assume the reader has some
+background knowledge of category theory, we briefly define profunctors,
+which are not included in many introductory texts.  Recall that a
+category $\cat C$ has a collection of objects and morphisms with
+identity and composition, and a functor $F : \cat C \to \cat D$ is a
+function on objects and a function on morphisms that preserves identity
+and composition.  A category can be thought of as a generalization of a
+preordered set, which has a set of elements and a binary \emph{relation}
+on its objects satisfying reflexivity and transitivity.  A category is
+then a \emph{proof-relevant preorder}, where morphisms are the proofs of
+ordering, and the reflexivity and transitivity proofs must identity and
+unit equations. A functor is then a \emph{proof-relevant monotone
+  function}.  Given categories $\mathcal C$ and $\mathcal D$, a
+profunctor $R$ from $\mathcal C$ to $\mathcal D$, written $R : \cat C
+\pto \cat D$ is a functor $R : {\cat C}^{op} \times {\cat D} \to \Set$.
+Because a profunctor outputs a $\Set$ rather than a proposition, it is
+itself a \emph{proof-relevant relation}.  Thinking of categories as
+proof-relevant preorders, functoriality says that the profunctor is
+downward-closed in $\cat C$ and upward-closed in $\cat D$.  Given
+profunctors $R, S : \cat C \pto \cat D$, a homomorphism from $R$ to $S$
+is simply a natural transformation, which in the preordered setting is
+simply an implication of relations.
 
 %% We can think of each set $R(c,d)$ as a set of
 %% ``heteromorphisms'' from $c$ (an object of $\cat C$) to $d$ (an object
@@ -581,19 +581,22 @@ categories, functors, profunctors and natural transformations.
 Finally we have several forms of context which are used in the theory.
 The contexts $\Gamma$ of term variables with their types are as usual;
 we write ${\Gamma \isadtctx}$ to indicate that a context is well-formed.
-The category contexts $\Gamma \vdash \Xi \boundary$ contain object
-variables with their categories; the two forms of category context are
-$\alpha : \cat C$, containing one variable that can be used both
-contravariantly and covariantly, and $\alpha : \cat C ; \beta : \cat D$,
-containing a contravariant variable $\alpha$ and covariant variable
-$\beta$.  Finally, we have contexts $\Phi$ of element variables with
-their sets, alternating with those sets' object variables.  A typical
-$\Phi$ has the shape
+We name the remaining contexts after the judgements that they are used
+by.  The set contexts $\Gamma \vdash \Xi \boundary$, which will be used
+to type-check sets, contain object variables with their categories. The
+two forms of set context are $\alpha : \cat C$, containing one variable
+that can be used both contravariantly and covariantly, and $\alpha :
+\cat C ; \beta : \cat D$, containing a contravariant variable $\alpha$
+and covariant variable $\beta$.  Finally, the transformation contexts
+$\Gamma \vdash \Phi \isavectx$ contain element variables with their sets, alternating with those
+sets' object variables with their categories.  A typical $\Phi$ has the
+shape
 \[
 \alpha_1 : \cat C_1, x_1:R_1(\alpha_1,\alpha_2), \alpha_2 : \cat C_2,
-x_2:R_2(\alpha_2,\alpha_3), \ldots, R_n(\alpha_n,\alpha_{n+1}), \alpha_{n+1} : C_{n+1}
+x_2:R_2(\alpha_2,\alpha_3), \ldots, R_n(\alpha_n,\alpha_{n+1}),
+\alpha_{n+1} : \cat C_{n+1}
 \]
-and represents the composition of the relations $R_1, R_2, R_3, \ldots,
+and represents the composition of the ``relations'' $R_1, R_2, R_3, \ldots,
 R_n$.  We write $d^-(\Phi)$ for the first category variable in $\Phi$
 (which we regard as the negative/contravariant position), $d^+(\Phi)$
 for the last category variable in $\Phi$ (which we regard as the
@@ -704,8 +707,8 @@ d^+(\alpha_1 : \cat C_1, x_1:R_1(\alpha_1,\alpha_2), \ldots, x_n:R_n(\alpha_n,\a
       \textrm{Term} & L,M,N & ::= & X \pipe \lambda X:M. N \pipe M\,N \pipe (M,N) \pipe \pi_1 M \pipe \pi_2 M \mid \text{refl}_{M} \\
       &&&\lceil \cat C \rceil \pipe \vlambda {\alpha:\cat C} a \pipe \hlambda {\alpha:\cat C}{\beta: \cat D} R \mid \ldots \\
       \textrm{Type Context} & \Gamma, \Delta & ::= & \cdot \pipe \Gamma, X : A\\
-      \textrm{Category Context} & \Xi, Z & ::= & \alpha:\cat C \pipe \alpha:\cat C;\beta: \cat D\\
-      \textrm{Set Context} & \Phi,\Psi & ::= & \alpha : \cat C \pipe \Phi , x : P,\beta:\cat D\\
+      \textrm{Set Context} & \Xi, Z & ::= & \alpha:\cat C \pipe \alpha:\cat C;\beta: \cat D\\
+      \textrm{Transformation Context} & \Phi,\Psi & ::= & \alpha : \cat C \pipe \Phi , x : P,\beta:\cat D\\
     \end{array}
   \end{mathpar}
   \caption{\vett{} Syntactic Forms}
@@ -730,13 +733,13 @@ Next, we overview our basic judgement forms.  We have
 \item Elements/natural transformations: ${\Gamma \pipe \Phi \vdash s :
   R}$, where ${\Gamma \vdash \Phi \isavectx}$ and $\Gamma\pipe
   \underline \Phi \vdash R \isaSet$.  A transformation $s$ has a context
-  of transformation variable and a single set output. To be well formed,
-  the context and set must be parameterized by the same contravariant
-  and covariant object variables. To ensure this, we use a coercion
-  operation $\underline \Phi$ that erases everything in the context but
-  the left-most and right-most object variables, i.e. $\underline{\alpha
-    : \cat C} = \alpha : \cat C$ and $\underline{\Phi} =
-  d^-(\Phi);d^+(\Phi)$ otherwise.
+  $\Phi$ of transformation variable and a single set output $R$. To be
+  well formed, the context and set must be parameterized by the same
+  contravariant and covariant object variables. To ensure this, we use a
+  coercion operation $\underline \Phi$ from transformation contexts to
+  set contexts that erases everything in the context but the left-most
+  and right-most object variables ($\underline{\alpha : \cat C} = \alpha
+  : \cat C$ and $\underline{\Phi} = d^-(\Phi);d^+(\Phi)$).
 
 \item Meta-language types and terms: $\Gamma \vdash A \isaTy$ and
   $\Gamma \vdash M : A$ as in standard dependent type theory.
@@ -1027,9 +1030,9 @@ continuation $t$ typed in a context $\Phi_l \jnctx \Phi_r$ and $\Phi_l
 \jnctx \Phi \jnctx \Phi_r$ as the context of the conclusion of the rule.
 Because of dependency, this is not necessarily well-formed in cases
 where the endpoints $A$ and $B$ of $\punitinXfromYtoZ{\cat C} A B$ are
-not fully general (i.e. not distinct variables).  However, the instances
-of this more general rule that do type check are derivable from our more
-restricted rule using right/left-hom types.
+not distinct variables.  However, the instances of this more general
+rule that do type check are derivable from our more restricted rule
+using right/left-hom types.
 
 The tensor product of sets is a kind of combined existential quantifier
 and monoidal product, which we combine into a single notation
