@@ -213,10 +213,10 @@ Originally developed for applications to homological algebra, it was
 quickly discovered that categorical structures were common in logic and
 computer science.  Formal systems like logics, type theories and
 programming languages typically have sound and complete models given by
-notions of structured categories,\cite{lawvere,goguen,lambek,moggi}.
+notions of structured categories,\cite{Lawvere69,LambekScott,moggi}.
 %
-This Curry-Howard-Lambek correspondence~\cite{curry-howard-lambek}
-applies to simply typed lambda calculus~\cite{lambekscott},
+This Curry-Howard-Lambek correspondence~
+applies to simply typed lambda calculus~\cite{LambekScott},
 computational lambda calculus~\cite{moggi}, linear logic~\cite{girard}
 dependent type theory\cite{cartmell1986}, and many other type theories
 designed based on category-theoretic semantics.
@@ -225,7 +225,6 @@ The syntax of a type theory should present an initial object in its
 category of models, a category-theoretic reformulation of logical
 soundness and completeness.
 
-% TODO: do we have citations for this?
 While this research program has been quite successful,
 category-theoretic techniques in computer science are sometimes
 criticized for being overly complex and hard to learn, especially for
@@ -260,7 +259,7 @@ language applications; for example, domain- and metric- and
 step-index-enriched categories have been used to model recursive
 programming languages and internal categories have been used to model
 parametricity and gradual
-typing\cite{order-enriched-cats,topos-of-trees,reflexive-graphs,double-cats-gradual-typing}.
+typing\cite{wand197913,topos-of-trees,reflexive-graphs,double-cats-gradual-typing}.
 
 Fortunately, the tools of category theory itself can be employed to
 simplify this complexity, specifically the tools of \emph{higher}
@@ -281,7 +280,7 @@ principles to eliminate the tedium of explicit proofs.
 %
 In the case of category theory, these principles can be formalized
 using algebraic structures such as 2-categories, bicategories,
-(virtual) double categories and pro-arrow equipments\cite{TODO}, an
+(virtual) double categories and pro-arrow equipments\cite{bicategories,proarrow-equipments,LEINSTER2002391,Cruttwell2010}, an
 approach known as \emph{formal category theory}.
 %
 In these structures, rather than defining notions of category, functor
@@ -304,7 +303,7 @@ in formal category theory.
 %
 We call the resulting theory \emph{virtual equipment type theory} (VETT)
 as (hyperdoctrines of) \emph{virtual
-  equipments}~\cite{virtualequipments}, a particular semantic model of
+  equipments}~\cite{LEINSTER2002391,Cruttwell2010}, a particular semantic model of
 formal category theory, provide a sound and complete notion of model for
 the theory.
 %
@@ -382,8 +381,7 @@ important concepts such as functor categories or opposite categories,
 the restriction is natural in that it corresponds exactly to a
 well-understood notion of model, virtual equipments, which can express a
 great deal of fundamental results and constructions in category
-theory~\cite{elements-of-oo-category-theory,
-  enriched-indexed-categories}.
+theory~\cite{riehl_verity_2022,Shulman13}.
 %
 Moreover, we can work around these unary/binary restrictions to some
 extent by viewing the type theory as a domain-specific language embedded
@@ -1047,7 +1045,7 @@ distinct variables $\alpha$ and $\beta$, $\punitinXfromYtoZ{\cat
   C}{\alpha}{\beta}$ denotes the unit, which has a universal property,
 but $\punitinXfromYtoZ{\cat C} A B$ denotes a restriction of a unit,
 which in general does not.  Those familiar with linear
-logic~\cite{polakawpfenning} might expect a more general rule, with the
+logic~\cite{polakow-pfenning} might expect a more general rule, with the
 continuation $t$ typed in a context $\Phi_l \jnctx \Phi_r$ and $\Phi_l
 \jnctx \Phi \jnctx \Phi_r$ as the context of the conclusion of the rule.
 Because of dependency, this is not necessarily well-formed in cases
@@ -1262,7 +1260,7 @@ syntactically use a variable more than once and still be ``linear'').
 
 Finally, we briefly describe the connectives for the ``meta-logic'',
 which extends Martin-L\"of type theory with $\Pi$/$\Sigma$ and extensional
-identity types (with their standard rules)~\cite{emltt}. We use
+identity types (with their standard rules). We use
 extensional identity types so that the description of models is simpler,
 but intensional identity types could be used instead.
 %
@@ -1392,7 +1390,7 @@ that much category theory can be formalized in virtual equipments, we
 show these examples to demonstrate how the VETT syntax gives a more
 familiar syntax to these constructions, while still avoiding the need
 for explicit naturality and functoriality side conditions.  We have
-checked some of the results in this section (e.g. Lemma~\ref{lem:yoneda}
+mechanized some of the results in this section (e.g. Lemma~\ref{lem:yoneda}
 and Lemma~\ref{lem:fubini-short} and the maps in
 Lemma~\ref{lem:adjunction}) in
 Agda.\footnote{\url{https://github.com/maxsnew/virtual-equipments/blob/master/agda/Examples.agda}}
@@ -1663,13 +1661,13 @@ enriched, internal and indexed notions.
 
 First, we can model the judgmental structure of the unary type theory
 and predicate logic in certain \emph{virtual equipments}
-\cite{leinster,crutwell-shulman}, i.e., virtual double categories with
+\cite{LEINSTER2002391,Cruttwell2010}, i.e., virtual double categories with
 restrictions. We briefly recount the structure present in a virtual
-double category, but see \citet{crutwell-shulman} for a precise
+double category, but see \citet{Cruttwell2010} for a precise
 definition of the composition rules for 2-cells and functor of virtual
 double categories.
 %
-Our notion here differs from \citet{crutwell-shulman} in several ways
+Our notion here differs from \citet{Cruttwell2010} in several ways
 to more closely match our judgmental structure: (1) we require that
 restrictions are given as coherent structure rather than mere
 existence (2) we include a notion of ``small'' object and (3) we don't
@@ -1735,7 +1733,7 @@ substitution, we use a variation on Lawvere's notion of
   \text{vEq}$ to the category of virtual equipments and functors.
 \end{definition}
 Categories with families $\mathcal C$ model dependent type theory
-\citep{cwf} and for each semantic context $\Gamma$, $V^\Gamma$ models
+\citep{dybjer-cwf} and for each semantic context $\Gamma$, $V^\Gamma$ models
 the VETT judgments in context $\Gamma$, with the functoriality
 modeling the fact that all of these judgments admit a well-behaved
 action of substitution.
@@ -1771,10 +1769,10 @@ are interpreted as products in the vertical category, and products of
 sets as products in the category of pro-arrows and 2-cells. The units,
 tensor and covariant and contravariant homs are modeled by the
 universal properties of the same names, as described for instance in
-\citet{shulmanFrBicats}. The graph of a profunctor is modeled by
-\emph{tabulators} \citet{grandis-pare}. Finally, the covariant and
+\citet{Shulman08}. The graph of a profunctor is modeled by
+\emph{tabulators} \citet{grandis-pare99}. Finally, the covariant and
 contravariant presheaf categories can be described as a weakening of
-the definition of a Yoneda equipment from \citet{yosegi-boxes} to
+the definition of a Yoneda equipment from \citet{diliberti-loregian} to
 virtual double categories. More detailed descriptions of these
 universal properties are included in the appendix.
 %
@@ -1864,7 +1862,7 @@ isomorphism.
 %
 We leave strictification theorems to future work.  
 
-\begin{construction}[(\citet{shulman-enriched-indexed})]
+\begin{construction}[(\citet{Shulman13})]
   Given any functor $\mathcal V : S^o \to \SymMonCat$ such that $S$
   and $\mathcal V$ have sufficiently well-behaved (indexed)
   $\kappa$-products, then there is a virtual equipment $\mathcal
@@ -1879,7 +1877,7 @@ We leave strictification theorems to future work.
 
 We now compare \vett{} with other calculi for formal category theory.  
 
-Riehl and Verity~\cite{rvXXelements} use a formal language of virtual
+Riehl and Verity~\cite{riehl_verity_2022} use a formal language of virtual
 equipments to prove results valid for $\infty$-categories without
 concrete manipulation of model categories. They formalize this language
 as a theory in Makkai's framework of first-order logic with dependent
@@ -1901,14 +1899,14 @@ admissible substitution operations.
 %% into first-order logic, whereas we argue our type-theoretic approach
 %% %
 
-The coend calculus~\citet{coend-calculus} is an informal syntax for
+The coend calculus~\citet{loregian_2021} is an informal syntax for
 manipulating profunctors involving ends and coends; an extension of
 \vett{} to treat profunctors of many variables of different variances
 may provide a formal treatment of it.
 
-\citet{djm-string-diagrams} provides a string diagram calculus for
+\citet{jazmyers-strings} provides a string diagram calculus for
 double categories and pro-arrow equipments, generalizing string
-diagrams for monoidal categories \citet{joyal?}. These are an
+diagrams for monoidal categories. These are an
 alternative approach to type theoretic calculi, with the string
 diagrams typically making tensor products simpler to work with, while
 a type theoretic calculus like SCT makes the closed structure
@@ -1920,10 +1918,8 @@ of categories, profunctors and natural transformations rather than the
 virtual double category of categories, functors, profunctors and natural
 transformations. An abstract structure along these lines is a
 \emph{Cartesian
-  bicategory}~\citet{carboni-walters,carboni-walters-someonelese}.  (In
-a terminological collision, \citet{fioresaville} give a syntax for a a
-bicategory with products/finite limits, but this is a different notion.)
-\citet{jonasfreycartesianbicategories} describe some preliminary work on
+  bicategory}~\citet{CARBONI198711}.
+\citet{frey} describe some preliminary work on
 a proof system for Cartesian bicateogires.  This calculus is more
 general than \vett{} in that their profunctors may have 0, 1 or more
 covariant or contravariant variables, but they do not have a term syntax
@@ -1964,7 +1960,7 @@ the theorems that are provable in \vett{} apply in more settings.
 %% assistant in the style of Agda or Coq \cite{agda,coq}.
 
 Finally, some variations on double categories have been used to model
-the structure of certain program logics. \citet{newlicata20} present a
+the structure of certain program logics. \citet{double-cats-gradual-typing} present a
 logic for \emph{vertically thin} pro-arrow equipments, i.e., pro-arrow
 equipments where the functor and natural transformation judgments are
 posetal. This calculus is quite different from ours in that the
@@ -1972,7 +1968,7 @@ horizontal morphisms are terms of a programming language, and so they
 are not presented as relations with co-variant and contravariant
 variables, and the equipment structure is modeled by explicit coercions
 rather than by syntactic substitution of vertical arrows in horizontal
-arrows. Another similar calculus is System P \citep{systemP} which is an
+arrows. Another similar calculus is System P \citep{dunphyreddy} which is an
 internal language of \emph{reflexive graph categories}, which are like
 double categories without horizontal composition.
 
@@ -1982,9 +1978,9 @@ double categories without horizontal composition.
 In future work, \vett{} could incorporate functor categories by
 generalizing the unary type theory of functors to functors of many
 variables, in which case ordinary $\lambda$ calculus can be used to
-define functor categories as function types. Similarly, ideas from modal
-type theory/graded linear logic could be used for defining opposite
-categories \cite{mike-contravariance-enrichment,semiring-stuf??}. 
+define functor categories as function types. Similarly, ideas from
+coeffects and enriched category theory could be used for defining
+opposite categories \cite{Shulman18,coeffect}.
 
 %% while many constructions in category theory can be formalized in
 %% virtual equipments, and therefore \vett{}, others require more
@@ -2409,7 +2405,7 @@ theory, we do not present explicit transitivity, congruence, or
 transport rules, but rather consider these as inherent to the notion
 of equality. This can be formalized by modeling the terms of our type
 theory as a quotient inductive inductive type
-\cite{altenkirch-kaposi-popl17}.
+\cite{qit}.
 
 \begin{figure}
   \begin{mathpar}
