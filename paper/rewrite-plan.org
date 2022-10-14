@@ -28,11 +28,11 @@ search for "appendix"
 
 - [-] Syntax
   1. [X] typing rules for substitution etc
-  2. [ ] descriptions of different operations like \jnctx (some of these are in semantics currently)
+  2. [X] descriptions of different operations like \jnctx (some of these are in semantics currently)
   3. [X] substitution in functors/profunctors/elements
-  4. [ ] composition of substitutions?
-  5. [X] equational theory
-  6. [ ] admissibility of general identity elimination (syntax or semantics?)
+  4. [X] equational theory
+  5. [ ] admissibility of general identity elimination (syntax or semantics? really part of completeness)
+  6. [ ] composition of substitutions?
 - [ ] Examples
   1. [ ] Compositions/naturality
   2. [ ] Fubini
