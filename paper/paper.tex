@@ -2091,8 +2091,52 @@ Shulman, Dominic Verity for helpful feedback on this work.
 
 \subsection{Substitution}
 
-In Figure~\ref{fig:subst} we give full definitions for well-formedness
-of contexts and substitutions.
+In Figure~\ref{fig:ctx} we include the formation rules and definitions
+of the three kinds of contexts that are used in \vett{}.
+%
+In Figure~\ref{fig:substitutions} we give definitions for
+well-typedness of the corresponding three kinds of substitutions.
+
+\begin{figure}
+  \begin{mathpar}
+    \inferrule*[right=TyCtxForm]
+    {}
+    {\Gamma \isadtctx}
+
+    \inferrule*[right=MtTyCtx]{}{\cdot \isadtctx}
+
+    \inferrule*[right=TyCtxExt]
+    {\Gamma \isadtctx \and \Gamma \vdash A \isaTy}
+    {\Gamma , X : A \isadtctx}
+
+    \inferrule*[right=BoundaryForm]
+    {\Gamma \isadtctx}
+    {\Gamma \vdash \Xi \boundary}
+
+    \inferrule*[right=BoundarySingle]
+    {\Gamma \vdash \cat C \isaCat}
+    {\Gamma \vdash \alpha: \cat C \boundary}
+
+    \inferrule*[right=BoundaryDbl]
+    {\Gamma \vdash \cat C \isaCat \and \Gamma\vdash\cat D \isaCat}
+    {\Gamma \vdash \alpha: \cat C; \beta: \cat D \isaboundary}
+
+    \inferrule*[right=SetCtxForm]
+    {\Gamma \isadtctx}
+    {\Gamma \vdash \Phi \isavectx}
+
+    \inferrule*[right=SetCtxMt]
+    {\Gamma \vdash \cat C \isaCat}
+    {\Gamma \vdash \alpha: \cat C \isavectx}
+
+    \inferrule*[right=SetCtxExt]
+    {\Gamma \vdash \Phi \isavectx\and
+    \Gamma \pipe d^+\Phi; \beta:\cat D \vdash R \isaSet}
+    {\Gamma \vdash \Phi, x:R, \beta:\cat D \isavectx}
+  \end{mathpar}
+  \caption{Contexts}
+  \label{fig:ctx}
+\end{figure}
 
 \begin{figure}
   \begin{mathpar}
@@ -2102,96 +2146,120 @@ of contexts and substitutions.
       \textrm{Transformation Substitution} & \phi, \psi & ::= & a/\alpha \pipe \phi,s/x, \psi      
     \end{array}
 
-      \inferrule*[right=TyCtxForm]
-        {}
-        {\Gamma \isadtctx}
-
-    \inferrule*[right=SetCtxForm]
-    {\Gamma \isadtctx}
-    {\Gamma \vdash \Xi \boundary}
-
-    \inferrule*[right=TransCtxForm]
-    {\Gamma \isadtctx}
-     {\Gamma \vdash \Phi \isavectx}
-    \inferrule
+    \inferrule*[right=TermSubstFormation]
     {\Delta \isadtctx \and \Gamma \isadtctx}
-    {\gamma : \Delta \to \Gamma}
+    {\Delta \vdash \gamma :: \Gamma}
     
-    \inferrule*[right=Boundary Map formation]
+    \inferrule*[right=TermSubstMt]
+    {}
+    {\cdot : \Gamma \to \cdot}
+
+    \inferrule*[right=TermSubstExt]
+    {\gamma : \Delta \to \Gamma \and \Delta \vdash M : A[\gamma]}
+    {\gamma,M/X : \Delta \to \Gamma,X:A}
+
+    \inferrule*[right=BoundarySubstFormation]
     {\Gamma \vdash Z \boundary \and \Gamma \vdash \Xi \boundary}
-    {\Gamma \vdash \xi : Z \to \Xi}
+    {\Gamma\pipe Z \vdash \xi :: \Xi}
 
-    \inferrule*[right=Cat Subst formation]
+    \inferrule*[right=BoundarySubstSingle]
+    {\Gamma\pipe \alpha:\cat C \vdash b : \cat D}
+    {\Gamma \pipe \alpha:\cat C \vdash b/\beta :: \beta:\cat D}
+
+    \inferrule*[right=BoundarySubstDbl]
+    {\Gamma\pipe d^-\Xi \vdash a : \cat C\and
+     \Gamma\pipe d^+\Xi \vdash b : \cat D}
+    {\Gamma \pipe \Xi \vdash a/\alpha;b/\beta :: (\alpha : \cat C; \beta:\cat D)}
+
+    \inferrule*[right=ElementSubstFormation]
     {\Gamma \vdash \Psi \isavectx \and \Gamma \vdash \Phi \isavectx}
-    {\Gamma \vdash \phi : \Psi \to \Phi}
-  \end{mathpar}
-  \begin{mathpar}
-    \inferrule{}{\cdot \isadtctx}
-
-    \inferrule
-    {\Gamma \isadtctx \and \Gamma \vdash A \isaTy}
-    {\Gamma , X : A \isadtctx}\\
-
-    \inferrule
-    {X : A \in \Gamma}
-    {\Gamma \vdash X : A}
-
-    \inferrule
-    {}
-    {\alpha: \cat C \vdash \alpha: \cat C}
-
-    \inferrule
-    {\Gamma \vdash \cat C : \isaCat}
-    {\Gamma \vdash \alpha: \cat C \isavectx}
-
-    \inferrule
-    {\Gamma \vdash \Phi \isavectx\and
-    \Gamma \pipe d^+\Phi; \beta:\cat D \vdash R \isaSet}
-    {\Gamma \vdash \Phi, x:R, \beta:\cat D \isavectx}
-
-    \inferrule
-    {}
-    {\Gamma \pipe \alpha:\cat C, x : R, \beta: \cat D \vdash x : R}
+    {\Gamma\pipe \Psi \vdash \phi :: \Phi}
 
     % horizontal identity
-    \inferrule
+    \inferrule*[right=ElementSubstMt]
     {\Gamma\pipe \beta:\cat C \vdash a : \cat C}
     {\Gamma \pipe \beta:\cat C \vdash a/\alpha : (\alpha : \cat C)}
 
-    \inferrule
-    {\Psi = \Psi_1 \jnctx \Psi_2\and
-      \Gamma\pipe\Psi_1 \vdash \phi : \Phi\and
-      \Gamma \pipe \Psi_2 \vdash t : R[d^+\phi;b/\beta] \and
-      \Gamma \vdash \phi_2 : \Psi_2 \to \Phi_2
-      }
+    \inferrule*[right=ElementSubstExt]
+    {\Gamma\pipe\Psi \vdash \phi :: \Phi \and
+      d^+\Psi = d^-\Psi'
+     \Gamma\pipe\Psi' \vdash t : R[d^+\phi;b/\beta]\and
+     \Gamma\pipe d^+\Psi'\vdash b : \cat D}
     {\Gamma\pipe\Psi \vdash \phi,t/x,b/\beta :: (\Phi,x:R,\beta:\cat D)}
   \end{mathpar}
-
   \caption{Substitution}
+  \label{fig:substitions}
 \end{figure}
 
-\begin{figure}
-  \begin{align*}
-    \underline{\alpha:C} &= \alpha:C\\
-    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
-  \end{align*}
+
+
+These definitions involve several operations $d^\pm\Phi$, $\underline
+\Phi$ and $\Phi\jnctx \Psi$ on contexts (and their functorial lift to
+substitutions) that we now define.
+
+\begin{definition}
+  We define operations $d^\pm$ that project out the covariant and
+  contravariant boundary of a set context.
+  This can be typed with the admissible rule
+  \begin{mathpar}
+    \inferrule*[right=(*)]
+               {\Gamma \vdash \Phi \vectx}
+               {\Gamma \vdash d^\pm\Phi \boundary}
+  \end{mathpar}
+  and is defined as
   \begin{align*}
     d^{\pm}(\alpha:\cat C) &= \alpha : \cat C\\
     d^{-}(\Phi,x:R,\Psi) &= d^-\Phi\\
     d^{+}(\Phi,x:R,\Psi) &= d^-\Psi
   \end{align*}
+  This operation extends to the substitutions with admissible rule
+  \begin{mathpar}
+    \inferrule*[right=(*)]
+    {\Gamma\pipe\Psi \vdash \phi :: \Phi}
+    {\Gamma\pipe d^\pm \Psi \vdash d^\pm\phi :: d^\pm \Phi}
+  \end{mathpar}
+  defined as
   \begin{align*}
     d^{\pm}(a/\alpha) &= a/\alpha\\
     d^{-}(\phi,t/x,\psi) &= d^-\phi\\
     d^{+}(\phi,t/x,\psi) &= d^+\psi\\
   \end{align*}
-  \caption{Operations on Contexts}
-\end{figure}
+\end{definition}
 
+\begin{definition}
+  We define the operation of restricting a set context to both sides
+  of its boundary with admissible typing
+  \begin{mathpar}
+    \inferrule*[right=(*)]
+    {\Gamma \vdash \Phi \isavectx}
+    {\Gamma \vdash \underline\Phi \boundary}
+  \end{mathpar}
+  and definition
+  \begin{align*}
+    \underline{\alpha:C} &= \alpha:C\\
+    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
+  \end{align*}
+  The extension to substitutions has admissible typing
+  \begin{mathpar}
+    \inferrule*[right=(*)]
+    {\Gamma \pipe \Psi \vdash \phi :: \Phi}
+    {\Gamma\pipe\underline \vdash \Phi \boundary}
+  \end{mathpar}
+  and definition
+  \begin{align*}
+    \underline{\alpha:C} &= \alpha:C\\
+    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
+  \end{align*}
+\end{definition}
 
-In Figure~\ref{fig:admissible}, we describe the admissible typing
-rules for the actions of substitution.
+% RETURN
+Finally, we define the operation of ``horizontal composition'' of set
+contexts $\Phi \jnctx \Psi$ and its functorial lift $\phi \jnctx
+\psi$. Note that the horizontal composition is only well-defined when $$
 
+Next, we define the actions of substitutions on terms. We elide the
+obvious action of term substitutions $\gamma$ and include only the
+more unusual substructural substitutions.
 \begin{definition}[Substitution Actions]
   For any $\Gamma \pipe \alpha: \cat C \vdash a : \cat D$ and $\Gamma
   \pipe \beta:\cat D \vdash b \cat E$, we define $b[a/\beta]$ by
@@ -2240,24 +2308,14 @@ rules for the actions of substitution.
   \end{align*}
 \end{definition}
 
-%% Theorems about substitution?
+\begin{lemma}[Properties of Substitution]
+  Substitution is associative and unital?
+\end{lemma}
 
-%% \begin{definition}[Substitution of Objects in Sets]
-%%   3
-%% \end{definition}
-%% \begin{definition}[Substitution of Elements in Elements]
-%%   3
-%% \end{definition}
+%% Theorems about substitution?
 
 \begin{figure}
   \begin{mathpar}
-    \inferrule
-    {}
-    {\cdot : \Gamma \to \cdot}
-
-    \inferrule
-    {\gamma : \Delta \to \Gamma \and \Delta \vdash M : A[\gamma]}
-    {\gamma,M/X : \Delta \to \Gamma,X:A}
     
     \inferrule
     {\Gamma \vdash \Phi \isavectx \and
