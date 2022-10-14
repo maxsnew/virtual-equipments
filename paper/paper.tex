@@ -2773,6 +2773,23 @@ Section~\ref{sec:examples}.
   \end{enumerate}
 \end{proof}
 
+\begin{lemma}[Equivalent Definitions of Adjoints]
+  We show that given a morphism of profunctors
+  \[ \homunary \alpha {\punitinXfromYtoZ{} {L\alpha} \beta} \beta {\punitinXfromYtoZ {} \alpha {R \beta}}\]
+  we can extract a unit natural transformation $\eta : \pendallXdotY
+  \alpha \punitinXfromYtoZ {}{\alpha}{R(L\alpha)}$ and vice-versa.
+\end{lemma}
+\begin{proof}
+  The construction is exactly the ordinary proof but formalized in \vett{} syntax.
+  Given the morphism of profunctors $M$, we define the unit by evaluating at the identity:
+  \[ \pendallXdotY \alpha \appunary M \alpha {\punitrefl \alpha} \alpha \]
+  and given the unit $\eta$, we can define a morphism of profunctors
+  by composing the unit with the functorial lift of the input:
+  \[ \homunary \alpha {f} \beta \textrm{comp}(\pendappXtoY \eta \alpha, \textrm{fctor}(R)(f))\]
+  That this is an isomorphism follows by a similar argument to the
+  proof of the Yoneda lemma.
+\end{proof}
+
 \section{Semantics}
 \label{sec:appendix:semantics}
 
