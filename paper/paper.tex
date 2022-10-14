@@ -2650,8 +2650,9 @@ uses the hom types.
 \section{Extended Formal Category Theory Examples}
 \label{sec:appendix:examples}
 
-Next, we provide some futher detailed examples of the formal category
-theory constructions and theorems from Section~\ref{sec:examples}.
+Next, we provide some futher details for some of the examples of the
+formal category theory constructions and theorems from
+Section~\ref{sec:examples}.
 
 \begin{definition}[Synthetic Composition/Functoriality]
   We provide the definitions of the terms in \cref{construction:synthetic-composition}
@@ -2659,7 +2660,8 @@ theory constructions and theorems from Section~\ref{sec:examples}.
   \item Identity $\id = \pendlambdaXdotY \alpha \punitrefl \alpha$
   \item Composition $\textrm{comp} = \lambdaunary {\alpha_1} f {\alpha_2} \punitelimkontZatABC {\alpha. \homrallXYtoZ {\alpha_3} g g} {\alpha_1} f {\alpha_2}$
   \item Functoriality $\textrm{fctor}(F) = \lambdaunary {\alpha_1} f {\alpha_2} \punitelimkontZatABC {\alpha. \punitrefl{F\,\alpha}} {\alpha_1} f {\alpha_2}$
-  \item Profunctoriality $\textrm{prof}(R) = \lambdaunary {\alpha_1} f {\alpha_2} {\punitelimkontZatABC {\alpha. \homrlambdaXatYdotZ r {\beta_1} \homrlambdaXatYdotZ g {\beta_2} {\homlappXtoYatZ {(\punitelimkontZatABC {\beta. \homllambdaXatYdotZ r \alpha r}{\beta_1}{g}{\beta_2})} {r} {\alpha}}}{\alpha_1} f {\alpha_2}}$
+  \item Profunctoriality
+    \[\textrm{prof}(R) = \lambdaunary {\alpha_1} f {\alpha_2} {\punitelimkontZatABC {\alpha. \homrlambdaXatYdotZ r {\beta_1} \homrlambdaXatYdotZ g {\beta_2} {\homlappXtoYatZ {(\punitelimkontZatABC {\beta. \homllambdaXatYdotZ r \alpha r}{\beta_1}{g}{\beta_2})} {r} {\alpha}}}{\alpha_1} f {\alpha_2}}\]
 
     We can also define left and right composition for profunctors by
     applying the profunctorial action to a reflexivity on one side or
