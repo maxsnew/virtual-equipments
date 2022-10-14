@@ -1,3 +1,224 @@
+
+
+%% The final connectives we need are the ``universes'' that internalize
+%% the double category structure as types in the CwF.
+
+%% \begin{definition}
+%%   Let $(\textrm{Ctx},\textrm{Ty},\textrm{Tm},\textrm{ext})$ be a
+%%   category with families and let $\mathcal V = (C,C_d)$ be a DCD internal to
+%%   $\Set^\textrm{Ctx}$. Then
+%%   \begin{enumerate}
+%%   \item $\mathcal V$ objects are representable as types if there is a
+%%     type given by a section $\textrm{Ob} \in \textrm{Ty}(1)$ with a
+%%     natural isomorphism
+%%     \[ \textrm{Tm}(!_\Gamma^*\textrm{Ob}) \cong C_{0}(\Gamma) \]
+%%   \item $\mathcal V$ vertical arrows are representable as types if
+%%     there is a type
+%%     \[ \textrm{Tm}(Functor)(\Gamma)(a,b) \cong C_0(\Gamma)(a,b)
+%%     \]
+%%     and similarly horizontal displays are representable as types if
+%%     \[ \textrm{Tm}(Prof)(\Gamma)(a,b) \cong \{ R \in C_d(\Gamma) \,|\, s(R) = a \wedge t(R) = b \}
+%%     \]
+%%   \item Closed $\mathcal V$ transformations are representable as types if
+%%     \[ \textrm{Tm}(\textrm{End})(\Gamma)(a,R) \cong C_\vdash^{\id,\id}(r(a),R) \]
+%%   \end{enumerate}
+%% \end{definition}
+
+\begin{proof}
+  The details are in the linked lemmas. Here we give an overview of
+  the relevant structure and properties.
+  \begin{enumerate}
+  \item Vertical composition is given by substitution of object terms
+    and is associative and unital with the variable as the identity
+    (Lemma \ref{lem:vertical-cat}).
+  \item Horizontal composition is given by the gluing of contexts
+    $\Phi\jnctx \Psi$ and is associative and unital with the single
+    category variable as the identity (Lemma
+    \ref{lem:horizontal-cat}).
+  \item Vertical composition of substitutions is given by substitution
+    $\phi[\psi]$ and is associative and unital with the identity
+    substitution given by a substitution of variables for themselves
+    (Lemma \ref{lem:vertical-sq-cat}).
+  \item Horizontal composition of substitutions is given by gluing of
+    substitutions $\phi \jnctx \psi$ and is associative and unital
+    with the identity substitution given by a single functor/open
+    object substitution (Lemma \ref{lem:horizontal-sq-cat}).
+  \item The process of constructing horizontal identity substitutions
+    is functorial in that the horizontal identity of a vertical
+    identity arrow is the vertical identity
+    (Lemma~\ref{lem:hor-vert-id-id}) and the vertical composition of
+    horizontal identities is a horizontal identity
+    (Lemma~\ref{lemma:lem-hor-sq-id}).
+  \item The process of horizontal composition of substitutions is
+    functorial in that the horizontal composition of vertical identity
+    squares is the identity (Lemma~\ref{lem:lem-vert-sq-id}) and the
+    interchange law holds (Lemma~\ref{lem:interchange}).
+  \end{enumerate}
+\end{proof}
+
+
+\begin{lemma}
+  \label{lem:sq-vid-hid}
+  For any $\cat C$, $\alpha/\alpha : \alpha:\cat C \to \alpha:\cat C$
+  is both a horizontal and vertical identity.
+\end{lemma}
+
+\begin{lemma}
+  \label{lem:sq-vcomp-hid}
+  For any $\beta:\cat D \vdash a : \cat C$ and $\alpha:\cat C \vdash a': \cat C'$
+  the substitution
+  \[ (a'/\alpha')[a/\alpha] : \beta:\cat D \to \alpha':\cat C' \]
+  satisfies
+  \[ (a'/\alpha')[a/\alpha] = a'[a/\alpha]/\alpha' \]
+\end{lemma}
+
+\begin{lemma}
+  \label{lem:sq-vid-hcomp}
+  For any $\Phi$ and $\Psi$ with $\Phi\jnctx \Psi$ well-defined,
+  \[ \id_\Phi \jnctx \id_\Psi = \id_{\Phi\jnctx\Psi} \]
+  follows by induction.
+\end{lemma}
+
+\begin{lemma}{Interchange}
+  \label{lem:sq-vcomp-hcomp}
+  We prove the interchange law
+  $$(\phi\jnctx\psi)[\phi'\jnctx\psi'] = \phi[\phi'] \jnctx \psi[\psi']$$
+  by induction on $\psi$.
+
+  \begin{enumerate}
+  \item When $\psi=a/\alpha$
+      \begin{align*}
+    (\phi\jnctx a/\alpha)[\phi'\jnctx b/\beta]
+        &= \phi[\phi']\\
+        &= \phi[\phi'] \jnctx (a[b/\beta]/\alpha)\\
+        &= \phi[\phi'] \jnctx (a/\alpha)[b/\beta]
+  \end{align*}
+    \item When $\psi=\psi,t/x,a/\alpha$
+      \begin{align*}
+        (\phi\jnctx (\psi,t/x,a/\alpha))[\phi' \jnctx (\psi'_1\jnctx\psi'_2)]
+        &= ((\phi\jnctx \psi),t/x,a/\alpha)[(\phi' \jnctx \psi'_1)\jnctx\psi'_2]\\
+        &= (\phi\jnctx \psi)[\phi' \jnctx \psi'_1],t[\psi'_2]/x,a[d^+\psi'_2]/\alpha\\
+        &= (\phi[\psi'] \jnctx \psi[\psi'_1]),t[\psi'_2]/x,a[d^+\psi'_2]/\alpha\\
+        &= \phi[\psi'] \jnctx (\psi[\psi'_1],t[\psi'_2]/x,a[d^+\psi'_2]/\alpha)\\
+        &= \phi[\psi'] \jnctx (\psi,t/x,a/\alpha)[\psi'_1\jnctx \psi'_2]
+      \end{align*}
+  \end{enumerate}
+  Again, this covers all cases by \cref{inversion}.
+\end{lemma}
+
+%% \begin{figure}
+%%   \begin{mathpar}
+%%     % vertical arrows
+%%     \inferrule*[Right=VComp*]
+%%     {\alpha:\cat C \vdash b : \cat D \and
+%%      \beta:\cat D \vdash c : \cat E}
+%%     {\alpha:\cat C \vdash c[b/\beta] : \cat E}\\
+
+%%     \beta[b/\beta] = b\and
+%%     c[\beta/\beta] = c\and
+%%     c[b/\beta][a/\alpha] = c[b[a/\alpha]/\beta]\\
+
+%%     % horizontal arrows
+%%     \inferrule*[Right=HComp*]
+%%     {\Gamma \vdash \Phi \isavectx\\\\
+%%       \Gamma\vdash\Psi\isavectx\\\\
+%%       d^+\Phi = d^-\Psi}
+%%     {\Gamma \vdash \Phi \jnctx \Psi \isavectx}
+
+%%     d^+(\Phi \jnctx \Psi) = d^+\Psi\and
+%%     d^-(\Phi \jnctx \Psi) = d^-\Phi\\
+
+%%     \Phi \jnctx (d^+\Phi) = \Phi \and
+%%     (d^-\Phi) \jnctx \Phi = \Phi \and
+%%     (\Phi \jnctx \Psi) \jnctx \Sigma = \Phi \jnctx (\Psi \jnctx \Sigma)\\
+
+%%     % 2-cells
+%%     %% vertical composition
+%%     \inferrule*[Right=V2Comp*]
+%%     {\Sigma \vdash \psi :: \Psi \and
+%%      \Psi \vdash \phi :: \Phi}
+%%     {\Sigma \vdash \phi[\psi] :: \Phi}
+
+%%     \inferrule*[Right=V2Id*]
+%%     {}
+%%     {\Phi \vdash \id_\Phi :: \Phi}\\
+
+%%     \id_\Phi[\phi] = \phi\and
+%%     \phi[\id_\Psi] = \phi\and
+%%     \phi[\psi][\sigma] = \phi[\psi[\sigma]]\\
+
+%%     %% Horizontal composition
+%%     \inferrule*[Right=H2Comp*]
+%%     {\Phi' \vdash \phi :: \Phi \\\\
+%%      \Psi' \vdash \psi :: \Psi \\\\
+%%      d^+\phi = d^-\psi 
+%%     }
+%%     {\Phi' \jnctx \Psi' \vdash \phi \jnctx \psi :: \Phi \jnctx \Psi}
+
+%%     d^-(\phi\jnctx\psi) = d^-\phi\and
+%%     d^+(\phi\jnctx\psi) = d^+\phi\and
+    
+%%     \phi\jnctx d^+\phi = \phi\and
+%%     d^-\phi \jnctx \phi = \phi\and
+%%     \phi\jnctx(\psi\jnctx\sigma) = (\phi\jnctx\psi)\jnctx\sigma
+
+%%     %% Interchange
+%%     \inferrule*[Right=Interchange]
+%%     {\Phi'' \vdash \phi' :: \Phi' \and
+%%      \Psi'' \vdash \psi' :: \Psi' \and
+%%      d^+\phi' = d^-\psi'\\\\
+%%      \Phi' \vdash \phi :: \Phi \and
+%%      \Psi' \vdash \psi :: \Psi \and
+%%      d^+\phi = d^-\psi
+%%     }
+%%     {(\phi\jnctx\psi)[\phi'\jnctx\psi'] = \phi[\phi'] \jnctx \psi[\psi']}\\
+    
+%%     % Interaction with displays
+%%     \inferrule
+%%     {\Psi \vdash \phi :: \Phi\and
+%%      \Phi \vdash t : R[a/\alpha;b/\beta]}
+%%     {\Psi\vdash t[\phi] : R[a[d^-\phi]/\alpha;b[d^+\phi]/\beta]}
+
+%%     t[\id_\Phi] = t\and
+%%     t[\phi][\psi] = t[\phi[\psi]]
+%%   \end{mathpar}
+%%   \caption{Syntactic Double Category with Displays Structure}
+%% \end{figure}
+
+%% \section{Soundness}
+
+%% We next show how to uniquely interpret the profunctor contexts and
+%% substitutions in an arbitrary HED.
+
+%% \begin{proof}
+%%   We sketch only the interpretation of profunctor contexts in $C_1$,
+%%   as the rest is a straightforward translation from type theoretic to
+%%   categorical syntax.  We define the translation of a context
+%%   $\sem{\Phi}$ by induction on $\Phi$:
+
+%%   \begin{align*}
+%%     \sem{\alpha:\cat C} &= \sem{\id^h(\cat C)}\\
+%%     &= \id^h(\sem{\cat C})\\\\
+%%     \sem{\Phi , x:R, \beta:\cat C}\\
+%%     &= \sem{\Phi \circ_h i(R)}\\
+%%     &= \sem{\Phi} \sem{\Phi} \circ_h i(\sem{R})
+%%   \end{align*}
+%%   As these derivations show every step was uniquely determined by the
+%%   homomorphism property. Preservation of identity follows by
+%%   definition. Preservation of composition $\sem{\Phi \jnctx \Psi} =
+%%   \sem{\Phi} \circ_h \sem{\Psi}$ follows by induction on $\Psi$:
+%%   \begin{align*}
+%%     \sem{\Phi \jnctx (\alpha:\cat C)} &= \sem{\Phi} = \sem{\Phi} \circ_h \sem{\id(C)}\\
+%%     \sem{\Phi \jnctx (\Psi,x:R,\alpha:\cat C)}
+%%     &= \sem{(\Phi \jnctx \Psi),x:R,\alpha:\cat C} \\
+%%     &= \sem{(\Phi \jnctx \Psi)} \circ_h i(\sem{R})\\
+%%     &= (\sem{\Phi} \circ_h \sem{\Psi}) \circ_h i(\sem{R})\\
+%%     &= \sem{\Phi} \circ_h (\sem{\Psi} \circ_h i(\sem{R}))\\
+%%     &= \sem{\Phi} \circ_h \sem{\Psi, x:R, \alpha:\cat C}
+%%   \end{align*}
+%%   The interpretation of transformation substitutions is analogous.
+%% \end{proof}
+
 %% \subsection{Dependent Types}
 
 %% Next, we cover the basic dependent type theory structure: $\Pi,\Sigma$
