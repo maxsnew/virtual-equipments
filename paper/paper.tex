@@ -2426,7 +2426,9 @@ theory, we do not present explicit transitivity, congruence, or
 transport rules, but rather consider these as inherent to the notion
 of equality. This can be formalized by modeling the terms of our type
 theory as a quotient inductive inductive type
-\cite{qit}.
+\cite{qit}.  We elide the types on the $\beta$ rules, as they can be
+inferred from the shape of the term, but include them for clarity on the
+$\eta$ rules.  
 
 \begin{figure}
   \begin{mathpar}
@@ -2478,7 +2480,7 @@ theory as a quotient inductive inductive type
 
     \inferrule*[right=NegPresheaf$\beta$]
     {~}
-    {\negPresheafApp a (\lambda \alpha. R) = R[a/\alpha]}
+    {\negPresheafApp a {(\lambda \alpha. R)} = R[a/\alpha]}
 
     \inferrule*[right=NegPresheaf$\eta$]
     {\Gamma \pipe \beta:\cat D \vdash p : \negPresheaf {\cat C}}
