@@ -1398,6 +1398,7 @@ Agda.\footnote{\url{https://github.com/maxsnew/virtual-equipments/blob/master/ag
 First, we using the elimination for the unit set, we can see that all
 constructions are (pro-)functorial:
 \begin{construction}
+  \label{construction:synthetic-composition}
   For any small category $\cat C$, we can construct natural elements
   \begin{enumerate}
   \item Identity: $\pendallXdotY {\alpha} {\punitinXfromYtoZ {\cat C}{\alpha}{\alpha'}}$
@@ -2208,7 +2209,7 @@ well-typedness of the corresponding three kinds of substitutions.
     {\Gamma\pipe\Psi \vdash \phi,t/x,b/\beta :: (\Phi,x:R,\beta:\cat D)}
   \end{mathpar}
   \caption{Substitution}
-  \label{fig:substitions}
+  \label{fig:substitutions}
 \end{figure}
 
 These definitions involve several operations $d^\pm\Phi$, $\underline
@@ -2768,7 +2769,7 @@ equipments.
     (a/\alpha)[b/\beta] &= a[b/\beta]/\alpha\\
     (\phi_1,t/x,a/\alpha)[\psi_1\jnctx\psi_2] &= \phi_1[\psi_1], t[\psi_2],a[d^+\psi_2]
   \end{align*}
-  This covers all cases by \cref{inversion}.
+  This covers all cases by \cref{lem:inversion}.
 
   We define the vertical identity $\id_\Phi$ by induction on $\Phi$
   \begin{align*}
@@ -3061,96 +3062,96 @@ functors
   \[ \id_{L[\alpha]} = \epsilon_{L[\alpha]} \circ L[\eta_{\alpha}] \]
 \end{definition}
 
-\begin{theorem}[Adjunctions]
-  $G$ is right adjoint to $F$ if and only if there is a natural isomorphism
-  $\punitinXfromYtoZ {\cat D} {(F \alpha)} \beta \cong \punitinXfromYtoZ {\cat D} \alpha {G \beta}$
-\end{theorem}
-\begin{proof}
-  First, by \cref{lem:co-unit}, the forward direction of the
-  isomorphism is equivalent to providing a term
-  \[ \eta : \pendallXdotY \alpha \punitinXfromYtoZ \alpha {G(F(\alpha)) } \]
+%% \begin{theorem}[Adjunctions]
+%%   $G$ is right adjoint to $F$ if and only if there is a natural isomorphism
+%%   $\punitinXfromYtoZ {\cat D} {(F \alpha)} \beta \cong \punitinXfromYtoZ {\cat D} \alpha {G \beta}$
+%% \end{theorem}
+%% \begin{proof}
+%%   First, by \cref{lem:co-unit}, the forward direction of the
+%%   isomorphism is equivalent to providing a term
+%%   \[ \eta : \pendallXdotY \alpha \punitinXfromYtoZ \alpha {G(F(\alpha)) } \]
 
-  Second, the backward direction of the isomorphism is equivalent to
-  providing a term
-  \[ \epsilon : \pendallXdotY \beta \punitinXfromYtoZ {F(G(\beta))} \beta \]
+%%   Second, the backward direction of the isomorphism is equivalent to
+%%   providing a term
+%%   \[ \epsilon : \pendallXdotY \beta \punitinXfromYtoZ {F(G(\beta))} \beta \]
 
-  And the triangle laws state exactly that the induced functions are
-  isomorphisms.
-\end{proof}
+%%   And the triangle laws state exactly that the induced functions are
+%%   isomorphisms.
+%% \end{proof}
 
-\subsection{Kan Extensions/Lifts}
+%% \subsection{Kan Extensions/Lifts}
 
-As a further example of the synthetic approach to universal
-properties, we consider right and left \emph{Kan extensions}, which
-are generalizations of limits and colimits, respectively.
+%% As a further example of the synthetic approach to universal
+%% properties, we consider right and left \emph{Kan extensions}, which
+%% are generalizations of limits and colimits, respectively.
 
-The right Kan extension of $F$ along $J$ is the ``best'' (maximal) way to
-fill in the following square:
-\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEQBfU9TXfIRQBGclVqMWbACLdeIDNjwEiZYePrNWiDgHJu4mFADm8IqABmAJwgBbJGRA4ISAEzVNUnQCk5lm-aIjs5IohJabABiBlxAA
-\begin{tikzcd}
-\cat C \arrow[d, "J"] \arrow[r, "F"] & \cat D \\
-\cat C'                              &  
-\end{tikzcd}\]
-I.e. a functor $\textrm{Ran}_J F : \cat C' \to \cat D$ with a
-universal natural transformation $\textrm{Ran}_J F \circ J \Rightarrow
-F$. A left kan extension $\textrm{Lan}_J F$ is the same but with a
-natural transformation $F \Rightarrow \textrm{Lan}_J F \circ J $.
+%% The right Kan extension of $F$ along $J$ is the ``best'' (maximal) way to
+%% fill in the following square:
+%% \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGEQBfU9TXfIRQBGclVqMWbACLdeIDNjwEiZYePrNWiDgHJu4mFADm8IqABmAJwgBbJGRA4ISAEzVNUnQCk5lm-aIjs5IohJabABiBlxAA
+%% \begin{tikzcd}
+%% \cat C \arrow[d, "J"] \arrow[r, "F"] & \cat D \\
+%% \cat C'                              &  
+%% \end{tikzcd}\]
+%% I.e. a functor $\textrm{Ran}_J F : \cat C' \to \cat D$ with a
+%% universal natural transformation $\textrm{Ran}_J F \circ J \Rightarrow
+%% F$. A left kan extension $\textrm{Lan}_J F$ is the same but with a
+%% natural transformation $F \Rightarrow \textrm{Lan}_J F \circ J $.
 
-We can express the concept in SCT as representing a certain profunctor
-constructed using the profunctor hom:
-\begin{definition}[Kan Extensions]
-  Given functors $F : \varr {\cat C}{\cat D}$ and $J : \varr {\cat
-    C}{\cat C'}$, a right Kan extension is a functor $\textrm{Ran}_J F
-  : \varr {\cat C'}{\cat D} $that right-represents the profunctor
-  \[ \hlambda {\beta:\cat D}{\alpha': \cat C} \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {\cat C'}{\alpha'}{J\alpha})} {\punitinXfromYtoZ {\cat D}{\beta}{F \alpha}} \]
+%% We can express the concept in SCT as representing a certain profunctor
+%% constructed using the profunctor hom:
+%% \begin{definition}[Kan Extensions]
+%%   Given functors $F : \varr {\cat C}{\cat D}$ and $J : \varr {\cat
+%%     C}{\cat C'}$, a right Kan extension is a functor $\textrm{Ran}_J F
+%%   : \varr {\cat C'}{\cat D} $that right-represents the profunctor
+%%   \[ \hlambda {\beta:\cat D}{\alpha': \cat C} \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {\cat C'}{\alpha'}{J\alpha})} {\punitinXfromYtoZ {\cat D}{\beta}{F \alpha}} \]
 
-  A left Kan extensions is a functor $\textrm{Lan}_J F : \varr {\cat
-    C'}{\cat D}$ is a functor satisfying the dual property: it
-  \emph{left}-represents the profunctor
-  \[\hlambda {\alpha':\cat C}{\beta:\cat D} \homlallXYtoZ {\alpha}{(\punitinXfromYtoZ {\cat C'}{J\alpha}{\alpha'})} {\punitinXfromYtoZ {\cat D}{F \alpha}{\beta}}
-  \]
-\end{definition}
+%%   A left Kan extensions is a functor $\textrm{Lan}_J F : \varr {\cat
+%%     C'}{\cat D}$ is a functor satisfying the dual property: it
+%%   \emph{left}-represents the profunctor
+%%   \[\hlambda {\alpha':\cat C}{\beta:\cat D} \homlallXYtoZ {\alpha}{(\punitinXfromYtoZ {\cat C'}{J\alpha}{\alpha'})} {\punitinXfromYtoZ {\cat D}{F \alpha}{\beta}}
+%%   \]
+%% \end{definition}
 
-The limit of a functor $F : \varr{\cat C}{\cat D}$ is a special case
-of a Kan extension where $J : \varr{\cat C}{1}$ is the unique functor
-to the terminal category. Similarly, the colimit of $F$ is the left
-Kan extension with respect to the same $J$.
-%
-Specializing to this case, the representability for limits means:
-\[ \punitinXfromYtoZ {\cat D}{\beta}{\textrm{lim} F} \cong \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {\cat 1}{\alpha'}{()})}{\punitinXfromYtoZ {\cat D}{\beta}{F \alpha}} \]
-And if we view a morphism in $\cat 1$ as being trivial, then this
-essentially states that mapping $\beta$ to $\textrm{lim} F$ is the
-same thing as constructing a cone: for all $\alpha :\cat C$, a
-morphism from $\beta$ to $F \alpha$, naturally in $\alpha$.
+%% The limit of a functor $F : \varr{\cat C}{\cat D}$ is a special case
+%% of a Kan extension where $J : \varr{\cat C}{1}$ is the unique functor
+%% to the terminal category. Similarly, the colimit of $F$ is the left
+%% Kan extension with respect to the same $J$.
+%% %
+%% Specializing to this case, the representability for limits means:
+%% \[ \punitinXfromYtoZ {\cat D}{\beta}{\textrm{lim} F} \cong \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {\cat 1}{\alpha'}{()})}{\punitinXfromYtoZ {\cat D}{\beta}{F \alpha}} \]
+%% And if we view a morphism in $\cat 1$ as being trivial, then this
+%% essentially states that mapping $\beta$ to $\textrm{lim} F$ is the
+%% same thing as constructing a cone: for all $\alpha :\cat C$, a
+%% morphism from $\beta$ to $F \alpha$, naturally in $\alpha$.
 
-The usual formulation of Kan extensions is in terms of a universal
-morphism.
-%
-We can reproduce this formulation using our established theory of
-equivalences for homs of profunctors.
-\begin{lemma}
-  One half of the representability isomorphism for a right Kan
-  extension $\textrm{Ran}_J F$ is determined by a natural
-  transformation
-  \[ \pendallXdotY \alpha \punitinXfromYtoZ {\cat D}{(\textrm{Ran}_JF)(J\alpha)}{F\alpha} \]
+%% The usual formulation of Kan extensions is in terms of a universal
+%% morphism.
+%% %
+%% We can reproduce this formulation using our established theory of
+%% equivalences for homs of profunctors.
+%% \begin{lemma}
+%%   One half of the representability isomorphism for a right Kan
+%%   extension $\textrm{Ran}_J F$ is determined by a natural
+%%   transformation
+%%   \[ \pendallXdotY \alpha \punitinXfromYtoZ {\cat D}{(\textrm{Ran}_JF)(J\alpha)}{F\alpha} \]
 
-  Dually, one half of the representability isomorphism for a left Kan
-  extension $\textrm{Lan}_J F$ is determined by a natural
-  transformation
-  \[ \pendallXdotY \alpha \punitinXfromYtoZ {\cat D}{F\alpha}{(\textrm{Lan}_JF)(J\alpha)} \]
-\end{lemma}
-\begin{proof}
-  By \cref{lem:unit-repr}, one half of representability is determined by a natural element
-  \[ \pendallXdotY {\alpha'} \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {\cat C'}{\alpha'}{J\alpha})} {\punitinXfromYtoZ {\cat D}{(\textrm{Ran}_J F)\alpha'}{F \alpha}} \]
-  which, by \cref{lem:fubini} is isomorphic to
-  \[
-  \pendallXdotY {\alpha} \homlallXYtoZ {\alpha'}{(\punitinXfromYtoZ {\cat C'}{\alpha'}{J\alpha})}{\punitinXfromYtoZ {\cat D}{(\textrm{Ran}_J F)\alpha'}{F \alpha}}
-  \]
-  which, by \cref{lem:yo-and-co-yo}, is isomorphic to 
-  \[ \pendallXdotY \alpha \punitinXfromYtoZ {\cat D}{(\textrm{Ran}_JF)(J\alpha)}{F\alpha} \]
-  by taking $P = \hlambda {\alpha'}{\alpha} {\punitinXfromYtoZ {\cat D}{(\textrm{Ran}_J F)\alpha'}{F \alpha}}$.
+%%   Dually, one half of the representability isomorphism for a left Kan
+%%   extension $\textrm{Lan}_J F$ is determined by a natural
+%%   transformation
+%%   \[ \pendallXdotY \alpha \punitinXfromYtoZ {\cat D}{F\alpha}{(\textrm{Lan}_JF)(J\alpha)} \]
+%% \end{lemma}
+%% \begin{proof}
+%%   By \cref{lem:unit-repr}, one half of representability is determined by a natural element
+%%   \[ \pendallXdotY {\alpha'} \homrallXYtoZ {\alpha}{(\punitinXfromYtoZ {\cat C'}{\alpha'}{J\alpha})} {\punitinXfromYtoZ {\cat D}{(\textrm{Ran}_J F)\alpha'}{F \alpha}} \]
+%%   which, by \cref{lem:fubini} is isomorphic to
+%%   \[
+%%   \pendallXdotY {\alpha} \homlallXYtoZ {\alpha'}{(\punitinXfromYtoZ {\cat C'}{\alpha'}{J\alpha})}{\punitinXfromYtoZ {\cat D}{(\textrm{Ran}_J F)\alpha'}{F \alpha}}
+%%   \]
+%%   which, by \cref{lem:yo-and-co-yo}, is isomorphic to 
+%%   \[ \pendallXdotY \alpha \punitinXfromYtoZ {\cat D}{(\textrm{Ran}_JF)(J\alpha)}{F\alpha} \]
+%%   by taking $P = \hlambda {\alpha'}{\alpha} {\punitinXfromYtoZ {\cat D}{(\textrm{Ran}_J F)\alpha'}{F \alpha}}$.
 
-  The proof for left Kan extensions follows by \cref{lem:duality}.
-\end{proof}
+%%   The proof for left Kan extensions follows by \cref{lem:duality}.
+%% \end{proof}
 
 \end{document}
