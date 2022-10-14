@@ -2600,10 +2600,10 @@ The rule is more general because it allows the elimination of an input
 of the unit type with non-trivial contexts $\Phi, \Psi$ surrounding
 it, whereas the rule presented earlier would only allow this
 elimination if $x$ were the only variable. We did not include this
-more general rule because it does not seem possible to define it with
-an admissible action of substitution, and would require a notion of
-explicit substitution.
-
+more general rule as a basic inference rule because 
+it requires an additional explicit substitution for the context
+$\Phi,x:\punitinXfromYtoZ {}{\alpha_-} {\alpha_+}, \Psi$,
+which would require making the substitutions part of the basic syntax.
 In the presence of hom types, we can prove this more general
 elimination is admissible, because the judgment
 \[ \Phi,x:\punitinXfromYtoZ {}{\alpha_-} {\alpha_+}, \Psi \vdash s : P \]
@@ -2611,7 +2611,9 @@ is in natural bijection with the judgment
 \[ \alpha_-,x:\punitinXfromYtoZ {}{\alpha_-} {\alpha_+}, \alpha_+ \vdash s : \Phi \triangleright P \triangleleft \Psi \]
 where $\Psi \triangleright P \triangleleft \Phi$ (note the reversal of
 order) is a type constructed by recursion on $\Phi$ and $\Psi$ using
-uses the hom types.
+uses the hom types.  The function applications for the hom types then
+provide a more lightweight way to incorporate the explicit substitution
+into the definition of the type theory.  
 
 \begin{definition}[Generalized Unit Elimination]
   We define $\textrm{ind}_{\to}^{\Phi;\Psi}(\alpha.t; x)$ by induction
@@ -2661,7 +2663,7 @@ uses the hom types.
     Which is equal to $s$ by the primitive unit $\eta$.
   \item $\Phi = \alpha_-$ and $\Psi = \Psi, y, \beta$:
     \begin{align*}
-      s &= \homrappXtoYatZ {\homrlambdaXatYdotZ y \beta s} y \beta\tag{Hom $\beta$}\\
+      s &= \homrappXtoYatZ {\homrlambdaXatYdotZ y \beta s} y \beta\tag{Hom $\eta$}\\
       &= \homrappXtoYatZ {(\textrm{ind}_{\to}^{\alpha_-;\Psi}(\alpha.\homrlambdaXatYdotZ y \beta {s[\punitrefl \alpha/x]}; x))} y \beta \tag{Induction}\\
       &= \textrm{ind}_{\to}^{\Phi;\Psi,y,\beta}(\alpha. s[\punitrefl \alpha/x]; x)\tag{Definition}
     \end{align*}
