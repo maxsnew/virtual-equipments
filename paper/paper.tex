@@ -598,12 +598,12 @@ x_2:R_2(\alpha_2,\alpha_3), \ldots, R_n(\alpha_n,\alpha_{n+1}),
 \]
 and represents the composition of the ``relations'' $R_1, R_2, R_3, \ldots,
 R_n$.  We write $d^-(\Phi)$ for the first category variable in $\Phi$
-(which we regard as the negative/contravariant position), $d^+(\Phi)$
+(which we regard as the negative or contravariant position), $d^+(\Phi)$
 for the last category variable in $\Phi$ (which we regard as the
-positive/covariant position), and $\Phi_1 \jnctx \Phi_2$ for the append
-of two category contexts where the last variable in $\Phi_1$ is equal to
+positive or covariant position), and $\Phi_1 \jnctx \Phi_2$ for the append
+of two transformation contexts where the last variable in $\Phi_1$ is equal to
 the first variable in $\Phi_2$.  Formal inductive definitions are in the
-appendix, but intuitively we have: 
+appendix, but intuitively: 
 \[
 \begin{array}{ccl}
 d^-(\alpha_1 : \cat C_1, x_1:R_1(\alpha_1,\alpha_2), \ldots, x_n:R_n(\alpha_n,\alpha_n), \alpha_{n+1} : \cat C_{n+1}) & = & \alpha_1 : \cat C_1\\
@@ -695,7 +695,7 @@ d^+(\alpha_1 : \cat C_1, x_1:R_1(\alpha_1,\alpha_2), \ldots, x_n:R_n(\alpha_n,\a
       \textrm{Categories} &\cat C, \cat D, \cat E & ::= & \unquoth M \pipe \cat C \times \cat D \pipe \cat 1
       \pipe \graphProf \alpha \beta P \pipe \negPresheaf {\cat C} \pipe \posPresheaf {\cat C}
       \\
-      \textrm{Objects} & A, B, C, a, b, c & ::= & \alpha \pipe M a \pipe (a,b)
+      \textrm{Objects} & a, b, c & ::= & \alpha \pipe M a \pipe (a,b)
       \pipe () \pipe \pi_i a \pipe (a_-, a_+, s) \pipe \pi_- a \pipe
       \pi_+ a \pipe \lambda \alpha:\cat C.R \\
       \textrm{Sets} & P,Q,R & ::= & \punitinXfromYtoZ {\cat C} a b \pipe \tensorexistsXwithYandZ {\beta} P Q \pipe \homrallXYtoZ \beta P Q \pipe \homlallXYtoZ \alpha R S 
@@ -851,18 +851,20 @@ The variable rules for objects and elements are
 \qquad
 \inferrule*{}{ \Gamma \pipe \alpha : \cat C, x : R, \beta : \cat D \vdash x : R}
 \]
-All syntactic forms typed in context admit an action of substitution.
-For types and terms, this is as usual. Objects $\alpha:\cat C \vdash a :
-\cat D$ can be substituted for object variables $\beta : \cat D$ in
-other objects. We can also substitute objects into \emph{sets}, that is,
-if we have a set $P$ parameterized by a contravariant variable $\alpha :
-\cat C$ and a covariant variable $\beta: \cat D$, then we can substitute
-objects $a : \cat C$ and $b : \cat D$ for these variables
-$P[a/\alpha;b/\beta]$. This generalizes the ordinary precomposition of a
-relation by a function.  Semantically this is the ``restriction'' of a
-profunctor along two functors, which is just composition of functors if
-a profunctor is viewed as a functor to $\Set$. Modeling this operation
-as a substitution considerably simplifies reasoning using profunctors.
+As in linear logic, the latter rule applies only when the context
+contains a single set $R$.  All syntactic forms typed in context admit
+an action of substitution.  For types and terms, this is as
+usual. Objects $\alpha:\cat C \vdash a : \cat D$ can be substituted for
+object variables $\beta : \cat D$ in other objects. We can also
+substitute objects into \emph{sets}, that is, if we have a set $P$
+parameterized by a contravariant variable $\alpha : \cat C$ and a
+covariant variable $\beta: \cat D$, then we can substitute objects $a :
+\cat C$ and $b : \cat D$ for these variables $P[a/\alpha;b/\beta]$. This
+generalizes the ordinary precomposition of a relation by a function.
+Semantically this is the ``restriction'' of a profunctor along two
+functors, which is just composition of functors if a profunctor is
+viewed as a functor to $\Set$. Modeling this operation as a substitution
+considerably simplifies reasoning using profunctors.
 %
 Finally we have the action of substitution on elements/natural transformations.
 First, we can substitute elements/natural transformations for the set
@@ -903,7 +905,7 @@ With various choices of $P$, this connective can be used to define the
 arrow category, slice category and comma category constructions.
 %
 In our syntax we define it as the universal category $\cat C$ equipped
-with functors to $\cat C_-$ and $\cat C_+$ and a morphism to $P$.
+with functors to $\cat C_-$ and $\cat C_+$ and a natural transformation to $P$.
 
 Lastly, we define the \emph{negative} and \emph{positive} presheaf
 categories $\negPresheaf \cat C$ and $\posPresheaf \cat D$. These are
@@ -1018,7 +1020,7 @@ category is the opposite of the dual presheaf category $(\Set^{\cat
 
 Next, in Figure~\ref{fig:set-connectives}, we cover the connectives for
 the sets/profunctors, which classify elements/natural transformations
-(the $\beta/eta$-rules are in the appendix).
+(the $\beta/\eta$-rules are in the appendix).
 %% %
 %% The top of the figure includes the formation rules for tensor products
 %% $\tensorexistsXwithYandZ \beta P Q$, the covariant $\homrallXYtoZ
@@ -1034,25 +1036,25 @@ category $\cat C$, which is well-formed when given two objects of the
 same category.  
 %
 Its introduction and elimination rules are analogous to the usual rules
-for equality in Martin-L\"of type theory.  The introduction rule is the
-identity morphism (reflexivity) and the elimination rule is an induction
-principle: we can use a term of $s : \punitinXfromYtoZ {\cat C} A B$ by
-specifying the behavior when $s$ is of the form $\punitrefl \alpha$ in
-the form of a continuation $\alpha. t$.  Like the $J$ elimination rule
-for equality in Martin-L\"of type theory, $P$ must be ``fully general'',
-i.e. well-typed for variables $\alpha$ and $\beta$; this is because for
-distinct variables $\alpha$ and $\beta$, $\punitinXfromYtoZ{\cat
-  C}{\alpha}{\beta}$ denotes the unit, which has a universal property,
-but $\punitinXfromYtoZ{\cat C} A B$ denotes a restriction of a unit,
-which in general does not.  Those familiar with linear
-logic~\cite{polakow-pfenning} might expect a more general rule, with the
-continuation $t$ typed in a context $\Phi_l \jnctx \Phi_r$ and $\Phi_l
-\jnctx \Phi \jnctx \Phi_r$ as the context of the conclusion of the rule.
-Because of dependency, this is not necessarily well-formed in cases
-where the endpoints $A$ and $B$ of $\punitinXfromYtoZ{\cat C} A B$ are
-not distinct variables.  However, the instances of this more general
-rule that do type check are derivable from our more restricted rule
-using right/left-hom types.
+for equality in intensional Martin-L\"of type theory.  The introduction
+rule is the identity morphism (reflexivity) and the elimination rule is
+an induction principle: we can use a term of $s : \punitinXfromYtoZ
+{\cat C} a b$ by specifying the behavior when $s$ is of the form
+$\punitrefl \alpha$ in the form of a continuation $\alpha. t$.  Like the
+$J$ elimination rule for equality in Martin-L\"of type theory, $P$ must
+be ``fully general'', i.e. well-typed for variables $\alpha$ and
+$\beta$; this is because for distinct variables $\alpha$ and $\beta$,
+$\punitinXfromYtoZ{\cat C}{\alpha}{\beta}$ denotes the unit, which has a
+universal property, but $\punitinXfromYtoZ{\cat C} a b$ denotes a
+restriction of a unit, which in general does not.  Those familiar with
+linear logic as in e.g.~\cite{polakow-pfenning} might expect a more
+general rule, with the continuation $t$ typed in a context $\Phi_l
+\jnctx \Phi_r$, and $\Phi_l \jnctx \Phi \jnctx \Phi_r$ as the context of
+the conclusion of the rule.  Because of dependency, this is not
+necessarily well-formed in cases where the endpoints $a$ and $b$ of
+$\punitinXfromYtoZ{\cat C} a b$ are not distinct variables.  However,
+the instances of this more general rule that do type check are derivable
+from our more restricted rule using right/left-hom types.
 
 The tensor product of sets is a kind of combined existential quantifier
 and monoidal product, which we combine into a single notation
@@ -1146,8 +1148,8 @@ syntactically use a variable more than once and still be ``linear'').
     \inferrule
     {\Gamma\pipe \alpha:\cat C; \beta:\cat C \vdash P \isaSet \\\\
      \Gamma\pipe \alpha:\cat C\vdash t : P[\alpha/\alpha;\alpha/\beta]\\\\
-     \Gamma\pipe\Phi \vdash s : \punitinXfromYtoZ {\cat C} A B}
-    {\Gamma \pipe \Phi \vdash \punitelimkontZatABC {\alpha. t} A s B : P[A/\alpha;B/\beta]}
+     \Gamma\pipe\Phi \vdash s : \punitinXfromYtoZ {\cat C} a b}
+    {\Gamma \pipe \Phi \vdash \punitelimkontZatABC {\alpha. t} A s B : P[a/\alpha;b/\beta]}
     \\
   %% \inferrule*[right=Tensor intro function]
   %% {}
@@ -1492,17 +1494,17 @@ Next, we can prove that two definitions of an adjunction are equivalent:
 \begin{proof}
   Given the forward homomorphism $\text{lr}$, we can construct $\eta =
   \pendlambdaXdotY \alpha \appunary {\text{lr}} \alpha {\punitrefl
-    \alpha} {L \alpha}$ and given the unit we can reconstruct the
+    \alpha} {L \alpha}$.  Given the unit we can reconstruct the
   forward homomorphism using
-  $\text{comp}$ and $\text{fctor}$ as defined in
-  Construction\ref{construction:synthetic-composition} as
+  $\text{comp}$ (composition) and $\text{fctor}$ (functoriality) from
+  Construction~\ref{construction:synthetic-composition} as\\
   $\appbinary {\text{comp}} \alpha
   {\pendappXtoY \eta \alpha} {R(L\alpha)} {(\appunary
     {\text{fctor}(R)}{L \alpha} {f} {\beta})} {R \beta}$.
 \end{proof}
 
-\noindent We can define weighted limits, which include ordinary limits and
-Kan extensions.
+We can define weighted limits, which as special cases include ordinary
+limits and Kan extensions.
 \begin{definition}
   For a functor $D : \varr {\cat J}{\cat C}$ and a profunctor $W :
   \harr{\cat K}{\cat J}$, the limit of $D$ weighted by $W$ is (if it
@@ -1715,7 +1717,7 @@ In the presence of restrictions, every 2-cell can be represented as a
 ``globular'' 2-cell where the left and right frame are identities. For
 example the 2-cell $\phi$ above can be represented as one with the
 same domain but whose codomain is $S(f,g)$. This property is crucial
-for the completeness of our semantics as we only include a syntax for these globular terms 
+for the completeness of our semantics as we only include a syntax for these globular terms.
 %
 Each component of this definition has a direct correspondence to a
 syntactic structure in \ohol{}. The objects of $\mathcal V_o$ models
@@ -1730,15 +1732,15 @@ judgments are all typed under a context $\Gamma$ with an action of
 substitution, we use a variation on Lawvere's notion of
 \emph{hyperdoctrine} for modeling predicate logic\cite{Lawvere69}:
 \begin{definition}[Hyperdoctrine of Virtual Equipments]
-  A hyperdoctrine of virtual equipments is a pair of a category with
+  A hyperdoctrine of virtual equipments (HVE) is a pair of a category with
   families $\mathcal C$ and a functor $V^{(-)} : \mathcal C^o \to
   \text{vEq}$ to the category of virtual equipments and functors.
 \end{definition}
-Categories with families $\mathcal C$ model dependent type theory
-\citep{dybjer-cwf} and for each semantic context $\Gamma$, $V^\Gamma$ models
-the VETT judgments in context $\Gamma$, with the functoriality
-modeling the fact that all of these judgments admit a well-behaved
-action of substitution.
+Categories with families $\mathcal C$ model dependent type
+theory~\cite{dybjer-cwf} and for each semantic context $\Gamma$,
+$V^\Gamma$ models the VETT judgments in context $\Gamma$, with the
+functoriality modeling the fact that all of these judgments admit a
+well-behaved action of substitution.
 
 An HVE is then precisely the structure corresponding to the
 \emph{judgments} and actions of substitution in VETT.
@@ -1756,8 +1758,8 @@ An HVE is then precisely the structure corresponding to the
   definition of the 2-cells.  A 2-cell from\\ $(\alpha_1:\cat
   C_1\mathord{;}\alpha_2:\cat C_2\vdash R_1),(\alpha_2:\cat
   C_2;\alpha_3:\cat C_3 \vdash R_2),\ldots$ to $(\beta_1:\cat
-  D_1;\beta_2\vdash S)$ with frames $\alpha_1:\cat C_1\vdash b_1 : \cat
-  D_1$ and $\alpha_n:\cat C_n\vdash b_2 : \cat D_2$ given by a term
+  D_1;\beta_2 : \cat D_2\vdash S)$ with frames $\alpha_1:\cat C_1\vdash b_1 : \cat
+  D_1$ and $\alpha_n:\cat C_n\vdash b_2 : \cat D_2$ is given by a term
   $x_1:R_1,x_2:R_2\ldots \vdash s :
   S[b_1/\beta_1;b_2/\beta_2]$. Composition is defined by substitution.
 \end{proof}
@@ -1841,23 +1843,23 @@ universal properties.
 More generally, categories internal to, enriched in and/or indexed by
 sufficiently nice categories define a virtual equipment that model the
 connectives of VETT. We highlight one example from the literature that
-is highly general: Shulman's enriched indexed categories. Shulman's
-construction defines a virtual double category of large and small
-$\mathcal V$-categories for any pseudofunctor $\mathcal V : S^o \to
-\MonCat$ where $S$ is a category with finite products. He gives
-examples that show that this subsumes ordinary internal, enriched and
-indexed categories for suitable choices of $\mathcal V$, as well as
-more general categories that can be thought of as both indexed and
-enriched.
+is highly general: Shulman's enriched indexed
+categories~\cite{Shulman13}. Shulman's construction defines a virtual
+double category of large and small $\mathcal V$-categories for any
+pseudofunctor $\mathcal V : S^o \to \MonCat$ where $S$ is a category
+with finite products. He gives examples that show that this subsumes
+ordinary internal, enriched and indexed categories for suitable choices
+of $\mathcal V$, as well as more general categories that can be thought
+of as both indexed and enriched.
 %
 This is slightly weaker then what we require: to have
 \emph{split} restrictions, we need that $\mathcal V$ be a
 \emph{strict} functor, not merely a pseudo-functor.
 %
-This is analogous to the situation for dependent type theory where
-substitution is strictly associative but in models is typically
-modeled by pullback which is only associative up to unique
-isomorphism.
+This is analogous to the situation for dependent type theory, where
+syntactic substitution is strictly associative, but semantic
+substitution is typically given by pullback, which is only associative
+up to unique isomorphism.
 %% In fact, one of the main examples is only a
 %% pseudo-functor for precisely this reason that the action on morphisms
 %% is given by pullback.
@@ -1906,7 +1908,7 @@ manipulating profunctors involving ends and coends; an extension of
 \vett{} to treat profunctors of many variables of different variances
 may provide a formal treatment of it.
 
-\citet{jazmyers-strings} provides a string diagram calculus for
+Myers~\citet{jazmyers-strings} provides a string diagram calculus for
 double categories and pro-arrow equipments, generalizing string
 diagrams for monoidal categories. These are an
 alternative approach to type theoretic calculi, with the string
@@ -1921,7 +1923,7 @@ virtual double category of categories, functors, profunctors and natural
 transformations. An abstract structure along these lines is a
 \emph{Cartesian
   bicategory}~\citet{CARBONI198711}.
-\citet{frey} describe some preliminary work on
+Frey~\citet{frey} describes some preliminary work on
 a proof system for Cartesian bicateogires.  This calculus is more
 general than \vett{} in that their profunctors may have 0, 1 or more
 covariant or contravariant variables, but they do not have a term syntax
@@ -1962,17 +1964,18 @@ the theorems that are provable in \vett{} apply in more settings.
 %% assistant in the style of Agda or Coq \cite{agda,coq}.
 
 Finally, some variations on double categories have been used to model
-the structure of certain program logics. \citet{double-cats-gradual-typing} present a
-logic for \emph{vertically thin} pro-arrow equipments, i.e., pro-arrow
-equipments where the functor and natural transformation judgments are
-posetal. This calculus is quite different from ours in that the
-horizontal morphisms are terms of a programming language, and so they
-are not presented as relations with co-variant and contravariant
-variables, and the equipment structure is modeled by explicit coercions
-rather than by syntactic substitution of vertical arrows in horizontal
-arrows. Another similar calculus is System P \citep{dunphyreddy} which is an
-internal language of \emph{reflexive graph categories}, which are like
-double categories without horizontal composition.
+the structure of certain program
+logics. GTT~\cite{double-cats-gradual-typing} is a logic for
+\emph{vertically thin} pro-arrow equipments, i.e., pro-arrow equipments
+where the functor and natural transformation judgments are posetal. This
+calculus is quite different from ours in that the horizontal morphisms
+are terms of a programming language, and so they are not presented as
+relations with co-variant and contravariant variables, and the equipment
+structure is modeled by explicit coercions rather than by syntactic
+substitution of vertical arrows in horizontal arrows. Another similar
+calculus is System P~\cite{dunphyreddy} which is an internal language
+of \emph{reflexive graph categories}, which are like double categories
+without horizontal composition.
 
 %% DRL note: I would compress the rest of this to a couple of sentences
 %% as the first thing to remove for space.  
@@ -1980,7 +1983,8 @@ double categories without horizontal composition.
 In future work, \vett{} could incorporate functor categories by
 generalizing the unary type theory of functors to functors of many
 variables, in which case ordinary $\lambda$ calculus can be used to
-define functor categories as function types. Similarly, ideas from
+define functor categories as function types, and incorporate
+multi-variable profunctors as in~\cite{frey}.  Similarly, ideas from
 coeffects and enriched category theory could be used for defining
 opposite categories \cite{Shulman18,coeffect}.
 
