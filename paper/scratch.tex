@@ -1,3 +1,47 @@
+%% \subsection{Dependent Types}
+
+%% Next, we cover the basic dependent type theory structure: $\Pi,\Sigma$
+%% and identity types.
+
+%% \begin{figure}
+%%   \begin{mathpar}
+%%   \inferrule
+%%   {\Gamma \pipe\cdot \vdash S \isaSet\and \Gamma \pipe\cdot \vdash T \isaSet}
+%%   {\Gamma\pipe\cdot \vdash \prod_{x:S} T \isaSet}
+
+%%   \inferrule
+%%   {\Gamma \pipe \cdot \vdash M : \prod_{x:S} T\and
+%%     \Gamma \pipe \cdot \vdash N : S}
+%%   {\Gamma \pipe \cdot \vdash M N : T[N/x]}
+
+%%   \inferrule
+%%   {\Gamma,x:S \pipe \cdot \vdash M : T}
+%%   {\Gamma \pipe \cdot \vdash \lambda x:S. M : \prod_{x:S} T}
+
+%%   \inferrule
+%%   {\Gamma \pipe\cdot \vdash S \isaSet\and \Gamma \pipe\cdot \vdash T \isaSet}
+%%   {\Gamma\pipe\cdot \vdash \sum_{x:S} T \isaSet}
+  
+%%   \inferrule
+%%   {~}
+%%   {\Gamma\pipe\cdot \vdash \top \isaSet}
+
+%%   \inferrule
+%%   {\Gamma \pipe \cdot \vdash M : S\and \Gamma \pipe \cdot \vdash N : S}
+%%   {\Gamma \pipe \cdot \vdash \textrm{Id}_S M N \isaSet}
+
+%%   \inferrule
+%%   {\Gamma \pipe \cdot \vdash M : S}
+%%   {\Gamma \pipe \cdot \vdash \textrm{refl}(M) : \textrm{Id}_S M M}
+
+%%   \inferrule
+%%   {\Gamma,x:S,y:S,p:\textrm{Id}_S x y \pipe \cdot \vdash C \isaSet\and
+%%    \Gamma \pipe \cdot \vdash M_k : \prod_{x:S} C[x/y,\textrm{refl}(x)/p]}
+%%   {\Gamma \pipe \cdot \vdash \textrm{J}(x,y,p.C,M) : \prod_{x:S,y:S,p:\textrm{Id}_S x y} C}
+%%   \end{mathpar}
+%%   \caption{Ordinary Dependent Type Structure}
+%% \end{figure}
+
 
 %% \subsection{(op)-Fibrations}
 

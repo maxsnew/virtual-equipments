@@ -2214,8 +2214,6 @@ well-typedness of the corresponding three kinds of substitutions.
   \label{fig:substitions}
 \end{figure}
 
-
-
 These definitions involve several operations $d^\pm\Phi$, $\underline
 \Phi$ and $\Phi\jnctx \Psi$ on contexts (and their functorial lift to
 substitutions) that we now define.
@@ -2275,10 +2273,51 @@ substitutions) that we now define.
   \end{align*}
 \end{definition}
 
-% RETURN
 Finally, we define the operation of ``horizontal composition'' of set
 contexts $\Phi \jnctx \Psi$ and its functorial lift $\phi \jnctx
-\psi$. Note that the horizontal composition is only well-defined when 
+\psi$.
+\begin{definition}
+  We define horizontal composition of transformation contexts with the
+  admissible typing rule
+  \[\inferrule*[right=(*)]
+  {\Gamma\vdash \Phi\isavectx\and \Gamma\vdash \Psi\isavectx\and d^+\Phi=d^-\Psi}
+  {\Gamma\vdash \Phi \jnctx \Psi \isavectx }\]
+  as follows
+  \begin{align*}
+    \Phi \jnctx \alpha:\cat C &= \Phi\\
+    \Phi \jnctx (\Psi,x:R,\alpha:\cat C) &= (\Phi\jnctx \Psi), x:R, \alpha:\cat C
+  \end{align*}
+
+  And we extend this to an operation on substitutions with the
+  admissible rule
+  \[\inferrule*[right=(*)]
+  {\Gamma\pipe\Psi \vdash \phi : \Phi \and
+   \Gamma\pipe\Psi' \vdash \phi' : \Phi'\and
+   d^+\phi = d^-\phi'
+  }
+  {\Gamma\pipe\Psi \jnctx \Psi' \vdash \phi \jnctx \phi' :: \Phi \jnctx \Phi' }
+  \]
+  Defined as follows
+  \begin{align*}
+    \phi \jnctx a/\alpha &= \phi\\
+    \phi\jnctx (\psi, s/x,a/\alpha) &= (\phi\jnctx\psi), s/x, a/\alpha
+  \end{align*}  
+\end{definition}
+
+\begin{lemma}[Horizontal Category of Contexts/Substitutions]
+  Horizontal composition of contexts is associative (when defined)
+  \[ (\Phi \jnctx \Psi) \jnctx \Sigma = \Phi \jnctx (\Psi \jnctx \Sigma) \]
+  and unital with identity for $\cat C$ given by the single category
+  variable context $\alpha:\cat C$:
+  \[ \alpha:\cat C \jnctx \Phi = \Phi = \Phi \jnctx \beta:\cat D\]
+  when $d^-\Phi = \alpha:\cat C$ and $d^+\Phi = \beta:\cat D$.
+
+  These properties extend to the horizontal composition of element substitutions:
+  \[ \phi \jnctx (\psi \jnctx \sigma) = (\phi \jnctx \psi) \jnctx \sigma \]
+  where the identity is the single variable substitution:
+  \[ a/\alpha \jnctx \phi = \phi = \phi \jnctx b/\beta \]
+  when $d^-\phi = a/\alpha$ and $d^+\phi = b/\beta$.
+\end{lemma}
 
 Next, we define the actions of substitutions on terms. We elide the
 obvious action of term substitutions $\gamma$ and include only the
@@ -2349,34 +2388,17 @@ more unusual substructural substitutions.
   \end{enumerate}
 \end{lemma}
 
-\begin{lemma}[Vertical category]
-  \label{lem:vertical-cat}
-  Substitution of object terms $A[B/\beta]$ is associative with
-  identity given by the variable $\alpha:\cat C \vdash \alpha:\cat C$.
-\end{lemma}
+%% \begin{lemma}[Vertical category]
+%%   \label{lem:vertical-cat}
+%%   Substitution of object terms $A[B/\beta]$ is associative with
+%%   identity given by the variable $\alpha:\cat C \vdash \alpha:\cat C$.
+%% \end{lemma}
 
-To define vertical composition of squares, we need the following lemma.
-
-\begin{lemma}[Horizontal Category of Contexts]
-  Horizontal composition of contexts is associative (when defined)
-  \[ (\Phi \jnctx \Psi) \jnctx \Sigma = \Phi \jnctx (\Psi \jnctx \Sigma) \]
-  and unital with identity for $\cat C$ given by the single category
-  variable context $\alpha:\cat C$:
-  \[ \alpha:\cat C \jnctx \Phi = \Phi = \Phi \jnctx \beta:\cat D\]
-  when $d^-\Phi = \alpha:\cat C$ and $d^+\Phi = \beta:\cat D$.
-
-  These properties extend to the horizontal composition of element substitutions:
-  \[ \phi \jnctx (\psi \jnctx \sigma) = (\phi \jnctx \psi) \jnctx \sigma \]
-  where the identity is the single variable substitution:
-  \[ a/\alpha \jnctx \phi = \phi = \phi \jnctx b/\beta \]
-  when $d^-\phi = a/\alpha$ and $d^+\phi = b/\beta$.
-\end{lemma}
-
-\begin{lemma}[Properties of Substitution]
-  TODO
-\end{lemma}
+%% To define vertical composition of squares, we need the following lemma.
 
 %% Theorems about substitution?
+
+% TODO: more properties of substitution??
 
 \subsection{Equational Theory}
 
@@ -2530,82 +2552,96 @@ theory as a quotient inductive inductive type
   \label{fig:betaeta-sets}
 \end{figure}
 
-\subsection{Identity Elimination}
+\subsection{Generalized Unit Elimination}
 
-As a final syntactic meta-theorem, we prove that the more general identity elimination principle
-\[ \]
-is admissible in the presence of let and right hom types.
+The unit elimination rule presented in Section~\ref{sec:syntax} is
+more restrictive than universal property of a unit in a virtual double
+category that we use in the semantics. So in order for our calculus to
+be complete for virtual equipments with units, we need to show that
+the more general unit elimination principle is admissible and
+satisfies the correct $\beta\eta$ rules.
 
-TODO
-As an example, any sequent $\Gamma \pipe \alpha, x: R, \beta, y : S, \gamma \vdash
-P$ is equivalent to either of
-\[ \Gamma \vdash \pendallXdotY\alpha \homrallXYtoZ \beta R \homrallXYtoZ \gamma S P 
-\qquad\qquad\qquad \Gamma \vdash \pendallXdotY \gamma \homlallXYtoZ \beta S {\homlallXYtoZ \alpha R P}\]
-This property is useful in giving a simple syntax to positive types.
+The more general rules are as follows
+\begin{mathpar}
+  \inferrule*[Right=UnitElim]
+  {\Phi[\alpha/\alpha_-]\jnctx \Psi[\alpha/\alpha_+] \vdash t : P[\alpha/\alpha_-;\alpha/\alpha_+]}
+  {\Phi,x:\punitinXfromYtoZ {}{\alpha_-} {\alpha_+}, \Psi \vdash \textrm{ind}_{\to}^{\Phi;\Psi}(\alpha.t; x) : P}
 
-First, the multiplicative unit is the set $\punitinXfromYtoZ {\cat C}
-{a_1} {a_2}$, semantically, the hom set of the category $\cat C$. The
-rules for this type act like an identity type in a directed type
-theory. The introduction rule defines an identity morphism of an
-object in any category. The elimination rule is then the appropriate
-analogue of the $J$ rule of the identity type. Given any profunctor
-$Q$ from $\cat C$ to itself, we can construct an element $\harrapp Q
-{\alpha_1}{\alpha_2}$ for any objects in $\cat C$ if we specify a
-natural element $\harrapp Q \alpha \alpha$ for any $\alpha$ in $\cat
-C$. The reason this is sufficient, semantically, is that all
-profunctors must be functorial in their two indices. In fact, as we
-will see in the section on synthetic category theory, this induction
-principle is how we can show internally that profunctors are
-functorial in their indices. We choose to express this elimination
-form using the right hom type as its syntax more closely matches the
-usual syntax of function types, but this choice is arbitrary, and we
-would get an equivalent calculus had we used the left hom, or added
-both.
+  (\textrm{ind}_{\to}^{\Phi;\Psi}(\alpha.t; x))[\phi,\punitrefl \alpha,\psi] = t[\phi\jnctx\psi]
 
+  \inferrule
+  {\Phi,x:\punitinXfromYtoZ {}{\alpha_-} {\alpha_+}, \Psi \vdash s : P}
+  {\Phi,x:\punitinXfromYtoZ {}{\alpha_-} {\alpha_+}, \Psi \vdash s = \textrm{ind}_{\to}^{\Phi;\Psi}(\alpha. s[\punitrefl \alpha/x]; x){}}
+\end{mathpar}
 
-%% \subsection{Dependent Types}
+The rule is more general because it allows the elimination of an input
+of the unit type with non-trivial contexts $\Phi, \Psi$ surrounding
+it, whereas the rule presented earlier would only allow this
+elimination if $x$ were the only variable. We did not include this
+more general rule because it does not seem possible to define it with
+an admissible action of substitution, and would require a notion of
+explicit substitution.
 
-%% Next, we cover the basic dependent type theory structure: $\Pi,\Sigma$
-%% and identity types.
+In the presence of hom types, we can prove this more general
+elimination is admissible, because the judgment
+\[ \Phi,x:\punitinXfromYtoZ {}{\alpha_-} {\alpha_+}, \Psi \vdash s : P \]
+is in natural bijection with the judgment
+\[ \alpha_-,x:\punitinXfromYtoZ {}{\alpha_-} {\alpha_+}, \alpha_+ \vdash s : \Phi \triangleright P \triangleleft \Psi \]
+where $\Psi \triangleright P \triangleleft \Phi$ (note the reversal of
+order) is a type constructed by recursion on $\Phi$ and $\Psi$ using
+uses the hom types.
 
-%% \begin{figure}
-%%   \begin{mathpar}
-%%   \inferrule
-%%   {\Gamma \pipe\cdot \vdash S \isaSet\and \Gamma \pipe\cdot \vdash T \isaSet}
-%%   {\Gamma\pipe\cdot \vdash \prod_{x:S} T \isaSet}
+\begin{definition}[Generalized Unit Elimination]
+  We define $\textrm{ind}_{\to}^{\Phi;\Psi}(\alpha.t; x)$ by induction
+  on $\Phi/\Psi$.
+  \begin{align*}
+    \textrm{ind}_{\to}^{\alpha_-;\alpha_+}(\alpha.t; x) &= \punitelimkontZatABC{\alpha.t}{\alpha_-}{x}{\alpha_+}\\
+    \textrm{ind}_{\to}^{\alpha_-;\Psi,y,\beta}(\alpha.t; x) &=
+    \homrappXtoYatZ
+        {(\textrm{ind}_{\to}^{\alpha_-;\Psi}(\alpha.\homrlambdaXatYdotZ y \beta t; x))} y \beta \\
+    \textrm{ind}_{\to}^{\beta, y, \Phi;\Psi}(\alpha.t; x) &=
+    \homlappXtoYatZ
+        {(\textrm{ind}_{\to}^{\alpha_-;\Psi}(\alpha.\homllambdaXatYdotZ y \beta t; x))} y \beta \\
+  \end{align*}
+\end{definition}
 
-%%   \inferrule
-%%   {\Gamma \pipe \cdot \vdash M : \prod_{x:S} T\and
-%%     \Gamma \pipe \cdot \vdash N : S}
-%%   {\Gamma \pipe \cdot \vdash M N : T[N/x]}
-
-%%   \inferrule
-%%   {\Gamma,x:S \pipe \cdot \vdash M : T}
-%%   {\Gamma \pipe \cdot \vdash \lambda x:S. M : \prod_{x:S} T}
-
-%%   \inferrule
-%%   {\Gamma \pipe\cdot \vdash S \isaSet\and \Gamma \pipe\cdot \vdash T \isaSet}
-%%   {\Gamma\pipe\cdot \vdash \sum_{x:S} T \isaSet}
+\begin{lemma}[Generalized Unit Elim $\beta\eta$]
+  The admissible generalizaed unit elimination satisfies the described $\beta\eta$ equations.
+\end{lemma}
+\begin{proof}
+  By induction on $\Phi/\Psi$
+  First, $\beta$
+  \begin{itemize}
+  \item If $\Phi = \Psi = \alpha$
+    \begin{align*}
+    (\punitelimkontZatABC{\alpha.t}{\alpha_-}{x}{\alpha_+})[\alpha,\punitrefl \alpha, \alpha] &=
+    \punitelimkontZatABC{\alpha.t}{\alpha}{\punitrefl}{\alpha}\\
+    &= t \tag{Unit$\beta$}
+  \end{align*}
+  \item If $\Phi = \alpha$ and $\Psi = \Psi, y, \beta$
+    \begin{align*}
+    (\homrappXtoYatZ
+      {(\textrm{ind}_{\to}^{\alpha_-;\Psi}(\alpha.\homrlambdaXatYdotZ y \beta t; x))} y \beta)[\phi,\punitrefl \alpha, \psi, s/y, b/\beta]
+      &= (\homrappXtoYatZ
+        {(\textrm{ind}_{\to}^{\alpha_-;\Psi}(\alpha.\homrlambdaXatYdotZ y \beta t; x)[[\phi,\punitrefl \alpha, \psi]])} s b)\tag{Definition}\\
+      &= (\homrappXtoYatZ {\homrlambdaXatYdotZ y \beta t[\phi,\psi]} s b) \tag{Induction}\\
+      &= t[\phi,\psi,s/y,b/\beta]\tag{Hom$\beta$}
+    \end{align*}
+  \item $\Phi = \beta, y, \Phi$ case is similar to previous.
+  \end{itemize}
   
-%%   \inferrule
-%%   {~}
-%%   {\Gamma\pipe\cdot \vdash \top \isaSet}
+  Next $\eta$.
+  \begin{itemize}
+  \item $\Phi = \alpha_- $ and $\Psi = \alpha_+$: immediate by unit $\eta$.
+  \item $\Phi = \alpha_-$ and $\Psi = \Psi, y, \beta$:
+    \begin{align*}
+      s &= \homrappXtoYatZ {\homrlambdaXatYdotZ y \beta s} y \beta\tag{Hom $\beta$}\\
+      &= \homrappXtoYatZ {(\textrm{ind}_{\to}^{\alpha_-;\Psi}(\alpha.\homrlambdaXatYdotZ y \beta {s[\punitrefl \alpha/x]}; x))} y \beta \tag{Induction}\\
+      &= \textrm{ind}_{\to}^{\Phi;\Psi,y,\beta}(\alpha. s[\punitrefl \alpha/x]; x)\tag{Definition}
+    \end{align*}
+  \end{itemize}
+\end{proof}
 
-%%   \inferrule
-%%   {\Gamma \pipe \cdot \vdash M : S\and \Gamma \pipe \cdot \vdash N : S}
-%%   {\Gamma \pipe \cdot \vdash \textrm{Id}_S M N \isaSet}
-
-%%   \inferrule
-%%   {\Gamma \pipe \cdot \vdash M : S}
-%%   {\Gamma \pipe \cdot \vdash \textrm{refl}(M) : \textrm{Id}_S M M}
-
-%%   \inferrule
-%%   {\Gamma,x:S,y:S,p:\textrm{Id}_S x y \pipe \cdot \vdash C \isaSet\and
-%%    \Gamma \pipe \cdot \vdash M_k : \prod_{x:S} C[x/y,\textrm{refl}(x)/p]}
-%%   {\Gamma \pipe \cdot \vdash \textrm{J}(x,y,p.C,M) : \prod_{x:S,y:S,p:\textrm{Id}_S x y} C}
-%%   \end{mathpar}
-%%   \caption{Ordinary Dependent Type Structure}
-%% \end{figure}
 
 \section{Extended Formal Category Theory Examples}
 \label{sec:appendix:examples}

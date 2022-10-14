@@ -31,7 +31,7 @@ search for "appendix"
   2. [X] descriptions of different operations like \jnctx (some of these are in semantics currently)
   3. [X] substitution in functors/profunctors/elements
   4. [X] equational theory
-  5. [ ] admissibility of general identity elimination (syntax or semantics? really part of completeness)
+  5. [X] admissibility of general identity elimination (syntax or semantics? really part of completeness)
   6. [ ] composition of substitutions?
 - [ ] Examples
   1. [ ] Compositions/naturality
