@@ -1401,7 +1401,7 @@ constructions are (pro-)functorial:
   \label{construction:synthetic-composition}
   For any small category $\cat C$, we can construct natural elements
   \begin{enumerate}
-  \item Identity: $\pendallXdotY {\alpha} {\punitinXfromYtoZ {\cat C}{\alpha}{\alpha'}}$
+  \item Identity: $\pendallXdotY {\alpha} {\punitinXfromYtoZ {\cat C}{\alpha}{\alpha}}$
   \item Composition: $\hombinary {\alpha_1} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_3} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_3}}$
   \item Functoriality: for any $F : \varr {\cat C}{\cat D}$, $\homunary {\alpha_1} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {} {F(\alpha_1)}{F(\alpha_2)}}$.
    \item Profunctoriality: for any $R : \harr {\cat C}{\cat D}$ if
@@ -1437,21 +1437,22 @@ the usual case of naturality arising when $R \alpha \beta =
 \end{lemma}
 
 Next, we turn to some of the central theorems of category theory, the
-Yoneda and Co-Yoneda lemmas. Despite being ultimately quite elementary,
-these are notoriously abstract. In \ohol{}, we can view these as
-ordered generalizations of some very simple tautologies about
-equality. For instance, the Yoneda lemma generalizes
-the equivalence between the formulae $\forall x. \forall y. x = y
-\Rightarrow P y$ and $P x$.
+Yoneda and Co-Yoneda lemmas. Despite being ultimately quite
+elementary, these are notoriously abstract. In \ohol{}, we view
+these as ordered generalizations of some very simple tautologies about
+equality. For instance, the Yoneda lemma generalizes the equivalence
+between the formulae $\forall x. \forall y. x = y \Rightarrow P y$ and
+$P x$.
 \begin{lemma} \label{lem:yoneda}
-  Let $\alpha^o : \cat C$ and $\pi : \negPresheaf {\cat C}$. Then
+  Let $\alpha : \cat C$ and $\pi : \posPresheaf {\cat C}$. Then
   \begin{enumerate}
-  \item (Yoneda) The profunctor $\homrallXYtoZ {\alpha'} {\punitinXfromYtoZ {\cat C} {\alpha'}{\alpha}} {\negPresheafAppPtoX \pi {\alpha'}}$ is isomorphic to $\negPresheafAppPtoX \pi \alpha$
-  \item (Co-Yoneda) The profunctor $\tensorexistsXwithYandZ {\alpha'}{\punitinXfromYtoZ{}{\alpha}{\alpha'}} {\negPresheafAppPtoX \pi \alpha}$ is isomorphic to $\negPresheafAppPtoX \pi \alpha$
+  \item (Yoneda) The profunctor 
+    $\homrallXYtoZ {\alpha'} {\punitinXfromYtoZ {\cat C} {\alpha}{\alpha'}} {\posPresheafAppPtoX \pi {\alpha'}}$ is isomorphic to $\posPresheafAppPtoX \pi \alpha$
+  \item (Co-Yoneda) The profunctor $\tensorexistsXwithYandZ {\alpha'}{\posPresheafAppPtoX \pi \alpha'} {\punitinXfromYtoZ{}{\alpha'}{\alpha}}$ is isomorphic to $\posPresheafAppPtoX \pi \alpha$
   \end{enumerate}
 \end{lemma}
 The proofs both follow from the unit elimination rule, which is
-essential the Yoneda lemma---the two cases of showing (1) is an
+essentialy the Yoneda lemma---the two cases of showing (1) is an
 isomorphism are precisely the $\beta$ and $\eta$ rules for the unit.
 
 Next, we have the ``Fubini'' theorems, which are analogous to simple
@@ -2523,16 +2524,18 @@ theory as a quotient inductive inductive type
     \inferrule*[right=Unit$\beta$]
     {~}
     {(\punitelimkontZatABC {\alpha. t} a {\punitrefl a} a) = t[a/\alpha]}
+    
     \inferrule*[right=Unit$\eta$]
-    {\Gamma\pipe\Phi \vdash s : \punitinXfromYtoZ {\cat C}{a}{b}}
-    {\Gamma\pipe\Phi\vdash s = \punitelimkontZatABC {\alpha. \punitrefl \alpha} a s b: \punitinXfromYtoZ {\cat C}{a}{b}}
+    {\Gamma\pipe \alpha_1:\cat C,z:\punitinXfromYtoZ {\cat C}{\alpha_1}{\alpha_2},\alpha_2:\cat C \vdash s : R}
+    {\Gamma\pipe\alpha_1:\cat C,z:\punitinXfromYtoZ {\cat C}{\alpha_1}{\alpha_2},\alpha_2:\cat C\vdash s = \punitelimkontZatABC {\alpha. s[\alpha/\alpha_1;\punitrefl{\alpha}/z,\alpha/\alpha_2]} {\alpha_1} z {\alpha_2}: R}
       
     \inferrule*[right=Tensor$\beta$]
     {~}
     {\tensorelimWkontZ {\tensorintroatXwithYandZ b s t} {x.\beta.y. r} = t[s/x;b/\beta;t/y]}
+    
     \inferrule*[right=Tensor$\eta$]
-    {\Gamma\pipe\Phi \vdash s : \tensorexistsXwithYandZ \beta P Q}
-    {\Gamma\pipe\Phi\vdash s = \tensorelimWkontZ s {x.\beta.y. \tensorintroatXwithYandZ \beta x y}: \tensorexistsXwithYandZ \beta P Q}
+    {\Gamma\pipe\Phi,z:\tensorexistsXwithYandZ \beta P Q, \Psi \vdash s : R}
+    {\Gamma\pipe\Phi,z:\tensorexistsXwithYandZ \beta P Q, \Psi \vdash s = \tensorelimWkontZ s {x.\beta.y. s[\tensorintroatXwithYandZ \beta x y/z]}: \tensorexistsXwithYandZ \beta P Q}
 
   \inferrule*[right=$1\eta$]
   {\Phi \vdash s : 1}
@@ -2569,7 +2572,7 @@ The more general rules are as follows
 
   \inferrule
   {\Phi,x:\punitinXfromYtoZ {}{\alpha_-} {\alpha_+}, \Psi \vdash s : P}
-  {\Phi,x:\punitinXfromYtoZ {}{\alpha_-} {\alpha_+}, \Psi \vdash s = \textrm{ind}_{\to}^{\Phi;\Psi}(\alpha. s[\punitrefl \alpha/x]; x){}}
+  {\Phi,x:\punitinXfromYtoZ {}{\alpha_-} {\alpha_+}, \Psi \vdash s = \textrm{ind}_{\to}^{\Phi;\Psi}(\alpha. s[\alpha/\alpha_-,\punitrefl \alpha/x,\alpha/\alpha_+]; x) : P}
 \end{mathpar}
 
 The rule is more general because it allows the elimination of an input
@@ -2630,7 +2633,11 @@ uses the hom types.
   
   Next $\eta$.
   \begin{itemize}
-  \item $\Phi = \alpha_- $ and $\Psi = \alpha_+$: immediate by unit $\eta$.
+  \item $\Phi = \alpha_- $ and $\Psi = \alpha_+$:
+    \[ \textrm{ind}_{\to}^{\alpha_-;\alpha_+}(\alpha. s[\alpha/\alpha_-,\punitrefl \alpha/x,\alpha/\alpha_+]; x)
+    = \punitelimkontZatABC {\alpha. s[\alpha/\alpha_-,\punitrefl \alpha/x,\alpha/\alpha_+]} {\alpha_1}{x}{\alpha_2}
+    \]
+    Which is equal to $s$ by the primitive unit $\eta$.
   \item $\Phi = \alpha_-$ and $\Psi = \Psi, y, \beta$:
     \begin{align*}
       s &= \homrappXtoYatZ {\homrlambdaXatYdotZ y \beta s} y \beta\tag{Hom $\beta$}\\
@@ -2640,12 +2647,75 @@ uses the hom types.
   \end{itemize}
 \end{proof}
 
-
 \section{Extended Formal Category Theory Examples}
 \label{sec:appendix:examples}
 
 Next, we provide some futher detailed examples of the formal category
 theory constructions and theorems from Section~\ref{sec:examples}.
+
+\begin{definition}[Synthetic Composition/Functoriality]
+  We provide the definitions of the terms in \cref{construction:synthetic-composition}
+  \begin{enumerate}
+  \item Identity $\id = \pendlambdaXdotY \alpha \punitrefl \alpha$
+  \item Composition $\textrm{comp} = \lambdaunary {\alpha_1} f {\alpha_2} \punitelimkontZatABC {\alpha. \homrallXYtoZ {\alpha_3} g g} {\alpha_1} f {\alpha_2}$
+  \item Functoriality $\textrm{fctor}(F) = \lambdaunary {\alpha_1} f {\alpha_2} \punitelimkontZatABC {\alpha. \punitrefl{F\,\alpha}} {\alpha_1} f {\alpha_2}$
+  \item Profunctoriality $\textrm{prof}(R) = \lambdaunary {\alpha_1} f {\alpha_2} {\punitelimkontZatABC {\alpha. \homrlambdaXatYdotZ r {\beta_1} \homrlambdaXatYdotZ g {\beta_2} {\homlappXtoYatZ {(\punitelimkontZatABC {\beta. \homllambdaXatYdotZ r \alpha r}{\beta_1}{g}{\beta_2})} {r} {\alpha}}}{\alpha_1} f {\alpha_2}}$
+
+    We can also define left and right composition for profunctors by
+    applying the profunctorial action to a reflexivity on one side or
+    the other:
+
+    \[ \textrm{lcomp}(R) = \lambdabinary {\alpha_1} f {\alpha_2} r {\beta} {\apptrinary {\textrm{prof}(R)} {\alpha_1} f {\alpha_2} r {\beta} {\punitrefl \beta} {\beta}}\]
+    
+    \[ \textrm{rcomp}(R) = \lambdabinary {\alpha} r {\beta_1} g {\beta_2} {\apptrinary {\textrm{prof}(R)}  {\alpha} {\punitrefl \alpha} {\alpha} r {\beta_1} g {\beta_2}}\]
+  \end{enumerate}
+  Associativity and unit folllow by $\beta\eta$ for unit and homs.
+\end{definition}
+
+\begin{lemma}[Naturality]
+  For any $t : \pendallXdotY {\alpha:\cat C}{\harrapp R \alpha \alpha}$,
+  \[ \lambdaunary {\alpha_1} f {\alpha_2} {\appbinary {\textrm{lcomp}(R)}{\alpha_1} f {\alpha_2} {\pendappXtoY t {\alpha_2}} {\alpha_2}}
+  =  \lambdaunary {\alpha_1} f {\alpha_2} {\appbinary {\textrm{rcomp}(R)}{\alpha_1}  {\pendappXtoY t {\alpha_1}} {\alpha_1} f {\alpha_2}}\]
+\end{lemma}
+\begin{proof}
+  Expanding the definitions and applying $\beta$ reductions, both are equal to $\lambdaunary {\alpha_1} f {\alpha_2} \punitelimkontZatABC {\alpha. \pendappXtoY t \alpha} {\alpha_1} f {\alpha_2}$
+\end{proof}
+
+\begin{lemma}[Yoneda, Co-Yoneda]
+  Let $\alpha^o : \cat C$ and $\pi : \posPresheaf {\cat C}$. Then
+  \item (Yoneda) The profunctor $\homrallXYtoZ {\alpha'} {\punitinXfromYtoZ {\cat C} {\alpha'}{\alpha}} {\negPresheafAppPtoX \pi {\alpha'}}$ is isomorphic to $\negPresheafAppPtoX \pi \alpha$
+  \item (Co-Yoneda) The profunctor $\tensorexistsXwithYandZ {\alpha'}{\punitinXfromYtoZ{}{\alpha}{\alpha'}} {\negPresheafAppPtoX \pi \alpha}$ is isomorphic to $\negPresheafAppPtoX \pi \alpha$
+\end{lemma}
+\begin{proof}
+  We show Yoneda in detail.
+  \begin{itemize}
+  \item The left-to-right homomorphism is defined as
+    \[ M = \lambdaunary {\alpha} {\phi} \pi {\homrappXtoYatZ {\phi} {\punitrefl {\alpha}} \alpha} \]
+  \item The right-to-left homomorphism is defined as
+    \[ N = \lambdabinary \pi x \alpha f \alpha' {\homlappXtoYatZ {\punitelimkontZatABC {\alpha. \homllambdaXatYdotZ x \pi x} {\alpha'} f {\alpha}} x \pi}\]
+  \item First, right-to-left-to-right:
+    \begin{align*}
+      \lambdaunary \pi x \alpha {\appunary M {\alpha} {(\appunary N \pi x \alpha)} \pi}
+      &= \lambdaunary \pi x \alpha {\appunary M {\alpha} {({\homrlambdaXatYdotZ f {\alpha'} {{\homlappXtoYatZ {\punitelimkontZatABC {\alpha. \homllambdaXatYdotZ x \pi x} {\alpha'} f {\alpha}} x \pi}}})} \pi}\\
+      &= \lambdaunary \pi x \alpha {\homrappXtoYatZ {({\homrlambdaXatYdotZ f {\alpha'} {{\homlappXtoYatZ {\punitelimkontZatABC {\alpha. \homllambdaXatYdotZ x \pi x} {\alpha'} f {\alpha}} x \pi}}})} {\punitrefl \alpha} \alpha}\\
+      &= \lambdaunary \pi x \alpha {{\homlappXtoYatZ {\punitelimkontZatABC {\alpha. \homllambdaXatYdotZ x \pi x} {\alpha'} {\punitrefl \alpha} {\alpha}} x \pi}}\tag{covhom$\beta$}\\
+      &= \lambdaunary \pi x \alpha {{\homlappXtoYatZ {(\homllambdaXatYdotZ x \pi x)} x \pi}}\tag{unit$\beta$}\\
+      &= \lambdaunary \pi x \alpha {x}\tag{contrahom$\beta$}\\
+    \end{align*}
+  \item Left-to-right-to-left
+    \begin{align*}
+      &\lambdaunary {\alpha} {\phi} \pi \appunary N {\pi} {({\appunary M \alpha \phi \pi})} {\alpha}\\
+      &= \lambdaunary {\alpha} {\phi} \pi \homrlambdaXatYdotZ {f}{\alpha'} {\homlappXtoYatZ {\punitelimkontZatABC {\alpha. \homllambdaXatYdotZ x \pi x} {\alpha'} f {\alpha}} {({\appunary M \alpha \phi \pi})} \pi}\\
+      &= \lambdaunary {\alpha} {\phi} \pi \homrlambdaXatYdotZ {f}{\alpha'} {\homlappXtoYatZ {\punitelimkontZatABC {\alpha. \homllambdaXatYdotZ x \pi x} {\alpha'} f {\alpha}} {(\appunary \phi \alpha {\punitrefl\alpha}{\alpha})} \pi}\\ 
+      &= \lambdaunary {\alpha} {\phi} \pi \homrlambdaXatYdotZ {f}{\alpha'} \punitelimkontZatABC {\alpha. ({\homlappXtoYatZ {\punitelimkontZatABC {\alpha. \homllambdaXatYdotZ x \pi x} {\alpha} {\punitrefl \alpha} {\alpha}} {(\appunary \phi \alpha {\punitrefl\alpha}{\alpha})} \pi})} {\alpha'}{f}{\alpha}\tag{unit $\eta$}
+      \\ 
+      &= \lambdaunary {\alpha} {\phi} \pi \homrlambdaXatYdotZ {f}{\alpha'} \punitelimkontZatABC {\alpha. ({\homlappXtoYatZ {\homllambdaXatYdotZ x \pi x} {(\appunary \phi \alpha {\punitrefl\alpha}{\alpha})} \pi})} {\alpha'}{f}{\alpha}\tag{unit $\beta$} \\ 
+      &= \lambdaunary {\alpha} {\phi} \pi \homrlambdaXatYdotZ {f}{\alpha'} \punitelimkontZatABC {\alpha. ({{(\appunary \phi \alpha {\punitrefl\alpha}{\alpha})}})} {\alpha'}{f}{\alpha}\tag{contrahom $\beta$} \\ 
+      &= \lambdaunary {\alpha} {\phi} \pi \homrlambdaXatYdotZ {f}{\alpha'} {{(\appunary \phi {\alpha'} f {\alpha})}}\tag{unit $\eta$} \\ 
+      &= \lambdaunary {\alpha} {\phi} \pi \phi \tag{covhom $\eta$} \\ 
+    \end{align*}
+  \end{itemize}
+\end{proof}
 
 \section{Semantics}
 \label{sec:appendix:semantics}
