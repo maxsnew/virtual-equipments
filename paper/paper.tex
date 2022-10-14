@@ -1094,7 +1094,7 @@ Finally, we have the cartesian unit and product sets, which are
 analogous to the normal unit and product of types. The most notable
 point to emphasize is that in the formation rule for the product, the
 two subformulae should have the same covariant and contravariant
-dependence (so, as with linear logic, some constructions can
+dependence (as with linear logic, some constructions can
 syntactically use a variable more than once and still be ``linear'').  
 %% the
 %% unit constructor ``uses'' all variables and the product ``uses'' all
@@ -1367,11 +1367,10 @@ that much category theory can be formalized in virtual equipments, we
 show these examples to demonstrate how the VETT syntax gives a more
 familiar syntax to these constructions, while still avoiding the need
 for explicit naturality and functoriality side conditions.  We have
-formalized the syntax of \vett{} in Agda, using Agda's rewriting
-mechanism to implement substitution and $\beta$-reduction, and checked
-some of the results in this section (e.g. Lemma~\ref{lem:yoneda} and
-Lemma~\ref{lem:fubini-short} and the maps in
-Lemma~\ref{lem:adjunction}).\footnote{\url{https://github.com/maxsnew/virtual-equipments/blob/master/agda/Examples.agda}}
+checked some of the results in this section (e.g. Lemma~\ref{lem:yoneda}
+and Lemma~\ref{lem:fubini-short} and the maps in
+Lemma~\ref{lem:adjunction}) in
+Agda.\footnote{\url{https://github.com/maxsnew/virtual-equipments/blob/master/agda/Examples.agda}}
 
 First, we using the elimination for the unit set, we can see that all
 constructions are (pro-)functorial:
@@ -1417,7 +1416,7 @@ Next, we turn to some of the central theorems of category theory, the
 Yoneda and Co-Yoneda lemmas. Despite being ulimately quite elementary,
 these are notoriously abstract. In \ohol{}, we can view these as
 ordered generalizations of some very simple tautologies about
-equality. For instance, the Yoneda lemma (and its proof) generalizes
+equality. For instance, the Yoneda lemma generalizes
 the equivalence between the formulae $\forall x. \forall y. x = y
 \Rightarrow P y$ and $P x$.
 \begin{lemma} \label{lem:yoneda}
@@ -1427,10 +1426,9 @@ the equivalence between the formulae $\forall x. \forall y. x = y
   \item (Co-Yoneda) The profunctor $\tensorexistsXwithYandZ {\alpha'}{\punitinXfromYtoZ{}{\alpha}{\alpha'}} {\negPresheafAppPtoX \pi \alpha}$ is isomorphic to $\negPresheafAppPtoX \pi \alpha$
   \end{enumerate}
 \end{lemma}
-The proofs both follow from the unit elimination rule: we can view
-the unit elimination rule as essentially making the Yoneda lemma a
-primitive axiom, as the two cases of showing (1) is an isomorphism are
-precisely the $\beta$ and $\eta$ rules for the unit.
+The proofs both follow from the unit elimination rule, which is
+essential the Yoneda lemma---the two cases of showing (1) is an
+isomorphism are precisely the $\beta$ and $\eta$ rules for the unit.
 
 Next, we have the ``Fubini'' theorems, which are analogous to simple
 theorems relating tensor and hom types in ordered logic, and whose proofs are 
@@ -1662,9 +1660,9 @@ modeled by a connective rather than judgmental structure.
   \item A chosen subset of the objects $V_s \subseteq V_o$ of ``small objects''
   \item A set ${\mathcal V}_h$ of ``horizontal arrows'' with source
     and target functions $s,t : {\mathcal V}_h \to {\mathcal V_o}^2$
-  \item Sets of 2-cells of the following form:
-    With appropriate ``multi-categorical'' notions of identity and
-    composition.
+  \item Sets of 2-cells of the following form, 
+    with appropriate ``multi-categorical'' notions of identity and
+    composition:
 \[\begin{tikzcd}% https://q.uiver.app/?q=WzAsNixbMCwwLCJDXzAiXSxbMCwyLCJEXzAiXSxbMiwwLCJDX3tufSJdLFsxLDAsIlxcY2RvdHMiXSxbMiwyLCJEXzEiXSxbMSwxLCJcXHBoaSJdLFszLDIsIlJfbiIsMCx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImJhcnJlZCJ9fX1dLFswLDEsIkYiLDJdLFsyLDQsIkciXSxbMSw0LCJTIiwyLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV0sWzAsMywiUl8wIiwwLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV1d
 	{C_0} & \cdots & {C_{n}} \\
 	& \phi \\
