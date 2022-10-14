@@ -7,6 +7,7 @@
 \usepackage{mathpartir}
 \usepackage{bbm}
 \usepackage{cleveref}
+\usepackage[utf8]{inputenc}
 
 \DeclareMathOperator*{\colim}{colim}
 
@@ -2119,7 +2120,7 @@ well-typedness of the corresponding three kinds of substitutions.
 
     \inferrule*[right=BoundaryDbl]
     {\Gamma \vdash \cat C \isaCat \and \Gamma\vdash\cat D \isaCat}
-    {\Gamma \vdash \alpha: \cat C; \beta: \cat D \isaboundary}
+    {\Gamma \vdash \alpha: \cat C; \beta: \cat D \boundary}
 
     \inferrule*[right=SetCtxForm]
     {\Gamma \isadtctx}
@@ -2203,7 +2204,7 @@ substitutions) that we now define.
   This can be typed with the admissible rule
   \begin{mathpar}
     \inferrule*[right=(*)]
-               {\Gamma \vdash \Phi \vectx}
+               {\Gamma \vdash \Phi \isavectx}
                {\Gamma \vdash d^\pm\Phi \boundary}
   \end{mathpar}
   and is defined as
@@ -2255,7 +2256,7 @@ substitutions) that we now define.
 % RETURN
 Finally, we define the operation of ``horizontal composition'' of set
 contexts $\Phi \jnctx \Psi$ and its functorial lift $\phi \jnctx
-\psi$. Note that the horizontal composition is only well-defined when $$
+\psi$. Note that the horizontal composition is only well-defined when 
 
 Next, we define the actions of substitutions on terms. We elide the
 obvious action of term substitutions $\gamma$ and include only the
