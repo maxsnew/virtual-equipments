@@ -693,23 +693,38 @@ d^+(\alpha_1 : \cat C_1, x_1:R_1(\alpha_1,\alpha_2), \ldots, x_n:R_n(\alpha_n,\a
 \begin{figure}[t]
   \begin{mathpar}
     \begin{array}{rccl}
-      \textrm{Categories} &\cat C, \cat D, \cat E & ::= & M \pipe \cat C \times \cat D \pipe \cat 1
+      \textrm{Categories} &\cat C, \cat D, \cat E & ::= & \unquoth M \pipe \cat C \times \cat D \pipe \cat 1
       \pipe \graphProf \alpha \beta P \pipe \negPresheaf {\cat C} \pipe \posPresheaf {\cat C}
       \\
-      \textrm{Objects} & a, b, c & ::= & \alpha \pipe M a \pipe (a,b) \pipe () \ldots\\
-      \textrm{Sets} & P,Q,R & ::= & \punitinXfromYtoZ {\cat C} a b \pipe \tensorexistsXwithYandZ {\beta} P Q \pipe \homrallXYtoZ \beta P Q \pipe \homlallXYtoZ \alpha R S \\
-      &&& 1 \pipe P \times Q\\
+      \textrm{Objects} & A, B, C, a, b, c & ::= & \alpha \pipe M a \pipe (a,b)
+      \pipe () \pipe \pi_i a \pipe (a_-, a_+, s) \pipe \pi_- a \pipe
+      \pi_+ a \pipe \lambda \alpha:\cat C.R \\
+      \textrm{Sets} & P,Q,R & ::= & \punitinXfromYtoZ {\cat C} a b \pipe \tensorexistsXwithYandZ {\beta} P Q \pipe \homrallXYtoZ \beta P Q \pipe \homlallXYtoZ \alpha R S 
+      \pipe 1 \pipe P \times Q\\
       &&& \pipe \harrapp M a b \pipe \negPresheafAppPtoX a b \pipe \posPresheafAppPtoX a b\\
-      \textrm{Elements} & s,t,u & ::= & \ldots \\
-      \\
+      \textrm{Elements} & s,t,u & ::= & 
+    x \pipe 
+    {\punitelimkontZatABC {\alpha. t}{b_1} s {b_2}} \pipe
+    \punitrefl b \pipe 
+    {\tensorelimWkontZ s {x.\beta.y.r}} \pipe 
+    {\tensorintroatXwithYandZ b s t} \pipe
+    {\homrappXtoYatZ s t a} \\
+    &&&
+    \pipe {\homrlambdaXatYdotZ {x}{\alpha} s}\pipe 
+    {\homlappXtoYatZ t s a} \pipe 
+    {\homllambdaXatYdotZ {x}{\alpha} s} \pipe
+    \pi_i s \pipe 
+    (s_1,s_2) \pipe
+    () \pipe \pi_e a \pipe \pendappXtoY M b \\ 
       \textrm{Type} & A,B,C & ::= &
-      \sum_{X:A} B \pipe \prod_{X:A} B \pipe \Id A M N \\
-      &&& \Cat \pipe \varr{\cat C}{\cat D}\pipe \harr {\cat C} {\cat D}\pipe \pendallXdotY {\alpha:{\cat C}} R\\
-      \textrm{Term} & L,M,N & ::= & X \pipe \lambda X:M. N \pipe M\,N \pipe (M,N) \pipe \pi_1 M \pipe \pi_2 M \mid \text{refl}_{M} \\
-      &&&\lceil \cat C \rceil \pipe \vlambda {\alpha:\cat C} a \pipe \hlambda {\alpha:\cat C}{\beta: \cat D} R \mid \ldots \\
+%      \sum_{X:A} B \pipe \prod_{X:A} B \pipe \Id A M N \\
+      \ldots \pipe \smallCats \pipe \Cat \pipe \varr{\cat C}{\cat D}\pipe \harr {\cat C} {\cat D}\pipe \pendallXdotY {\alpha:{\cat C}} R\\
+      \textrm{Term} & L,M,N & ::= & 
+      %% & X \pipe \lambda X:M. N \pipe M\,N \pipe (M,N) \pipe \pi_1 M \pipe \pi_2 M \mid \text{refl}_{M} \\
+      \ldots \pipe \lceil \cat C \rceil \pipe \lambda {\alpha:\cat C}. a \pipe \lambda ({\alpha:\cat C};{\beta: \cat D}). R \mid \lambda \alpha.t \\
       \textrm{Type Context} & \Gamma, \Delta & ::= & \cdot \pipe \Gamma, X : A\\
       \textrm{Set Context} & \Xi, Z & ::= & \alpha:\cat C \pipe \alpha:\cat C;\beta: \cat D\\
-      \textrm{Transformation Context} & \Phi,\Psi & ::= & \alpha : \cat C \pipe \Phi , x : P,\beta:\cat D\\
+      \textrm{Trans. Context} & \Phi,\Psi & ::= & \alpha : \cat C \pipe \Phi , x : P,\beta:\cat D\\
     \end{array}
   \end{mathpar}
   \caption{\vett{} Syntactic Forms}
@@ -831,19 +846,24 @@ Next, we overview our basic judgement forms.  We have
 %% substitution of types for the judgment's parameter variables. Next, we
 %% have rules for constructing an ``empty'' context, which is just a
 
-All syntactic forms typed in context admit an action of
-substitution. For (meta-language) types and terms, this is as
-usual. Objects $\alpha:\cat C \vdash a : \cat D$ can be substituted for
-object variables $\beta : \cat D$ in other objects. We can also
-substitute objects into \emph{sets}, that is, if we have a set $P$
-parameterized by a contravariant variable $\alpha : \cat C$ and a
-covariant variable $\beta: \cat D$, then we can substitute objects $a :
-\cat C$ and $b : \cat D$ for these variables $P[a/\alpha;b/\beta]$. This
-generalizes the ordinary precomposition of a relation by a function.
-Semantically this is the ``restriction'' of a profunctor along two
-functors, which is just composition of functors if a profunctor is
-viewed as a functor to $\Set$. Modeling this operation as a substitution
-considerably simplifies reasoning using profunctors.
+The variable rules for objects and elements are 
+\[
+\inferrule*{}{ \Gamma \pipe \alpha : \cat C \vdash \alpha : \cat C}
+\qquad
+\inferrule*{}{ \Gamma \pipe \alpha : \cat C, x : R, \beta : \cat D \vdash x : R}
+\]
+All syntactic forms typed in context admit an action of substitution.
+For types and terms, this is as usual. Objects $\alpha:\cat C \vdash a :
+\cat D$ can be substituted for object variables $\beta : \cat D$ in
+other objects. We can also substitute objects into \emph{sets}, that is,
+if we have a set $P$ parameterized by a contravariant variable $\alpha :
+\cat C$ and a covariant variable $\beta: \cat D$, then we can substitute
+objects $a : \cat C$ and $b : \cat D$ for these variables
+$P[a/\alpha;b/\beta]$. This generalizes the ordinary precomposition of a
+relation by a function.  Semantically this is the ``restriction'' of a
+profunctor along two functors, which is just composition of functors if
+a profunctor is viewed as a functor to $\Set$. Modeling this operation
+as a substitution considerably simplifies reasoning using profunctors.
 %
 Finally we have the action of substitution on elements/natural transformations.
 First, we can substitute elements/natural transformations for the set
@@ -1227,9 +1247,9 @@ syntactically use a variable more than once and still be ``linear'').
     \inferrule{\Gamma\pipe\Xi \vdash R \isaSet \\\\ \Gamma\pipe\Xi \vdash S\isaSet}
               {\Gamma\pipe\Xi \vdash R \times S\isaSet}
     \quad
-    \inferrule{\forall i \in \{1,2\}.~ \Gamma \pipe\Phi \vdash M_i : R_i}{\Gamma \pipe\Phi \vdash (M_1,M_2) : R_1 \times R_2}
+    \inferrule{\forall i \in \{1,2\}.~ \Gamma \pipe\Phi \vdash s_i : R_i}{\Gamma \pipe\Phi \vdash (s_1,s_2) : R_1 \times R_2}
     \quad
-    \inferrule{\Gamma \pipe\Phi\vdash M : R_1 \times R_2}{\Gamma \pipe\Phi \vdash \pi_i M : R_i}
+    \inferrule{\Gamma \pipe\Phi\vdash s : R_1 \times R_2}{\Gamma \pipe\Phi \vdash \pi_i s : R_i}
   \end{array}
   \]
   \end{scriptsize}
@@ -1317,7 +1337,7 @@ exactly one free variable.
     
     \inferrule
     {\Gamma \vdash \cat C \isaCat \and\Gamma \vdash \cat D \isaCat}
-    {\Gamma\pipe\cdot \vdash \varr{\cat C}{\cat D} \isaTy}
+    {\Gamma \vdash \varr{\cat C}{\cat D} \isaTy}
     \quad
     \inferrule
     {\Gamma \pipe \alpha:\cat C \vdash A : \cat D}
@@ -1325,13 +1345,13 @@ exactly one free variable.
     \quad
     \inferrule
     {\Gamma \pipe \alpha:\cat C \vdash A : \cat D\and
-      \Gamma\pipe\cdot \vdash M : \varr{\cat D}{\cat E}}
+      \Gamma \vdash M : \varr{\cat D}{\cat E}}
     {\Gamma\pipe \alpha:\cat C \vdash M A : \cat E}
     \\ \\
     
     \inferrule
     {\Gamma \vdash \cat C \isaCat \and\Gamma \vdash \cat D \isaCat}
-    {\Gamma\pipe\cdot \vdash \harr{\cat C}{\cat D} \isaTy}
+    {\Gamma \vdash \harr{\cat C}{\cat D} \isaTy}
     \quad
     \inferrule
     {\Gamma \pipe \alpha:\cat C;\beta:\cat D \vdash R \,\isaSet}
