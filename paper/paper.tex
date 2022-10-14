@@ -2230,7 +2230,7 @@ substitutions) that we now define.
                {\Gamma \vdash \Phi \isavectx}
                {\Gamma \vdash d^\pm\Phi \boundary}
   \end{mathpar}
-  and is defined as
+  This is defined as
   \begin{align*}
     d^{\pm}(\alpha:\cat C) &= \alpha : \cat C\\
     d^{-}(\Phi,x:R,\Psi) &= d^-\Phi\\
@@ -2250,6 +2250,12 @@ substitutions) that we now define.
   \end{align*}
 \end{definition}
 
+  Note that $d^\pm\Phi$ will always be a set context with a single
+  variable $\alpha : \cat C$---we exploit the fact that we have these
+  singleton set contexts to avoid introducing a separate syntactic class
+  of category contexts $\alpha : \cat C$ and substitutions between them.
+
+
 \begin{definition}
   We define the operation of restricting a set context to both sides
   of its boundary with admissible typing
@@ -2260,19 +2266,19 @@ substitutions) that we now define.
   \end{mathpar}
   and definition
   \begin{align*}
-    \underline{\alpha:C} &= \alpha:C\\
+    \underline{\alpha:\cat C} &= \alpha:\cat C\\
     \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
   \end{align*}
   The extension to substitutions has admissible typing
   \begin{mathpar}
     \inferrule*[right=(*)]
     {\Gamma \pipe \Psi \vdash \phi :: \Phi}
-    {\Gamma\pipe\underline \vdash \Phi \boundary}
+    {\Gamma\pipe\underline \Psi \vdash \underline \phi : \underline \Phi}
   \end{mathpar}
   and definition
   \begin{align*}
-    \underline{\alpha:C} &= \alpha:C\\
-    \underline{\Phi,x:R,\Psi} &= d^-\Phi; d^+{\Psi}
+    \underline{b/\beta} &= b/\beta\\
+    \underline{\phi} &= d^-\phi; d^+{\phi} \text{ otherwise }
   \end{align*}
 \end{definition}
 
@@ -2327,27 +2333,30 @@ obvious action of term substitutions $\gamma$ and include only the
 more unusual substructural substitutions.
 \begin{definition}[Substitution Actions]
   For any $\Gamma \pipe \alpha: \cat C \vdash a : \cat D$ and $\Gamma
-  \pipe \beta:\cat D \vdash b \cat E$, we define $b[a/\beta]$ by
+  \pipe \beta:\cat D \vdash b : \cat E$, we define $b[a/\beta]$ by
   recursion on $b$:
 
   \begin{align*}
     \beta[a/\beta] &= a\\
     (M\,b)[a/\beta] &= M\,(b[a/\beta])\\
-    (\lambda \beta)    
+    (b_1,b_2)[a/\beta] &= (b_1[a/\beta],b_2[a/\beta])\\
+    (\pi_i b)[a/\beta] &= \pi_i b[a/\beta]\\
+    () [a/\beta] &= () \\
     (\pi_\pm b)[a/\beta] &= \pi_\pm b[a/\beta]\\
     (b_-,b_+,s)[a/\beta] &= (b_-[a/\beta],b_+[a/\beta], s[a/\beta])\\
+    (\lambda \alpha.R)[a/\beta] &=\lambda \alpha.R[a/\beta] %% FIXME: not sure if this is formally legal... split cases on positive and negative
   \end{align*}
 
-  Simultaneously by recursion on $s$ we define $s[\phi]$
+  Simultaneously by recursion on an element $s$ we define $s[\phi]$
   \begin{align*}
-    x[a/\alpha,t,b/\beta] &= t\\
+    x[a/\alpha,t/x,b/\beta] &= t\\
     \pendappXtoY M b[a/\alpha] &= \pendappXtoY M {b[a/\alpha]}\\
     {\punitelimkontZatABC {\alpha. t}{b_1} s {b_2}}[\phi] &=
     {\punitelimkontZatABC {\alpha. t}{b_1[d^-\phi]} {s[\phi]} {b_2[d^+\phi]}}\\
     (\punitrefl b)[a/\alpha] &= \punitrefl {b[a/\alpha]}\\
     {\tensorelimWkontZ s {x.\beta.y.r}[\phi_l\jnctx\phi_m\jnctx\phi_r]} &=
     \tensorelimWkontZ {s[\phi_m]} {x.\beta.y. r[\phi_l,x/x,\beta/\beta \jnctx \beta/\beta,y/y,\phi_r]}\\
-    {\tensorintroatXwithYandZ b s t}[\phi_s \jnctx \phi_t] &= \tensorintroatXwithYandZ {d^+\phi_s} {s[\phi_s]} {t[\phi_t]}\\
+    {\tensorintroatXwithYandZ b s t}[\phi_s \jnctx \phi_t] &= \tensorintroatXwithYandZ {b[d^+\phi_s]} {s[\phi_s]} {t[\phi_t]}\\
     {(\homrappXtoYatZ s t a)}[\phi_f\jnctx \phi_a] &=
     {\homrappXtoYatZ {s[\phi_f]} {t[\phi_a]} {a[d^+\phi_f]}}\\
     {(\homrlambdaXatYdotZ {x}{\alpha} s)}[\phi] &=
@@ -2369,7 +2378,7 @@ more unusual substructural substitutions.
   And finally, we define $P[\xi]$ by recursion on $P$:
   \begin{align*}
     (M\,a\,b)[\xi] &= M\,(a[d^-\xi])\,(b[d^+\xi])\\
-    (\punitinXfromYtoZ {\cat C} a b)[\xi] &= \punitinXfromYtoZ {\cat C} {a[\xi]}{b[\xi]}\\
+    (\punitinXfromYtoZ {\cat C} a b)[\xi] &= \punitinXfromYtoZ {\cat C} {a[d^- \xi]}{b[d^+ \xi]}\\
     (\tensorexistsXwithYandZ \beta P Q)[\xi] &= \tensorexistsXwithYandZ \beta {P[d^-\xi;\beta/\beta]}{P[\beta/\beta;d^+\xi]}\\
     (\homrallXYtoZ \alpha R P)[\xi] &= \homrallXYtoZ \alpha {R[d^+\xi;\alpha/\alpha]} {P[d^-\xi;\alpha/\alpha]}\\
     (\homlallXYtoZ \alpha P Q)[\xi] &= \homlallXYtoZ \alpha {P[\alpha/\alpha;d^-\xi]} {Q[\alpha/\alpha;d^+\xi]}\\
