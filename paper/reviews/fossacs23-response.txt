@@ -1,0 +1,175 @@
+
+We thank the reviewers for their very detailed and helpful feedback, and
+will integrate them into the final version of the paper (including all
+of the minor comments not mentioned below).
+
+----- Review 1 -----
+
+>> It is not clear what the limits of the present formalism are.
+
+>> - Section 2.1: I would appreciate a more careful and detailed explanation about the
+>>   positive and negative presheaf rules.
+>>   - First, what is d-(Ξ) and d+(Ξ)? As far as I understand Ξ is either an object
+>>     var, or a pair of object vars. What do those maps do in the first case?
+>>   - Second, I would appreciate some more details in the elimination rules of the
+>>     positive and negative presheaves. For example in the negative presheaf the
+>>     "a" presumably needs to be contravariant in Ξ so that one can define the
+>>     action of the presheaf. But why must the presheaf itself be positive in Ξ?
+>>     Is that just a "rest of the context" rule?
+
+>> - Section 2.2: This is very nice, but I would appreciate a bit more discussion
+>>   about the tensor product of categories. Usually this kind of construction is a
+>>   colimit, i.e. a quotient of a coproduct of some sort. However, there is no
+>>   indication in the rule nor any discussion in the text stating this colimiting
+>>   behaviour. In other words, I would expect to see something stating the
+>>   property that "ind(x, beta, y. t; s) is not allowed to depend on the
+>>   particular choice of beta" - or maybe that the chosen section t itself is not.
+>>   Could you comment on this?
+
+>> - I find the second half of Section 4 very confusing. While I can believe the
+>>   overall results, there are many details in the presentation that I find
+>>   suspect. Here are some:
+
+>>   - Theorem 2 (Initiality). While I understand exactly what you mean, I have
+>>     great trouble accepting a theorem with the phrasing "almost any choice of
+>>     connectives" in it. I would really very strongly prefer if this bit was
+>>     described discursively rather than claimed as a result.
+
+>>   - Construction 3: What is "vDbl_r"? Presumably
+>>     virtual-double-category-with-restrictions, but you surely mean vEq_r (in
+>>     that case introduce the symbol). Maybe you'd like to also include one
+>>     sentence explaining what the construction achieves.
+
+>>   - Construction 4: What is "Cat_U"? Is it from a previous version of the paper
+>>     that used Grothendieck universes instead of κ-smallness?
+
+>> ----------------------- REVIEW 2 ---------------------
+
+>> - A general question: suppose that I do not trust your type theory, would it be
+>>   possible (in principle) to generate explicit proofs of functoriality /
+>>   naturality from proofs in your type theory?
+
+Q: Could one generate explicit proofs of functoriality /naturality from
+proofs in the type theory?
+
+A: Yes, "running" the (constructive) proof of soundness (Theorem XXX)
+would do exactly this, by compiling our "synthetic" proofs to "analytic"
+ones.  
+
+>> - p. 3: the reason why you have to restrict to unary functors and binary
+>>   profunctors is not clear and should be detailed or illustrated. What goes
+>>   wrong if we naively remove this restriction?
+
+>> - p. 10: the construction "P ▹∀α Q" is the most unusual one (at least for me)
+>>   and should be better explained. I had hard times to understand what it
+>>   does. Also, an explicit formula for the counterpart of this operation on
+>>   profunctors would be welcome (and perhaps an example). Also, please provide
+>>   citations about where this is introduced / used.
+
+>>   - more importantly, I am not sure I understand the construction "P ▹∀α Q". The
+>>     rule seems to state that α should occur covariantly both in P and Q, but in
+>>     the formula for composition it seems that α₂ ooccurs both covariantly and
+>>     contravariantly (in "α₂ → α₃") what am I missing here? Perhaps should
+>>     exchange the quantifications on α₁ and α₂ (so that α₂ gets a ∀ and α₁ gets
+>>     a ▹)? But I am not sure that this is a solution or an accurate understanding
+>>     of things because the same problem occurs in "Prounctorality" below it
+>>     seems...
+>>   - What is exactly the difference between ∀ and ▹. For instance, what is the
+>>     difference if we phrase Functoriality as "∀α₂. α₁ → α₂ ∀α₁◃ F(α₁) → F(α₂)"?
+>> - p. 12, "For instance, the Yoneda lemma generalizes the equivalence...": I
+>>   could not understand this (x is bound in the formula on the left
+>>   (∀x.∀y.x=y⇒Py) and free on the right (Px) for instance). Are you referring to
+>>   the fact that equality can be defined Leibniz style by x=y meaning
+>>   "∀P.P(y)⇒P(x)"?
+
+could clarify if room
+
+>> - p. 15, p. 16: the initiality theorem is very sketchy here. Could this be (or
+>>   has it been) Agda'ed?
+
+
+------ Review 3 -------
+
+>> While I do think this work is interesting, I am not convinced by this
+>> motivation, and in my opinion, dealing with functoriality and naturality
+>> conditions, is not an interesting application of this work. My reasoning
+>> is as follows:
+
+>> - I don't think that it is fair to call some arguments in category
+>>   theory 'objectively' complex due to the high amount of
+>>   functoriality/naturality side conditions.
+
+>> Having numerous side conditions in proofs is very common in mathematics,
+>> and not unique to category. When dealing with quotients, one needs check
+>> for well-definedness, and to construct a ring homomorphism, one needs to
+>> check preservation of addition, multiplication, and the multiplicative
+>> unit.
+
+>> In addition, the example that illustrates this point (constructing
+>> adjunctions by giving the functors and natural transformations) is not
+>> convincing. That is because there are alternative methods available,
+>> like universal arrows, that provide a way of dealing with these
+>> side-conditions. As such, in this case, the high amount of side
+>> conditions seems to come from taking the 'wrong' approach to deal with a
+>> specific problem.
+
+>> - Domain-specific theories are not necessary to deal with such
+>>   syntactical proofs.
+
+>> If one composes natural transformations, one does not need to reprove
+>> the naturality every time, even if one does not have a domain-specific
+>> syntax for the constructions. As such, VETT is not necessary to reduce
+>> the number of functoriality/naturality side conditions in proofs.
+
+>> For me, the first four paragraphs of the introduction would be more convincing if it were structured as follows:
+
+>> - There are many applications of both category theory and enriched
+>>   category theory to programming languages. These also come up in the
+>>   mechanization of certain proofs.
+
+>> - As such, we want to have a suitable interface that allows us to deal
+>>   uniformly with constructions in both category theory and enriched
+>>   category theory. This way we can avoid having to formalizing theorems
+>>   for both categories and enriched categories.
+
+>> - This is what VETT does.
+
+>> I think that this way, you could also strengthen the statement
+>> "Additionally, VETT may serve as the basis of a future domain specific
+>> proof assistant for category theoretic proofs" (first paragraph on page
+>> 4). The current formulation suggests that VETT would only be useful if
+>> one wants to extend proof assistants. However, VETT could also offer
+>> advantages for designing interfaces of libraries about category theory.
+
+>> - Page 3, paragraph 2: I think it would be good to mention "Categories
+>>   with families and first-order logic with dependent sorts" by
+>>   Palmgren. In this paper, hyperdoctrines over CwFs are introduced, and
+>>   this definition is actually quite similar to VETT (compare your
+>>   Definition 3 to page 46 in the work by Palmgren)
+
+Thank you for the suggested references; we will include them.
+
+>> - Another model of VETT that might be worth mentioning (either as a
+>>   conjecture or a theorem): in MLTT, one can formalize the notions of
+>>   category, functor, transformation, and profunctor. As such, I think
+>>   that every CwF gives rise to a HVE.
+
+strictness?
+
+>> - Constructions 4 and 5 should be more explicit on the relevant CwF
+>>   structure, because currently, they only mention how the added
+>>   connectives of VETT are interpreted. As described in the paper, the
+>>   CwF should model pi-types, sigma-types, and extensional identity
+>>   types. The category of contexts in such a CwF must be locally
+>>   cartesian closed (Theorem 6.1 in The biequivalence of locally
+>>   cartesian closed categories and Martin-Lof type theories by
+>>   Clairambault and Dybjer). However, the (bi)category of categories is
+>>   not locally cartesian closed: exponentials do not exists for all
+>>   functors, but only Conduché functors
+>>   (https://ncatlab.org/nlab/show/Conduché+functor#failure_of_local_cartesian_closedness_in_cat). As
+>>   such, one does not fully model VETT if the category of contexts would
+>>   be the category of categories. For that reason, I think it is good to
+>>   mention explicitly what the relevant CwF structures are in
+>>   Constructions 4 and 5.
+
+
