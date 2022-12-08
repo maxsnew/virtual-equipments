@@ -250,33 +250,88 @@ AUTHORS: Max New and Daniel R. Licata
 ----------- Overall evaluation -----------
 ==== Summary ====
 
-The paper presents an extension of type theory called Virtual Equipment Type Theory (VETT). VETT is an extension of type theory with special sorts for categories, functors, transformations, and profunctors. As such, one can abstractly reason about constructs in category theory.
+The paper presents an extension of type theory called Virtual Equipment
+Type Theory (VETT). VETT is an extension of type theory with special
+sorts for categories, functors, transformations, and profunctors. As
+such, one can abstractly reason about constructs in category theory.
 
-The paper proceeds as follows. First, the syntax of VETT is introduced, and it is compared to higher-order logic with the main observation being that profunctors are like proof relevant relations of categories. After that, the authors show how VETT can be used by proving established theorems from category theory, such as the Yoneda lemma and the characterization of adjunctions via homsets. In the fourth section, the semantics of VETT is discussed. It is shown that every category with families together with a contravariant functor from the category of contexts to the category of virtual equipments gives rise to a model of VETT. Initiality of the syntax is proven as well. The authors also construct two concrete models of VETT: one using categories and one using enriched categories.
+The paper proceeds as follows. First, the syntax of VETT is introduced,
+and it is compared to higher-order logic with the main observation being
+that profunctors are like proof relevant relations of categories. After
+that, the authors show how VETT can be used by proving established
+theorems from category theory, such as the Yoneda lemma and the
+characterization of adjunctions via homsets. In the fourth section, the
+semantics of VETT is discussed. It is shown that every category with
+families together with a contravariant functor from the category of
+contexts to the category of virtual equipments gives rise to a model of
+VETT. Initiality of the syntax is proven as well. The authors also
+construct two concrete models of VETT: one using categories and one
+using enriched categories.
 
 The motivation given in the paper for this endeavor, is as follows:
-- Some category-theoretic arguments are 'objectively' complex due to the high amount of functoriality and naturality side-conditions (paragraph 2 of introduction). This is illustrated using adjunctions
-- One can deal with these complexities by using 2-categorical notions, which is illustrated by formal category theory (paragraph 3 of introduction). This is analogous to analysis where one avoids proving every continuity requirement using syntactical principles.
-- This paper deals with the aforementioned complexities syntactically, and that is why they introduce VETT.
 
-While I do think this work is interesting, I am not convinced by this motivation, and in my opinion, dealing with functoriality and naturality conditions, is not an interesting application of this work. My reasoning is as follows:
+- Some category-theoretic arguments are 'objectively' complex due to the
+  high amount of functoriality and naturality side-conditions (paragraph
+  2 of introduction). This is illustrated using adjunctions
 
-- I don't think that it is fair to call some arguments in category theory 'objectively' complex due to the high amount of functoriality/naturality side conditions.
+- One can deal with these complexities by using 2-categorical notions,
+  which is illustrated by formal category theory (paragraph 3 of
+  introduction). This is analogous to analysis where one avoids proving
+  every continuity requirement using syntactical principles.
 
-Having numerous side conditions in proofs is very common in mathematics, and not unique to category. When dealing with quotients, one needs check for well-definedness, and to construct a ring homomorphism, one needs to check preservation of addition, multiplication, and the multiplicative unit.
+- This paper deals with the aforementioned complexities syntactically,
+  and that is why they introduce VETT.
 
-In addition, the example that illustrates this point (constructing adjunctions by giving the functors and natural transformations) is not convincing. That is because there are alternative methods available, like universal arrows, that provide a way of dealing with these side-conditions. As such, in this case, the high amount of side conditions seems to come from taking the 'wrong' approach to deal with a specific problem.
+While I do think this work is interesting, I am not convinced by this
+motivation, and in my opinion, dealing with functoriality and naturality
+conditions, is not an interesting application of this work. My reasoning
+is as follows:
 
-- Domain-specific theories are not necessary to deal with such syntactical proofs.
+- I don't think that it is fair to call some arguments in category
+  theory 'objectively' complex due to the high amount of
+  functoriality/naturality side conditions.
 
-If one composes natural transformations, one does not need to reprove the naturality every time, even if one does not have a domain-specific syntax for the constructions. As such, VETT is not necessary to reduce the number of functoriality/naturality side conditions in proofs. 
+Having numerous side conditions in proofs is very common in mathematics,
+and not unique to category. When dealing with quotients, one needs check
+for well-definedness, and to construct a ring homomorphism, one needs to
+check preservation of addition, multiplication, and the multiplicative
+unit.
+
+In addition, the example that illustrates this point (constructing
+adjunctions by giving the functors and natural transformations) is not
+convincing. That is because there are alternative methods available,
+like universal arrows, that provide a way of dealing with these
+side-conditions. As such, in this case, the high amount of side
+conditions seems to come from taking the 'wrong' approach to deal with a
+specific problem.
+
+- Domain-specific theories are not necessary to deal with such
+  syntactical proofs.
+
+If one composes natural transformations, one does not need to reprove
+the naturality every time, even if one does not have a domain-specific
+syntax for the constructions. As such, VETT is not necessary to reduce
+the number of functoriality/naturality side conditions in proofs.
 
 For me, the first four paragraphs of the introduction would be more convincing if it were structured as follows:
-- There are many applications of both category theory and enriched category theory to programming languages. These also come up in the mechanization of certain proofs.
-- As such, we want to have a suitable interface that allows us to deal uniformly with constructions in both category theory and enriched category theory. This way we can avoid having to formalizing theorems for both categories and enriched categories.
+
+- There are many applications of both category theory and enriched
+  category theory to programming languages. These also come up in the
+  mechanization of certain proofs.
+
+- As such, we want to have a suitable interface that allows us to deal
+  uniformly with constructions in both category theory and enriched
+  category theory. This way we can avoid having to formalizing theorems
+  for both categories and enriched categories.
+
 - This is what VETT does.
 
-I think that this way, you could also strengthen the statement "Additionally, VETT may serve as the basis of a future domain specific proof assistant for category theoretic proofs" (first paragraph on page 4). The current formulation suggests that VETT would only be useful if one wants to extend proof assistants. However, VETT could also offer advantages for designing interfaces of libraries about category theory. 
+I think that this way, you could also strengthen the statement
+"Additionally, VETT may serve as the basis of a future domain specific
+proof assistant for category theoretic proofs" (first paragraph on page
+4). The current formulation suggests that VETT would only be useful if
+one wants to extend proof assistants. However, VETT could also offer
+advantages for designing interfaces of libraries about category theory.
 
 ==== Judgment ====
 
@@ -284,31 +339,90 @@ The work in this paper is interesting, and it is technically sound. However, I t
 
 ==== Minor comments ====
 
-- "While in some ways this could be remedied by better introductory materials" (page 1). I think it is better to remove this sentence. It is rather indirect criticism on works by others (like the books by Awodey, MacLane, Riehl, and more) without providing any reason for it and explaining what 'better' means in this case. 
+- "While in some ways this could be remedied by better introductory
+  materials" (page 1). I think it is better to remove this sentence. It
+  is rather indirect criticism on works by others (like the books by
+  Awodey, MacLane, Riehl, and more) without providing any reason for it
+  and explaining what 'better' means in this case.
 
-- Page 3, paragraph 2: I think it would be good to mention "Categories with families and first-order logic with dependent sorts" by Palmgren. In this paper, hyperdoctrines over CwFs are introduced, and this definition is actually quite similar to VETT (compare your Definition 3 to page 46 in the work by Palmgren)
+- Page 3, paragraph 2: I think it would be good to mention "Categories
+  with families and first-order logic with dependent sorts" by
+  Palmgren. In this paper, hyperdoctrines over CwFs are introduced, and
+  this definition is actually quite similar to VETT (compare your
+  Definition 3 to page 46 in the work by Palmgren)
 
-- Page 8 and 9: at several points C is used instead of \mathbb{C} (line 9 in the first paragraph on page 8 and the rules for the graph of profunctors on page 9). I think these should be \mathbb{C}.
+- Page 8 and 9: at several points C is used instead of \mathbb{C} (line
+  9 in the first paragraph on page 8 and the rules for the graph of
+  profunctors on page 9). I think these should be \mathbb{C}.
 
-- Final sentence on page 8 and 9 (Like the J elimination... which in general does not). This sentence is too long, and it would be good to split it into two.
+- Final sentence on page 8 and 9 (Like the J elimination... which in
+  general does not). This sentence is too long, and it would be good to
+  split it into two.
 
-- Personally, I am not too fond of the usage of construction environments in this paper, because it conflates specifications of constructions with the actual constructions. For example, Construction 1 is not actually a construction, because the relevant terms are not constructed in the specific environment. Instead, it is only a specification of a construction. I prefer the usage of Problems (for the specifications) and Constructions (for the actual constructions) as in "Categorical Structures for Type Theory in Univalent Foundations" by Ahrens, Lumsdaine and Voevodsky.
+- Personally, I am not too fond of the usage of construction
+  environments in this paper, because it conflates specifications of
+  constructions with the actual constructions. For example, Construction
+  1 is not actually a construction, because the relevant terms are not
+  constructed in the specific environment. Instead, it is only a
+  specification of a construction. I prefer the usage of Problems (for
+  the specifications) and Constructions (for the actual constructions)
+  as in "Categorical Structures for Type Theory in Univalent
+  Foundations" by Ahrens, Lumsdaine and Voevodsky.
 
-- Page 14, Definition 2. In the third item, you write V_o^2, and this might be read as functors from the interval 2 to V_o (see https://ncatlab.org/nlab/show/interval+category), but I don't think that is meant. It would be better to write V_o \times V_o.
+- Page 14, Definition 2. In the third item, you write V_o^2, and this
+  might be read as functors from the interval 2 to V_o (see
+  https://ncatlab.org/nlab/show/interval+category), but I don't think
+  that is meant. It would be better to write V_o \times V_o.
 
-- In the proofs of Lemma 3, Construction 2 and Construction 3, the word 'straightforward' is used 3 times. I suggest cutting the word 'straightforward', because it does not add anything to the paper. 
+- In the proofs of Lemma 3, Construction 2 and Construction 3, the word
+  'straightforward' is used 3 times. I suggest cutting the word
+  'straightforward', because it does not add anything to the paper.
 
-- I think that it is worth to mention the work 'Yoneda Structures from 2-toposes' by Mark Weber in Section 4, because I think that every 2-topos a la Weber gives rise to a HVE. Weber defined a notion of 2-topos, and proved that every 2-topos can be equipped with a Yoneda structure. Every Yoneda structure gives rise to a proarrow equipment (Theorem 4.3 in On the unicity of formal category theories by Di Liberti and Loregian), and proarrow equipments give rise to virtual equipments (paragraph 4 on page 5 of A Unified Framework for Generalized Multicategories by Cruttwell and Shulman).
+- I think that it is worth to mention the work 'Yoneda Structures from
+  2-toposes' by Mark Weber in Section 4, because I think that every
+  2-topos a la Weber gives rise to a HVE. Weber defined a notion of
+  2-topos, and proved that every 2-topos can be equipped with a Yoneda
+  structure. Every Yoneda structure gives rise to a proarrow equipment
+  (Theorem 4.3 in On the unicity of formal category theories by Di
+  Liberti and Loregian), and proarrow equipments give rise to virtual
+  equipments (paragraph 4 on page 5 of A Unified Framework for
+  Generalized Multicategories by Cruttwell and Shulman).
 
-- Another model of VETT that might be worth mentioning (either as a conjecture or a theorem): in MLTT, one can formalize the notions of category, functor, transformation, and profunctor. As such, I think that every CwF gives rise to a HVE.
+- Another model of VETT that might be worth mentioning (either as a
+  conjecture or a theorem): in MLTT, one can formalize the notions of
+  category, functor, transformation, and profunctor. As such, I think
+  that every CwF gives rise to a HVE.
 
-- Constructions 4 and 5 should be more explicit on the relevant CwF structure, because currently, they only mention how the added connectives of VETT are interpreted. As described in the paper, the CwF should model pi-types, sigma-types, and extensional identity types. The category of contexts in such a CwF must be locally cartesian closed (Theorem 6.1 in The biequivalence of locally cartesian closed categories and Martin-Lof type theories by Clairambault and Dybjer). However, the (bi)category of categories is not locally cartesian closed: exponentials do not exists for all functors, but only Conduché functors (https://ncatlab.org/nlab/show/Conduché+functor#failure_of_local_cartesian_closedness_in_cat). As such, one does not fully model VETT if the category of contexts would be the category of categories. For that reason, I think it is good to mention explicitly what the relevant CwF structures are in Constructions 4 and 5.
+- Constructions 4 and 5 should be more explicit on the relevant CwF
+  structure, because currently, they only mention how the added
+  connectives of VETT are interpreted. As described in the paper, the
+  CwF should model pi-types, sigma-types, and extensional identity
+  types. The category of contexts in such a CwF must be locally
+  cartesian closed (Theorem 6.1 in The biequivalence of locally
+  cartesian closed categories and Martin-Lof type theories by
+  Clairambault and Dybjer). However, the (bi)category of categories is
+  not locally cartesian closed: exponentials do not exists for all
+  functors, but only Conduché functors
+  (https://ncatlab.org/nlab/show/Conduché+functor#failure_of_local_cartesian_closedness_in_cat). As
+  such, one does not fully model VETT if the category of contexts would
+  be the category of categories. For that reason, I think it is good to
+  mention explicitly what the relevant CwF structures are in
+  Constructions 4 and 5.
 
-- Construction 5 is currently written as if the strictification result is already proven, while it is only conjectured. As such, it would be better to either write explicitly in this construction that you assume strictification for it or to say that you only have a 'weak' model (where 'weak' refers to substitution law not holding up to equality but only up to isomorphism).
+- Construction 5 is currently written as if the strictification result
+  is already proven, while it is only conjectured. As such, it would be
+  better to either write explicitly in this construction that you assume
+  strictification for it or to say that you only have a 'weak' model
+  (where 'weak' refers to substitution law not holding up to equality
+  but only up to isomorphism).
 
-- Page 18, line 2: "Cartesian bicateogires" should be "cartesian bicategories" 
+- Page 18, line 2: "Cartesian bicateogires" should be "cartesian
+  bicategories"
 
-- Page 22: The last 3 rules in Figure 6 are called SetCtxForm, SetCtxMt, and SetCtxExt. I think that TransCtxForm, TransCtxMt, and TransCtxExt are more suitable, because those rules are about transformation contexts.
+- Page 22: The last 3 rules in Figure 6 are called SetCtxForm, SetCtxMt,
+  and SetCtxExt. I think that TransCtxForm, TransCtxMt, and TransCtxExt
+  are more suitable, because those rules are about transformation
+  contexts.
 
 
 ------------------------------------------------------
