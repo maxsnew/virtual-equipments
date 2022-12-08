@@ -19,7 +19,10 @@ TODO
 >>     action of the presheaf. But why must the presheaf itself be positive in Ξ?
 >>     Is that just a "rest of the context" rule?
 
-TODO
+d-(x:C) and d+(x:C) are just x:C; we will add this definition.
+The negative presheaf elimination rule is the closure under substitution of
+a : C ; p : P- C |- a in p Set 
+i.e. evaluation is a map C^op x (Set^{C^op}) -> Set
 
 >> - Section 2.2: This is very nice, but I would appreciate a bit more discussion
 >>   about the tensor product of categories. Usually this kind of construction is a
