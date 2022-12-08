@@ -66,7 +66,12 @@ compiling our "synthetic" proofs to "analytic" ones.
 >>   profunctors is not clear and should be detailed or illustrated. What goes
 >>   wrong if we naively remove this restriction?
 
-TODO
+Review 2 asks why we restrict to unary/binary functors/profunctors.
+This corresponds to an established semantics (virtual equipments), so we
+do not need to define a tweaked semantics with n-ary horiztonal and
+vertical morphisms.  Moreover, product categories (Fig 3) allow n-ary
+functors and profunctors to be defined (albeit in de Bruijn form).
+Reference [21] develops a syntax without this restriction.
 
 >> - p. 10: the construction "P ▹∀α Q" is the most unusual one (at least for me)
 >>   and should be better explained. I had hard times to understand what it
@@ -146,7 +151,8 @@ not yet done so.
 >> >> syntax for the constructions. As such, VETT is not necessary to reduce
 >> >> the number of functoriality/naturality side conditions in proofs.
 >> 
->> >> For me, the first four paragraphs of the introduction would be more convincing if it were structured as follows:
+>> >> For me, the first four paragraphs of the introduction would be
+>> >> more convincing if it were structured as follows:
 >> 
 >> >> - There are many applications of both category theory and enriched
 >> >>   category theory to programming languages. These also come up in the
@@ -166,7 +172,22 @@ not yet done so.
 >> >> one wants to extend proof assistants. However, VETT could also offer
 >> >> advantages for designing interfaces of libraries about category theory.
 
-TODO
+We agree with the reviewer that the most important advantages of our
+approach are for enriched category theory (indeed, this was our
+motivation for starting this work), and can revise the introduction to
+emphasize this aspect more.  However, we do feel there are some
+advantages even for ordinary category theory: while a synthetic theory
+cannot eliminate all side conditions, it can help structure when the
+user really needs to prove them.  One of the examples the reviewer
+mentions, respect for quotients, is a classic example where an
+"analytic" approach is unpleasant in practice ("setoid hell"), and
+improved by synthetic approaches in NuPRL/Observational Type
+Theory/HoTT/Cubical type theory.  While an adept category theorist may
+know how to manage these obligations and e.g. pick a definition that is
+more automatically natural, our experience explaining category theory to
+programming languages researchers as background for understanding some
+of our past papers suggests that the support of a type theory may be
+useful for explaining how experts think about these issues.
  
 >> - Page 3, paragraph 2: I think it would be good to mention "Categories
 >>   with families and first-order logic with dependent sorts" by
