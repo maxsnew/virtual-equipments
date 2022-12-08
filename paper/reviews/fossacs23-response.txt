@@ -84,13 +84,28 @@ TODO
 >>     seems...
 >>   - What is exactly the difference between ∀ and ▹. For instance, what is the
 >>     difference if we phrase Functoriality as "∀α₂. α₁ → α₂ ∀α₁◃ F(α₁) → F(α₂)"?
+
+P ▹∀α Q is the 'hom' of profuctors, the right adjoint to - (x) P.  This
+type binds both an object variable α and a transformation variable x:P.
+
+In the type of composition 
+   ∀α1. (α1 → α2) |>∀α2 (α2 → α3 |>∀α3 (α1 → α3))
+α2 occurs covariantly in (α1 → α2)
+and covariantly in (α2 → α3 |>∀α3 (α1 → α3)) because the
+contravariance of |> and → cancel out.  
+
+∀α.P is the 'end' over a profunctor with 1 free variable (Figure 5,
+bottom row).  This type is used to bind the "last" object variable in a
+singleton context. The type for functoriality that the reviewer gives is
+isomorphic to the type we gave by Lemma 3, part 5.
+
 >> - p. 12, "For instance, the Yoneda lemma generalizes the equivalence...": I
 >>   could not understand this (x is bound in the formula on the left
 >>   (∀x.∀y.x=y⇒Py) and free on the right (Px) for instance). Are you referring to
 >>   the fact that equality can be defined Leibniz style by x=y meaning
 >>   "∀P.P(y)⇒P(x)"?
 
-TODO
+That's a typo, thanks --- we meant ∀x. [ (∀y.(x=y) ⇒ Py) iff P x].    
 
 >> - p. 15, p. 16: the initiality theorem is very sketchy here. Could this be (or
 >>   has it been) Agda'ed?
