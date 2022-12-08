@@ -7,7 +7,20 @@ all of the clarification comments not mentioned below.
 
 >> It is not clear what the limits of the present formalism are.
 
-TODO
+Currently we are limited to "single-variable" category theory, i.e.,
+we only have judgments for functors of one variable and profunctors
+with one covariant and one contravariant variable. Several concepts
+would require extending the judgments: opposite categories, functor
+categories, a category of small sets. Additionally, we conjecture that
+the system cannot prove the equivalent of "function extensionality"
+for presheaf categories, i.e., that the synthetic hom of a presheaf
+category is given by the usual definition in terms of an end.
+
+There is a tradeoff though: there are models of the current theory
+that do not generalize to incorporate these other features. One class
+of examples is categories enriched in a non-symmetric monoidal
+category, which based on preliminary work we expect cannot model
+opposite categories.
 
 >> - Section 2.1: I would appreciate a more careful and detailed explanation about the
 >>   positive and negative presheaf rules.
@@ -58,9 +71,17 @@ NuPRL/Observational type theory/HoTT/Cubical type theory.
 >>   - Construction 4: What is "Cat_U"? Is it from a previous version of the paper
 >>     that used Grothendieck universes instead of κ-smallness?
 
-We will rephrase Theorem 2 with less shorthand.  
+We will rephrase Theorem 2 with less shorthand. The formal meaning of
+"almost any" is to emphasize that the initiality theorem is modular in
+that most connectives are independent of each other. The exception is
+that to get the right universal property for hom and tensor of
+profunctors, we need the exponential of profunctors.
 
-TODO
+vDbl_r and Cat_U should, as the reviewer guessed, be vEq and
+Cat_κ. The purpose of Construction 3 is to reduce the construction of
+a model of VETT to just constructing a virtual equipment, since any
+virtual equipment can be "upgraded" to a hyperdoctrine of equipments
+using this construction.
 
 >> ----------------------- REVIEW 2 ---------------------
 
@@ -101,7 +122,7 @@ Reference [21] develops a syntax without this restriction.
 >>   - What is exactly the difference between ∀ and ▹. For instance, what is the
 >>     difference if we phrase Functoriality as "∀α₂. α₁ → α₂ ∀α₁◃ F(α₁) → F(α₂)"?
 
-P ▹∀α Q is the 'hom' of profuctors, the right adjoint to - (x) P.  This
+P ▹∀α Q is the 'hom' of profuctors, the right adjoint to - (x)∃α P.  This
 type binds both an object variable α and a transformation variable x:P.
 
 In the type of composition 
@@ -194,11 +215,14 @@ mentions, respect for quotients, is a classic example where an
 "analytic" approach is unpleasant in practice ("setoid hell"), and
 improved by synthetic approaches in NuPRL/Observational Type
 Theory/HoTT/Cubical type theory.  While an adept category theorist may
-know how to manage these obligations and e.g. pick a definition that is
-more automatically natural, our experience explaining category theory to
-programming languages researchers as background for understanding some
-of our past papers suggests that the support of a type theory may be
-useful for explaining how experts think about these issues.
+know how to manage these obligations and e.g. pick a definition that
+is more automatically natural, our experience explaining category
+theory to programming languages researchers as background for
+understanding some of our past papers suggests that the support of a
+type theory may be useful for explaining how experts think about these
+issues. We agree with the reviewer that the form the "domain specific
+proof assistant" could take is as a library design for an existing
+proof assistant, i.e., an embedded DSL.
  
 >> - Page 3, paragraph 2: I think it would be good to mention "Categories
 >>   with families and first-order logic with dependent sorts" by
@@ -215,8 +239,12 @@ Review 3 suggests some additional references and examples (Palmgren,
 >>   category, functor, transformation, and profunctor. As such, I think
 >>   that every CwF gives rise to a HVE.
 
-Review 3 asks if every CwF gives rise to a HVE; this seems right, at
-least if the CwF has extensional identity types.  
+Review 3 asks if every CwF gives rise to a HVE. Certainly construction
+4 can be adapted to any elementary topos with sufficient universes
+since the category-theoretic constructions needed are all
+intuitionistically valid. So this should correspond to a Category with
+Families extended with certain universal properties, for instance, at
+least extensional identity types.
 
 >> - Constructions 4 and 5 should be more explicit on the relevant CwF
 >>   structure, because currently, they only mention how the added

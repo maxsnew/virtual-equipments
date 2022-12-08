@@ -1,0 +1,117 @@
+We thank the reviewers for their very detailed and helpful feedback.  We
+will integrate them into the final version of the paper --- including
+all of the clarification comments not mentioned below.
+
+We respond to the most pertinent questions first. And each response
+includes "Reviewer X" so you can search for the responses to your
+specific questions.
+
+We agree with Review 3 that the most important advantages of our
+approach are for enriched category theory (indeed, this was our
+motivation for starting this work), and can revise the introduction to
+emphasize this aspect more.  However, we do feel there are some
+advantages even for ordinary category theory: while a synthetic theory
+cannot eliminate all side conditions, it can help structure when the
+user really needs to prove them.  One of the examples the reviewer
+mentions, respect for quotients, is a classic example where an
+"analytic" approach is unpleasant in practice ("setoid hell"), and
+improved by synthetic approaches in NuPRL/Observational Type
+Theory/HoTT/Cubical type theory.  While an adept category theorist may
+know how to manage these obligations and e.g. pick a definition that
+is more automatically natural, our experience explaining category
+theory to programming languages researchers as background for
+understanding some of our past papers suggests that the support of a
+type theory may be useful for explaining how experts think about these
+issues. We agree with the reviewer that the form the "domain specific
+proof assistant" could take is as a library design for an existing
+proof assistant, i.e., an embedded DSL.
+
+Review 3 asks what the relevant CwF structures are in Constructions 4
+and 5.  Our type theory distinguishes between the virtual equipment
+layer (categories, functors, profunctors, natural transformations) and
+the "meta" layer, a dependent type theory.  The semantics interprets
+this in a hyperdoctrine of virtual equipments, with the CwF structure
+for the meta-layer on the base of the hyperdoctrine.  In the "standard"
+model, the base is just the category of sets Set, while the fibers of
+the hyperdoctrine are Cat.  So there is no need for a CwF structure on
+Cat.  
+
+Review 3 asks if every CwF gives rise to a HVE. Certainly construction
+4 can be adapted to any elementary topos with sufficient universes
+since the category-theoretic constructions needed are all
+intuitionistically valid. So this should correspond to a Category with
+Families extended with certain universal properties, for instance,
+extensional identity types.
+
+Review 3 suggests some additional references and examples (Palmgren,
+  Weber, Di Liberti and Loregian). Thank you; we will include them!
+
+Review 1 asks about the limitations of the present formalism, and
+Review 2 similarly asked about why we restrict to unary
+functors/binary profunctors. There are several useful concepts we
+cannot formalize because our judgments are limited to covariant
+functors of a single argument: categories of functors and opposite
+categories, for instance. Next steps for the current work would be to
+extend the judgmental structure to support these. Some preliminary
+work along these lines is in Reference [21]. However, there is a
+tradeoff: by adding more structure in the type theory, we support
+fewer models. We chose these restrictions as a starting point because
+they correspond to a well-understood notion of model (virtual
+equipments), future extensions would likely require the equipment to
+come with a monoidal closed structure. In particular, we expect that
+categories enriched in a non-symmetric monoidal closed category will
+not be a model of these extensions.
+
+Review 1 asks about the definition of d(Ξ) and the presheaf
+elimination rules. d-(x:C) and d+(x:C) are both x:C; we will add this
+definition. The negative presheaf elimination rule is the closure
+under substitution of a : C ; p : P- C |- a in p Set i.e. evaluation
+is a map C^op x (Set^{C^op}) -> Set
+
+Review 1 asks about the tensor product of profunctors. The tensor
+product of profunctors is indeed a colimit --- e.g. it can be defined
+using a coend.  Syntactically, beta is just a bound variable (and can
+of course be alpha-converted).  The fact that maps out of the tensor
+respect the quotienting is implicit/synthetic, and comes from the fact
+that all open terms ... beta : C ... |- t : S respect this
+quotienting.  This is similar to how quotient types are handled in
+NuPRL/Observational type theory/HoTT/Cubical type theory.
+
+Review 1 had several questions about Section 4. We will rephrase
+Theorem 2 with less shorthand. The formal meaning of "almost any" is
+to emphasize that the initiality theorem is modular in that most
+connectives are independent of each other. The exception is that to
+get the right universal property for hom and tensor of profunctors, we
+need the exponential of profunctors. vDbl_r and Cat_U should, as the
+reviewer guessed, be vEq and Cat_κ. The purpose of Construction 3 is
+to reduce the construction of a model of VETT to just constructing a
+virtual equipment, since any virtual equipment can be "upgraded" to a
+hyperdoctrine of equipments using this construction.
+
+Review 2 asks if one can generate explicit proofs of functoriality
+/naturality from proofs in the type theory.  Yes, "running" the
+(constructive) proof of soundness (Theorem 2) would do exactly this, by
+compiling our "synthetic" proofs to "analytic" ones.
+
+Review 2 asks about "P ▹∀α Q" and the difference with "∀α.P".
+
+P ▹∀α Q is the 'hom' of profunctors, the right adjoint to - (x)∃α P.  This
+type binds both an object variable α and a transformation variable x:P.
+
+In the type of composition 
+   ∀α1. (α1 → α2) |>∀α2 (α2 → α3 |>∀α3 (α1 → α3))
+α2 occurs covariantly in (α1 → α2)
+and covariantly in (α2 → α3 |>∀α3 (α1 → α3)) because the
+contravariance of |> and → cancel out.  
+
+∀α.P is the 'end' over a profunctor with 1 free variable (Figure 5,
+bottom row).  This type is used to bind the "last" object variable in a
+singleton context. The type for functoriality that the reviewer gives is
+isomorphic to the type we gave by Lemma 3, part 5.
+
+Review 2 asks about our comments on the Yoneda lemma. We had a typo in
+this formula, thanks --- we meant ∀x. [ (∀y.(x=y) ⇒ Py) iff P x].
+
+Review 2 asks about the proof of initiality theorem. The initiality
+theory could in principle be mechanized in Agda, though we have not
+yet done so.
