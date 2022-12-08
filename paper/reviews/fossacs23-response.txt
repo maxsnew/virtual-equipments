@@ -30,7 +30,13 @@ TODO
 >>   particular choice of beta" - or maybe that the chosen section t itself is not.
 >>   Could you comment on this?
 
-TODO
+The tensor product of profunctors is indeed a colimit --- e.g. it can be
+defined using a coend.  Syntactically, beta is just a bound variable
+(and can of course be alpha-converted).  The fact that maps out of the
+tensor respect the quotienting is implicit/synthetic, and comes from the
+fact that all open terms ... beta : C ... |- t : S respect this
+quotienting.  This is similar to how quotient types are handled in
+NuPRL/Observational type theory/HoTT/Cubical type theory.  
 
 >> - I find the second half of Section 4 very confusing. While I can believe the
 >>   overall results, there are many details in the presentation that I find
@@ -48,6 +54,8 @@ TODO
 
 >>   - Construction 4: What is "Cat_U"? Is it from a previous version of the paper
 >>     that used Grothendieck universes instead of κ-smallness?
+
+We will rephrase Theorem 2 with less shorthand.  
 
 TODO
 
