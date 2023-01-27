@@ -12,12 +12,19 @@
 \DeclareMathOperator*{\colim}{colim}
 
 \begin{document}
+
+\newif\ifextended
+\extendedfalse
+\newcommand{\theappendix}{\ifextended the appendix \else the extended version \cite{extended-version}\fi}
+
 %% \newtheorem{theorem}{Theorem}
 %% \newtheorem{lemma}{Lemma}
 \newtheorem{construction}{Construction}
 %% \newtheorem{definition}{Definition}
 \newcommand{\vett}{VETT}
 \newcommand{\ohol}{\vett}
+\newcommand{\fVDC}{\textrm{fVDCs}}
+\newcommand{\VMJ}{\textrm{VM}_J}
 \newcommand{\sem}[1]{\llbracket{#1}\rrbracket}
 \newcommand{\pto}{\nrightarrow}
 \newcommand{\pfrom}{\nleftarrow}
@@ -70,10 +77,6 @@
 \newcommand{\tensorexistsXwithYandZ}[3]{#2 \odotexists{#1} #3}
 \newcommand{\tensorintroofXandY}[2]{\textrm{pair}_\odot(#1,#2)}
 \newcommand{\tensorintroatXwithYandZ}[3]{(#2,#1,#3)}
-\newcommand{\tensorelimXtoYwithkontZ}[3]{\textrm{ind}_{\to}(#1,#2,#3)}
-\newcommand{\tensorelimfromWXtoYwithkontZ}[4]{\textrm{ind}_{\odot}(#1,#2,#3,#4)}
-\newcommand{\tensorelimVatWtoXtoYwithkontZ}[5]{\textrm{ind}_{\odot}(#4,#2,#1,#3,#5)}
-\newcommand{\tensorelimWfromXtoYkontZ}[4]{\textrm{ind}_{\odot}(#4;#1,#2,#3)}
 \newcommand{\tensorelimWkontZ}[2]{\textrm{ind}_{\odot}(#2;#1)}
 
 \newcommand{\tlwith}[1]{\mathop{\prescript{#1}{}\triangleleft}}
@@ -179,7 +182,7 @@
 \newcommand{\citep}[1]{(\cite{#1})}
 
 \title{A Formal Logic for Formal Category Theory}
-\author{Max S. New\inst{1,2} and Daniel R. Licata\inst{2}}
+\author{Max S. New\inst{1,2}\orcidID{0000-0001-8141-195X} and Daniel R. Licata\inst{2}}
 \institute{University of Michigan \and Wesleyan University}
 
 \maketitle
@@ -192,8 +195,8 @@
   on standard predicate logic, which guarantees that all functions
   between categories are functorial, all relations are profunctorial,
   and all transformations are natural by construction, with no separate
-  proofs necessary. Important category theoretic proofs such as the
-  Yoneda lemma and Co-yoneda lemma become simple type theoretic proofs
+  proofs necessary. Important category-theoretic proofs such as the
+  Yoneda lemma and Co-yoneda lemma become simple type-theoretic proofs
   about the relationship between unit, tensor and (ordered) function
   types, and can be seen to be ordered refinements of theorems in
   predicate logic.  The type theory is sound and complete for a
@@ -218,7 +221,7 @@ notions of structured categories~\cite{Lawvere69,LambekScott,moggi}.
 This Curry-Howard-Lambek correspondence~
 applies to simply typed lambda calculus~\cite{LambekScott},
 computational lambda calculus~\cite{moggi}, linear logic~\cite{girard}
-dependent type theory~\cite{cartmell1986}, and many other type theories
+dependent type theory~\cite{cartmell1986,seely_1984}, and many other type theories
 designed based on category-theoretic semantics.
 %
 The syntax of a type theory should present an initial object in its
@@ -226,13 +229,7 @@ category of models, a category-theoretic reformulation of logical
 soundness and completeness.
 
 While this research program has been quite successful,
-category-theoretic techniques in computer science are sometimes
-criticized for being overly complex and hard to learn, especially for
-computer scientists who do not have a strong background in pure
-mathematics.
-%
-While in some ways this could be remedied by better introductory
-materials, in some ways category theory is objectively complex.
+category-theoretic notions can be overwhelming for beginners.
 %
 In a traditional set-theoretic formulation, notions such as adjoint
 functors and limits produce a proliferation of ``naturality'' and
@@ -245,17 +242,17 @@ functoriality of such actions, as well as construct two families of
 transformations, prove they are natural and then finally proving a pair
 of equalities relating compositions of natural transformations.
 %
-Carrying out these proofs explicitly is quite tedious and many newcomers
-to are left with the impression that category theory is full of long,
-but ultimately trivial constructions.
+Carrying out these proofs explicitly is quite tedious and many
+newcomers are left with the impression that category theory is full of
+long, but ultimately trivial constructions.
 %
-This complexity is compounded when we move from ordinary category theory to
-enriched and internal category theory, where constructions must be
-additionally proven continuous, monotone, etc, in addition to natural
-or functorial.
+This complexity is compounded when moving from ordinary category
+theory to enriched and internal category theory, where constructions
+must be additionally proven continuous, monotone, etc, in addition to
+natural or functorial.
 %
 However, these generalizations are often exactly what is needed for programming
-language applications; for example, domain- and metric- and
+language applications; for example, domain-, metric- and
 step-index-enriched categories have been used to model recursive
 programming languages and internal categories have been used to model
 parametricity and gradual
@@ -270,8 +267,7 @@ down a function, they do not expand out the $\epsilon\mathord{-}\delta$
 definition of continuity for a function and proceed from first
 principles, but rather use certain \emph{syntactic principles} for
 defining functions that are continuous by construction --- e.g. that
-composition of continuous functions is continuous and that previously
-defined functions are known to be continuous.
+composition of continuous functions is continuous.
 %
 Similar principles apply to category theory itself: functors and
 natural transformations are closed under composition and whiskering
@@ -279,9 +275,10 @@ operations, and experienced category theorists rely on these syntactic
 principles to eliminate the tedium of explicit proofs.
 %
 In the case of category theory, these principles can be formalized
-using algebraic structures such as 2-categories, bicategories,
-(virtual) double categories and pro-arrow equipments~\cite{bicategories,proarrow-equipments,LEINSTER2002391,Cruttwell2010}, an
-approach known as \emph{formal category theory}.
+using algebraic structures such as 2-categories, bicategories, Yoneda
+structures, (virtual) double categories, pro-arrow
+equipments~\cite{bicategories,proarrow-equipments,STREET1978350,LEINSTER2002391,Cruttwell2010},
+an approach known as \emph{formal category theory}.
 %
 In these structures, rather than defining notions of category, functor
 and natural transformation from first principles, they are axiomatized
@@ -291,9 +288,10 @@ and homomorphism.
 Proofs in formal category theory apply to enriched and internal
 settings, which are instances of the formal axioms.
 %
-A downside is that these algebraic structures are quite complicated, and
-practitioners typically employ either an algebraic combinator syntax or
-a 2-dimensional diagrammatic language that can be quite beautiful and
+A downside is that these algebraic structures are quite complicated,
+and practitioners typically employ either an algebraic combinator
+syntax (formalized in \citet{CURIEN1986188}) or a
+2-dimensional diagrammatic language that can be quite beautiful and
 elegant, but is also somewhat removed from the traditional formulation
 of category theory in terms of sets and functions.
 
@@ -330,7 +328,7 @@ categorical combinators and string diagram calculi for cartesian
 closed categories.
 
 
-%% The type theoretic syntax allows us to write all of our 
+%% The type-theoretic syntax allows us to write all of our 
 %% constructions are written as if they were
 %% ordinary functors and profunctors in set-based category theory.
 
@@ -350,7 +348,7 @@ The syntax of \vett{} is an indexed, ordered linear, proof-relevant
 variant of predicate logic over a unary type theory.
 %
 Just as a predicate logic has a notion of type, term, relation and
-implication, \vett{} is based on four analogous category theoretic
+implication, \vett{} is based on four analogous category-theoretic
 concepts: categories, functors, profunctors and natural transformations
 of profunctors.
 %
@@ -358,7 +356,7 @@ Categories are treated like types, and the unary functors we consider in
 this paper are each represented by a term whose type is a category and
 whose one free variable ranges over a category.
 %
-The analogue of a relation is a \emph{profunctor} (defined below), which
+The analog of a relation is a \emph{profunctor} (defined below), which
 is written like a set with free category variables.  Like the
 restriction to unary functors, we restrict to profunctors with two free
 variables.
@@ -395,7 +393,7 @@ logic judgments are also indexed by a context from this dependent
 type theory, and the type theory includes universe types for categories,
 functors, profunctors and natural transformations.  This allow us to
 formalize theorems the object logic is too restrictive to encode, analogous to
-2-level~\cite{voevodsky13hts,altenkirch+16strict} or indexed type
+2-level~\cite{voevodsky13hts,altenkirch+16strict,PALMGREN2019102715} or indexed type
 theories~\cite{isaev21indexed,cervesatopfenning02llf,vakar15linear,krishnaswami+15linear}.
 
 %% This is analogous to the notion of a
@@ -430,7 +428,7 @@ the syntactic burden of proving downward-closure or transitivity
 side-conditions.
 %
 Additionally, \vett{} may serve as the basis of a future domain specific
-proof assistant for category theoretic proofs.  To pilot-test this, we
+proof assistant for category-theoretic proofs.  To pilot-test this, we
 have formalized the syntax of \vett{} in Agda 2.6.2.2, using the rewrite
 mechanism to make \vett's substitution and $\beta$-reduction rules
 definitional
@@ -452,7 +450,7 @@ ordering, and the reflexivity and transitivity proofs must satisfy identity and
 unit equations. A functor is then a \emph{proof-relevant monotone
   function}.  Given categories $\mathcal C$ and $\mathcal D$, a
 profunctor $R$ from $\mathcal C$ to $\mathcal D$, written $R : \cat C
-\pto \cat D$ is a functor $R : {\cat C}^{op} \times {\cat D} \to \Set$.
+\pto \cat D$ is a functor $R : {\cat C}^{o} \times {\cat D} \to \Set$\footnote{${\cat C}^o$ is the notation we use for the opposite category of $\cat C$}.
 Because a profunctor outputs a $\Set$ rather than a proposition, it is
 itself a \emph{proof-relevant relation}.  Thinking of categories as
 proof-relevant preorders, functoriality says that the profunctor is
@@ -580,15 +578,15 @@ categories, functors, profunctors and natural transformations.
 
 Finally we have several forms of context which are used in the theory.
 The contexts $\Gamma$ of term variables with their types are as usual;
-we write ${\Gamma \isadtctx}$ to indicate that a context is well-formed.
+we write ``${\Gamma \isadtctx}$'' to indicate that a context is well-formed.
 We name the remaining contexts after the judgements that they are used
-by.  The set contexts $\Gamma \vdash \Xi \boundary$, which will be used
+by.  The set contexts $\Xi$, which will be used
 to type-check sets, contain object variables with their categories. The
 two forms of set context are $\alpha : \cat C$, containing one variable
 that can be used both contravariantly and covariantly, and $\alpha :
 \cat C ; \beta : \cat D$, containing a contravariant variable $\alpha$
 and covariant variable $\beta$.  Finally, the transformation contexts
-$\Gamma \vdash \Phi \isavectx$ contain element variables with their sets, alternating with those
+$\Phi$ contain element variables with their sets, alternating with those
 sets' object variables with their categories.  A typical $\Phi$ has the
 shape
 \[
@@ -596,14 +594,16 @@ shape
 x_2:R_2(\alpha_2,\alpha_3), \ldots, R_n(\alpha_n,\alpha_{n+1}),
 \alpha_{n+1} : \cat C_{n+1}
 \]
-and represents the composition of the ``relations'' $R_1, R_2, R_3, \ldots,
-R_n$.  We write $d^-(\Phi)$ for the first category variable in $\Phi$
-(which we regard as the negative or contravariant position), $d^+(\Phi)$
-for the last category variable in $\Phi$ (which we regard as the
-positive or covariant position), and $\Phi_1 \jnctx \Phi_2$ for the append
-of two transformation contexts where the last variable in $\Phi_1$ is equal to
-the first variable in $\Phi_2$.  Formal inductive definitions are in the
-appendix, but intuitively: 
+and represents the composition of the ``relations'' $R_1, R_2, R_3,
+\ldots, R_n$.  We write $d^-(\Phi)$ for the first category variable in
+$\Phi$ (which we regard as the negative or contravariant position),
+$d^+(\Phi)$ for the last category variable in $\Phi$ (which we regard
+as the positive or covariant position) and use the notation $d^\pm\Xi$
+with the same meaning. We write $\Phi_1 \jnctx \Phi_2$ for the append
+of two transformation contexts, which is only well-formed when the
+last variable in $\Phi_1$ is equal to the first variable in
+$\Phi_2$. Formal inductive definitions are in the appendix, but
+intuitively:
 \[
 \begin{array}{ccl}
 d^-(\alpha_1 : \cat C_1, x_1:R_1(\alpha_1,\alpha_2), \ldots, x_n:R_n(\alpha_n,\alpha_n), \alpha_{n+1} : \cat C_{n+1}) & = & \alpha_1 : \cat C_1\\
@@ -616,7 +616,7 @@ d^+(\alpha_1 : \cat C_1, x_1:R_1(\alpha_1,\alpha_2), \ldots, x_n:R_n(\alpha_n,\a
 %% First, we have the types and terms of the logic over our category
 %% theory. Types include the usual dependent sum, product and identity
 %% types of dependent type theory, as well as several forms that allow us
-%% to abstract over the category theoretic constructions: a type $\Cat$
+%% to abstract over the category-theoretic constructions: a type $\Cat$
 %% of categories, a type $\varr{\cat C}{\cat D}$ for functors from $\cat
 %% C$ to $\cat D$, a type $\harr{\cat C}{\cat D}$ for profunctors
 %% contravariant in $\cat C$ and covariant in $\cat D$, and finally a
@@ -705,7 +705,7 @@ d^+(\alpha_1 : \cat C_1, x_1:R_1(\alpha_1,\alpha_2), \ldots, x_n:R_n(\alpha_n,\a
     x \pipe 
     {\punitelimkontZatABC {\alpha. t}{b_1} s {b_2}} \pipe
     \punitrefl b \pipe 
-    {\tensorelimWkontZ s {x.\beta.y.r}} \pipe 
+    {\tensorelimWkontZ s {x,\beta,y.r}} \pipe 
     {\tensorintroatXwithYandZ b s t} \pipe
     {\homrappXtoYatZ s t a} \\
     &&&
@@ -748,8 +748,8 @@ Next, we overview our basic judgement forms.  We have
 \item Elements/natural transformations: ${\Gamma \pipe \Phi \vdash s :
   R}$, where ${\Gamma \vdash \Phi \isavectx}$ and $\Gamma\pipe
   \underline \Phi \vdash R \isaSet$.  A transformation $s$ has a context
-  $\Phi$ of transformation variable and a single set output $R$. To be
-  well formed, the context and set must be parameterized by the same
+  $\Phi$ of transformation variables and a single output set $R$. To be
+  well-formed, the context and set must be parameterized by the same
   contravariant and covariant object variables. To ensure this, we use a
   coercion operation $\underline \Phi$ from transformation contexts to
   set contexts that erases everything in the context but the left-most
@@ -788,10 +788,10 @@ Next, we overview our basic judgement forms.  We have
 %% virtual double categories with restrictions.
 %% %
 %% The type theory has 4 central concepts, which we will refer to
-%% sometimes using type theoretic/set theoretic and at other times
+%% sometimes using type-theoretic/set theoretic and at other times
 %% category-theoretic terminology.
 %% %
-%% In type theoretic terminology, judgment theory has \emph{sorts} $\cat
+%% In type-theoretic terminology, judgment theory has \emph{sorts} $\cat
 %% C, \cat D, \cat E$, and \emph{types} $A,B,C$ which have a given sort
 %% and are also \emph{parameterized} by an object of some other sort, and
 %% so can also be thought of as \emph{functions} with input and output
@@ -847,11 +847,11 @@ Next, we overview our basic judgement forms.  We have
 
 The variable rules for objects and elements are 
 \[
-\inferrule*{}{ \Gamma \pipe \alpha : \cat C \vdash \alpha : \cat C}
+\inferrule*{~}{ \Gamma \pipe \alpha : \cat C \vdash \alpha : \cat C}
 \qquad
-\inferrule*{}{ \Gamma \pipe \alpha : \cat C, x : R, \beta : \cat D \vdash x : R}
+\inferrule*{~}{ \Gamma \pipe \alpha : \cat C, x : R, \beta : \cat D \vdash x : R}
 \]
-As in linear logic, the latter rule applies only when the context
+As when using variables in linear logic, the latter rule applies only when the context
 contains a single set $R$.  All syntactic forms typed in context admit
 an action of substitution.  For types and terms, this is as
 usual. Objects $\alpha:\cat C \vdash a : \cat D$ can be substituted for
@@ -887,22 +887,24 @@ substitution rules are included in the appendix).  The introduction and
 elimination rules make use of functors, profunctors, and natural
 transformations.
 %
-First we introduce the additives: the unit category $1$ and product
-category $\cat C \times \cat D$ have the usual introduction and
-elimination rules defining functors to/from them.  
+First we introduce the additive connectives: the unit category $1$ and
+product category $\cat C \times \cat D$ have the usual introduction
+and elimination rules defining functors to/from them.
 %
 Next, we introduce the \emph{graph of a profunctor} $\graphProf \alpha
 \beta P$. Just as a relation $R : A \times B \to \Set$ can be viewed
 as a subset $\{ (a,b) \in A\times B | R(a,b)\}$, any profunctor $P :
-C_-^o\times C_+ \to \Set$ can be viewed as a category with a functor
-to $C_- \times C_+$ (no op), specifically a two-sided discrete
-fibration. In set-based category theory, the objects are triples
+{\cat C}_-^o\times {\cat D}_+ \to \Set$ can be viewed as a category with a functor
+to ${\cat C}_- \times {\cat D}_+$ (no op), specifically a two-sided discrete
+fibration. In set-based category theory, the objects of $\graphProf \alpha
+\beta P$ are triples
 $(a_-, a_+, s : P(a_-,a_+))$ and morphisms from $(a_-,a_+, s)$ to
 $(a_-',a_+', s')$ are pairs of morphisms $f_- : a_- \to a_-'$ and $f_+
 : a_+ \to a_+'$ such that $P(\id,f_+)(s) = P(f_-,\id)(s')$.
 %
 With various choices of $P$, this connective can be used to define the
-arrow category, slice category and comma category constructions.
+arrow category, slice category, comma category and category of
+elements.
 %
 In our syntax we define it as the universal category $\cat C$ equipped
 with functors to $\cat C_-$ and $\cat C_+$ and a natural transformation to $P$.
@@ -925,7 +927,9 @@ to a profunctor $\cat C^o \times \cat D \to \Set$.
 The introduction rule constructs an object of the negative presheaf
 category from such a profunctor and the elimination rule inverts
 it. We use the notation $\negPresheafApp a p$ for the elements of the
-induced profunctor.
+induced profunctor. Since $a$ occurs in a negative position, it must
+depend only on the contravariant variable $d^-\Xi$ and vice-versa for
+$p$.
 %
 The positive presheaf category is then the dual. In ordinary
 set-theoretic category theory the negative presheaf category is the
@@ -937,10 +941,11 @@ category is the opposite of the dual presheaf category $(\Set^{\cat
   \begin{scriptsize}
   \[
   \begin{array}{l}
-    \text{Unit:} \quad
+    \text{Unit:}
+    \qquad
     \inferrule{ ~ }{\Gamma \vdash 1 \isaCat}
-    \quad
-    \inferrule*{ ~ }{\Gamma\pipe\alpha:C \vdash () : 1}\\\\
+    \qquad
+    \inferrule{ ~ }{\Gamma\pipe\alpha:C \vdash () : 1}\\\\
     
     \text{Product:} \quad
     \inferrule
@@ -962,8 +967,8 @@ category is the opposite of the dual presheaf category $(\Set^{\cat
     {\Gamma \vdash \graphProf{\alpha}{\beta} P \isaCat}
     \quad
     \inferrule
-    {\defaultObCtx \vdash a_- : C_-\and
-      \defaultObCtx \vdash a_+ : C_+\and
+    {\defaultObCtx \vdash a_- : {\cat C}_-\and
+      \defaultObCtx \vdash a_+ : {\cat C}_+\and
       \defaultObCtx \vdash s : P[a_-/\alpha;a_+/\beta]}
     {\defaultObCtx \vdash (a_-,a_+,s) : \graphProf{\alpha:\cat C_-}{\beta:\cat C_+} P}
     \\
@@ -979,7 +984,7 @@ category is the opposite of the dual presheaf category $(\Set^{\cat
     {\defaultObCtx \vdash a : \graphProf{\alpha}{\beta} P}
     {\defaultObCtx \vdash \pi_e a : P[\pi_-a/\alpha;\pi_+a/\beta]}
     \\\\
-    \text{Negative Presehaf:} \\
+    \text{Negative Presheaf:} \\
     \inferrule
     {\Gamma \vdash \cat C \isaCat \and \cat C \isSmall}
     {\Gamma \vdash \negPresheaf {\cat C} \isaCat}
@@ -1031,30 +1036,32 @@ the sets/profunctors, which classify elements/natural transformations
 %% The remainder of the figure gives the introduction and elimination rules
 %% for these sets .  
 %% %
-First, the unit set is our syntax for the profunctor of morphisms of a
-category $\cat C$, which is well-formed when given two objects of the
-same category.  
+First, the unit set $\punitinXfromYtoZ {\cat C} a b$ is our syntax for
+the profunctor of morphisms in $\cat C$ instantiated at generalized
+objects $a$ and $b$.
 %
-Its introduction and elimination rules are analogous to the usual rules
-for equality in intensional Martin-L\"of type theory.  The introduction
-rule is the identity morphism (reflexivity) and the elimination rule is
-an induction principle: we can use a term of $s : \punitinXfromYtoZ
-{\cat C} a b$ by specifying the behavior when $s$ is of the form
-$\punitrefl \alpha$ in the form of a continuation $\alpha. t$.  Like the
-$J$ elimination rule for equality in Martin-L\"of type theory, $P$ must
-be ``fully general'', i.e. well-typed for variables $\alpha$ and
-$\beta$; this is because for distinct variables $\alpha$ and $\beta$,
-$\punitinXfromYtoZ{\cat C}{\alpha}{\beta}$ denotes the unit, which has a
-universal property, but $\punitinXfromYtoZ{\cat C} a b$ denotes a
-restriction of a unit, which in general does not.  Those familiar with
-linear logic as in e.g.~\cite{polakow-pfenning} might expect a more
-general rule, with the continuation $t$ typed in a context $\Phi_l
-\jnctx \Phi_r$, and $\Phi_l \jnctx \Phi \jnctx \Phi_r$ as the context of
-the conclusion of the rule.  Because of dependency, this is not
+Its introduction and elimination rules are analogous to the usual
+rules for equality in intensional Martin-L\"of type theory.  The
+introduction rule is the identity morphism (reflexivity) and the
+elimination rule is an induction principle: we can use a term of $s :
+\punitinXfromYtoZ {\cat C} a b$ by specifying the behavior when $s$ is
+of the form $\punitrefl \alpha$ in the form of a continuation
+$\alpha. t$.  Like the $J$ elimination rule for equality in
+Martin-L\"of type theory, $P$ must be ``fully general'',
+i.e. well-typed for variables $\alpha$ and $\beta$. This is because
+for distinct variables $\alpha$ and $\beta$, $\punitinXfromYtoZ{\cat
+  C}{\alpha}{\beta}$ denotes the unit in a virtual double category,
+which has a universal property, but $\punitinXfromYtoZ{\cat C} a b$
+denotes a restriction of the unit, which in general does not.  Those
+familiar with linear logic as in e.g.~\cite{polakow-pfenning} might
+expect a more general rule, where the continuation $t$ is allowed to
+use variables that are not used in $s$, i.e., have a context $\Phi_l
+\jnctx \Phi_r$ and the conclusion of the rule to have a context
+$\Phi_l \jnctx \Phi \jnctx \Phi_r$. Because of dependency, this is not
 necessarily well-formed in cases where the endpoints $a$ and $b$ of
 $\punitinXfromYtoZ{\cat C} a b$ are not distinct variables.  However,
-the instances of this more general rule that do type check are derivable
-from our more restricted rule using right/left-hom types.
+the instances of this more general rule that do type check are
+derivable from our more restricted rule using right/left-hom types.
 
 The tensor product of sets is a kind of combined existential quantifier
 and monoidal product, which we combine into a single notation
@@ -1091,6 +1098,9 @@ contravariant variables occur to the left of the covariant variable,
 and similarly the covariant hom has the quantified variable on the
 right.
 %
+Similar to ordered lambda calculus, the covariant hom is
+right-associative while the contravariant hom is left-associative.
+%
 Then the
 covariant variable of the contravariant hom set is the covariant
 variable of the codomain and, and the contravariant variable of the
@@ -1098,8 +1108,8 @@ hom set is the \emph{covariant} variable of the domain, as the two
 contravariances cancel. The covariant hom is dual.
 %
 Semantically, in ordinary category theory these are known as the
-\emph{hom} of profunctors and are constructed using a combination of
-an end and a function set.
+\emph{hom} of profunctors and are adjoint to the composition of
+profunctors \cite{benabou2000distributors}.
 %
 The two connectives have similar introduction and elimination rules in
 the form of $\lambda$ terms abstracting over both the object of the
@@ -1164,9 +1174,9 @@ syntactically use a variable more than once and still be ``linear'').
     \text{Tensor product:}\\
     \inferrule
     {\cat D \isSmall\\\\
-      \Gamma \pipe d^-\Xi; \beta:D\vdash P \isaSet\\\\
-     \Gamma \pipe \beta:D;d^+\Xi \vdash Q \isaSet}
-    {\Gamma \pipe \Xi \vdash \tensorexistsXwithYandZ {\beta:D} P Q \isaSet}
+      \Gamma \pipe d^-\Xi; \beta:{\cat D}\vdash P \isaSet\\\\
+     \Gamma \pipe \beta:{\cat D};d^+\Xi \vdash Q \isaSet}
+    {\Gamma \pipe \Xi \vdash \tensorexistsXwithYandZ {\beta:{\cat D}} P Q \isaSet}
     \quad
   \inferrule
   {\Gamma \pipe d^+\Psi_s \vdash b : \cat D\\\\
@@ -1177,8 +1187,8 @@ syntactically use a variable more than once and still be ``linear'').
   \inferrule
   {
    \Gamma\pipe \Phi_l \jnctx x:P, \beta:\cat D, y:Q \jnctx \Phi_r \vdash t : R\\\\
-   \Gamma \pipe\Phi_m \vdash s : \tensorexistsXwithYandZ {\beta} P Q}
-  {\Gamma\pipe\Phi_l\jnctx \Phi_m \jnctx \Phi_r \vdash \tensorelimWkontZ s {x.\beta.y. t} : R}
+   \Gamma \pipe\Phi_m \vdash s : \tensorexistsXwithYandZ {\beta:\cat D} P Q}
+  {\Gamma\pipe\Phi_l\jnctx \Phi_m \jnctx \Phi_r \vdash \tensorelimWkontZ s {x,\beta,y. t} : R}
   \\
   %% \tensorintroatXwithYandZ B M N [\phi,B'/\beta',\psi] = \tensorintroatXwithYandZ {B[B'\beta]} {M[\phi]} {N[\psi]}
 
@@ -1203,7 +1213,7 @@ syntactically use a variable more than once and still be ``linear'').
   \inferrule
   {\Gamma \pipe \Phi, x : R, \alpha : \cat C \vdash t : P}
   {\Gamma \pipe \Phi \vdash
-   \homrlambdaXatYdotZ {x : R} {\alpha : \cat C} t : \homrallXYtoZ \alpha R P}
+   \homrlambdaXatYdotZ {x : R} {\alpha : \cat C} t : \homrallXYtoZ {\alpha:\cat C} R P}
   \quad
   \inferrule
   {\Gamma\pipe\Phi_f \vdash s : \homrallXYtoZ {\alpha:\cat C} R P \\\\
@@ -1227,7 +1237,7 @@ syntactically use a variable more than once and still be ``linear'').
   \quad
   \inferrule
   {\Gamma\pipe\alpha:\cat C, x : R, \Phi \vdash t : P}
-  {\Gamma\pipe\Phi \vdash \homllambdaXatYdotZ {x : R} {\alpha : \cat C} t : \homlallXYtoZ \alpha R P}
+  {\Gamma\pipe\Phi \vdash \homllambdaXatYdotZ {x : R} {\alpha : \cat C} t : \homlallXYtoZ {\alpha:\cat C} R P}
   \quad
   \inferrule
   {\Gamma \pipe d^-\Phi_a \vdash a : \cat C\\\\
@@ -1403,19 +1413,19 @@ constructions are (pro-)functorial:
   \label{construction:synthetic-composition}
   For any small category $\cat C$, we can construct natural elements
   \begin{enumerate}
-  \item Identity: $\pendallXdotY {\alpha} {\punitinXfromYtoZ {\cat C}{\alpha}{\alpha}}$
-  \item Composition: $\hombinary {\alpha_1} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_3} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_3}}$
-  \item Functoriality: for any $F : \varr {\cat C}{\cat D}$, $\homunary {\alpha_1} {\punitinXfromYtoZ {}{\alpha_1}{\alpha_2}} {\alpha_2} {\punitinXfromYtoZ {} {F(\alpha_1)}{F(\alpha_2)}}$.
+  \item Identity: $\pendallXdotY {\alpha:\cat C} {\punitinXfromYtoZ {\cat C}{\alpha}{\alpha}}$
+  \item Composition: $\hombinary {\alpha_1:\cat C} {(\punitinXfromYtoZ {\cat C}{\alpha_1}{\alpha_2})} {\alpha_2:\cat C} {(\punitinXfromYtoZ {\cat C}{\alpha_2}{\alpha_3})} {\alpha_3:\cat C} {(\punitinXfromYtoZ {\cat C}{\alpha_1}{\alpha_3})}$
+  \item Functoriality: for any $F : \varr {\cat C}{\cat D}$, $\homunary {\alpha_1:\cat C} {(\punitinXfromYtoZ {\cat C}{\alpha_1}{\alpha_2})} {\alpha_2:\cat C} {(\punitinXfromYtoZ {\cat D} {F(\alpha_1)}{F(\alpha_2)})}$.
    \item Profunctoriality: for any $R : \harr {\cat C}{\cat D}$ if
-     $\cat D$ is small then \\ $\homtrinary {\alpha_1}
-     {\punitinXfromYtoZ{} {\alpha_1}{\alpha_2}} {\alpha_2}
-     {R{\alpha_2}{\beta_2}} {\beta_2} {\punitinXfromYtoZ{} {\beta_2}
-       {\beta_1}} {\beta_1} {R\alpha_1\beta_1}$
+     $\cat D$ is small then \\ $\homtrinary {\alpha_1:\cat C}
+     {(\punitinXfromYtoZ{\cat C} {\alpha_1}{\alpha_2})} {\alpha_2:\cat C}
+     {R{\alpha_2}{\beta_2}} {\beta_2:\cat D} {(\punitinXfromYtoZ{\cat D} {\beta_2}
+       {\beta_1})} {\beta_1:\cat D} {R\alpha_1\beta_1}$
   \end{enumerate}
 \end{construction}
-Reflexivity and transitivity generalize the corresponding properties
-of equality, with the lack of symmetry being a key feature of the
-generalization.
+Identity and Composition generalize the reflexivity and transitivity
+properties of equality, respectively, with the lack of symmetry being
+a key feature of the generalization.
 %
 In addition, we can prove that the (pro)-functoriality axioms commute
 with the composition proof by the $\eta$ principle for the unit.
@@ -1424,15 +1434,15 @@ with the composition proof by the $\eta$ principle for the unit.
 relations respect equality.
 %
 Naturality is more complex to state, and it is a statement about the
-\emph{proofs} so it has no analogue in ordinary higher-order
+\emph{proofs} so it has no analog in ordinary higher-order
 logic. The following version is stated for any \emph{profunctor}, with
 the usual case of naturality arising when $R \alpha \beta =
 \punitinXfromYtoZ {\cat C}{F \alpha}{G \beta}$.
 \begin{lemma}[Naturality]
   For any $t : \pendallXdotY {\alpha:\cat C}{\harrapp R \alpha
     \alpha}$, by composing with profunctoriality, we can construct
-  terms $\alpha_1, f : \punitinXfromYtoZ {\cat C} {\alpha_1}
-  {\alpha_2}, \alpha_2 \vdash \textrm{lcomp}(f,\pendappXtoY t
+  terms $\alpha_1:{\cat C}, f : \punitinXfromYtoZ {\cat C} {\alpha_1}
+  {\alpha_2}, \alpha_2:{\cat C} \vdash \textrm{lcomp}(f,\pendappXtoY t
   {\alpha_2})$ and $\textrm{rcomp}(\pendappXtoY t {\alpha_1}, f) :
   \harrapp R {\alpha_1}{\alpha_2}$ that are both equal to
   $\punitelimtoYwithkontZ f {t}$.
@@ -1440,25 +1450,28 @@ the usual case of naturality arising when $R \alpha \beta =
 
 Next, we turn to some of the central theorems of category theory, the
 Yoneda and Co-Yoneda lemmas. Despite being ultimately quite
-elementary, these are notoriously abstract. In \ohol{}, we view
-these as ordered generalizations of some very simple tautologies about
+elementary, these are notoriously abstract. In \ohol{}, we view these
+as ordered generalizations of some very simple tautologies about
 equality. For instance, the Yoneda lemma generalizes the equivalence
-between the formulae $\forall x. \forall y. x = y \Rightarrow P y$ and
-$P x$.
+between the formulae $\forall y. x = y \Rightarrow P y$ and $P x$ for
+any $x$.
 \begin{lemma} \label{lem:yoneda}
   Let $\alpha : \cat C$ and $\pi : \posPresheaf {\cat C}$. Then
   \begin{enumerate}
   \item (Yoneda) The profunctor 
-    $\homrallXYtoZ {\alpha'} {\punitinXfromYtoZ {\cat C} {\alpha}{\alpha'}} {\posPresheafAppPtoX \pi {\alpha'}}$ is isomorphic to $\posPresheafAppPtoX \pi \alpha$
-  \item (Co-Yoneda) The profunctor $\tensorexistsXwithYandZ {\alpha'}{\posPresheafAppPtoX \pi \alpha'} {\punitinXfromYtoZ{}{\alpha'}{\alpha}}$ is isomorphic to $\posPresheafAppPtoX \pi \alpha$
+    $\homrallXYtoZ {\alpha'} {(\punitinXfromYtoZ {\cat C} {\alpha}{\alpha'})} {(\posPresheafAppPtoX \pi {\alpha'})}$ is isomorphic to $\posPresheafAppPtoX \pi \alpha$
+  \item (Co-Yoneda) The profunctor $\tensorexistsXwithYandZ {\alpha'}{(\posPresheafAppPtoX \pi \alpha')} {(\punitinXfromYtoZ{}{\alpha'}{\alpha})}$ is isomorphic to $\posPresheafAppPtoX \pi \alpha$
   \end{enumerate}
 \end{lemma}
 The proofs both follow from the unit elimination rule, which is
 essentially the Yoneda lemma---the two cases of showing (1) is an
 isomorphism are precisely the $\beta$ and $\eta$ rules for the unit.
 
-Next, we have the ``Fubini'' theorems, which are analogous to simple
-theorems relating tensor and hom types in ordered logic, and whose proofs are 
+Next, we have the ``Fubini'' theorems, which relate the tensor and hom
+types. The statement and proofs for these theorems are analogous to
+proofs relating tensor and hom in ordered logic. For instance, the
+second isomorphism below is analogous to the equivalence $(P \odot Q)
+\multimap R \cong P \multimap Q \multimap R$ in ordered logic.
 \begin{lemma}[{Fubini}]
   \label{lem:fubini-short}
   The following isomorphisms hold when the corresponding profunctors
@@ -1472,14 +1485,15 @@ theorems relating tensor and hom types in ordered logic, and whose proofs are
   \end{enumerate}  
 \end{lemma}
 \begin{proof}
-  Straightforward, for instance the forward direction of (1) is given
-  by $\lambdaunary \alpha {x} \delta {\tensorelimWkontZ x
-    {p.\beta.y. \tensorelimWkontZ y
-      {q.\gamma.r. \tensorintroatXwithYandZ {\gamma}
+  We show one case as an example, the forward direction of (1) is
+  given by $\lambdaunary \alpha {x} \delta {\tensorelimWkontZ x
+    {p,\beta,y. \tensorelimWkontZ y
+      {q,\gamma,r. \tensorintroatXwithYandZ {\gamma}
         {\tensorintroatXwithYandZ \beta p q} {r}}}}$
 \end{proof}
 
-Next, we can prove that two definitions of an adjunction are equivalent:
+Next, we can prove that two definitions of an adjunction are
+equivalent:
 \begin{lemma} \label{lem:adjunction}
   For $R : \varr {\cat D}{\cat C}$ and $L : \varr {\cat
     C}{\cat D}$, the following are in bijection:
@@ -1563,14 +1577,14 @@ inverse of $\phi \triangleright \psi$.
 %% is limited due to the lack of opposite categories.
 
 %% \subsection{Duality Principle}
-%% One common source of category theoretic arguments is the duality
+%% One common source of category-theoretic arguments is the duality
 %% principle: since the opposite of any category is also a category, any
 %% statement that quantifies over all categories is equally true of their
 %% opposites. Furthermore in a formal language of categories, any
 %% statement can be dualized to a statement where domains and codomains
 %% are swapped and composition is flipped.
 %% %
-%% A similar duality principle holds in SCT.
+%% A similar duality principle holds in VETT.
 %% %
 %% The basic idea is to reverse the orientation of all \emph{set}
 %% expressions by swapping which variable is covariant and which is
@@ -1578,8 +1592,8 @@ inverse of $\phi \triangleright \psi$.
 %% %
 %% This has the effect of reversing the order of the context $\Phi$.
 %% %
-%% We can define this as a translation $\cdot^* : SCT \to SCT$ defined on
-%% syntactic forms of SCT in Figure~\ref{fig:duality}.
+%% We can define this as a translation $\cdot^* : VETT \to VETT$ defined on
+%% syntactic forms of VETT in Figure~\ref{fig:duality}.
 %% \begin{figure}
 %%     \begin{align*}
 %%       (\harr {\cat C} {\cat D})^* &= \harr {\cat D^*} {\cat C^*}\\
@@ -1632,7 +1646,7 @@ inverse of $\phi \triangleright \psi$.
 %% type rather than equality.
 
 %% The presheaf extensionality principle is independent from the existing
-%% axioms of \ohol{}: it is true in the ordinary category theoretic
+%% axioms of \ohol{}: it is true in the ordinary category-theoretic
 %% model, but it is false in the set theoretic model. That is, in the set
 %% theoretic model, the presheaf category is simply the powerset, the hom
 %% type is \emph{equality} and the function profunctor is interpreted as
@@ -1654,8 +1668,8 @@ inverse of $\phi \triangleright \psi$.
 
 Next, we develop the basics of the model theory for \ohol{}.
 %
-First, we demonstrate that a hyperdoctrine of virtual equipments
-provides a sound and complete notion of categorical model.
+First, we define a sound and complete notion of categorical model
+based on hyperdoctrines of virtual equipments.
 %
 Then we instantiate this general notion of model to show that the
 \ohol{} can be interpreted in ordinary category theory as well as
@@ -1664,31 +1678,23 @@ enriched, internal and indexed notions.
 %% \subsection{Notion of Model}
 
 First, we can model the judgmental structure of the unary type theory
-and predicate logic in certain \emph{virtual equipments}
-\cite{LEINSTER2002391,Cruttwell2010}, i.e., virtual double categories with
-restrictions. We briefly recount the structure present in a virtual
-double category, but see \citet{Cruttwell2010} for a precise
-definition of the composition rules for 2-cells and functor of virtual
-double categories.
-%
-Our notion here differs from \citet{Cruttwell2010} in several ways
-to more closely match our judgmental structure: (1) we require that
-restrictions are given as coherent structure rather than mere
-existence (2) we include a notion of ``small'' object and (3) we don't
-yet require the existence of unit horizontal arrows, as these are
-modeled by a connective rather than judgmental structure.
+and predicate logic in \emph{virtual double categories} that are
+\emph{split fibrant} and have a notion of \emph{small object}
+\cite{LEINSTER2002391,Cruttwell2010}. We briefly recount the structure
+present in a virtual double category, but see \citet{Cruttwell2010}
+for a precise definition of the composition rules for 2-cells and
+functor of virtual double categories.
 
-\begin{definition}[Virtual Equipment]
-  A virtual equipment $\mathcal V$ consists of
+\begin{definition}
+  A virtual double category $\mathcal V$ consists of
   \begin{enumerate}
   \item A category $V_o$ of ``objects and vertical arrows''
-  \item A chosen subset of the objects $V_s \subseteq V_o$ of ``small objects''
   \item A set ${\mathcal V}_h$ of ``horizontal arrows'' with source
     and target functions $s,t : {\mathcal V}_h \to {\mathcal V_o}^2$
   \item Sets of 2-cells of the following form, 
     with appropriate ``multi-categorical'' notions of identity and
     composition:
-\[\begin{tikzcd}% https://q.uiver.app/?q=WzAsNixbMCwwLCJDXzAiXSxbMCwyLCJEXzAiXSxbMiwwLCJDX3tufSJdLFsxLDAsIlxcY2RvdHMiXSxbMiwyLCJEXzEiXSxbMSwxLCJcXHBoaSJdLFszLDIsIlJfbiIsMCx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImJhcnJlZCJ9fX1dLFswLDEsIkYiLDJdLFsyLDQsIkciXSxbMSw0LCJTIiwyLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV0sWzAsMywiUl8wIiwwLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV1d
+\[\begin{tikzcd}[row sep=tiny]% https://q.uiver.app/?q=WzAsNixbMCwwLCJDXzAiXSxbMCwyLCJEXzAiXSxbMiwwLCJDX3tufSJdLFsxLDAsIlxcY2RvdHMiXSxbMiwyLCJEXzEiXSxbMSwxLCJcXHBoaSJdLFszLDIsIlJfbiIsMCx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImJhcnJlZCJ9fX1dLFswLDEsIkYiLDJdLFsyLDQsIkciXSxbMSw0LCJTIiwyLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV0sWzAsMywiUl8wIiwwLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiYmFycmVkIn19fV1d
 	{C_0} & \cdots & {C_{n}} \\
 	& \phi \\
 	{D_0} && {D_1}
@@ -1702,22 +1708,26 @@ modeled by a connective rather than judgmental structure.
     $R_0 \ldots R_n$ as domain and call $f$ and $g$ the left and right
     ``frames'', or that $\phi$ is framed by $f$ and $g$.
   \end{enumerate}
-  We say a virtual double category has \emph{split restrictions} when
-  for any horizontal arrow $R : C \pto D$ and vertical arrows $f : C'
-  \to C$ and $g : D' \to D$ there is a chosen horizontal arrow $R(f,g)
-  : C' \pto D'$ with a cartesian 2-cell to $R$ framed by $f,g$ and
-  these chosen cartesian lifts are functorial in $f,g$.
-  
-  A functor of virtual equipments is a functor of the virtual double
-  categories that additionally preserves the restrictions and
-  smallness of objects.
+  We say a virtual double category is \emph{split fibrant} when it has
+  a choice of \emph{restrictions}, that is, for any horizontal arrow
+  $R : C \pto D$ and vertical arrows $f : C' \to C$ and $g : D' \to D$
+  there is a chosen horizontal arrow $R(f,g) : C' \pto D'$ with a
+  cartesian 2-cell to $R$ framed by $f,g$ and these chosen cartesian
+  lifts are functorial in $f,g$ (\cite{Shulman08}).  A \emph{choice of
+  small objects} is a subset of the objects $V_s \subseteq V_o$.  A
+  \emph{morphism} of split fibrant virtual double categories with
+  small objects is a functor of the virtual double categories that
+  additionally preserves the restrictions and smallness of objects.
+  This defines a category $\fVDC$.
 \end{definition}
 
 In the presence of restrictions, every 2-cell can be represented as a
-``globular'' 2-cell where the left and right frame are identities. For
-example the 2-cell $\phi$ above can be represented as one with the
-same domain but whose codomain is $S(f,g)$. This property is crucial
-for the completeness of our semantics as we only include a syntax for these globular terms.
+``globular'' 2-cell where the left and right frame are identities
+\cite{Shulman08}. For example the 2-cell $\phi$ above can be
+represented as one with the same domain but whose codomain is
+$S(f,g)$. This property is crucial for the completeness of our
+semantics as we only include a syntax for these globular terms (proof
+of Construction~\ref{cons:syn-model}).
 %
 Each component of this definition has a direct correspondence to a
 syntactic structure in \ohol{}. The objects of $\mathcal V_o$ models
@@ -1726,35 +1736,42 @@ judgment. The set $\mathcal V_h$ models the profunctor judgment. A
 composable string $R_0 \cdots R_n$ models the profunctor contexts. The
 2-cells correspond to the natural transformation judgment where we
 have taken the restriction $S(F,G)$ of the codomain.
+%
+Note that Cruttwell and Shulman define a \emph{virtual equipment} to
+be a virtual double category with all restrictions and all units. The
+units are the model of the unit of profunctors connective and so all
+of our models with the unit will be virtual equipments, hence the name
+VETT.
 
-To model the dependent type theory and fact that the categorical
-judgments are all typed under a context $\Gamma$ with an action of
-substitution, we use a variation on Lawvere's notion of
-\emph{hyperdoctrine} for modeling predicate logic\cite{Lawvere69}:
-\begin{definition}[Hyperdoctrine of Virtual Equipments]
-  A hyperdoctrine of virtual equipments (HVE) is a pair of a category with
+To model the dependent type theory and indexing of category-theoretic
+judgments by a $\Gamma$ with an action of substitution, we use a
+variation on Lawvere's notion of \emph{hyperdoctrine} for modeling
+predicate logic\cite{Lawvere69}\footnote{note that unlike in
+hyperdoctrines, we do not require \emph{quantifiers} adjoint to
+substitution}:
+\begin{definition}[VETT Judgmental model]
+  A VETT judgmental model ($\VMJ$) is a pair of a category with
   families $\mathcal C$ and a functor $V^{(-)} : \mathcal C^o \to
-  \text{vEq}$ to the category of virtual equipments and functors.
+  \fVDC$.
 \end{definition}
 Categories with families $\mathcal C$ model dependent type
 theory~\cite{dybjer-cwf} and for each semantic context $\Gamma$,
 $V^\Gamma$ models the VETT judgments in context $\Gamma$, with the
 functoriality modeling the fact that all of these judgments admit a
 well-behaved action of substitution.
-
-An HVE is then precisely the structure corresponding to the
-\emph{judgments} and actions of substitution in VETT.
+A $\VMJ$ is then precisely the structure corresponding to the
+judgments and actions of substitution in VETT.
 \begin{construction}[Syntactic Model]
   \label{cons:syn-model}
-  The syntax of VETT with any choice of which subset of connectives
-  are included presents an HVE.
+  The syntax of VETT with with any subset of connectives are included
+  presents a $\VMJ$.
 \end{construction}
 \begin{proof}
-  Straightforward, defining the category of families using the dependent
+  Define the category of families using the dependent
   type structure and the virtual equipment structure having
   ($\alpha$-equivalence classes of) syntactic categories as objects,
   functors/sets as vertical/horizontal arrows and interpreting
-  compositions/restrictions as substitutions.  The biggest gap is in the
+  compositions/restrictions as substitutions.  The biggest gap between syntax and semantics is in the
   definition of the 2-cells.  A 2-cell from\\ $(\alpha_1:\cat
   C_1\mathord{;}\alpha_2:\cat C_2\vdash R_1),(\alpha_2:\cat
   C_2;\alpha_3:\cat C_3 \vdash R_2),\ldots$ to $(\beta_1:\cat
@@ -1765,39 +1782,36 @@ An HVE is then precisely the structure corresponding to the
 \end{proof}
 
 Then the \emph{connectives} of VETT each precisely correspond to a
-universal construction of structures in an HVE. The
-$\Pi,\Sigma,\text{Id}$ types correspond to their standard semantics in
-a CwF and the types of categories, functors etc as representing
-objects for the virtual equipment structures. Products of categories
-are interpreted as products in the vertical category, and products of
-sets as products in the category of pro-arrows and 2-cells. The units,
+universal construction in a $\VMJ$. The $\Pi,\Sigma,\text{Id}$ types
+correspond to their standard semantics in a CwF and the connectives
+for categories and profunctors correspond to universal constructions
+in the virtual double categories. Products of categories are
+interpreted as products in the vertical category, and products of sets
+as products in the category of pro-arrows and 2-cells. The units,
 tensor and covariant and contravariant homs are modeled by the
-universal properties of the same names, as described for instance in
+universal properties of the same names, as described in
 \citet{Shulman08}. The graph of a profunctor is modeled by
 \emph{tabulators} \citet{grandis-pare99}. Finally, the covariant and
 contravariant presheaf categories can be described as a weakening of
-the definition of a Yoneda equipment from \citet{diliberti-loregian} to
-virtual double categories. More detailed descriptions of these
-universal properties are included in the appendix.
+the definition of a Yoneda equipment from \citet{diliberti-loregian}
+to virtual double categories. More detailed descriptions of these
+universal properties are included in the extended version
+\cite{extended-version}.
 %
-Then we can package up the soundness and completeness of this notion
-of categorical model in the following modular initiality theorem.
-
+Then the soundness and completeness of this notion of categorical
+model is formalized by the following initiality theorem.
 \begin{theorem}[Initiality]
-  The syntax of VETT with almost any choice of connectives presents an
-  HVE that is initial in the category of HVEs with the chosen
-  instances of the universal properties and functors that preserve
-  such chosen instances. The only exception is that if units are
-  included, then contravariant and covariant hom sets must be included
-  as well.
+  The syntax of VETT with any subset of connectives that includes the
+  hom types presents a $\VMJ$ that is initial in the category of
+  $\VMJ$ with the chosen instances of the universal properties and
+  functors that preserve such chosen instances.
 \end{theorem}
 \begin{proof}
-  It is straightforward to extend the construction
-  \ref{cons:syn-model} for any connective modularly, with the
-  exception that the unit relies on the presence of hom sets in order
-  to satisfy the ``distributivity'' requirement that its elimination
-  can occur in any context. Then we can construct the unique morphism
-  to any HVE by straightforward induction on syntax.
+  The construction \ref{cons:syn-model} can be extended for any
+  connective modularly, with the exception that the unit relies on the
+  presence of hom sets in order to satisfy the ``distributivity''
+  requirement that its elimination can occur in any context. Then we
+  can construct the unique morphism to any HVE induction on syntax.
 \end{proof}
 
 %% \subsection{Examples of Models}
@@ -1806,13 +1820,14 @@ Now that we have a category-theoretic notion of model, we give some
 model construction theorems that can be used to justify our intuitive
 notion of semantics in (enriched, internal, indexed) category theory.
 %
-First, we can extend any virtual equipment to an HVE as follows:
+First, we can extend any set-theoretic model of the category theoretic
+judgments to a hyperdoctrine of models where the category of families
+is the category of sets:
 \begin{construction}
-  Given a virtual equipment $\mathcal V$, we
-  can construct a functor $\mathcal V^{-}: \Set \to \text{vDbl}_r$ by
-  defining the objects of $\mathcal V^\Gamma$ to be functions $\Gamma
-  \to \mathcal V_o$, and similarly for morphisms and 2-cells with all
-  operations given pointwise. 
+  Given a $\mathcal V \in \fVDC$, we can construct a $\VMJ$ $\mathcal
+  V^{-}: \Set \to \text{vDbl}_r$ by defining of $(\mathcal
+  V^\Gamma)_o$ to be functions $\mathcal V_o^\Gamma$, and similarly
+  for morphisms and 2-cells with all operations given pointwise.
 \end{construction}
 % NOTE: this should be some kind of general theorem right?
 % Sketch:
@@ -1829,15 +1844,17 @@ Then to define a model of VETT with a collection of connectives it is
 sufficient to construct a virtual equipment with the corresponding
 universal properties.
 %
+The ``standard model'' is the virtual double category of locally
+small categories where the small objects are the small categories.
 \begin{construction}
-  Fix a cardinal $\kappa$. The virtual equipment $\Cat_{\kappa}$ is
-  defined to have as objects locally $\kappa$-small categories, small
-  objects as $\kappa$-small categories, vertical morphisms as functors,
-  horizontal arrows as functors $\cat C^o \times \cat D \to \kappa Set$ and
-  2-cells as morphisms of profunctors. Restriction of profunctors is
-  given by composition, which is strictly associative and unital.
-  $\Cat_{U}$ has objects satisfying the universal properties of all
-  connectives in VETT.
+  Fix a cardinal $\kappa$. The virtual double category $\Cat_{\kappa}$
+  is defined to have as objects locally $\kappa$-small categories,
+  small objects as $\kappa$-small categories, vertical morphisms as
+  functors, horizontal arrows as functors $\cat C^o \times \cat D \to
+  \kappa Set$ and 2-cells as morphisms of profunctors. Restriction of
+  profunctors is given by composition, which is strictly associative
+  and unital.  $\Cat_{U}$ has objects satisfying the universal
+  properties of all connectives in VETT.
 \end{construction}
 
 More generally, categories internal to, enriched in and/or indexed by
@@ -1864,9 +1881,10 @@ up to unique isomorphism.
 %% pseudo-functor for precisely this reason that the action on morphisms
 %% is given by pullback.
 %
-We leave strictification theorems to future work.  
-
-\begin{construction}[(\citet{Shulman13})]
+Shulman's construction carries over when the functor is strict but
+some of their example instances would require a strictification
+theorem.
+\begin{construction}[Shulman \citet{Shulman13}]
   Given any functor $\mathcal V : S^o \to \SymMonCat$ such that $S$
   and $\mathcal V$ have sufficiently well-behaved (indexed)
   $\kappa$-products, then there is a virtual equipment $\mathcal
@@ -1876,11 +1894,24 @@ We leave strictification theorems to future work.
   of the universal properties needed for a model of VETT.
 \end{construction}
 
+A final model that uses a CwF that is not $\Set$ would be given by
+taking extensional dependent type theory as the CwF and interpreting
+the category-theoretic constructions by their definitions inside type
+theory.
+
 \section{Related and Future Work}
 \label{sec:discussion}
 
 We now compare \vett{} with other calculi for formal category theory.  
 
+C\'accamo and Winskel~\cite{caccamo_winskel_2001} develop a formal
+language for defining categories, functors (of many variables) and
+proving existence of natural equivalences between them. Their system
+can encode profunctors as functors into $\Set$. Their natural
+equivalence judgment does not have proof terms or equality between
+equivalences and they do not support natural
+transformations. Additionally, they only consider ordinary categories
+as the intended model and do not develop a more general semantics.
 Riehl and Verity~\cite{riehl_verity_2022} use a formal language of virtual
 equipments to prove results valid for $\infty$-categories without
 concrete manipulation of model categories. They formalize this language
@@ -1911,29 +1942,20 @@ may provide a formal treatment of it.
 Myers~\citet{jazmyers-strings} provides a string diagram calculus for
 double categories and pro-arrow equipments, generalizing string
 diagrams for monoidal categories. These are an
-alternative approach to type theoretic calculi, with the string
+alternative approach to type-theoretic calculi, with the string
 diagrams typically making tensor products simpler to work with, while
-a type theoretic calculus like SCT makes the closed structure
+a type-theoretic calculus like VETT makes the closed structure
 $\homrallXYtoZ \alpha P Q$ simpler to work with by using bound
 variables.
 
-One alternative to proarrow equipments is to axiomatize the bicategory
-of categories, profunctors and natural transformations rather than the
-virtual double category of categories, functors, profunctors and natural
-transformations. An abstract structure along these lines is a
-\emph{Cartesian
-  bicategory}~\citet{CARBONI198711}.
-Frey~\citet{frey} describes some preliminary work on
-a proof system for Cartesian bicateogires.  This calculus is more
-general than \vett{} in that their profunctors may have 0, 1 or more
-covariant or contravariant variables, but they do not have a term syntax
-or equational theory for the natural transformations/elements, and Cartesian bicategories do
-not have functors and restriction of profunctors by
-functors. Semantically, Cartesian bicategories are less general
-than virtual equipments because in general the set of functors between
-two categories can only be recovered from the set of profunctors if the
-codomain category is Cauchy complete, in which case functors are
-equivalent to adjoint pairs of profunctors.
+\emph{Cartesian bicategories} are similar to equipments but they
+axiomatize the bicategory of profunctors rather than the full double
+category of functors and profunctors \citet{CARBONI198711}.
+Frey~\citet{frey} describes preliminary work on a proof system for
+Cartesian bicateogires. Their profunctors are more general than in
+\vett{} in as they may have 0, 1 or more covariant or contravariant
+variables. But they do not have a term syntax for functors or natural
+transformations.
 
 Our work in this paper fits broadly into a line of work on
 \emph{directed dependent type theories}, a type theory where the
@@ -1945,13 +1967,14 @@ type
 theory~\cite{bch18,cchm18cubical,angiuli+18cartesian-csl,abcfhl17cartesian},
 and universal properties like ``morphism induction'' are an internally
 definable property of certain types.  Other type
-theories~\cite{north18,ahrens+22semantics-2dtt} define morphism types via an induction
-principle, corresponding to the lifting properties of certain kinds of
-fibrations of categories.  While these previous works can express some
-constructions on $\Cat$ that are not expressible in \vett{}, because
-\vett{} is more restricted, \vett{} contrariwise has more models, for
-instance categories enriched in non-cartesian monoidal categories, so
-the theorems that are provable in \vett{} apply in more settings.
+theories~\cite{north18,ahrens+22semantics-2dtt} define morphism types
+via an induction principle, corresponding to the lifting properties of
+certain kinds of fibrations of categories.  While these previous works
+can express some constructions on $\Cat$ that are not expressible in
+\vett{}, because \vett{} is more restricted, \vett{} contrariwise has
+more models, for instance categories enriched in non-cartesian
+monoidal categories, so the theorems that are provable in \vett{}
+apply in more settings.
 
 %% Directed dependent type theories
 %% should generalize \ohol{} in the same way that dependent type theory
@@ -1966,15 +1989,11 @@ the theorems that are provable in \vett{} apply in more settings.
 Finally, some variations on double categories have been used to model
 the structure of certain program
 logics. GTT~\cite{double-cats-gradual-typing} is a logic for
-\emph{vertically thin} pro-arrow equipments, i.e., pro-arrow equipments
-where the functor and natural transformation judgments are posetal. This
-calculus is quite different from ours in that the horizontal morphisms
-are terms of a programming language, and so they are not presented as
-relations with co-variant and contravariant variables, and the equipment
-structure is modeled by explicit coercions rather than by syntactic
-substitution of vertical arrows in horizontal arrows. Another similar
-calculus is System P~\cite{dunphyreddy} which is an internal language
-of \emph{reflexive graph categories}, which are like double categories
+\emph{vertically thin} pro-arrow equipments, where there is at most
+one vertical arrow or 2-cell of any tyepe, so their calculus does not
+include functor or transformation judgments. Another similar calculus
+is System P~\cite{dunphyreddy} which is an internal language of
+\emph{reflexive graph categories}, which are like double categories
 without horizontal composition.
 
 %% DRL note: I would compress the rest of this to a couple of sentences
@@ -1984,9 +2003,10 @@ In future work, \vett{} could incorporate functor categories by
 generalizing the unary type theory of functors to functors of many
 variables, in which case ordinary $\lambda$ calculus can be used to
 define functor categories as function types, and incorporate
-multi-variable profunctors as in~\cite{frey}.  Similarly, ideas from
-coeffects and enriched category theory could be used for defining
-opposite categories \cite{Shulman18,coeffect}.
+multi-variable profunctors as in~\cite{frey}. This would require to
+the models to have a monoidal structure. Ideas from coeffects and
+enriched category theory may be useful for defining opposite
+categories \cite{Shulman18,coeffect}.
 
 %% while many constructions in category theory can be formalized in
 %% virtual equipments, and therefore \vett{}, others require more
@@ -1994,7 +2014,7 @@ opposite categories \cite{Shulman18,coeffect}.
 
 %% While we have demonstrated that some common constructions in category
 %% theory can be expressed using the simple combination of homs, tensors
-%% and units, there are several that are out of reach for SCT due to its
+%% and units, there are several that are out of reach for VETT due to its
 %% restrictive judgmental structure. These require extensions to the
 %% judgmental structure that would move beyond virtual equipments.
 
@@ -2110,6 +2130,7 @@ Shulman, Dominic Verity for helpful feedback on this work.
 \bibliographystyle{splncs04}
 \bibliography{cats}
 
+\ifextended
 \appendix
 
 \section{Details of \vett{} Syntax and Syntactic Metatheory}
@@ -2359,8 +2380,8 @@ more unusual substructural substitutions.
     {\punitelimkontZatABC {\alpha. t}{b_1} s {b_2}}[\phi] &=
     {\punitelimkontZatABC {\alpha. t}{b_1[d^-\phi]} {s[\phi]} {b_2[d^+\phi]}}\\
     (\punitrefl b)[a/\alpha] &= \punitrefl {b[a/\alpha]}\\
-    {\tensorelimWkontZ s {x.\beta.y.r}[\phi_l\jnctx\phi_m\jnctx\phi_r]} &=
-    \tensorelimWkontZ {s[\phi_m]} {x.\beta.y. r[\phi_l,x/x,\beta/\beta \jnctx \beta/\beta,y/y,\phi_r]}\\
+    {\tensorelimWkontZ s {x,\beta,y.r}[\phi_l\jnctx\phi_m\jnctx\phi_r]} &=
+    \tensorelimWkontZ {s[\phi_m]} {x,\beta,y. r[\phi_l,x/x,\beta/\beta \jnctx \beta/\beta,y/y,\phi_r]}\\
     {\tensorintroatXwithYandZ b s t}[\phi_s \jnctx \phi_t] &= \tensorintroatXwithYandZ {b[d^+\phi_s]} {s[\phi_s]} {t[\phi_t]}\\
     {(\homrappXtoYatZ s t a)}[\phi_f\jnctx \phi_a] &=
     {\homrappXtoYatZ {s[\phi_f]} {t[\phi_a]} {a[d^+\phi_f]}}\\
@@ -2552,11 +2573,11 @@ $\eta$ rules.
       
     \inferrule*[right=Tensor$\beta$]
     {~}
-    {\tensorelimWkontZ {\tensorintroatXwithYandZ b s t} {x.\beta.y. r} = t[s/x;b/\beta;t/y]}
+    {\tensorelimWkontZ {\tensorintroatXwithYandZ b s t} {x,\beta,y. r} = t[s/x;b/\beta;t/y]}
     
     \inferrule*[right=Tensor$\eta$]
     {\Gamma\pipe\Phi,z:\tensorexistsXwithYandZ \beta P Q, \Psi \vdash s : R}
-    {\Gamma\pipe\Phi,z:\tensorexistsXwithYandZ \beta P Q, \Psi \vdash s = \tensorelimWkontZ s {x.\beta.y. s[\tensorintroatXwithYandZ \beta x y/z]}: \tensorexistsXwithYandZ \beta P Q}
+    {\Gamma\pipe\Phi,z:\tensorexistsXwithYandZ \beta P Q, \Psi \vdash s = \tensorelimWkontZ s {x,\beta,y. s[\tensorintroatXwithYandZ \beta x y/z]}: \tensorexistsXwithYandZ \beta P Q}
 
   \inferrule*[right=$1\eta$]
   {\Phi \vdash s : 1}
@@ -2687,7 +2708,7 @@ Section~\ref{sec:examples}.
     \[\textrm{prof}(R) = \lambdaunary {\alpha_1} f {\alpha_2} {\punitelimkontZatABC {\alpha. \homrlambdaXatYdotZ r {\beta_1} \homrlambdaXatYdotZ g {\beta_2} {\homlappXtoYatZ {(\punitelimkontZatABC {\beta. \homllambdaXatYdotZ r \alpha r}{\beta_1}{g}{\beta_2})} {r} {\alpha}}}{\alpha_1} f {\alpha_2}}\]
 
     We can also define left and right composition for profunctors by
-    applying the profunctorial action to a reflexivity on one side or
+    applying the profunctorial action to an identity morphism on one side or
     the other:
 
     \[ \textrm{lcomp}(R) = \lambdabinary {\alpha_1} f {\alpha_2} r {\beta} {\apptrinary {\textrm{prof}(R)} {\alpha_1} f {\alpha_2} r {\beta} {\punitrefl \beta} {\beta}}\]
@@ -2758,19 +2779,19 @@ Section~\ref{sec:examples}.
     \item Left to Right
       \[ \lambdaunary \alpha h \delta \homllambdaXatYdotZ q \beta \homllambdaXatYdotZ p \gamma \homlappXtoYatZ h {(p,\beta,q)} \gamma  \]
     \item Right to Left
-      \[ \lambdaunary {\alpha} k \delta \homllambdaXatYdotZ w \gamma \tensorelimWkontZ {w} {p.\beta.q. \homlappXtoYatZ {\homlappXtoYatZ k p \gamma} q \beta } \]
+      \[ \lambdaunary {\alpha} k \delta \homllambdaXatYdotZ w \gamma \tensorelimWkontZ {w} {p,\beta,q. \homlappXtoYatZ {\homlappXtoYatZ k p \gamma} q \beta } \]
     \item Left to Right to Left
       \begin{align*}
-        &\lambdaunary \alpha h \delta \homllambdaXatYdotZ w \gamma {\tensorelimWkontZ {w} {p.\beta.q. (\homlappXtoYatZ {\homlappXtoYatZ {(\homllambdaXatYdotZ q \beta \homllambdaXatYdotZ p \gamma {\homlappXtoYatZ h {(p,\beta,q)} \gamma})} q \beta }  p \gamma) }}\\
-        &=\lambdaunary \alpha h \delta \homllambdaXatYdotZ w \gamma {\tensorelimWkontZ {w} {p.\beta.q. (\homlappXtoYatZ {{(\homllambdaXatYdotZ p \gamma {\homlappXtoYatZ h {(p,\beta,q)} \gamma})} }  p \gamma) }}\tag{contrahom$\beta$}\\
-        &=\lambdaunary \alpha h \delta \homllambdaXatYdotZ w \gamma {\tensorelimWkontZ {w} {p.\beta.q. {{({\homlappXtoYatZ h {(p,\beta,q)} \gamma})} } }}\tag{contrahom$\beta$}\\
+        &\lambdaunary \alpha h \delta \homllambdaXatYdotZ w \gamma {\tensorelimWkontZ {w} {p,\beta,q. (\homlappXtoYatZ {\homlappXtoYatZ {(\homllambdaXatYdotZ q \beta \homllambdaXatYdotZ p \gamma {\homlappXtoYatZ h {(p,\beta,q)} \gamma})} q \beta }  p \gamma) }}\\
+        &=\lambdaunary \alpha h \delta \homllambdaXatYdotZ w \gamma {\tensorelimWkontZ {w} {p,\beta,q. (\homlappXtoYatZ {{(\homllambdaXatYdotZ p \gamma {\homlappXtoYatZ h {(p,\beta,q)} \gamma})} }  p \gamma) }}\tag{contrahom$\beta$}\\
+        &=\lambdaunary \alpha h \delta \homllambdaXatYdotZ w \gamma {\tensorelimWkontZ {w} {p,\beta,q. {{({\homlappXtoYatZ h {(p,\beta,q)} \gamma})} } }}\tag{contrahom$\beta$}\\
         &=\lambdaunary \alpha h \delta \homllambdaXatYdotZ w \gamma \homlappXtoYatZ h w \gamma\tag{tensor$\eta$}\\
         &=\lambdaunary \alpha h h\tag{contrahom$\eta$}
       \end{align*}
     \item Right to Left to Right
       \begin{align*}
-        &\lambdaunary \alpha k \delta \homllambdaXatYdotZ q \beta \homllambdaXatYdotZ p \gamma \homlappXtoYatZ {(\homllambdaXatYdotZ w \gamma {\tensorelimWkontZ {w} {p.\beta.q. \homlappXtoYatZ {\homlappXtoYatZ k q \beta}  p \gamma }})} {(p,\beta,q)} \gamma\\
-        &=\lambdaunary \alpha k \delta \homllambdaXatYdotZ q \beta \homllambdaXatYdotZ p \gamma { {\tensorelimWkontZ { {(p,\beta,q)}} {p.\beta.q. \homlappXtoYatZ {\homlappXtoYatZ k q \beta } p \gamma }}}\\
+        &\lambdaunary \alpha k \delta \homllambdaXatYdotZ q \beta \homllambdaXatYdotZ p \gamma \homlappXtoYatZ {(\homllambdaXatYdotZ w \gamma {\tensorelimWkontZ {w} {p,\beta,q. \homlappXtoYatZ {\homlappXtoYatZ k q \beta}  p \gamma }})} {(p,\beta,q)} \gamma\\
+        &=\lambdaunary \alpha k \delta \homllambdaXatYdotZ q \beta \homllambdaXatYdotZ p \gamma { {\tensorelimWkontZ { {(p,\beta,q)}} {p,\beta,q. \homlappXtoYatZ {\homlappXtoYatZ k q \beta } p \gamma }}}\\
         &=\lambdaunary \alpha k \delta \homllambdaXatYdotZ q \beta \homllambdaXatYdotZ p \gamma {\homlappXtoYatZ {\homlappXtoYatZ k q \beta } p \gamma}\\
         &=\lambdaunary \alpha k \delta \homllambdaXatYdotZ q \beta { {\homlappXtoYatZ k q \beta}}\\
         &=\lambdaunary \alpha k \delta k\\
@@ -2948,5 +2969,5 @@ equipments.
   and unital
   \[ \id_{\Phi}[\phi] = \phi = \phi[\id_{\Psi}] \]
 \end{definition}
-
+\fi
 \end{document}

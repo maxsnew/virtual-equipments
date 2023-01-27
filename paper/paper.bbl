@@ -1,0 +1,276 @@
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{ahrens+22semantics-2dtt}
+Ahrens, B., North, P., van~der Weide, N.: Semantics for two-dimensional type
+  theory. In: ACM/IEEE Symposium on Logic in Computer Science (LICS) (2022)
+
+\bibitem{altenkirch+16strict}
+Altenkirch, T., Capriotti, P., Kraus, N.: Extending homotopy type theory with
+  strict equality. In: EACSL Annual Conference on Computer Science Logic (CSL)
+  (2016)
+
+\bibitem{abcfhl17cartesian}
+Angiuli, C., Brunerie, G., Coquand, T., {Hou (Favonia)}, K.B., Harper, R.,
+  Licata, D.R.: Syntax and models of cartesian cubical type theory.
+  Mathematical Structures in Computer Science  (2021)
+
+\bibitem{angiuli+18cartesian-csl}
+Angiuli, C., {Hou (Favonia)}, K.B., Harper, R.: Cartesian cubical computational
+  type theory: Constructive reasoning with paths and equalities. In: Computer
+  Science Logic (CSL) (2018)
+
+\bibitem{awodeywarren09identity}
+Awodey, S., Warren, M.: Homotopy theoretic models of identity types.
+  Mathematical Proceedings of the Cambridge Philosophical Society  (2009)
+
+\bibitem{bicategories}
+B{\'e}nabou, J.: Introduction to bicategories. In: Reports of the Midwest
+  Category Seminar. pp. 1--77. Springer Berlin Heidelberg, Berlin, Heidelberg
+  (1967)
+
+\bibitem{benabou2000distributors}
+B{\'e}nabou, J.: Distributors at work. Lecture notes written by Thomas
+  Streicher  \textbf{11} (2000)
+
+\bibitem{bch18}
+Bezem, M., Coquand, T., Huber, S.: The univalence axiom in cubical sets.
+  Journal of Automated Reasoning  (June 2018). \doi{10.1007/s10817-018-9472-6}
+
+\bibitem{topos-of-trees}
+Birkedal, L., Møgelberg, R.E., Schwinghammer, J., Støvring, K.: {First steps
+  in synthetic guarded domain theory: step-indexing in the topos of trees}.
+  {Logical Methods in Computer Science}  \textbf{{Volume 8, Issue 4}} (Oct
+  2012). \doi{10.2168/LMCS-8(4:1)2012}
+
+\bibitem{coeffect}
+Brunel, A., Gaboardi, M., Mazza, D., Zdancewic, S.: A core quantitative
+  coeffect calculus. In: Proceedings of the 23rd European Symposium on
+  Programming Languages and Systems - Volume 8410. p. 351–370 (2014).
+  \doi{10.1007/978-3-642-54833-8_19}
+
+\bibitem{buchholtzweinberger21fibered}
+Buchholtz, U., Weinberger, J.: Synthetic fibered ($\infty$,1)-category theory,
+  higher Structures, to appear. arXiv:2105.01724
+
+\bibitem{caccamo_winskel_2001}
+C{\'a}ccamo, M., Winskel, G.: A higher-order calculus for categories. In:
+  Boulton, R.J., Jackson, P.B. (eds.) Theorem Proving in Higher Order Logics.
+  pp. 136--153. Springer Berlin Heidelberg, Berlin, Heidelberg (2001)
+
+\bibitem{CARBONI198711}
+Carboni, A., Walters, R.: Cartesian bicategories i. Journal of Pure and Applied
+  Algebra  \textbf{49}(1),  11--32 (1987).
+  \doi{https://doi.org/10.1016/0022-4049(87)90121-6}
+
+\bibitem{cartmell1986}
+Cartmell, J.: Generalised algebraic theories and contextual categories. Annals
+  of Pure and Applied Logic  \textbf{32},  209--243 (1986).
+  \doi{https://doi.org/10.1016/0168-0072(86)90053-9}
+
+\bibitem{cervesatopfenning02llf}
+Cervesato, I., Pfenning, F.: A linear logical framework. Information and
+  Computation  \textbf{179}(1),  19--75 (2002)
+
+\bibitem{cchm18cubical}
+Cohen, C., Coquand, T., Huber, S., M{\"o}rtberg, A.: Cubical type theory: A
+  constructive interpretation of the univalence axiom. In: Uustalu, T. (ed.)
+  21st International Conference on Types for Proofs and Programs (TYPES 2015).
+  pp. 5:1--5:34 (2018). \doi{10.4230/LIPIcs.TYPES.2015.5}
+
+\bibitem{Cruttwell2010}
+Crutwell, G., Shulman, M.A.: A unified framework for generalized
+  multicategories. Theory and Applications of Categories  \textbf{24},
+  580--655 (2010)
+
+\bibitem{CURIEN1986188}
+Curien, P.L.: Categorical combinators. Information and Control  \textbf{69}(1),
+   188--254 (1986). \doi{https://doi.org/10.1016/S0019-9958(86)80047-X}
+
+\bibitem{diliberti-loregian}
+Di~Liberti, I., Loregian, F.: On the unicity of formal category theories
+  (2019). \doi{10.48550/ARXIV.1901.01594}
+
+\bibitem{lslr}
+Dreyer, D., Ahmed, A., Birkedal, L.: Logical step-indexed logical relations.
+  In: 2009 24th Annual IEEE Symposium on Logic In Computer Science. pp. 71--80
+  (2009). \doi{10.1109/LICS.2009.34}
+
+\bibitem{dunphyreddy}
+Dunphy, B.P., Reddy, U.S.: Parametric limits. In: 19th {IEEE} Symposium on
+  Logic in Computer Science {(LICS} 2004), 14-17 July 2004, Turku, Finland,
+  Proceedings. pp. 242--251 (2004). \doi{10.1109/LICS.2004.1319618}
+
+\bibitem{dybjer-cwf}
+Dybjer, P.: Internal type theory. In: Berardi, S., Coppo, M. (eds.) Types for
+  Proofs and Programs. pp. 120--134. Springer Berlin Heidelberg (1996)
+
+\bibitem{frey}
+Frey, J.: A language for closed cartesian bicategories (2019), category Theory
+  2019
+
+\bibitem{girard}
+Girard, J.Y.: Linear logic. Theoretical Computer Science  \textbf{50}(1),
+  1--101 (1987). \doi{https://doi.org/10.1016/0304-3975(87)90045-4}
+
+\bibitem{grandis-pare99}
+Grandis, M., Pare, R.: Limits in double categories. Cahiers de Topologie et
+  G\'eom\'etrie Diff\'erentielle Cat\'egoriques  \textbf{40}(3),  162--220
+  (1999)
+
+\bibitem{hofmann98groupoid}
+Hofmann, M., Streicher, T.: The groupoid interpretation of type theory. In:
+  Twenty-five years of constructive type theory. Oxford University Press (1998)
+
+\bibitem{isaev21indexed}
+Isaev, V.: Indexed type theories. Mathematical Structures in Computer Science
+  \textbf{31}(1),  3–63 (2021). \doi{10.1017/S0960129520000092}
+
+\bibitem{iris}
+Jung, R., Swasey, D., Sieczkowski, F., Svendsen, K., Turon, A., Birkedal, L.,
+  Dreyer, D.: Iris: Monoids and invariants as an orthogonal basis for
+  concurrent reasoning. In: Proceedings of the 42nd Annual ACM SIGPLAN-SIGACT
+  Symposium on Principles of Programming Languages. p. 637–650. POPL '15,
+  Association for Computing Machinery (2015). \doi{10.1145/2676726.2676980}
+
+\bibitem{krishnaswami+15linear}
+Krishnaswami, N.R., Pradic, P., Benton, N.: Integrating dependent and linear
+  types. In: ACM Symposium on Principles of Programming Languages (2015)
+
+\bibitem{LambekScott}
+Lambek, J., Scott, P.: Introduction to Higher-Order Categorical Logic.
+  Cambridge University Press (1988)
+
+\bibitem{Lawvere69}
+Lawvere, F.W.: Adjointness in foundations. Dialectica  \textbf{23} (1969)
+
+\bibitem{LEINSTER2002391}
+Leinster, T.: Generalized enrichment of categories. Journal of Pure and Applied
+  Algebra  \textbf{168}(2),  391--406 (2002).
+  \doi{https://doi.org/10.1016/S0022-4049(01)00105-0}, category Theory 1999:
+  selected papers, conference held in Coimbra in honour of the 90th birthday of
+  Saunders Mac Lane
+
+\bibitem{loregian_2021}
+Loregian, F.: (Co)end Calculus. London Mathematical Society Lecture Note
+  Series, Cambridge University Press (2021). \doi{10.1017/9781108778657}
+
+\bibitem{moggi}
+Moggi, E.: Notions of computation and monads. Information and Computation
+  \textbf{93}(1),  55--92 (1991).
+  \doi{https://doi.org/10.1016/0890-5401(91)90052-4}, selections from 1989 IEEE
+  Symposium on Logic in Computer Science
+
+\bibitem{jazmyers-strings}
+Myers, D.J.: String diagrams for double categories and equipments (2016).
+  \doi{10.48550/ARXIV.1612.02762}
+
+\bibitem{double-cats-gradual-typing}
+New, M.S., Licata, D.R.: {Call-by-Name Gradual Type Theory}. In: Kirchner, H.
+  (ed.) 3rd International Conference on Formal Structures for Computation and
+  Deduction (FSCD 2018). Leibniz International Proceedings in Informatics
+  (LIPIcs), vol.~108, pp. 24:1--24:17. Schloss Dagstuhl--Leibniz-Zentrum fuer
+  Informatik, Dagstuhl, Germany (2018). \doi{10.4230/LIPIcs.FSCD.2018.24}
+
+\bibitem{extended-version}
+New, M.S., Licata, D.R.: A formal logic for formal category theory (extended
+  version) (2022). \doi{10.48550/ARXIV.2210.08663},
+  \url{https://arxiv.org/abs/2210.08663}
+
+\bibitem{north18}
+North, P.R.: Towards a directed homotopy type theory. In: Mathematical
+  Foundations of Programming Semantics (MFPS) (2019)
+
+\bibitem{PALMGREN2019102715}
+Palmgren, E.: Categories with families and first-order logic with dependent
+  sorts. Annals of Pure and Applied Logic  \textbf{170}(12),  102715 (2019).
+  \doi{https://doi.org/10.1016/j.apal.2019.102715},
+  \url{https://www.sciencedirect.com/science/article/pii/S0168007219300727}
+
+\bibitem{abadi-plotkin}
+Plotkin, G., Abadi, M.: A logic for parametric polymorphism. In: Bezem, M.,
+  Groote, J.F. (eds.) Typed Lambda Calculi and Applications. pp. 361--375.
+  Springer Berlin Heidelberg, Berlin, Heidelberg (1993)
+
+\bibitem{polakow-pfenning}
+Polakow, J., Pfenning, F.: Natural deduction for intuitionistic
+  non-communicative linear logic. In: Girard, J. (ed.) Typed Lambda Calculi and
+  Applications, 4th International Conference, TLCA'99, L'Aquila, Italy, April
+  7-9, 1999, Proceedings. Lecture Notes in Computer Science, vol.~1581, pp.
+  295--309. Springer (1999). \doi{10.1007/3-540-48959-2\_21}
+
+\bibitem{riehlshulman17directed}
+Riehl, E., Shulman, M.: A type theory for synthetic $\infty$-categories. Higher
+  Structures  \textbf{1}(1) (2018)
+
+\bibitem{riehl_verity_2022}
+Riehl, E., Verity, D.: Elements of $\infty$-Category Theory. Cambridge Studies
+  in Advanced Mathematics, Cambridge University Press (2022).
+  \doi{10.1017/9781108936880}
+
+\bibitem{reflexive-graphs}
+Robinson, E., Rosolini, G.: Reflexive graphs and parametric polymorphism. In:
+  Proceedings Ninth Annual IEEE Symposium on Logic in Computer Science. pp.
+  364--371 (1994). \doi{10.1109/LICS.1994.316053}
+
+\bibitem{seely_1984}
+Seely, R.A.G.: Locally cartesian closed categories and type theory.
+  Mathematical Proceedings of the Cambridge Philosophical Society
+  \textbf{95}(1),  33–48 (1984). \doi{10.1017/S0305004100061284}
+
+\bibitem{Shulman08}
+Shulman, M.: Framed bicategories and monoidal fibrations. Theory and
+  Applications of Categories  \textbf{20},  650--738 (2008),
+  \url{http://www.tac.mta.ca/tac/volumes/20/18/20-18abs.html}
+
+\bibitem{Shulman13}
+Shulman, M.: Enriched indexed categories. Theory and Applications of Categories
+   \textbf{28},  616--695 (2013),
+  \url{http://www.tac.mta.ca/tac/volumes/28/21/28-21abs.html}
+
+\bibitem{Shulman18}
+Shulman, M.: Contravariance through enrichment. Theory and Applications of
+  Categories  \textbf{33},  95--130 (2018),
+  \url{http://tac.mta.ca/tac/volumes/33/5/33-05abs.html}
+
+\bibitem{STREET1978350}
+Street, R., Walters, R.: Yoneda structures on 2-categories. Journal of Algebra
+  \textbf{50}(2),  350--379 (1978).
+  \doi{https://doi.org/10.1016/0021-8693(78)90160-6},
+  \url{https://www.sciencedirect.com/science/article/pii/0021869378901606}
+
+\bibitem{voevodsky06homotopy}
+Voevodsky, V.: A very short note on homotopy $\lambda$-calculus (September
+  2006), unpublished.
+
+\bibitem{voevodsky13hts}
+Voevodsky, V.: A type system with two kinds of identity types (2013), talk at
+  Andre Joyal's 70th birthday conference (IAS)
+
+\bibitem{vakar15linear}
+Vákár, M.: A categorical semantics for linear logical frameworks. In:
+  Foundations of Software Science and Computation Structures (FoSSaCS) (2015)
+
+\bibitem{wand197913}
+Wand, M.: Fixed-point constructions in order-enriched categories. Theoretical
+  Computer Science  \textbf{8}(1),  13--30 (1979).
+  \doi{https://doi.org/10.1016/0304-3975(79)90053-7}
+
+\bibitem{WeaverLicata20}
+Weaver, M.Z., Licata, D.R.: A constructive model of directed univalence in
+  bicubical sets. In: Proceedings of the 35th Annual ACM/IEEE Symposium on
+  Logic in Computer Science. pp. 915--928. LICS '20, Association for Computing
+  Machinery, New York, NY, USA (2020). \doi{10.1145/3373718.3394794}
+
+\bibitem{weinberger22thesis}
+Weinberger, J.: A Synthetic Perspective on ($\infty$,1)-Category Theory:
+  Fibrational and Semantic Aspects. Ph.D. thesis, TU Darmstadt (2022),
+  arXiv:2202.13132
+
+\bibitem{proarrow-equipments}
+Wood, R.J.: Abstract pro arrows {I}. Cahiers de Topologie et G\'eom\'etrie
+  Diff\'erentielle Cat\'egoriques  \textbf{23}(3),  279--290 (1982)
+
+\end{thebibliography}
