@@ -14,7 +14,7 @@
 \begin{document}
 
 \newif\ifextended
-\extendedfalse
+\extendedtrue
 \newcommand{\theappendix}{\ifextended the appendix \else the extended version \cite{extended-version}\fi}
 
 %% \newtheorem{theorem}{Theorem}
@@ -181,7 +181,7 @@
 \newcommand{\citet}[1]{\cite{#1}}
 \newcommand{\citep}[1]{(\cite{#1})}
 
-\title{A Formal Logic for Formal Category Theory}
+\title{A Formal Logic for Formal Category Theory \ifextended{(Extended Version)}}
 \author{Max S. New\inst{1,2}\orcidID{0000-0001-8141-195X} and Daniel R. Licata\inst{2}}
 \institute{University of Michigan \and Wesleyan University}
 
@@ -580,7 +580,7 @@ Finally we have several forms of context which are used in the theory.
 The contexts $\Gamma$ of term variables with their types are as usual;
 we write ``${\Gamma \isadtctx}$'' to indicate that a context is well-formed.
 We name the remaining contexts after the judgements that they are used
-by.  The set contexts $\Xi$, which will be used
+by. The set contexts $\Xi$, which will be used
 to type-check sets, contain object variables with their categories. The
 two forms of set context are $\alpha : \cat C$, containing one variable
 that can be used both contravariantly and covariantly, and $\alpha :
@@ -2168,15 +2168,15 @@ well-typedness of the corresponding three kinds of substitutions.
     {\Gamma \vdash \cat C \isaCat \and \Gamma\vdash\cat D \isaCat}
     {\Gamma \vdash \alpha: \cat C; \beta: \cat D \boundary}
 
-    \inferrule*[right=SetCtxForm]
+    \inferrule*[right=TransCtxForm]
     {\Gamma \isadtctx}
     {\Gamma \vdash \Phi \isavectx}
 
-    \inferrule*[right=SetCtxMt]
+    \inferrule*[right=TransCtxMt]
     {\Gamma \vdash \cat C \isaCat}
     {\Gamma \vdash \alpha: \cat C \isavectx}
 
-    \inferrule*[right=SetCtxExt]
+    \inferrule*[right=TransCtxExt]
     {\Gamma \vdash \Phi \isavectx\and
     \Gamma \pipe d^+\Phi; \beta:\cat D \vdash R \isaSet}
     {\Gamma \vdash \Phi, x:R, \beta:\cat D \isavectx}
