@@ -12,6 +12,12 @@ Altenkirch, T., Capriotti, P., Kraus, N.: Extending homotopy type theory with
   strict equality. In: EACSL Annual Conference on Computer Science Logic (CSL)
   (2016)
 
+\bibitem{qit}
+Altenkirch, T., Kaposi, A.: Type theory in type theory using quotient inductive
+  types. In: Proceedings of the 43rd Annual ACM SIGPLAN-SIGACT Symposium on
+  Principles of Programming Languages. p. 18–29. POPL '16 (2016).
+  \doi{10.1145/2837614.2837638}
+
 \bibitem{abcfhl17cartesian}
 Angiuli, C., Brunerie, G., Coquand, T., {Hou (Favonia)}, K.B., Harper, R.,
   Licata, D.R.: Syntax and models of cartesian cubical type theory.
