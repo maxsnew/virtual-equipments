@@ -1,0 +1,362 @@
+\documentclass{article}
+
+\usepackage{tikz-cd} \usepackage{amssymb} \usepackage{amsmath}
+%% \usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{stmaryrd}
+\usepackage{mathpartir}
+\usepackage{bbm}
+\usepackage{cleveref}
+\usepackage[utf8]{inputenc}
+
+\DeclareMathOperator*{\colim}{colim}
+
+\begin{document}
+
+\newif\ifextended
+\extendedtrue
+\newcommand{\theappendix}{\ifextended the appendix \else the extended version \cite{extended-version}\fi}
+
+%% \newtheorem{theorem}{Theorem}
+%% \newtheorem{lemma}{Lemma}
+\newtheorem{construction}{Construction}
+%% \newtheorem{definition}{Definition}
+\newcommand{\vett}{VETT}
+\newcommand{\ohol}{\vett}
+\newcommand{\fVDC}{\textrm{fVDCs}}
+\newcommand{\VMJ}{\textrm{VM}_J}
+\newcommand{\sem}[1]{\llbracket{#1}\rrbracket}
+\newcommand{\pto}{\nrightarrow}
+\newcommand{\pfrom}{\nleftarrow}
+\newcommand{\vcat}{\mathcal}
+\newcommand{\cat}{\mathbbm}
+\newcommand{\isaSet}{\,\,\textrm{Set}}
+\newcommand{\isaTy}{\,\,\textrm{Type}}
+\newcommand{\isaCat}{\,\,\textrm{Cat}}
+\newcommand{\isSmall}{\,\,\textrm{Small}}
+\newcommand{\Set}{\textrm{Set}}
+\newcommand{\MonCat}{\textrm{MonCat}}
+\newcommand{\SymMonCat}{\textrm{SymMonCat}}
+\newcommand{\Syn}{\textrm{Syn}}
+\newcommand{\vtkmnd}{\mathbb{K}\text{Mod} (\vcat{V},T)}
+\newcommand{\rmod}{\text{RMod}}
+\newcommand{\lmod}{\text{LMod}}
+
+\newcommand{\smallCats}{\text{SmallCat}}
+\newcommand{\Cats}{\text{Cat}}
+\newcommand{\varr}[2]{\text{Fun}\,{#1}\,{#2}}
+\newcommand{\harr}[2]{\text{Prof}\,{#1}\,{#2}}
+\newcommand{\harrapp}[3]{#1(#2;#3)}
+
+\newcommand{\defaultObCtx}{\Gamma\pipe\alpha:\cat C}
+
+\newcommand{\jnctx}{\curlyveedownarrow}
+
+\newcommand{\id}{\textrm{id}}
+\newcommand{\for}{\textrm{for}\,}
+\newcommand{\when}{\textrm{when}\,}
+\newcommand{\lett}{\textrm{let}\,}
+%% \newcommand{\sort}{\,\,\textrm{sort}}
+\newcommand{\Sort}{\textrm{Sort}}
+\newcommand{\isadtctx}{\,\,\textrm{type context}}
+\newcommand{\isavectx}{\,\,\textrm{prof ctx}}
+\newcommand{\obctx}{\,\,\textrm{ob ctx}}
+\newcommand{\boundary}{\,\,\textrm{set context}}
+\newcommand{\prof}{\,\,\textrm{span}}
+\newcommand{\subst}{\,\,\textrm{subst}}
+\newcommand{\sigctx}{\,\,\textrm{sig-ctx}}
+\newcommand{\sig}{\,\,\textrm{sig}}
+\newcommand{\pipe}{\mathrel{|}}
+
+\newcommand{\punitinXfromYtoZ}[3]{#2 \mathop{\to_{#1}} #3}
+\newcommand{\punitrefl}[1]{\textrm{id}_{#1}}
+\newcommand{\punitelimtoYwithkontZ}[2]{\textrm{ind}_{\to}(#1,#2)}
+\newcommand{\punitelimkontZatABC}[4]{\textrm{ind}_{\to}(#1,#2, #3, #4)}
+
+\newcommand{\odotexists}[1]{\mathop{\overset{\exists #1}\odot}}
+\newcommand{\tensorexistsXwithYandZ}[3]{#2 \odotexists{#1} #3}
+\newcommand{\tensorintroofXandY}[2]{\textrm{pair}_\odot(#1,#2)}
+\newcommand{\tensorintroatXwithYandZ}[3]{(#2,#1,#3)}
+\newcommand{\tensorelimWkontZ}[2]{\textrm{ind}_{\odot}(#2;#1)}
+
+\newcommand{\tlwith}[1]{\mathop{\prescript{#1}{}\triangleleft}}
+\newcommand{\tlforall}[1]{\tlwith{\forall #1}}
+
+\newcommand{\trwith}[1]{\mathop{\triangleright^{#1}}}
+\newcommand{\trforall}[1]{\trwith {\forall #1}}
+
+\newcommand{\homrallXYtoZ}[3]{#2 \trforall {#1} #3}
+\newcommand{\monhomrallXYtoZ}[3]{#2 \mathop{\overset{{\forall #1}}{\multimap}} #3}
+
+\newcommand{\homlallXYtoZ}[3]{#3 \tlforall {#1} #2}
+
+\newcommand{\homrlambdaXatYdotZ}[3]{\lambda^\triangleright (#1, #2). #3}
+\newcommand{\homllambdaXatYdotZ}[3]{\lambda^\triangleleft (#2, #1). #3}
+
+\newcommand{\homrappXtoYatZ}[3]{#1 \trwith{#3} #2}
+\newcommand{\homlappXtoYatZ}[3]{#2 \tlwith{#3} #1}
+
+\newcommand{\homunary}[4]{\pendallXdotY {#1} {\homrallXYtoZ {#3} {#2} {#4}}}
+\newcommand{\hombinary}[6]{\pendallXdotY {#1} {\homrallXYtoZ {#3} {#2} \homrallXYtoZ {#5} {#4} {#6}}}
+\newcommand{\homtrinary}[8]{\pendallXdotY {#1} {\homrallXYtoZ {#3} {#2} \homrallXYtoZ {#5} {#4} \homrallXYtoZ {#7} {#6} {#8}}}
+
+\newcommand{\homlunary}[4]{\pendallXdotY {#1} {\homrallXYtoZ {#3} {#2} {#4}}}
+\newcommand{\homlbinary}[6]{\pendallXdotY {#1} {\homrallXYtoZ {#3} {#2} \homrallXYtoZ {#5} {#4} {#6}}}
+\newcommand{\homltrinary}[8]{\pendallXdotY {#1} {\homrallXYtoZ {#3} {#2} \homrallXYtoZ {#5} {#4} \homrallXYtoZ {#7} {#6} {#8}}}
+
+\newcommand{\lambdaunary}[4]{\pendlambdaXdotY {#1} {\homrlambdaXatYdotZ {#2} {#3} {#4}}}
+\newcommand{\lambdabinary}[6]{\lambdaunary{#1}{#2}{#3}{\homrlambdaXatYdotZ{#4}{#5}{#6}}}
+\newcommand{\lambdatrinary}[8]{\lambdabinary{#1}{#2}{#3}{#4}{#5}{\homrlambdaXatYdotZ{#6}{#7}{#8}}}
+
+\newcommand{\appunary}[4]{\homrappXtoYatZ {\pendappXtoY {#1} {#2}} {#3} {#4}}
+\newcommand{\appbinary}[6]{\homrappXtoYatZ {\appunary{#1}{#2}{#3}{#4}}{#5}{#6}}
+\newcommand{\apptrinary}[8]{\homrappXtoYatZ {\appbinary{#1}{#2}{#3}{#4}{#5}{#6}}{#7}{#8}}
+
+\newcommand{\pendallXdotY}[2]{\forall #1. #2}
+\newcommand{\pendlambdaXdotY}[2]{\lambda #1. #2}
+\newcommand{\pendappXtoY}[2]{#1^{#2}}
+
+\newcommand{\Cat}{\textrm{Cat}}
+\newcommand{\Id}[3]{\textrm{Id} #1\,#2\,#3}
+\newcommand{\vlambda}[1]{\lambda^{F}{#1}.}
+\newcommand{\hlambda}[2]{\lambda^{P}{#1};{#2}.}
+\newcommand{\ran}[1]{\textrm{Ran}_{#1}\,}
+\newcommand{\weightedLimitDW}[2]{\textrm{lim}^{#2}{#1}\,}
+
+\newcommand{\equalizeVofWbyXeqYatZ}[5]{\{ {#1} : {#2} \pipe {#3} = {#4} : {#5} \}}
+
+\newcommand{\paramPresheaf}[1]{\mathcal P^{#1}}
+\newcommand{\pmPresheaf}{\paramPresheaf\pm}
+\newcommand{\posPresheaf}{\paramPresheaf+}
+\newcommand{\negPresheaf}{\paramPresheaf-}
+\newcommand{\negPresheafAppPtoX}[2]{#2\in #1}
+\newcommand{\posPresheafAppPtoX}[2]{#1 \ni #2}
+\newcommand{\negPresheafApp}{\negPresheafAppPtoX}
+\newcommand{\posPresheafApp}{\posPresheafAppPtoX}
+
+\newcommand{\graphProf}[3]{\sum_{{#1};{#2}} #3}
+
+% Algebraic notation
+\newcommand{\algCtx}{\textrm{Ctx}}
+\newcommand{\algSubst}{\textrm{Subst}}
+\newcommand{\algTy}{\textrm{Type}}
+\newcommand{\algTm}{\textrm{Term}}
+\newcommand{\algCat}{\textrm{Cat}}
+\newcommand{\algVarr}{\textrm{Functor}}
+\newcommand{\algHCtx}{\textrm{ProfCtx}}
+\newcommand{\algHSubst}{\textrm{ProfSubst}}
+\newcommand{\algHarr}{\textrm{Prof}}
+\newcommand{\algTrans}{\textrm{Trans}}
+\newcommand{\algElts}{\textrm{Elts}}
+\newcommand{\algEltsI}{\textrm{EltsI}}
+
+\newcommand{\algLHom}{\textrm{LHom}}
+\newcommand{\algLHomI}{\textrm{LHomI}}
+\newcommand{\algLHomE}{\textrm{LHomE}}
+\newcommand{\algRHom}{\textrm{RHom}}
+\newcommand{\algRHomI}{\textrm{RHomI}}
+\newcommand{\algRHomE}{\textrm{RHomE}}
+
+\newcommand{\algUnit}{\textrm{Unit}}
+\newcommand{\algUnitI}{\textrm{UnitI}}
+\newcommand{\algUnitE}{\textrm{UnitE}}
+
+\newcommand{\algTensor}{\textrm{Tensor}}
+\newcommand{\algTensorI}{\textrm{TensorI}}
+\newcommand{\algTensorE}{\textrm{TensorE}}
+
+\newcommand{\algCatTy}{\textrm{Cat}}
+\newcommand{\algCatQt}{\textrm{CatQt}}
+\newcommand{\algCatUnqt}{\textrm{CatUnQt}}
+
+\newcommand{\algTransTy}{\textrm{Trans}}
+\newcommand{\algTransQt}{\textrm{TransQt}}
+\newcommand{\algTransUnqt}{\textrm{TransUnQt}}
+
+\newcommand{\algVarrQt}{\textrm{FunctQt}}
+\newcommand{\algVarrUnqt}{\textrm{FunctUnQt}}
+
+\newcommand{\quoth}[1]{\lceil{} {#1}\rceil{}}
+\newcommand{\unquoth}[1]{\lfloor{} {#1}\rfloor{}}
+
+\newcommand{\postfixop}{\,\,\mathrm{op}}
+
+\newcommand{\citet}[1]{\cite{#1}}
+\newcommand{\citep}[1]{(\cite{#1})}
+
+\title{A Type Theory for Monoidal Virtual Equipments}
+
+\maketitle
+
+Caveat: I haven't checked the semantics against monoidal virtual
+equipments, but instead based it off of semantics in categories
+enriched in a symmetric monoidal category.
+
+\section{Judgmental Structure}
+
+Our judgments are as follows, with their intended enriched semantics:
+\begin{enumerate}
+\item $\cat C \isaCat$, denoting an (enriched) category
+\item $\Gamma \obctx$, also denoting a category
+\item $\Gamma \vdash a : \cat C$ (objects), denoting a functor
+\item $\Gamma \vdash R \isaSet$, denoting a module
+\item $\Gamma \vdash \Phi \isavectx$, denoting a module
+\item $\Gamma\pipe \Delta. \Phi \vdash t : R$, denoting a homomorphism 
+  \[ \int^\Gamma\left(\int_\Delta \Phi(\Delta,\Gamma)\right) \multimap R(\Gamma)\]
+  (unless I got end/coend notation swapped, the outer one is an end)
+\end{enumerate}
+
+Category contexts $\Gamma$ support the following constructs:
+\begin{enumerate}
+\item $\cdot$, empty context
+\item Concatenation $\Gamma,\Delta$
+\item Opposite $\Gamma \postfixop$
+\end{enumerate}
+
+Where concatenation is associative with $\cdot$ the unit and taking
+the opposite is a monoid homomorphism and an involution ($\Gamma
+\postfixop\postfixop = \Gamma$). With variables $\alpha:\cat C$ as
+generators we get the following normal form, that contexts are freely
+generated from:
+\begin{enumerate}
+\item $\cdot$
+\item $\Gamma , \alpha : \cat C$
+\item $\Gamma , ((\alpha : \cat C) \postfixop)$
+\end{enumerate}
+We can represent this as a \emph{mode} on the variables: either
+$\alpha : \cat C$ or $\alpha :^{\mathrm{op}} \cat C$.
+
+\begin{mathpar}
+  \inferrule
+  {\gamma : \Gamma' \to \Gamma \and \Delta\,\,m \vdash a : \cat C\and
+   \Gamma',\Delta' \equiv \Delta
+  }
+  {(\gamma,a/\alpha) : \Delta \to \Gamma, \alpha:^m \cat C}
+
+  \inferrule
+  {}
+  {\cdot : \cdot \to \cdot}
+\end{mathpar}
+
+Our notion of substitution should make the category of contexts a
+symmetric monoidal category with a strong monoidal duality involution.
+
+Terms have an identity rule and an admissible action of substitution
+\begin{mathpar}
+  \inferrule
+  {}
+  {\alpha:\cat C \vdash \alpha:\cat C}
+
+  \inferrule
+  {\gamma : \Delta \to \Gamma \and \Gamma \vdash a : \cat C}
+  {\Delta \vdash a[\gamma] : \cat C}
+\end{mathpar}
+satisfying associativity and unit laws.
+
+Next, we consider the modules, $R$ and $\Phi$, which are checked under
+a $\Gamma$ context. $\Phi$ is closed under the following operations,
+the rules of morphisms in a compact closed category:
+\begin{enumerate}
+\item Identity: $\Gamma \postfixop, \Gamma \vdash \mathrm{hom}(\Gamma)$
+\item Cut:
+  \[ \inferrule{\Gamma,\Delta \vdash \Phi \and \Gamma', \Delta \vdash \Psi}{\Gamma,\Gamma' \vdash \Phi ,^{\Delta} \Psi}\]
+\item Monoidal Unit $\cdot \vdash \cdot$
+\item Tensor
+  \[ \inferrule{\Gamma \vdash \Phi \and \Delta \vdash \Psi}{\Gamma,\Delta \vdash \Phi,\Psi} \]
+\item Generators
+  \[ \inferrule{\Gamma \vdash R}{\Gamma\vdash x:R}\]
+\end{enumerate}
+
+I haven't checked the details, but I believe this has a normal form,
+where we add a ``trace'' constructor (denoting a coend) rather than
+identity/cut:
+\begin{enumerate}
+\item Unit, Tensor and generators as before
+\item Trace:
+  \[ \inferrule{\Gamma,\alpha:\cat C, \alpha:^{\mathrm{op}}\cat C\vdash \Phi}{\Gamma \vdash \exists \alpha^\pm:\cat C. \Phi}\]
+\end{enumerate}
+Here we violate usual PL conventions by having the same name bound
+twice, but this is common in process calculi/session types, where they
+relatedly use something called the ``anti-Barendregt convention''
+(TODO: reference).
+
+I think that all $\Phi$ can be put into a normal form of $\exists \vec
+\alpha. \Phi$ where $\Phi$ is constructed without using the trace
+rule. This depends on isomorphisms like $\Phi \otimes (\exists
+\alpha. \Psi) \equiv \exists \alpha. \Phi \otimes \Psi$ existing in
+the model (plus a coherence theorem?).
+
+Then the module judgment has an admissible action of substitution,
+which in a virtual equipment semantics is the restriction of a
+horizontal arrow along vertical arrows:
+\[ \inferrule{\Gamma \vdash R \and \gamma : \Delta \to \Gamma}{\Delta \vdash R[\gamma]}\]
+satisfying associativity/unit laws.
+
+Next, we have transformation terms with formation rule
+\[ \inferrule{\Gamma \vdash \Phi \and \Gamma\vdash R}{\Gamma \pipe \Phi \vdash t : R} \]
+and transformation substitutions
+\[ \inferrule
+   {\gamma : \Delta \to \Gamma \and \Delta \vdash \Psi\and\Gamma \vdash \Phi}
+   {\gamma \pipe \phi : \Psi \to \Phi} \]
+Generated by
+\begin{enumerate}
+\item Trace
+  \[ \inferrule
+     {\delta : \Delta' \to \Delta\and
+      \gamma,\delta \pipe \phi : \Psi \to \Phi
+     }
+     {\gamma \pipe (\delta, \phi) : \exists \Delta'. \Psi \to \exists \Delta. \Phi}\]
+\item Unit
+  \[ \cdot \pipe \cdot \to \cdot \]
+\item Tensor
+  \[ \inferrule{\gamma\pipe \phi : \Psi \to \Phi \and \gamma'\pipe \phi' : \Psi' \to \Phi'}{\gamma,\gamma'\pipe \phi,\phi' : \Psi , \Psi' \to \Phi , \Phi'}\]
+\item Term
+  \[ \inferrule{\Psi \vdash t : R[\gamma]}{\gamma\pipe t/x : \Psi \to x:R}\]
+\end{enumerate}
+
+We can define identity and composition of substitutions, as well as an
+action of substitutions on terms:
+
+\begin{mathpar}
+  \inferrule{~}{\Gamma \pipe x:R \vdash x:R}
+
+  \inferrule{\Gamma\pipe\Phi \vdash t : R \and \gamma\pipe \phi : \Delta \pipe \Psi \to \Gamma \pipe \Phi}{\Delta\pipe\Psi \vdash t[\phi] : R[\gamma]}
+\end{mathpar}
+Satisfying unit and associativity laws.
+
+\section{Connectives}
+
+The more flexible judgmental structure allows for more definable
+connectives. For categories: functor categories, opposite categories,
+Grothendieck construction, universes/module classifiers (i.e.,
+\textrm{Set}).
+
+For profunctors, the more flexible $\Phi$ contexts should allow for a
+decomposition of the VETT connective $\tensorexistsXwithYandZ \alpha P
+Q$ into separate connectives for the tensor product $P \otimes Q$ and
+the co-end $\exists \alpha^\pm. R$, and a monoidal unit as well. The
+universal property of such connectives should be the invertible left
+rules:
+
+\begin{mathpar}
+  \inferrule
+  {\Gamma\pipe \Phi(\cdot) \vdash R}
+  {\Gamma\pipe \Phi(x:I) \vdash R}
+
+  \inferrule
+  {\Gamma\pipe \Phi(x_1:P, x_2:Q) \vdash R}
+  {\Gamma\pipe \Phi(x:P \otimes Q) \vdash R}
+
+  \inferrule
+  {\Gamma,\alpha:\cat C,\alpha^{\mathrm{op}}:\cat C\pipe \Phi(y:P) \vdash R}
+  {\Gamma\pipe \Phi(x:\exists \alpha^\pm. P) \vdash R}
+\end{mathpar}
+
+The hom, though will still be a mixed quantifier/hom rule, however,
+but allowing for multiple variables to be quantified:
+\begin{mathpar}
+  \inferrule
+  {\Gamma,\Delta,\Delta \postfixop \pipe \Phi , x : P \vdash Q}
+  {\Gamma\pipe\Phi \vdash \monhomrallXYtoZ {\Delta} P Q}
+\end{mathpar}
+\end{document}
