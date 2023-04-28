@@ -201,9 +201,8 @@ Our judgments are as follows, with their intended enriched semantics:
 \item $\Gamma \vdash a : \cat C$ (objects), denoting a functor
 \item $\Gamma \vdash R \isaSet$, denoting a module
 \item $\Gamma \vdash \Phi \isavectx$, denoting a module
-\item $\Gamma\pipe \Delta. \Phi \vdash t : R$, denoting a homomorphism 
-  \[ \int^\Gamma\left(\int_\Delta \Phi(\Delta,\Gamma)\right) \multimap R(\Gamma)\]
-  (unless I got end/coend notation swapped, the outer one is an end)
+\item $\Gamma\pipe \Phi \vdash t : R$, denoting a homomorphism 
+  \[ \int_\Gamma\Phi(\Gamma) \multimap R(\Gamma)\]
 \end{enumerate}
 
 Category contexts $\Gamma$ support the following constructs:
@@ -328,8 +327,18 @@ Satisfying unit and associativity laws.
 
 The more flexible judgmental structure allows for more definable
 connectives. For categories: functor categories, opposite categories,
-Grothendieck construction, universes/module classifiers (i.e.,
-\textrm{Set}).
+tensor product of categories, Grothendieck construction,
+universes/module classifiers (i.e., \textrm{Set}). Here are some of their
+invertible rules:
+\begin{mathpar}
+  \inferrule{{\Gamma,\alpha:\cat C \vdash \cat D}}{\Gamma \vdash \cat C \multimap \cat D}\and
+
+  \inferrule{\Gamma(\alpha_1:\cat C,\alpha_2: \cat D) \vdash\cat E}{\Gamma(\alpha:\cat C \otimes \cat D) \vdash \cat E}
+
+  \inferrule{\Gamma\postfixop \vdash \cat C}{\Gamma \vdash \cat C^{\mathrm{op}}}
+
+  \inferrule{\Gamma \vdash \Phi}{\Gamma \vdash \mathrm{q}(\Phi) : \mathcal U}
+\end{mathpar}
 
 For profunctors, the more flexible $\Phi$ contexts should allow for a
 decomposition of the VETT connective $\tensorexistsXwithYandZ \alpha P
