@@ -258,7 +258,7 @@ the rules of morphisms in a compact closed category:
 \begin{enumerate}
 \item Identity: $\Gamma \postfixop, \Gamma \vdash \mathrm{hom}(\Gamma)$
 \item Cut:
-  \[ \inferrule{\Gamma,\Delta \vdash \Phi \and \Gamma', \Delta \vdash \Psi}{\Gamma,\Gamma' \vdash \Phi ,^{\Delta} \Psi}\]
+  \[ \inferrule{\Gamma,\Delta \vdash \Phi \and \Gamma', \Delta \postfixop \vdash \Psi}{\Gamma,\Gamma' \vdash \Phi ,^{\Delta} \Psi}\]
 \item Monoidal Unit $\cdot \vdash \cdot$
 \item Tensor
   \[ \inferrule{\Gamma \vdash \Phi \and \Delta \vdash \Psi}{\Gamma,\Delta \vdash \Phi,\Psi} \]
@@ -337,7 +337,7 @@ invertible rules:
 
   \inferrule{\Gamma\postfixop \vdash \cat C}{\Gamma \vdash \cat C^{\mathrm{op}}}
 
-  \inferrule{\Gamma \vdash \Phi}{\Gamma \vdash \mathrm{q}(\Phi) : \mathcal U}
+  \inferrule{\Gamma \vdash R}{\Gamma \vdash \mathrm{q}(R) : \mathcal U}
 \end{mathpar}
 
 For profunctors, the more flexible $\Phi$ contexts should allow for a
